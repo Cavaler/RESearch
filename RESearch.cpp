@@ -1,4 +1,5 @@
 #include "RESearch.h"
+#include "ViewFind\ViewFind.h"
 #include "EditFind\EditFind.h"
 #include "FileFind\FileFind.h"
 #include "FileTools\FileTools.h"
@@ -8,7 +9,7 @@ void WINAPI GetPluginInfo(PluginInfo *Info) {
 	static const char *ConfigStrings[]={GetMsg(MRESearch)};
 	static const char *MenuStrings[]={GetMsg(MRESearch)};
 	Info->StructSize=sizeof(PluginInfo);
-	Info->Flags=PF_EDITOR|PF_FULLCMDLINE;
+	Info->Flags=PF_EDITOR|PF_VIEWER|PF_FULLCMDLINE;
 	Info->DiskMenuStringsNumber=0;
 	Info->PluginMenuStrings=MenuStrings;
 	Info->PluginMenuStringsNumber=1;
@@ -269,10 +270,21 @@ int ShowEditorMenu() {
 	strcpy(MenuItems[0].Text,GetMsg(MMenuSearch));
 	strcpy(MenuItems[1].Text,GetMsg(MMenuReplace));
 	strcpy(MenuItems[2].Text,GetMsg(MMenuFilterText));
-	strcpy(MenuItems[3].Text,GetMsg(MMenuSearchAgain));
+	strcpy(MenuItems[3].Text,GetMsg(MMenuSearchReplaceAgain));
 	MenuItems[4].Separator=TRUE;
 	strcpy(MenuItems[5].Text,GetMsg(MMenuUTF8Converter));
-	return StartupInfo.Menu(StartupInfo.ModuleNumber,-1,-1,0,FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT,GetMsg(MRESearch),
+	return StartupInfo.Menu(StartupInfo.ModuleNumber,-1,-1,0,FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT,GetMsg(MMenuHeader),
+		NULL,"EditorMenu",NULL,NULL,MenuItems,sizeof(MenuItems)/sizeof(MenuItems[0]));
+}
+
+int ShowViewerMenu() {
+	FarMenuItem MenuItems[4];
+	memset(MenuItems,0,sizeof(MenuItems));
+	strcpy(MenuItems[0].Text,GetMsg(MMenuSearch));
+	strcpy(MenuItems[1].Text,GetMsg(MMenuSearchAgain));
+	MenuItems[2].Separator=TRUE;
+	strcpy(MenuItems[3].Text,GetMsg(MMenuUTF8Converter));
+	return StartupInfo.Menu(StartupInfo.ModuleNumber,-1,-1,0,FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT,GetMsg(MMenuHeader),
 		NULL,"EditorMenu",NULL,NULL,MenuItems,sizeof(MenuItems)/sizeof(MenuItems[0]));
 }
 
@@ -356,6 +368,27 @@ HANDLE WINAPI OpenPlugin(int OpenFrom,int Item) {
 			};
 			break;
 		case 5:
+			UTF8Converter();
+			break;
+		}
+		return INVALID_HANDLE_VALUE;
+
+	case OPEN_VIEWER:
+		switch (ShowViewerMenu()) {
+		case 0:
+			if (ViewerSearch()) LastAction = 0;
+			break;
+		case 1:
+			switch (LastAction) {
+			case -1:
+				if (EditorSearch()) LastAction = 0;
+				break;
+			default:
+				if (ViewerSearchAgain()) LastAction = 0;
+				break;
+			}
+			break;
+		case 3:
 			UTF8Converter();
 			break;
 		}

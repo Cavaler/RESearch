@@ -20,6 +20,7 @@ CFG=RESearch - Win32 Release
 !MESSAGE "RESearch - Win32 Release" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE "RESearch - Win32 Debug" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE "RESearch - Win32 Release Intel" (based on "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "RESearch - Win32 Release NET" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE 
 
 # Begin Project
@@ -56,7 +57,7 @@ BSC32=bscmake.exe
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386
 # ADD LINK32 PavelMD.lib pcreMD.lib kernel32.lib user32.lib advapi32.lib /nologo /version:4.2 /subsystem:windows /dll /machine:I386 /out:"RESearch.dll" /force:multiple
-# SUBTRACT LINK32 /pdb:none /debug
+# SUBTRACT LINK32 /pdb:none
 
 !ELSEIF  "$(CFG)" == "RESearch - Win32 Debug"
 
@@ -115,6 +116,37 @@ LINK32=link.exe
 # ADD LINK32 LibCTinyMDI.lib PavelMDI.lib pcreMDI.lib kernel32.lib user32.lib advapi32.lib /nologo /version:4.0 /subsystem:windows /dll /machine:I386 /out:"RESearch.dll.icl" /force:multiple
 # SUBTRACT LINK32 /pdb:none
 
+!ELSEIF  "$(CFG)" == "RESearch - Win32 Release NET"
+
+# PROP BASE Use_MFC 0
+# PROP BASE Use_Debug_Libraries 0
+# PROP BASE Output_Dir "RESearch___Win32_Release_NET"
+# PROP BASE Intermediate_Dir "RESearch___Win32_Release_NET"
+# PROP BASE Ignore_Export_Lib 1
+# PROP BASE Target_Dir ""
+# PROP Use_MFC 0
+# PROP Use_Debug_Libraries 0
+# PROP Output_Dir "Release_NET"
+# PROP Intermediate_Dir "Release_NET"
+# PROP Ignore_Export_Lib 1
+# PROP Target_Dir ""
+# ADD BASE CPP /nologo /G6 /Zp2 /MD /W3 /GX /Oy /Ob2 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "PCRE_STATIC" /D "FAR_USE_NAMESPACE" /FD /c
+# SUBTRACT BASE CPP /YX
+# ADD CPP /nologo /G6 /Zp2 /MD /W3 /GX /Oy /Ob2 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "PCRE_STATIC" /D "FAR_USE_NAMESPACE" /D _USE_COMPILER=VC7 /FD /c
+# SUBTRACT CPP /YX
+# ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
+# ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
+# ADD BASE RSC /l 0x809 /d "NDEBUG"
+# ADD RSC /l 0x809 /d "NDEBUG"
+BSC32=bscmake.exe
+# ADD BASE BSC32 /nologo
+# ADD BSC32 /nologo
+LINK32=link.exe
+# ADD BASE LINK32 PavelMD.lib pcreMD.lib kernel32.lib user32.lib advapi32.lib /nologo /version:4.2 /subsystem:windows /dll /machine:I386 /out:"RESearch.dll" /force:multiple
+# SUBTRACT BASE LINK32 /pdb:none
+# ADD LINK32 PavelMD7.lib pcreMD7.lib kernel32.lib user32.lib advapi32.lib /nologo /version:4.2 /subsystem:windows /dll /machine:I386 /out:"RESearch7.dll" /D_USE_COMPILER=VC7 /force:multiple
+# SUBTRACT LINK32 /pdb:none
+
 !ENDIF 
 
 # Begin Target
@@ -122,6 +154,7 @@ LINK32=link.exe
 # Name "RESearch - Win32 Release"
 # Name "RESearch - Win32 Debug"
 # Name "RESearch - Win32 Release Intel"
+# Name "RESearch - Win32 Release NET"
 # Begin Group "EditFind Sources"
 
 # PROP Default_Filter ""
@@ -182,24 +215,44 @@ SOURCE=.\FileTools\FileTools.cpp
 SOURCE=.\FileTools\FileTools.h
 # End Source File
 # End Group
+# Begin Group "ViewFind Sources"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\ViewFind\ViewCommon.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\ViewFind\ViewFind.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\ViewFind\ViewSearch.cpp
+# End Source File
+# End Group
 # Begin Group "Header Files"
 
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=\Cpp\Include\EasyReg.h
+SOURCE=\CPP\Include\CRegExp.h
 # End Source File
 # Begin Source File
 
-SOURCE=\Cpp\Include\FAR.h
+SOURCE=\CPP\Include\EasyReg.h
 # End Source File
 # Begin Source File
 
-SOURCE=\Cpp\Include\FarDlg.h
+SOURCE=\CPP\Include\FAR.h
 # End Source File
 # Begin Source File
 
-SOURCE=\Cpp\Include\FarKeys.hpp
+SOURCE=\CPP\Include\FarDlg.h
+# End Source File
+# Begin Source File
+
+SOURCE=\CPP\Include\FarKeys.hpp
 # End Source File
 # Begin Source File
 
@@ -207,7 +260,11 @@ SOURCE=\CPP\Include\pcre\pcre.h
 # End Source File
 # Begin Source File
 
-SOURCE=\Cpp\Include\Plugin.hpp
+SOURCE=\CPP\Include\Plugin.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=\CPP\Include\plugin_viewer.hpp
 # End Source File
 # Begin Source File
 
@@ -219,7 +276,7 @@ SOURCE=\CPP\Include\ptr.h
 # End Source File
 # Begin Source File
 
-SOURCE=\Cpp\Include\StringEx.h
+SOURCE=\CPP\Include\StringEx.h
 # End Source File
 # Begin Source File
 

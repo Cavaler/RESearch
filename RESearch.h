@@ -24,6 +24,7 @@ using namespace std;
 #include <FarKeys.hpp>
 #include <pcre\pcre.h>
 #include <CRegExp.h>
+#include <CMapping.h>
 
 #include "Presets.h"
 
@@ -84,6 +85,7 @@ enum {
 	MMenuUnselect,
 	MMenuFlipSelection,
 	MMenuSearchAgain,
+	MMenuSearchReplaceAgain,
 	MMenuFilterText,
 	MMenuUTF8Converter,
 
