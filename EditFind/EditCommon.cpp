@@ -1,28 +1,5 @@
 #include "EditFind.h"
 
-int LastAction=-1;
-
-string EText;
-BOOL ERegExp;
-BOOL ESeveralLine;
-BOOL ECaseSensitive;
-string ERReplace;
-BOOL ERRemoveEmpty;
-BOOL ERRemoveNoMatch;
-BOOL EReverse=FALSE;
-BOOL EInSelection;
-BOOL EUTF8=FALSE;
-
-string ETextUpcase;
-pcre *EPattern=NULL;
-pcre_extra *EPatternExtra=NULL;
-int *Match=NULL;
-int MatchCount=0;
-char *MatchedLine=NULL;
-int MatchedLineLength=0;
-
-int SelStartLine,SelStartPos,SelEndLine,SelEndPos,SelType;
-
 CParameterBatch g_ESBatch(1, 4,
 	"Text", &SearchText,
 	"IsRegExp", &ERegExp, "CaseSensitive", &ECaseSensitive, "SeveralLine", &ESeveralLine, "UTF8", &EUTF8
@@ -36,12 +13,6 @@ CParameterBatch g_EFBatch(1, 4,
 	"Text", &SearchText,
 	"LeaveFilter", &EFLeaveFilter, "IsRegExp", &ERegExp, "CaseSensitive", &ECaseSensitive, "UTF8", &EUTF8
 					 );
-
-CESPresetCollection *ESPresets;
-CERPresetCollection *ERPresets;
-CEFPresetCollection *EFPresets;
-CPresetBatchCollection *ERBatch;
-CPresetBatchCollection *EFBatch;
 
 void EReadRegistry(HKEY Key) {
 	QueryRegStringValue(Key,"EText",EText,"");

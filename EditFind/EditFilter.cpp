@@ -1,7 +1,5 @@
 #include "EditFind.h"
 
-BOOL EFLeaveFilter;
-
 BOOL EditorFilterAgain() {
 	EditorInfo EdInfo;
 	StartupInfo.EditorControl(ECTL_GETINFO,&EdInfo);

@@ -24,54 +24,90 @@ public:
 
 extern CParameterBatch g_FSBatch;
 extern CParameterBatch g_FRBatch;
-extern CFSPresetCollection *FSPresets;
-extern CFRPresetCollection *FRPresets;
-extern CPresetBatchCollection *FRBatch;
+EXTERN CFSPresetCollection *FSPresets;
+EXTERN CFRPresetCollection *FRPresets;
+EXTERN CPresetBatchCollection *FRBatch;
 
-extern BOOL FCaseSensitive;
-extern SearchAs FSearchAs;
-extern SearchIn FSearchIn;
-extern string FMask;
-extern BOOL FMaskAsRegExp;
-extern MaskCase FMaskCase;
-extern eReplaceReadonly FRReplaceReadonly;
-extern string FText;
-extern BOOL FUTF8;
+EXTERN BOOL FCaseSensitive;
+EXTERN SearchAs FSearchAs;
+EXTERN SearchIn FSearchIn;
+EXTERN string FMask;
+EXTERN BOOL FMaskAsRegExp;
+EXTERN MaskCase FMaskCase;
+EXTERN eReplaceReadonly FRReplaceReadonly;
+EXTERN string FText;
+EXTERN BOOL FUTF8 VALUE(FALSE);
 
-extern BOOL FSInverse;
-extern BOOL FAllCharTables;
-extern string FRReplace;
-extern BOOL FROpenModified;
-extern BOOL FRConfirmFile;
-extern BOOL FRConfirmLine;
-extern BOOL FRSaveOriginal;
-extern BOOL FRepeating;
+EXTERN BOOL FSInverse;
+EXTERN BOOL FAllCharTables;
+EXTERN string FRReplace;
+EXTERN BOOL FROpenModified;
+EXTERN BOOL FRConfirmFile;
+EXTERN BOOL FRConfirmLine;
+EXTERN BOOL FRSaveOriginal;
+EXTERN BOOL FRepeating;
 
-extern BOOL FAdvanced;
-extern BOOL FACaseSensitive;
-extern BOOL FADirectoryCaseSensitive;
-extern BOOL FASearchHead;
-extern DWORD FASearchHeadLimit;
+// Advanced options
+EXTERN BOOL FAdvanced VALUE(FALSE);
+EXTERN BOOL FACaseSensitive;
+EXTERN BOOL FADirectoryCaseSensitive;
+EXTERN BOOL FAFullFileNameMatch;
+EXTERN BOOL FAFullFileNameInverse;
+EXTERN string FAFullFileName;
 
-extern string FTextUpcase;
-extern pcre *FPattern;
-extern pcre_extra *FPatternExtra;
-extern vector<string> FSWords;
+EXTERN BOOL FADirectoryMatch;
+EXTERN BOOL FADirectoryInverse;
+EXTERN string FADirectoryName;
+EXTERN DWORD FARecursionLevel;
 
-extern string MaskText;
-extern string SearchText;
-extern string ReplaceText;
+EXTERN BOOL FADateBefore;
+EXTERN FILETIME FADateBeforeThis;
+EXTERN BOOL FADateAfter;
+EXTERN FILETIME FADateAfterThis;
+EXTERN BOOL FAModificationDate;
 
-extern int  FileConfirmed,FRConfirmFileThisRun,FRConfirmReadonlyThisRun;
-extern int  FRConfirmLineThisRun,FRConfirmLineThisFile;
+EXTERN BOOL FASizeLess;
+EXTERN DWORD FASizeLessLimit;
+EXTERN BOOL FASizeGreater;
+EXTERN DWORD FASizeGreaterLimit;
 
-extern PluginPanelItem *PanelItems;
-extern int ItemsNumber;
+EXTERN DWORD FAAttributesSet;
+EXTERN DWORD FAAttributesCleared;
+
+EXTERN BOOL FASearchHead;
+EXTERN DWORD FASearchHeadLimit;
+
+// Internals
+
+EXTERN string FTextUpcase;
+EXTERN pcre *FPattern;
+EXTERN pcre_extra *FPatternExtra;
+EXTERN vector<string> FSWords;
+
+EXTERN pcre *FMaskPattern VALUE(NULL);
+EXTERN pcre_extra *FMaskPatternExtra VALUE(NULL);
+
+EXTERN pcre *FAFullFileNamePattern VALUE(NULL);
+EXTERN pcre_extra *FAFullFileNamePatternExtra VALUE(NULL);
+EXTERN pcre *FADirectoryPattern VALUE(NULL);
+EXTERN pcre_extra *FADirectoryPatternExtra VALUE(NULL);
+EXTERN DWORD CurrentRecursionLevel;
+EXTERN int  FilesScanned;
+
+EXTERN string MaskText;
+EXTERN string SearchText;
+EXTERN string ReplaceText;
+
+EXTERN int  FileConfirmed,FRConfirmFileThisRun,FRConfirmReadonlyThisRun;
+EXTERN int  FRConfirmLineThisRun,FRConfirmLineThisFile;
+
+EXTERN PluginPanelItem *PanelItems;
+EXTERN int ItemsNumber;
 
 typedef char XLatTable[256];
-extern XLatTable *XLatTables;
-extern XLatTable *UpCaseXLatTables;
-extern int XLatTableCount;
+EXTERN XLatTable *XLatTables;
+EXTERN XLatTable *UpCaseXLatTables;
+EXTERN int XLatTableCount;
 
 typedef void (*ProcessFileProc)(WIN32_FIND_DATA *FindData,PluginPanelItem **PanelItems,int *ItemsNumber);
 

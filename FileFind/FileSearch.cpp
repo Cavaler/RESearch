@@ -1,7 +1,5 @@
 #include "FileFind.h"
 
-vector<string> FSWords;
-
 void XLatBuffer(BYTE *Buffer,int Length,int Table) {
 	for (register int I=0;I<Length;I++) Buffer[I]=XLatTables[Table][Buffer[I]];
 }

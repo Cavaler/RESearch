@@ -26,26 +26,35 @@ using namespace std;
 
 #include "Presets.h"
 
-extern int SeveralLines;
-extern BOOL AllowEmptyMatch;
-extern BOOL DotMatchesNewline;
-extern bool g_bUseSeparateThread;
-extern int  g_nMaxInThreadLength;
-extern int  g_nThreadStackMB;
+#ifdef DEFINE_VARS
+#define EXTERN
+#define VALUE(n) = n
+#else
+#define EXTERN extern
+#define VALUE(n)
+#endif
 
-extern int ReadAtOnceLimit;
-extern char MaskDelimiter;
-extern char MaskNegation;
-extern BOOL AutoappendAsterisk;
-enum ShowPosition {SP_TOP,SP_CENTER,SP_BOTTOM};
-extern ShowPosition EShowPosition;
-extern int EShowPositionOffset;
-extern int ERightSideOffset;
-enum FindTextAtCursor {FT_NONE,FT_WORD,FT_ANY};
-extern FindTextAtCursor EFindTextAtCursor;
-extern BOOL EFindSelection;
+// Common
+EXTERN int  SeveralLines;
+EXTERN BOOL AllowEmptyMatch;
+EXTERN BOOL DotMatchesNewline;
+EXTERN bool g_bUseSeparateThread;
+EXTERN int  g_nMaxInThreadLength;
+EXTERN int  g_nThreadStackMB;
 
-extern BOOL Interrupt;
+EXTERN int  ReadAtOnceLimit;
+EXTERN char MaskDelimiter;
+EXTERN char MaskNegation;
+EXTERN BOOL AutoappendAsterisk;
+enum   ShowPosition {SP_TOP,SP_CENTER,SP_BOTTOM};
+EXTERN ShowPosition EShowPosition;
+EXTERN int  EShowPositionOffset;
+EXTERN int ERightSideOffset;
+enum   FindTextAtCursor {FT_NONE,FT_WORD,FT_ANY};
+EXTERN FindTextAtCursor EFindTextAtCursor;
+EXTERN BOOL EFindSelection;
+
+EXTERN BOOL Interrupt;
 
 enum OperationResult {OR_CANCEL,OR_FAILED,OR_OK,OR_PANEL};
 
@@ -239,7 +248,7 @@ BOOL LoadPresets(char *Which,char **StringNames,int StringCount,char **IntNames,
 BOOL SavePresets(char *Which,char **StringNames,int StringCount,char **IntNames,int IntCount,void *PresetData,int PresetCount);
 BOOL Interrupted();
 
-extern char UpCaseTable[256];
+EXTERN char UpCaseTable[256];
 void SetANSILocale();
 int BMHSearch(const char *Buffer,int BufferLength,const char *String,int StringLength,char *XLatTable,int nPattern = 0);
 int ReverseBMHSearch(const char *Buffer,int BufferLength,const char *String,int StringLength,char *XLatTable,int nPattern = 0);

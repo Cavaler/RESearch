@@ -1,8 +1,5 @@
 #include "FileFind.h"
 
-PluginPanelItem *PanelItems=NULL;
-int ItemsNumber=0;
-
 void WINAPI GetOpenPluginInfo(HANDLE hPlugin,OpenPluginInfo *Info) {
 	CTemporaryPanel *Panel=(CTemporaryPanel *)hPlugin;
 	if (Panel) Panel->GetOpenPluginInfo(Info);

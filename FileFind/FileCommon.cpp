@@ -1,74 +1,5 @@
 #include "FileFind.h"
 
-BOOL FCaseSensitive;
-SearchAs FSearchAs;
-SearchIn FSearchIn;
-string FMask;
-BOOL FMaskAsRegExp;
-MaskCase FMaskCase;
-eReplaceReadonly FRReplaceReadonly;
-string FText;
-BOOL FUTF8=FALSE;
-
-BOOL FSInverse;
-BOOL FAllCharTables;
-string FRReplace;
-BOOL FROpenModified,FRConfirmFile,FRConfirmLine,FRSaveOriginal;
-BOOL FRepeating;
-
-BOOL FAdvanced=0;
-BOOL FAFullFileNameMatch;
-BOOL FACaseSensitive;
-BOOL FAFullFileNameInverse;
-string FAFullFileName;
-
-BOOL FADirectoryMatch;
-BOOL FADirectoryCaseSensitive;
-BOOL FADirectoryInverse;
-string FADirectoryName;
-DWORD FARecursionLevel;
-
-BOOL FADateBefore;
-FILETIME FADateBeforeThis={0,0};
-BOOL FADateAfter;
-FILETIME FADateAfterThis={0,0};
-BOOL FAModificationDate;
-
-BOOL FASizeLess;
-DWORD FASizeLessLimit;
-BOOL FASizeGreater;
-DWORD FASizeGreaterLimit;
-BOOL FASearchHead;
-DWORD FASearchHeadLimit;
-
-DWORD FAAttributesSet;
-DWORD FAAttributesCleared;
-
-string FTextUpcase;
-pcre *FPattern=NULL;
-pcre_extra *FPatternExtra=NULL;
-
-pcre *FMaskPattern=NULL;
-pcre_extra *FMaskPatternExtra=NULL;
-
-pcre *FAFullFileNamePattern=NULL;
-pcre_extra *FAFullFileNamePatternExtra=NULL;
-pcre *FADirectoryPattern=NULL;
-pcre_extra *FADirectoryPatternExtra=NULL;
-DWORD CurrentRecursionLevel;
-
-string MaskText;
-string SearchText;
-string ReplaceText;
-
-int  FileConfirmed,FRConfirmFileThisRun,FRConfirmReadonlyThisRun;
-int  FRConfirmLineThisRun, FRConfirmLineThisFile;
-int  FilesScanned;
-
-XLatTable *XLatTables;
-XLatTable *UpCaseXLatTables;
-int XLatTableCount;
-
 CParameterBatch g_FSBatch(2, 5,
 	 "Mask", &MaskText, "Text", &SearchText,
 	"MaskAsRegExp", &FMaskAsRegExp, "CaseSensitive", &FCaseSensitive,
@@ -79,10 +10,6 @@ CParameterBatch g_FRBatch(3, 4,
 	"MaskAsRegExp", &FMaskAsRegExp, "CaseSensitive", &FCaseSensitive,
 	"UTF8", &FUTF8, "SearchAs", &FSearchAs
 	);
-
-CFSPresetCollection *FSPresets;
-CFRPresetCollection *FRPresets;
-CPresetBatchCollection *FRBatch;
 
 void FReadRegistry(HKEY Key) {
 	QueryRegIntValue(Key,"FCaseSensitive",&FCaseSensitive,0,0,1);

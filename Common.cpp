@@ -1,26 +1,9 @@
+#define DEFINE_VARS
 #include "RESearch.h"
 #include "FileFind\FileFind.h"
 #include "FileTools\FileTools.h"
 #include "EditFind\EditFind.h"
 #include "UTF8.h"
-
-int SeveralLines;
-BOOL AllowEmptyMatch;
-BOOL DotMatchesNewline;
-bool g_bUseSeparateThread;
-int  g_nMaxInThreadLength;
-int  g_nThreadStackMB;
-
-int ReadAtOnceLimit;
-char MaskDelimiter,MaskNegation;
-BOOL AutoappendAsterisk;
-ShowPosition EShowPosition;
-int EShowPositionOffset;
-int ERightSideOffset;
-FindTextAtCursor EFindTextAtCursor;
-BOOL EFindSelection;
-
-BOOL Interrupt;
 
 HKEY OpenRegistry() {
 	HKEY Key;
@@ -288,8 +271,6 @@ BOOL Interrupted() {
 	} while (Read);
 	return FALSE;
 }
-
-char UpCaseTable[256];
 
 void SetANSILocale() {
 	char Locale[10];
