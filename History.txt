@@ -5,10 +5,10 @@ Regular Expression Search and Replace
  - Bug fixed
  * Minor change
 
-Version 4.30 (xx.11.2004)
+Version 4.30 (29.11.2004)
 	- Presets/batches with special characters in names saved correctly.
 	# WARNING! Sorry, but you'll lose presets/batches saved from previous versions
-
+    + 'Renumber files' feature on panels
 
 Version 4.25 (29.09.2004)
 	* Replacing macros in form ${N+0001} force right-alignment with zeros (4 digits in this case)
