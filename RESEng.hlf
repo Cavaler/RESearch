@@ -2,7 +2,7 @@
 .PluginContents=Regular Expression Search
 
 @Contents
-$ #Regular Expression Search and Replace, version 4.30#
+$ #Regular Expression Search and Replace, version 4.35#
     This plugin allows you to:
 
     - Perform text search and replace in editor
@@ -575,6 +575,8 @@ should be (previously selected files will be moved to a separate area)
   #Enter/Click#   Select next available number for a file
   #F7#            Reset next available numbers
   #Ctrl-Up/Down#  Move file up/down
+  #Gray +/-#      Change initial number up/down by 1
+  #Ctrl- Gray+/-# Change initial number up/down by 10
   #F10#           Perform rename
   #Esc#           Cancel
 @FRenameError

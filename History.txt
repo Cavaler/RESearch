@@ -5,6 +5,10 @@ Regular Expression Search and Replace
  - Bug fixed
  * Minor change
 
+Version 4.35 (15.05.2005)
+	- Fixed saving of postfix for file renumbering
+	* (Ctrl-)+/- in renumber menu change initial number
+
 Version 4.30 (29.11.2004)
 	- Presets/batches with special characters in names saved correctly.
 	# WARNING! Sorry, but you'll lose presets/batches saved from previous versions
