@@ -137,7 +137,7 @@ BOOL FindMemoryMapped(char *FileName,BOOL (*Searcher)(char *,int)) {
 				if (FileData==NULL) throw;
 
 				DWORD FileSize=GetFileSize(hFile,NULL);
-				if (FASearchHead&&(FileSize>FASearchHeadLimit)) FileSize=FASearchHeadLimit;
+				if (FAdvanced && FASearchHead && (FileSize>FASearchHeadLimit)) FileSize=FASearchHeadLimit;
 				IsFound=Searcher(FileData,FileSize);
 				UnmapViewOfFile(FileData);
 			} __finally {CloseHandle(hMap);}
