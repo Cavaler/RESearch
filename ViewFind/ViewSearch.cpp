@@ -135,11 +135,11 @@ BOOL ViewerSearch() {
 
 	Dialog.Add(new CFarTextItem(5,4,DIF_BOXCOLOR|DIF_SEPARATOR,""));
 	Dialog.Add(new CFarCheckBoxItem(5,5,0,MRegExp,&ERegExp));
-	Dialog.Add(new CFarCheckBoxItem(30,5,0,MSeveralLine,&ESeveralLine));
+	Dialog.Add(new CFarCheckBoxItem(30,5,DIF_DISABLE,MSeveralLine,&ESeveralLine));
 	Dialog.Add(new CFarCheckBoxItem(5,6,0,MCaseSensitive,&ECaseSensitive));
 	Dialog.Add(new CFarCheckBoxItem(30,6,0,"",&EUTF8));
 	Dialog.Add(new CFarButtonItem(34,6,0,0,MUTF8));
-	Dialog.Add(new CFarCheckBoxItem(5,7,0,MReverseSearch,&EReverse));
+	Dialog.Add(new CFarCheckBoxItem(5,7,DIF_DISABLE,MReverseSearch,&EReverse));
 	Dialog.AddButtons(MOk,MCancel);
 	Dialog.Add(new CFarButtonItem(60,5,0,0,MPresets));
 
@@ -154,7 +154,7 @@ BOOL ViewerSearch() {
 			if (ERegExp) QuoteRegExpString(SearchText);
 			break;
 		case 2:
-//			VSPresets->ShowMenu(g_ESBatch);
+			VSPresets->ShowMenu(g_VSBatch);
 			break;
 		case 3:
 			UTF8Converter(SearchText);
@@ -167,4 +167,35 @@ BOOL ViewerSearch() {
 	EText=SearchText;
 	if (!EText.empty()) ViewerSearchAgain();
 	return TRUE;
+}
+
+BOOL CVSPresetCollection::EditPreset(CPreset *pPreset) {
+	CFarDialog Dialog(76,14,"VSPresetDlg");
+	Dialog.AddFrame(MVSPreset);
+	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
+	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,"RESearch.PresetName",pPreset->m_strName));
+
+	Dialog.Add(new CFarTextItem(5,4,0,MSearchFor));
+	Dialog.Add(new CFarEditItem(5,5,70,DIF_HISTORY,"SearchText", pPreset->m_mapStrings["Text"]));
+
+	Dialog.Add(new CFarCheckBoxItem(5,7,0,MRegExp,&pPreset->m_mapInts["IsRegExp"]));
+	Dialog.Add(new CFarCheckBoxItem(5,8,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
+	Dialog.Add(new CFarCheckBoxItem(30,7,0,MSeveralLine,&pPreset->m_mapInts["SeveralLine"]));
+	Dialog.Add(new CFarCheckBoxItem(30,8,0,"",&pPreset->m_mapInts["UTF8"]));
+	Dialog.Add(new CFarButtonItem(34,8,0,0,MUTF8));
+	Dialog.AddButtons(MOk,MCancel);
+
+	do {
+		switch (Dialog.Display(2, -2, -3)) {
+		case 0:
+			return TRUE;
+		case 1:{		// avoid Internal Error for icl
+			string str = pPreset->m_mapStrings["SearchText"];
+			UTF8Converter(str);
+			break;
+			  }
+		default:
+			return FALSE;
+		}
+	} while (true);
 }
