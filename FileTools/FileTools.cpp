@@ -417,7 +417,7 @@ void ProcessNames(vector<string> &arrFileNames, vector<string> &arrProcessedName
 		string strName = arrFileNames[nItem];
 
 		vector<string> arrMatches;
-		if (reStrip.Match(strName, 0, &arrMatches)) {
+		if (reStrip.Match(strName, PCRE_ANCHORED, &arrMatches)) {
 			strName.erase(0, arrMatches[0].length());
 		}
 		char szNumber[16];
@@ -510,6 +510,7 @@ OperationResult RenumberFiles() {
 			return OR_OK;
 		}
 	} while (true);
+	return OR_CANCEL;
 }
 
 BOOL CRPresetCollection::EditPreset(CPreset *pPreset) {
