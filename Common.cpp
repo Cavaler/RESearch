@@ -299,7 +299,7 @@ typedef int BMHTable[256];
 typedef struct {BMHTable m_Table;} BMHTableRec;
 vector<BMHTableRec> g_BMHTables;
 
-void PrepareBMHSearch(const char *String,int StringLength,int nPattern) {
+void PrepareBMHSearch(const char *String,int StringLength,size_t nPattern) {
 	if (nPattern >= g_BMHTables.size()) g_BMHTables.resize(nPattern+1);
 
 	BMHTable &g_BMHTable = g_BMHTables[nPattern].m_Table;
@@ -345,7 +345,7 @@ string UTF8ToHex(string &strUTF8) {
 	char szBuffer[6];
 	wstring wstrUnicode = DecodeUTF8(strUTF8);
 	string strHex;
-	for (int nIndex = 0; nIndex < wstrUnicode.length(); nIndex++) {
+	for (size_t nIndex = 0; nIndex < wstrUnicode.length(); nIndex++) {
 		sprintf(szBuffer, "%04X ", wstrUnicode[nIndex]);
 		strHex += szBuffer;
 	}
@@ -354,7 +354,7 @@ string UTF8ToHex(string &strUTF8) {
 
 string HexToUTF8(string &strHex) {
 	wstring wstrUnicode;
-	int nStart = 0;
+	size_t nStart = 0;
 	while (nStart < strHex.length()) {
 		while (isspace(strHex[nStart])) nStart++;
 		int nEnd = nStart;
@@ -410,7 +410,7 @@ void UTF8Converter(string strInit) {
 }
 
 void QuoteRegExpString(string &strText) {
-	for (int I=0; I<strText.length();I++) {
+	for (size_t I=0; I<strText.length();I++) {
 		if (strchr("()[]{}\\^$+*.?",strText[I])) {
 			strText.insert(I++, 1, '\\');
 			continue;
@@ -419,7 +419,7 @@ void QuoteRegExpString(string &strText) {
 }
 
 void QuoteReplaceString(string &strText) {
-	for (int I=0; I<strText.length();I++) {
+	for (size_t I=0; I<strText.length();I++) {
 		if ((strText[I] == '\\') || (strText[I] == '$')) {
 			strText.insert(I++, 1, '\\');
 			continue;

@@ -252,7 +252,7 @@ BOOL EPreparePattern(string &SearchText) {
 	if (!ERegExp) {
 		ETextUpcase=SearchText;
 		if (!ECaseSensitive) {
-			for (int I=0; I<SearchText.size(); I++)
+			for (size_t I=0; I<SearchText.size(); I++)
 				ETextUpcase[I] = UpCaseTable[(unsigned char)SearchText[I]];
 		}
 

@@ -135,7 +135,7 @@ int FPreparePattern() {
 	if ((FSearchAs==SA_PLAINTEXT)||(FSearchAs==SA_MULTITEXT)) {
 		FTextUpcase=FText;
 		if (!FCaseSensitive) {
-			for (int I=0; I<FText.size(); I++)
+			for (size_t I=0; I<FText.size(); I++)
 				FTextUpcase[I] = UpCaseTable[(unsigned char)FText[I]];
 		}
 	}
@@ -188,7 +188,7 @@ int AddSlash(char *Directory) {
 	return Len;
 }
 
-BOOL MaskApplies(string &Mask,int Start,char *Filename,BOOL AppendAsterisk) {
+BOOL MaskApplies(string &Mask,size_t Start,char *Filename,BOOL AppendAsterisk) {
 	if (Start>=Mask.size()) return AppendAsterisk||(Filename[0]==0);
 
 	switch (Mask[Start]) {

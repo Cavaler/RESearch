@@ -107,7 +107,7 @@ CPresetCollection::CPresetCollection() {
 }
 
 CPresetCollection::~CPresetCollection() {
-	for (int nPreset=0; nPreset < size(); nPreset++) delete at(nPreset);
+	for (size_t nPreset=0; nPreset < size(); nPreset++) delete at(nPreset);
 }
 
 void CPresetCollection::Load() {
@@ -145,7 +145,7 @@ void CPresetCollection::Save() {
 		RegDeleteKey(hKey,szCurrentKey);
 	} while (TRUE);
 
-	for (int nPreset=0; nPreset<size(); nPreset++)
+	for (size_t nPreset=0; nPreset<size(); nPreset++)
 		at(nPreset)->Save(hKey);
 
 	RegCloseKey(hKey);
@@ -156,7 +156,7 @@ int CPresetCollection::ShowMenu(CParameterBatch &Batch) {
 	vector<string> arrItems;
 	do {
 		arrItems.resize(size());
-		for (int nPreset = 0; nPreset < size(); nPreset++)
+		for (size_t nPreset = 0; nPreset < size(); nPreset++)
 			arrItems[nPreset] = at(nPreset)->m_strName;
 
 		int nBreakKey;
@@ -167,7 +167,7 @@ int CPresetCollection::ShowMenu(CParameterBatch &Batch) {
 
 		switch (nBreakKey) {
 		case -1:
-			if (&Batch && (nResult < size())) at(nResult)->Apply(Batch);
+			if (&Batch && (nResult < (int)size())) at(nResult)->Apply(Batch);
 			return nResult;
 		case 0:{
 			CPreset *pPreset = new CPreset(Batch);
@@ -181,7 +181,7 @@ int CPresetCollection::ShowMenu(CParameterBatch &Batch) {
 			break;
 			  }
 		case 1:
-			if (nResult < size()) {
+			if (nResult < (int)size()) {
 				const char *Lines[]={"Delete", GetMsg(MDeletePresetQuery),
 					at(nResult)->m_strName.c_str(), GetMsg(MOk), GetMsg(MCancel)};
 				if (StartupInfo.Message(StartupInfo.ModuleNumber, FMSG_WARNING, "DeletePreset", Lines, 5, 2)==0) {
@@ -192,7 +192,7 @@ int CPresetCollection::ShowMenu(CParameterBatch &Batch) {
 			}
 			break;
 		case 2:
-			if (nResult < size()) {
+			if (nResult < (int)size()) {
 				if (EditPreset(at(nResult))) Save();
 			}
 			break;
@@ -201,7 +201,7 @@ int CPresetCollection::ShowMenu(CParameterBatch &Batch) {
 }
 
 CPreset *CPresetCollection::operator()(int nID) {
-	for (int nPreset = 0; nPreset < size(); nPreset++) {
+	for (size_t nPreset = 0; nPreset < size(); nPreset++) {
 		if (at(nPreset)->m_nID == nID) return at(nPreset);
 	}
 	return NULL;
@@ -209,7 +209,7 @@ CPreset *CPresetCollection::operator()(int nID) {
 
 int CPresetCollection::FindUnusedID() {
 	int nID = 1;
-	for (int nPreset = 0; nPreset < size(); nPreset++) {
+	for (size_t nPreset = 0; nPreset < size(); nPreset++) {
 		int nCurID = at(nPreset)->m_nID;
 		if (nCurID >= nID) nID = nCurID+1;
 	}
@@ -217,7 +217,7 @@ int CPresetCollection::FindUnusedID() {
 }
 
 void CPresetCollection::ValidateIDs() {
-	for (int nPreset = 0; nPreset < size(); nPreset++) {
+	for (size_t nPreset = 0; nPreset < size(); nPreset++) {
 		if (at(nPreset)->m_nID == 0)
 			at(nPreset)->m_nID = FindUnusedID();
 	}
@@ -259,7 +259,7 @@ void CPresetBatch::Save(int nID, HKEY hKey) {
 	SetRegIntValue(hOwnKey, "Count", size());
 
 	char szKeyName[16];
-	for (int nIndex = 0; nIndex < size(); nIndex++) {
+	for (size_t nIndex = 0; nIndex < size(); nIndex++) {
 		sprintf(szKeyName, "%08X", nIndex);
 		SetRegIntValue(hOwnKey, szKeyName, at(nIndex));
 	}
@@ -280,7 +280,7 @@ int CPresetBatch::ShowMenu() {
 
 	do {
 		arrItems.resize(size());
-		for (int nPreset = 0; nPreset < size(); nPreset++)
+		for (size_t nPreset = 0; nPreset < size(); nPreset++)
 			arrItems[nPreset] = (*this)(nPreset)->m_strName;
 
 		int nBreakKey;
@@ -307,7 +307,7 @@ int CPresetBatch::ShowMenu() {
 			}
 			break;
 		case 2:
-			if ((nResult >= 0) && (nResult < size()-1)) {
+			if ((nResult >= 0) && (nResult < (int)size()-1)) {
 				int nSave = at(nResult+1);
 				at(nResult+1) = at(nResult);
 				at(nResult) = nSave;
@@ -315,7 +315,7 @@ int CPresetBatch::ShowMenu() {
 			}
 			break;
 		case 3:
-			if (nResult < size()) {
+			if (nResult < (int)size()) {
 				erase(begin() + nResult);
 			}
 			break;
@@ -356,7 +356,7 @@ m_pCollection(pCollection)
 }
 
 CPresetBatchCollection::~CPresetBatchCollection() {
-	for (int nBatch=0; nBatch < size(); nBatch++) delete at(nBatch);
+	for (size_t nBatch=0; nBatch < size(); nBatch++) delete at(nBatch);
 }
 
 void CPresetBatchCollection::Save() {
@@ -372,7 +372,7 @@ void CPresetBatchCollection::Save() {
 		RegDeleteKey(hKey, szCurrentKey);
 	} while (TRUE);
 
-	for (int nBatch=0; nBatch<size(); nBatch++)
+	for (size_t nBatch=0; nBatch<size(); nBatch++)
 		at(nBatch)->Save(nBatch, hKey);
 
 	RegCloseKey(hKey);
@@ -384,7 +384,7 @@ int CPresetBatchCollection::ShowMenu(BatchExecutor Executor, CParameterBatch &Ba
 
 	do {
 		arrItems.resize(size());
-		for (int nBatch = 0; nBatch < size(); nBatch++)
+		for (size_t nBatch = 0; nBatch < size(); nBatch++)
 			arrItems[nBatch] = at(nBatch)->m_strName;
 
 		int nBreakKey;
@@ -395,13 +395,13 @@ int CPresetBatchCollection::ShowMenu(BatchExecutor Executor, CParameterBatch &Ba
 
 		switch (nBreakKey) {
 		case -1:
-			if (Executor && (nResult < size())) {
+			if (Executor && (nResult < (int)size())) {
 				CPresetBatch *pBatch = at(nResult);
 				const char *Lines[]={"Execute", GetMsg(MExecuteBatchQuery),
 					pBatch->m_strName.c_str(), GetMsg(MOk), GetMsg(MCancel)};
 				if (StartupInfo.Message(StartupInfo.ModuleNumber, FMSG_WARNING, "ExecuteBatch", Lines, 5, 2) != 0) break;
 
-				for (int nPreset = 0; nPreset < pBatch->size(); nPreset++) {
+				for (size_t nPreset = 0; nPreset < pBatch->size(); nPreset++) {
 					CPreset *pPreset = (*pBatch)(nPreset);
 					if (pPreset) {
 						pPreset->Apply(Batch);
@@ -423,7 +423,7 @@ int CPresetBatchCollection::ShowMenu(BatchExecutor Executor, CParameterBatch &Ba
 			break;
 			  }
 		case 1:
-			if (nResult < size()) {
+			if (nResult < (int)size()) {
 				const char *Lines[]={"Delete", GetMsg(MDeleteBatchQuery),
 					at(nResult)->m_strName.c_str(), GetMsg(MOk), GetMsg(MCancel)};
 				if (StartupInfo.Message(StartupInfo.ModuleNumber, FMSG_WARNING, "DeleteBatch", Lines, 5, 2)==0) {
@@ -434,7 +434,7 @@ int CPresetBatchCollection::ShowMenu(BatchExecutor Executor, CParameterBatch &Ba
 			}
 			break;
 		case 2:
-			if (nResult < size()) {
+			if (nResult < (int)size()) {
 				at(nResult)->ShowMenu();
 				Save();
 			}

@@ -74,7 +74,7 @@ BOOL ViewerSearchAgain() {
 	if (!szData) return FALSE;
 	szData += VInfo.CurMode.Unicode ? Info.CurPos*2 : Info.CurPos;
 
-	long nOffset = Info.CurPos;
+	long nOffset = (long)Info.CurPos;
 	int nMatchCount = ERegExp ? pcre_info(EPattern, NULL, NULL) + 1 : 0;
 	int *pMatch = ERegExp ? new int[nMatchCount*3] : NULL;
 
@@ -86,10 +86,10 @@ BOOL ViewerSearchAgain() {
 		int nLineOffset = Info.LeftPos;
 		do {
 			if (Interrupted()) break;
-			strLine = GetNextLine(VInfo, szData, VInfo.FileSize.i64-nOffset, &nEOLLen);
+			strLine = GetNextLine(VInfo, szData, (long)(VInfo.FileSize.i64-nOffset), &nEOLLen);
 			if (strLine.empty() && !nEOLLen) break;
 			if (!ECaseSensitive)
-				for (int n=0; n<strLine.size(); n++) strLine[n] = UpCaseTable[(BYTE)strLine[n]];
+				for (size_t n=0; n<strLine.size(); n++) strLine[n] = UpCaseTable[(BYTE)strLine[n]];
 
 			if (ERegExp) {
 				if (pcre_exec(EPattern, EPatternExtra, strLine.data(), strLine.length()-nLineOffset, nLineOffset, 0, pMatch, nMatchCount*3)>=0) {

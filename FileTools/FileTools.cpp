@@ -413,7 +413,7 @@ void ProcessNames(vector<string> &arrFileNames, vector<string> &arrProcessedName
 	arrProcessedNames.resize(0);
 	CRegExp reStrip(g_strStrip, PCRE_CASELESS);
 
-	for (int nItem = 0; nItem < arrFileNames.size(); nItem++) {
+	for (size_t nItem = 0; nItem < arrFileNames.size(); nItem++) {
 		string strName = arrFileNames[nItem];
 
 		vector<string> arrMatches;
@@ -429,7 +429,7 @@ void ProcessNames(vector<string> &arrFileNames, vector<string> &arrProcessedName
 }
 
 void PerformRename(vector<string> &arrFileNames, vector<string> &arrProcessedNames) {
-	for (int nItem = 0; nItem < arrFileNames.size(); nItem++) {
+	for (size_t nItem = 0; nItem < arrFileNames.size(); nItem++) {
 		MoveFile(arrFileNames[nItem].c_str(), arrProcessedNames[nItem].c_str());
 	}
 }
@@ -498,7 +498,7 @@ OperationResult RenumberFiles() {
 			}
 			break;
 		case 3:
-			if ((nPosition >= nOK) && (nPosition < arrFileNames.size()-1)) {
+			if ((nPosition >= nOK) && (nPosition < (int)arrFileNames.size()-1)) {
 				string strNext = arrFileNames[nPosition+1];
 				arrFileNames[nPosition+1] = arrFileNames[nPosition];
 				arrFileNames[nPosition] = strNext;
