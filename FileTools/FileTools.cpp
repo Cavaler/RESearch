@@ -16,6 +16,7 @@ CParameterBatch g_QRBatch(2, 2,
 
 int FileNumber;
 bool FTAskOverwrite;
+int g_nStartWithNow;
 
 void FTReadRegistry(HKEY Key) {
 	QueryRegStringValue(Key, "FTRStrip",   g_strStrip,   "^\\d+\\s*([-.]\\s*)?");
@@ -421,7 +422,7 @@ void ProcessNames(vector<string> &arrFileNames, vector<string> &arrProcessedName
 			strName.erase(0, arrMatches[0].length());
 		}
 		char szNumber[16];
-		sprintf(szNumber, "%0*d", g_nWidth, nItem+g_nStartWith);
+		sprintf(szNumber, "%0*d", g_nWidth, nItem+g_nStartWithNow);
 		strName = g_strPrefix + szNumber + g_strPostfix + strName;
 
 		arrProcessedNames.push_back(strName);
@@ -439,6 +440,7 @@ OperationResult RenumberFiles() {
 	StartupInfo.Control(INVALID_HANDLE_VALUE,FCTL_GETPANELINFO,&PInfo);
 	if (PInfo.PanelType != PTYPE_FILEPANEL) return OR_FAILED;
 	if (PInfo.Plugin && ((PInfo.Flags&PFLAGS_REALNAMES)==0)) return OR_FAILED;
+	g_nStartWithNow = g_nStartWith;
 
 	vector<string> arrFileNames;
 	for (int nItem = 0; nItem < PInfo.SelectedItemsNumber; nItem++)
@@ -447,7 +449,7 @@ OperationResult RenumberFiles() {
 	int BreakKeys[] = {
 		VK_F2, VK_F7,
 		(PKF_CONTROL<<16)|VK_UP, (PKF_CONTROL<<16)|VK_DOWN,
-		VK_F10, 0
+		VK_ADD, (PKF_CONTROL<<16)|VK_ADD, VK_SUBTRACT, (PKF_CONTROL<<16)|VK_SUBTRACT, VK_F10, 0
 	};
 
 	bool bOriginal = false;
@@ -464,7 +466,7 @@ OperationResult RenumberFiles() {
 		if (nPosition >= nOK) nPosition++;
 
 		int nBreakKey = 0;
-		nPosition = ChooseMenu(arrNames, GetMsg(MRenumber), "F2, F7, Ctrl-\x18\x19, F10-Go", "Renumber",
+		nPosition = ChooseMenu(arrNames, GetMsg(MRenumber), "F2, F7, Ctrl-\x18\x19, (Ctrl-)+/-, F10-Go", "Renumber",
 			nPosition, FMENU_WRAPMODE, BreakKeys, &nBreakKey);
 		if (nPosition >= nOK) nPosition--; else
 			if (nPosition < 0) nPosition = -2;		// -1 is not Esc
@@ -506,6 +508,18 @@ OperationResult RenumberFiles() {
 			}
 			break;
 		case 4:
+			g_nStartWithNow++;
+			break;
+		case 5:
+			g_nStartWithNow+=10;
+			break;
+		case 6:
+			if (g_nStartWithNow > 0) g_nStartWithNow--;
+			break;
+		case 7:
+			if (g_nStartWithNow > 10) g_nStartWithNow -= 10; else g_nStartWithNow = 0;
+			break;
+		case 8:
 			PerformRename(arrFileNames, arrProcessedNames);
 			return OR_OK;
 		}
