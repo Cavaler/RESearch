@@ -3,6 +3,7 @@
 #include "FileFind\FileFind.h"
 #include "FileTools\FileTools.h"
 #include "EditFind\EditFind.h"
+#include "ViewFind\ViewFind.h"
 #include "UTF8.h"
 
 HKEY OpenRegistry() {
@@ -34,6 +35,7 @@ void ReadRegistry() {
 	QueryRegBoolValue(Key,"EFindSelection",&EFindSelection,TRUE);
 
 	EReadRegistry(Key);
+	VReadRegistry(Key);
 	FReadRegistry(Key);
 	FTReadRegistry(Key);
 	RegCloseKey(Key);
@@ -60,6 +62,7 @@ void WriteRegistry() {
 	SetRegBoolValue(Key,"EFindSelection",EFindSelection);
 
 	EWriteRegistry(Key);
+	VWriteRegistry(Key);
 	FWriteRegistry(Key);
 	FTWriteRegistry(Key);
 	RegCloseKey(Key);
