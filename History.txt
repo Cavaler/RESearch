@@ -1,0 +1,230 @@
+Regular Expression Search and Replace
+
+ ! Major change
+ + Feature added
+ - Bug fixed
+ * Minor change
+
+Version 4.30 (xx.11.2004)
+	- Presets/batches with special characters in names saved correctly.
+	# WARNING! Sorry, but you'll lose presets/batches saved from previous versions
+
+
+Version 4.25 (29.09.2004)
+	* Replacing macros in form ${N+0001} force right-alignment with zeros (4 digits in this case)
+    * Compiled with MSVC instead of ICL
+
+Version 4.20 (05.05.2004)
+	+ Batch replace/filter/rename command execution
+	+ Shows last 10 files found during search
+	* Compiled with Intel C++ compiler 8.0
+	* PCRE library version 4.5 used
+	- "Volume-dependent" mask case on NTFS now works as "case-insensitive"
+	- Fixed hangup using Multiple plain text/regular expression search
+
+Version 4.16 (19.08.2003)
+	- Russian language file fixed
+	- Contact info in help file updated
+
+Version 4.15 (04.07.2003)
+	* Creating regexp thread only on demand, and stopping after one minute of inactivity
+	* "Quote" buttons moved away in tab order
+	* "Hex" added to UTF-8 Converter
+	+ "Filter text" in editor - leave/delete lines matching a specified pattern
+
+Version 4.10 (06.05.2003)
+	+ Can execute regexp match in separate thread with larger stack, avoiding
+		crash on very long lines/multi-line fragments
+	+ Uses updated dialog library - bugs possible, but Far 1.70 features will be
+		used soon
+	* Standard 'Ok/All/Skip/Cancel' in prompt to overwrite existing file while renaming
+	* Faster attribute checking method
+	+ More compiler-level speed optimization used, though increased size as well
+
+Version 4.01 (21.04.2003)
+	- Intel-compiled version does not crash Far
+
+Version 4.00 (17.04.2003)
+	! Compiled with Intel C++ Compiler 6.0, optimizing for PII. If by some reason
+		this version does not work, you can use still-included MSVC-compiled version
+	+ Using STLport library - should be some bit faster
+	+ PCRE 4.1 used
+	! UTF-8 support in regular expressions. Read help for more details
+	- Crashes when adding a preset fixed
+	* Parameter '.* matches no extension' deleted (always ON)
+	* Parameter 'Always add "*"' renamed to 'Filemask should match only beginning
+		of filename'
+	* Optional confirmation for replacing in read-only files added
+	* When "Confirm each replacement" is on, "All Files" confirmation disables it
+		for all files during this run
+	* More properties saved in presets
+	* "AltaVista-like" renamed to "Multiple plain text"
+	* "AltaVista with regular expressions" renamed to "Multiple regular expressions"
+	* "Advanced | Full path matches" renamed to "Full file name matches"
+	+ Added advanced search parameters controlling directory recursion:
+		"Recursion level" and "Full directory name matches"
+	* Added inversion of "Advanced | Full file name matches"
+	* Added possibility to quote special symbols in search/replace strings
+
+Version 3.90 (23.08.02)
+	+ Can search from panels only in first bytes of file
+	* Dates in Advanced settings can be set to Current by button
+	+ Replace in readonly files supported
+	- Fixed errors with situations like '\L\U' in replace line
+	- Proper replace in edtor when line count changes
+	- $R and $N were mistankenly swapped in help
+	- $N is no more equal to $L
+	* $L/$N/$R usage for file replace and renaming described in help
+
+Version 3.82 (04.02.02)
+	- 'Search in selected' can have selected folders in result
+	- Repeating Plain text QuickRename does not hang up
+	- $N was shifted by 1 when using QuickRename on '..' entry
+	- ? Tried to search in all plugin panels
+
+Version 3.81 (02.02.02)
+	- File Search mode was not saved in registry
+	- Fixed 'Search in selected'
+
+Version 3.80 (01.02.02)
+	+ Can search/replace in results and other RealNames plugin panels under Far 1.70 beta 4
+	+ Modified command-line interface
+	* Advanced options include "Directory" as attribute
+
+Version 3.75 (28.11.01)
+	- Repeating rename will not loop
+	- 'Rename Files' dialog did not work
+	* \c (\C) in replace - flip case
+
+Version 3.70 (20.11.01)
+	+ Default mask case sensivity can be configured and changed any time
+	* Finer displaying of long/multiline strings in replace prompts
+	+ Added presets to Rename Files and Rename Selected Files
+	- Added "Search in all local non-removable drives" option to Rename Files dialog
+
+Version 3.60 (25.10.01)
+	* Missing help topics added
+	* Replace All in editor is now interruptable
+	- Deleting file from temporary panel (F7) works
+	- 'Several Lines' configuration moved to 'Common'
+	+ Advanced search options can test either creation or modification time
+	* Allowing zero-width matches is now configurable
+	- Fixes for zero-width matches in editor and panels
+	- Fixed "^." matching everywhere in RegExp replace in panels
+	- Fixed Several-Line RegExp replace in panels
+	* 'All' button in Editor|Replace dialog
+	+ Several temporary panels, can add files to them
+	* Dot in regexps can now optionally match newline character as well
+
+Version 3.51, 3.52 (13.09.2001)
+	- Garbage at end of lines after "\n"
+	* Final position after replace is position of last found/replacement
+	* Selection resized after replace in selection
+	* Several-line search/replace in editor is now optional
+	- No "No more found" after Cancelling replace
+	- Single-line replace crashing fix
+	- Multi-line replace removed wrong lines
+	- Did not search till the end of file if replace string had more lines than original
+
+Version 3.50 (15.08.2001)
+	! Advanced file search options
+	! Several-line search/replace in editor (Use Ctrl-Q,Ctrl-Enter as newline
+for plain text)
+	* Added "Search in all local non-removable drives" option
+	* Only static version shipped
+	* Removed screen blinking after "Could not find the string..." in editor
+	* Fixed displaying editor search progress
+	* Fixed Ctrl+PgUp in Search Results panel
+	* BackSpace from Search Results panel now works as going to ".."
+
+Version 3.10 (17.06.2001)
+	+ Now "\n" in editor replace is handled cleanly, elimintaing need to
+reload editing file.
+	+ Fixed bug with loop when replacing text contains initial.
+	* Rename selected files processes all files if invoked from ".." entry with
+no files selected
+	+ Codepages in editor handled correctly (Michael Samanov pushed me)
+	+ Help fixed: '\nn' instead of '$nn' is used for back-referencing in
+regular expressions. (Noted: Michael Samanov)
+	+ Replace string syntax changed for more conformance with Perl: you can surround
+number following '$' with curly brackets '{}' instead of additional '$' to separate from
+the subsequent text: Instead of '$1$23'=>'${1}23', and '$1$$2'=>'$1$2'  (Michael Samanov pushed me)
+	+ $N, $L, $R in replacement string are now case-insensitive. To add offset, surround
+with '{}': like '${N+3}'
+
+Version 3.05 (03.03.2001)
+	- Fixed bug with .LNG
+	- Fixed bug with searching in editor
+
+Version 3.00 (29.01.2001)
+	+ 'Search in all character tables' option in File Search
+	+ 'In selection only' option for Editor Replace
+	! New command - "Rename selected files"
+	+ Now uses Boyere-Moore algorithm for plain text search, much faster
+	* Shortcuts from temporary panel are created correctly
+	- Fixed bug with case-insensivity not working in editor search with Cyrillic.
+	* (internal) Now uses class library for dialogs - bugs possible
+
+Version 2.80 (30.12.2000)
+	- 'Word' characters in regular expressions now include Cyrillic letters
+	- Fixed problem with selecting wrong controls using text label hotkeys
+	* Changed many hotkeys (Note: some .REG files were changed also!)
+Thanks to Roman Pekhov!
+	* File open/create error messages are now displayed
+	- Fixed problem with some help topics
+	* If search brought no results, essage is given instead of empty result panel
+	- Fixed bug with 'Del' in empty presets menu
+	* Timeslices are now released during lengthy operations
+	* Search progress is also updated every 100 files
+	* Search progess is shown upon search/replace in editor
+	+ Screen is not redrawn upon "Replace All" in editor
+	* Horizontal offset of found text from right screen side now can be specified
+	* Editor search/replace process can be interrupted by 'Esc'
+	+ 'Find text at cursor' option
+	+ If single-line selection exist, its text is default search text (superceding
+'Find text at cursor' option)
+
+Version 2.75 (29.11.2000)
+	- Fixed bug with '\\' in 'File Replace' as 'Plain Text'
+	* Added help for Select Files and Rename Files dialogs
+	+ 'Search in Selected Folders' changed to 'Search in Selected' and now searches
+also in selected files (matching mask) in current folder
+	+ Search with empty 'Text' string finds folders also
+	- Fixed bug with saving some 'File Replace' settings to registry
+	* 'Search in Selected' now searches highlighted file instead of all, if no
+	files are selected
+
+Version 2.7 (11.11.2000)
+	+ Now presets can be created in Edit/File Search/Replace dialogs
+	+ In replace string, when inserting back-reference ($nnn), it can be terminated
+with second '$'
+	- Fixed serious bug with "Save modified files" option causing files to be deleted
+	- Fixed bug with not working [ ] Case Sensitive in File Search dialog
+	+ Replace confirmation dialog now does not hide highlighted line
+
+Version 2.6 (27.09.2000)
+	+ Regular expression now can be used as a file mask
+	+ New function: 'Regular Expression Rename'
+	+ New function: 'Regular Expression Select/Unselect'
+
+Version 2.5 (20.09.2000)
+	+ Position of line with text found in editor can be changed
+	+ In editor several new replacement macros defined:
+		$l - current line
+		$r - current replace number
+		$n - current line, counted from replace start
+		They can be modified as $Lnnnn$, in this case nnnn (may be negative as well)
+is added to a number to be inserted
+	- Fixed bug with \l, \u in replace
+	- Fixed bugs with "Remove not matched lines"
+	* Now linked with MSVCRT.dll instead of static runtime
+	* Combined into single DLL
+	* Only one string in menu, expanding to a submenu.
+
+Version 2.4 (06.09.2000)
+	- Fixed bug with GPF while searching in files/showing strange data in panel
+	+ Search speed in editor greatly increased (about 60 times)
+
+Version 2.3 (30.07.2000)
+	+ Full command-line support (see help)
+	+ "Remove empty lines" and "Remove not matched lines" in Editor->Replace

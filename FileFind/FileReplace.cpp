@@ -1,0 +1,461 @@
+#include "FileFind.h"
+
+BOOL ConfirmFileReadonly(char *FileName) {
+	if (FRConfirmReadonlyThisRun) return TRUE;
+	if (FRReplaceReadonly == RR_NEVER) return FALSE;
+	const char *Lines[]={
+		GetMsg(MREReplace),GetMsg(MTheFile),FileName,GetMsg(MModifyReadonlyRequest),
+		GetMsg(MOk),GetMsg(MAll),GetMsg(MSkip),GetMsg(MCancel)
+	};
+	switch (StartupInfo.Message(StartupInfo.ModuleNumber,0,"FRConfirmReadonly",Lines,8,4)) {
+	case 1:FRConfirmReadonlyThisRun=FALSE;
+	case 0:return TRUE;
+	case 3:Interrupt=TRUE;
+	}
+	return FALSE;
+}
+
+BOOL ConfirmReplacement(char *Found,char *Replaced,char *FileName) {
+	if (!FRConfirmLineThisFile) return TRUE;
+	if (Interrupt) return FALSE;
+	const char *Lines[]={
+		GetMsg(MREReplace),GetMsg(MAskReplace),Found,GetMsg(MAskWith),Replaced,
+		GetMsg(MInFile),FileName,GetMsg(MReplace),GetMsg(MAll),GetMsg(MAllFiles),GetMsg(MSkip),GetMsg(MCancel)
+	};
+	switch (StartupInfo.Message(StartupInfo.ModuleNumber,0,"FRAskReplace",Lines,12,5)) {
+	case 2:FRConfirmLineThisRun=FALSE;
+	case 1:FRConfirmLineThisFile=FALSE;
+	case 0:return TRUE;
+	case 4:Interrupt=TRUE;
+	}
+	return FALSE;
+}
+
+BOOL WriteBuffer(HANDLE hFile,void *Buffer,DWORD BufLen,char *FileName) {
+	DWORD WrittenBytes;
+	if (!WriteFile(hFile,Buffer,BufLen,&WrittenBytes,NULL)||
+		(WrittenBytes!=BufLen)) {
+		const char *Lines[]={GetMsg(MREReplace),GetMsg(MFileWriteError),FileName,GetMsg(MOk)};
+		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"FRWriteError",Lines,4,1);
+		return FALSE;
+	} else return TRUE;
+}
+
+BOOL DoReplace(HANDLE &hFile,char *&Found,int FoundLen,char *Replace,int ReplaceLength,char *&Skip,int SkipLen,WIN32_FIND_DATA *FindData) {
+	if (hFile==INVALID_HANDLE_VALUE) {
+		if (!ConfirmFile(MREReplace,FindData->cFileName)) return FALSE;
+		if (FindData->dwFileAttributes&FILE_ATTRIBUTE_READONLY) {
+			if (!ConfirmFileReadonly(FindData->cFileName)) return FALSE;
+			SetFileAttributes(FindData->cFileName,FindData->dwFileAttributes&~FILE_ATTRIBUTE_READONLY);
+		}
+		hFile=CreateFile(FindData->cFileName,GENERIC_WRITE,0,NULL,CREATE_ALWAYS,
+			FindData->dwFileAttributes,INVALID_HANDLE_VALUE);
+		if (hFile==INVALID_HANDLE_VALUE) {
+			const char *Lines[]={GetMsg(MREReplace),GetMsg(MFileOpenError),FindData->cFileName,GetMsg(MOk)};
+			StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"FRCreateError",Lines,4,1);
+			return FALSE;
+		}
+	}
+
+	if (!WriteBuffer(hFile,Skip,SkipLen,FindData->cFileName)) return FALSE;
+
+	char *szFound=(char *)malloc(FoundLen+1);
+	strncpy(szFound,Found,FoundLen);szFound[FoundLen]=0;
+
+	if (ConfirmReplacement(szFound,Replace,FindData->cFileName)) {
+		if (!WriteBuffer(hFile,Replace,ReplaceLength,FindData->cFileName)) return FALSE;
+	} else {
+		if (!WriteBuffer(hFile,Found,FoundLen,FindData->cFileName)) return FALSE;
+	}
+	Skip=Found+FoundLen;Found+=(FoundLen)?FoundLen:1;
+	return TRUE;
+}
+
+BOOL FinishReplace(HANDLE hFile,char *&Skip,int SkipLen,WIN32_FIND_DATA *FindData) {
+	if (hFile!=INVALID_HANDLE_VALUE) {
+		WriteBuffer(hFile,Skip,SkipLen,FindData->cFileName);
+		CloseHandle(hFile);
+		if (FindData->dwFileAttributes&FILE_ATTRIBUTE_READONLY)
+			SetFileAttributes(FindData->cFileName,FindData->dwFileAttributes);
+		return TRUE;
+	} else return FALSE;
+}
+
+BOOL ProcessPlainTextBuffer(char *Buffer,int BufLen,WIN32_FIND_DATA *FindData) {
+	char *Current=Buffer;
+	char *Skip=Buffer;
+	HANDLE hFile=INVALID_HANDLE_VALUE;
+
+	while (Current+FText.size()<=Buffer+BufLen) {
+		if (((FCaseSensitive)?memcmp(Current,FText.data(),FText.size()):_memicmp(Current,FText.data(),FText.size()))==0) {
+			int ReplaceLength;
+			char *Replace=CreateReplaceString(Buffer,NULL,0,FRReplace.c_str(),"\n",NULL,ReplaceLength);
+			if (!DoReplace(hFile,Current,FText.size(),Replace,ReplaceLength,Skip,Current-Skip,FindData)) {free(Replace);break;}
+			free(Replace);
+		} else Current++;
+	}
+
+	return FinishReplace(hFile,Skip,Buffer+BufLen-Skip,FindData);
+}
+
+BOOL ProcessRegExpBuffer(char *Buffer,int BufLen,WIN32_FIND_DATA *FindData) {
+	char *BufEnd=Buffer;
+	char *Skip=Buffer;
+	HANDLE hFile=INVALID_HANDLE_VALUE;
+	int MatchCount=pcre_info(FPattern,NULL,NULL)+1;
+	int *Match=new int[MatchCount*3];
+	BOOL Error=FALSE;
+
+	do {
+		int Start=0;
+		Buffer=BufEnd;
+		SkipNoCRLF(BufEnd,&BufLen);
+		while ((BufEnd!=Buffer)&&do_pcre_exec(FPattern,FPatternExtra,Buffer,BufEnd-Buffer,Start,0,Match,MatchCount*3)>=0) {
+			int ReplaceLength;
+			char *Replace=CreateReplaceString(Buffer,Match,MatchCount,FRReplace.c_str(),"\n",NULL,ReplaceLength);
+			char *NewBuffer=Buffer+Match[0];
+			if (!DoReplace(hFile,NewBuffer,Match[1]-Match[0],Replace,ReplaceLength,Skip,NewBuffer-Skip,FindData)) {
+				free(Replace);Error=TRUE;break;
+			}
+			Start=NewBuffer-Buffer;
+			free(Replace);
+		}
+		SkipCRLF(BufEnd,&BufLen);
+	} while (BufLen&&(!Error));
+
+	delete[] Match;
+	return FinishReplace(hFile,Skip,BufEnd-Skip,FindData);
+}
+
+int CountLinesIn(char *Buffer,int Len) {
+	int LinesIn=0;
+	while (Len) {
+		SkipWholeLine(Buffer,&Len);LinesIn++;
+	}
+	return LinesIn;
+}
+
+BOOL ReplaceSeveralLineBuffer(HANDLE &hFile,char *&Buffer,char *BufEnd,int *Match,int MatchCount,char *&Skip,
+							  int &LinesIn,WIN32_FIND_DATA *FindData) {
+	int Len=BufEnd-Buffer;
+	int Start=0;
+	char *LineEnd=Buffer;
+	int LineLen=Len;
+	SkipWholeLine(LineEnd,&LineLen);
+	while (Len&&do_pcre_exec(FPattern,FPatternExtra,Buffer,Len,Start,0,Match,MatchCount*3)>=0) {
+		int ReplaceLength;
+		char *NewBuffer=Buffer+Match[0];
+		if (NewBuffer>=LineEnd) break;
+		char *Replace=CreateReplaceString(Buffer,Match,MatchCount,FRReplace.c_str(),"\n",NULL,ReplaceLength);
+		if (!DoReplace(hFile,NewBuffer,Match[1]-Match[0],Replace,ReplaceLength,Skip,NewBuffer-Skip,FindData)) {
+			free(Replace);return FALSE;
+		}
+		Start=NewBuffer-Buffer;
+		free(Replace);
+	}
+	Buffer=LineEnd;Len=LineLen;
+	LinesIn=CountLinesIn(Buffer,BufEnd-Buffer);
+	return TRUE;
+}
+
+BOOL ProcessSeveralLineBuffer(char *Buffer,int BufLen,WIN32_FIND_DATA *FindData) {
+	char *BufEnd=Buffer;
+	char *Skip=Buffer;
+	HANDLE hFile=INVALID_HANDLE_VALUE;
+	int LinesIn=0;
+	int MatchCount=pcre_info(FPattern,NULL,NULL)+1;
+	int *Match=new int[MatchCount*3];
+	BOOL Error=FALSE;
+
+	do {
+		SkipWholeLine(BufEnd,&BufLen);
+		LinesIn++;
+		if (LinesIn==SeveralLines) {
+			if (!ReplaceSeveralLineBuffer(hFile,Buffer,BufEnd,Match,MatchCount,Skip,LinesIn,FindData)) {Error=TRUE;break;};
+		}
+	} while (BufLen);
+
+	while (Buffer<BufEnd) {
+		if (!ReplaceSeveralLineBuffer(hFile,Buffer,BufEnd,Match,MatchCount,Skip,LinesIn,FindData)) {Error=TRUE;break;};
+	}
+	delete[] Match;
+	return FinishReplace(hFile,Skip,BufEnd-Skip,FindData);
+}
+
+BOOL ProcessBuffer(char *Buffer,int BufLen,WIN32_FIND_DATA *FindData) {
+	FRConfirmLineThisFile=FRConfirmLineThisRun;
+	FileConfirmed=!FRConfirmFileThisRun;
+	switch (FSearchAs) {
+	case SA_PLAINTEXT:return ProcessPlainTextBuffer(Buffer,BufLen,FindData);
+	case SA_REGEXP:return ProcessRegExpBuffer(Buffer,BufLen,FindData);
+	case SA_SEVERALLINE:return ProcessSeveralLineBuffer(Buffer,BufLen,FindData);
+	}
+	return FALSE;
+}
+
+char *AddExtension(char *FileName,char *Extension) {
+	char *New=(char *)malloc(strlen(FileName)+strlen(Extension)+1);
+	return strcat(strcpy(New,FileName),Extension);
+}
+
+BOOL SequentalReadReplace(WIN32_FIND_DATA *FindData) {
+	char *BackupFileName;
+	BOOL ReturnValue=FALSE;
+
+	BackupFileName=AddExtension(FindData->cFileName,".old");
+
+	if (!MoveFile(FindData->cFileName,BackupFileName)) {
+		const char *Lines[]={GetMsg(MREReplace),GetMsg(MFileOpenError),FindData->cFileName,GetMsg(MOk)};
+		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"FRBackupError",Lines,4,1);
+		free(BackupFileName);
+		return FALSE;
+	}
+
+	__try { __try {
+		HANDLE hFile=CreateFile(BackupFileName,GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+		if (hFile==INVALID_HANDLE_VALUE) throw;
+		__try {
+			HANDLE hMap=CreateFileMapping(hFile,NULL,PAGE_READONLY|SEC_COMMIT,0,0,NULL);
+			if (hMap==NULL) throw;
+			__try {
+				char *FileData=(char *)MapViewOfFile(hMap,FILE_MAP_READ,0,0,0);
+				if (FileData==NULL) throw;
+
+				ReturnValue=ProcessBuffer(FileData,FindData->nFileSizeLow,FindData);
+				UnmapViewOfFile(FileData);
+			} __finally {CloseHandle(hMap);}
+		} __finally {CloseHandle(hFile);}
+
+		if (ReturnValue) {
+			if (!FRSaveOriginal) DeleteFile(BackupFileName);
+		} else {
+			MoveFile(BackupFileName,FindData->cFileName);
+		}
+	} __finally {free(BackupFileName);}
+	} __except (1) {
+		const char *Lines[]={GetMsg(MREReplace),GetMsg(MFileOpenError),FindData->cFileName,GetMsg(MOk)};
+		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"FSOpenError",Lines,4,1);
+		return FALSE;
+	};
+
+	return ReturnValue;
+}
+
+BOOL ReadAtOnceReplace(WIN32_FIND_DATA *FindData) {
+	char *ReadBuffer=(char *)malloc(FindData->nFileSizeLow);
+	char *BackupFileName=NULL;
+	if (!ReadBuffer) return SequentalReadReplace(FindData);
+
+	HANDLE hFile=CreateFile(FindData->cFileName,GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,0,INVALID_HANDLE_VALUE);
+	if (hFile==INVALID_HANDLE_VALUE) {
+		const char *Lines[]={GetMsg(MREReplace),GetMsg(MFileOpenError),FindData->cFileName,GetMsg(MOk)};
+		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"FSOpenError",Lines,4,1);
+		free(ReadBuffer);return FALSE;
+	}
+
+	DWORD ReadBytes;
+	if (!ReadFile(hFile,ReadBuffer,FindData->nFileSizeLow,&ReadBytes,NULL)||(ReadBytes!=FindData->nFileSizeLow)) {
+		const char *Lines[]={GetMsg(MREReplace),GetMsg(MFileReadError),FindData->cFileName,GetMsg(MOk)};
+		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"FRReadError",Lines,4,1);
+		CloseHandle(hFile);free(ReadBuffer);return FALSE;
+	}
+	CloseHandle(hFile);
+
+	if (FRSaveOriginal) {
+		BackupFileName=AddExtension(FindData->cFileName,".old");
+		if (!MoveFile(FindData->cFileName,BackupFileName)) {
+			const char *Lines[]={GetMsg(MREReplace),GetMsg(MFileOpenError),FindData->cFileName,GetMsg(MOk)};
+			StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"FRBackupError",Lines,4,1);
+			free(BackupFileName);free(ReadBuffer);return FALSE;
+		}
+	}
+	BOOL ReturnValue=ProcessBuffer(ReadBuffer,FindData->nFileSizeLow,FindData);
+	if (FRSaveOriginal&&!ReturnValue) {
+		MoveFile(BackupFileName,FindData->cFileName);
+	}
+	free(BackupFileName);free(ReadBuffer);
+	return ReturnValue;
+}
+
+void ReplaceFile(WIN32_FIND_DATA *FindData,PluginPanelItem **PanelItems,int *ItemsNumber) {
+	DWORD MaxSize=ReadAtOnceLimit<<10;
+	BOOL FileReplaced;
+	if (FindData->dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) return;
+	if ((FRReplaceReadonly == RR_NEVER) && (FindData->dwFileAttributes&FILE_ATTRIBUTE_READONLY)) return;
+
+	if ((FindData->nFileSizeHigh>0)||(FindData->nFileSizeLow>MaxSize)) {
+		FileReplaced=SequentalReadReplace(FindData);
+	} else {
+		FileReplaced=ReadAtOnceReplace(FindData);
+	}
+	if (FileReplaced) AddFile(FindData,PanelItems,ItemsNumber);
+}
+
+BOOL FileReplaceExecutor(CParameterBatch &Batch) {
+	FMask=MaskText;
+	FText=SearchText;
+	FRReplace=ReplaceText;
+	if (!FPreparePattern()) return FALSE;
+	if (FUTF8) FAllCharTables=FALSE;
+
+	FRConfirmFileThisRun = FALSE;//FRConfirmFile;
+	FRConfirmReadonlyThisRun = FALSE;//(FRReplaceReadonly == RR_ALWAYS);
+	FRConfirmLineThisRun = FALSE;//FRConfirmLine;
+	ScanDirectories(&PanelItems,&ItemsNumber,ReplaceFile);
+
+	return TRUE;
+}
+
+int ReplacePrompt(BOOL Plugin) {
+	CFarDialog Dialog(76,24,"FileReplaceDlg");
+	Dialog.AddFrame(MREReplace);
+
+	Dialog.Add(new CFarCheckBoxItem(35,2,0,MAsRegExp,&FMaskAsRegExp));
+	Dialog.Add(new CFarTextItem(5,2,0,MMask));
+	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,"Masks", MaskText));
+
+	Dialog.Add(new CFarTextItem(5,4,0,MSearchFor));
+	Dialog.Add(new CFarEditItem(5,5,65,DIF_HISTORY,"SearchText", SearchText));
+
+	Dialog.Add(new CFarTextItem(5,6,0,MReplaceWith));
+	Dialog.Add(new CFarEditItem(5,7,65,DIF_HISTORY,"ReplaceText", ReplaceText));
+
+	Dialog.Add(new CFarButtonItem(67,5,0,0,"&\\"));
+	Dialog.Add(new CFarButtonItem(67,7,0,0,"&/"));
+
+	Dialog.Add(new CFarTextItem(5,8,DIF_BOXCOLOR|DIF_SEPARATOR,""));
+	Dialog.Add(new CFarCheckBoxItem(5,9,0,MCaseSensitive,&FCaseSensitive));
+	Dialog.Add(new CFarRadioButtonItem(5,10,DIF_GROUP,MPlainText,(int *)&FSearchAs,SA_PLAINTEXT));
+	Dialog.Add(new CFarRadioButtonItem(5,11,0,MRegExp,			 (int *)&FSearchAs,SA_REGEXP));
+	Dialog.Add(new CFarRadioButtonItem(5,12,0,MSeveralLineRegExp,(int *)&FSearchAs,SA_SEVERALLINE));
+
+	Dialog.Add(new CFarTextItem(5,13,DIF_BOXCOLOR|DIF_SEPARATOR,""));
+	if (Plugin) {
+		if (FSearchIn<SI_FROMCURRENT) FSearchIn=SI_FROMCURRENT;
+		Dialog.Add(new CFarRadioButtonItem(5,14,DIF_GROUP,MFromCurrent,		(int *)&FSearchIn,SI_FROMCURRENT));
+		Dialog.Add(new CFarRadioButtonItem(5,15,0,MCurrentOnly,		(int *)&FSearchIn,SI_CURRENTONLY));
+		Dialog.Add(new CFarRadioButtonItem(5,16,0,MSelected,		(int *)&FSearchIn,SI_SELECTED));
+	} else {
+		Dialog.Add(new CFarRadioButtonItem(5,14,DIF_GROUP,MAllDrives,(int *)&FSearchIn,SI_ALLDRIVES));
+		Dialog.Add(new CFarRadioButtonItem(5,15,0,MAllLocalDrives,	(int *)&FSearchIn,SI_ALLLOCAL));
+		Dialog.Add(new CFarRadioButtonItem(5,16,0,MFromRoot,		(int *)&FSearchIn,SI_FROMROOT));
+		Dialog.Add(new CFarRadioButtonItem(5,17,0,MFromCurrent,		(int *)&FSearchIn,SI_FROMCURRENT));
+		Dialog.Add(new CFarRadioButtonItem(5,18,0,MCurrentOnly,		(int *)&FSearchIn,SI_CURRENTONLY));
+		Dialog.Add(new CFarRadioButtonItem(5,19,0,MSelected,		(int *)&FSearchIn,SI_SELECTED));
+	}
+
+	Dialog.Add(new CFarCheckBoxItem(44,14,0,MViewModified,&FROpenModified));
+	Dialog.Add(new CFarCheckBoxItem(44,15,0,MConfirmFile,&FRConfirmFile));
+	Dialog.Add(new CFarCheckBoxItem(44,16,0,MConfirmLine,&FRConfirmLine));
+	Dialog.Add(new CFarCheckBoxItem(44,17,0,MSaveOriginal,&FRSaveOriginal));
+
+	Dialog.AddButtons(MOk,MCancel);
+	Dialog.Add(new CFarButtonItem(60,20,0,0,MBatch));
+	Dialog.Add(new CFarButtonItem(60,9,0,0,MPresets));
+	Dialog.Add(new CFarCheckBoxItem(56,10,0,"",&FAdvanced));
+	Dialog.Add(new CFarButtonItem(60,10,0,0,MAdvanced));
+	Dialog.Add(new CFarCheckBoxItem(56,11,0,"",&FUTF8));
+	Dialog.Add(new CFarButtonItem(60,11,0,0,MUTF8));
+	Dialog.SetFocus(3);
+	if (FSearchAs>=SA_MULTILINE) FSearchAs=SA_PLAINTEXT;
+	FACaseSensitive=FADirectoryCaseSensitive=MaskCaseHere();
+
+	MaskText=FMask;
+	SearchText=FText;
+	ReplaceText=FRReplace;
+	int ExitCode;
+	do {
+		switch (ExitCode=Dialog.Display(7,-8,8,9,-6,-5,-3,-1)) {
+		case 0:
+			FMask=MaskText;
+			FText=SearchText;
+			FRReplace=ReplaceText;
+			break;
+		case 1:
+			if ((FSearchAs!=SA_PLAINTEXT) && (FSearchAs!=SA_MULTITEXT)) QuoteRegExpString(SearchText);
+			break;
+		case 2:
+			QuoteReplaceString(ReplaceText);
+			break;
+		case 3:
+			if (FRBatch->ShowMenu(FileReplaceExecutor, g_FRBatch) >= 0)
+				return FALSE;
+			break;
+		case 4:
+			FRPresets->ShowMenu(g_FRBatch);
+			if (Plugin&&(FSearchIn<SI_FROMCURRENT)) FSearchIn=SI_FROMCURRENT;
+			break;
+		case 5:
+			if (AdvancedSettings()) FAdvanced=TRUE;
+			break;
+		case 6:
+			UTF8Converter(SearchText);
+			break;
+		case -1:
+			return FALSE;
+		}
+	} while ((ExitCode>=1)||!FPreparePattern());
+	if (FUTF8) FAllCharTables=FALSE;
+	return TRUE;
+}
+
+OperationResult FileReplace(PluginPanelItem **PanelItems,int *ItemsNumber,BOOL ShowDialog) {
+	PanelInfo PInfo;
+	StartupInfo.Control(INVALID_HANDLE_VALUE,FCTL_GETPANELINFO,&PInfo);
+	if (PInfo.PanelType!=PTYPE_FILEPANEL) return OR_FAILED;
+	if (PInfo.Plugin&&((PInfo.Flags&PFLAGS_REALNAMES)==0)) return OR_FAILED;
+
+	if (ShowDialog) {
+		if (!ReplacePrompt(PInfo.Plugin)) return OR_CANCEL;
+	} else {
+		if (!FPreparePattern()) return OR_CANCEL;
+	}
+
+	FRConfirmFileThisRun=FRConfirmFile;
+	FRConfirmReadonlyThisRun = (FRReplaceReadonly == RR_ALWAYS);
+	FRConfirmLineThisRun=FRConfirmLine;
+	if (ScanDirectories(PanelItems,ItemsNumber,ReplaceFile)) {
+		if (!FROpenModified) return OR_OK; else
+		return (*ItemsNumber==0)?NoFilesFound():OR_PANEL;
+	} else return OR_FAILED;
+}
+
+BOOL CFRPresetCollection::EditPreset(CPreset *pPreset) {
+	CFarDialog Dialog(76,20,"FRPresetDlg");
+	Dialog.AddFrame(MFRPreset);
+	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
+	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,"RESearch.PresetName", pPreset->m_strName));
+
+	Dialog.Add(new CFarCheckBoxItem(35,4,0,MAsRegExp,&pPreset->m_mapInts["MaskAsRegExp"]));
+	Dialog.Add(new CFarTextItem(5,4,0,MMask));
+	Dialog.Add(new CFarEditItem(5,5,70,DIF_HISTORY,"Masks", pPreset->m_mapStrings["Mask"]));
+
+	Dialog.Add(new CFarTextItem(5,6,0,MSearchFor));
+	Dialog.Add(new CFarEditItem(5,7,70,DIF_HISTORY,"SearchText", pPreset->m_mapStrings["Text"]));
+
+	Dialog.Add(new CFarTextItem(5,8,0,MReplaceWith));
+	Dialog.Add(new CFarEditItem(5,9,70,DIF_HISTORY,"ReplaceText", pPreset->m_mapStrings["Replace"]));
+
+	Dialog.Add(new CFarCheckBoxItem(5,11,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
+	int *pSearchAs = &pPreset->m_mapInts["SearchAs"];
+	Dialog.Add(new CFarRadioButtonItem(5,12,DIF_GROUP,MPlainText,pSearchAs,SA_PLAINTEXT));
+	Dialog.Add(new CFarRadioButtonItem(5,13,0,MRegExp,		pSearchAs,SA_REGEXP));
+	Dialog.Add(new CFarRadioButtonItem(5,14,0,MSeveralLineRegExp,pSearchAs,SA_SEVERALLINE));
+	Dialog.Add(new CFarCheckBoxItem(35,11,0,"",&pPreset->m_mapInts["UTF8"]));
+	Dialog.Add(new CFarButtonItem(39,11,0,0,MUTF8));
+	Dialog.AddButtons(MOk,MCancel);
+
+	do {
+		switch (Dialog.Display(2, -2, -3)) {
+		case 0:
+			return TRUE;
+		case 1:{		// avoid Internal Error for icl
+			string str = pPreset->m_mapStrings["Text"];
+			UTF8Converter(str);
+			break;
+			  }
+		default:
+			return FALSE;
+		}
+	} while (true);
+}

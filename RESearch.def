@@ -1,0 +1,13 @@
+LIBRARY
+EXPORTS
+	SetStartupInfo
+	GetPluginInfo
+	GetOpenPluginInfo
+	OpenPlugin
+	ProcessKey
+	GetFindData
+	SetDirectory
+	PutFiles
+	ClosePlugin
+	Configure
+	ExitFAR
