@@ -259,6 +259,10 @@ SOURCE=.\RESearch.cpp
 # End Group
 # Begin Source File
 
+SOURCE=.\File_Id.Diz
+# End Source File
+# Begin Source File
+
 SOURCE=.\History.txt
 # End Source File
 # Begin Source File
