@@ -23,6 +23,7 @@ using namespace std;
 #include <FarDlg.h>
 #include <FarKeys.hpp>
 #include <pcre\pcre.h>
+#include <CRegExp.h>
 
 #include "Presets.h"
 
@@ -78,6 +79,7 @@ enum {
 	MMenuReplace,
 	MMenuRename,
 	MMenuRenameSelected,
+	MMenuRenumber,
 	MMenuSelect,
 	MMenuUnselect,
 	MMenuFlipSelection,
@@ -144,6 +146,8 @@ enum {
 	MFilterLines,
 	MLeaveMatching,
 	MRemoveMatching,
+	
+	MRenumber,
 
 	MUTF8Converter,
 	MConverterANSI,
@@ -181,6 +185,12 @@ enum {
 			MNever,
 			MAsk,
 			MAlways,
+		MRenumberOptions,
+			MStripFromBeginning,
+			MPrefix,
+			MPostfix,
+			MStartFrom,
+			MWidth,
 
 	MEditorSearchSettings,
 		MShowPositionOffset,

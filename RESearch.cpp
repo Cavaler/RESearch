@@ -245,7 +245,7 @@ BOOL ProcessCommandLine(char *Line,BOOL *ShowDialog,int *Item) {
 }
 
 int ShowFileMenu() {
-	FarMenuItem MenuItems[11];
+	FarMenuItem MenuItems[12];
 	memset(MenuItems,0,sizeof(MenuItems));
 	strcpy(MenuItems[0].Text,GetMsg(MMenuSearch));
 	strcpy(MenuItems[1].Text,GetMsg(MMenuReplace));
@@ -256,8 +256,9 @@ int ShowFileMenu() {
 	MenuItems[6].Separator=TRUE;
 	strcpy(MenuItems[7].Text,GetMsg(MMenuRename));
 	strcpy(MenuItems[8].Text,GetMsg(MMenuRenameSelected));
-	MenuItems[9].Separator=TRUE;
-	strcpy(MenuItems[10].Text,GetMsg(MMenuUTF8Converter));
+	strcpy(MenuItems[9].Text,GetMsg(MMenuRenumber));
+	MenuItems[10].Separator=TRUE;
+	strcpy(MenuItems[11].Text,GetMsg(MMenuUTF8Converter));
 	return StartupInfo.Menu(StartupInfo.ModuleNumber,-1,-1,0,FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT,GetMsg(MMenuHeader),
 		NULL,"FileMenu",NULL,NULL,MenuItems,sizeof(MenuItems)/sizeof(MenuItems[0]));
 }
@@ -304,7 +305,11 @@ HANDLE WINAPI OpenPlugin(int OpenFrom,int Item) {
 		case 8:
 			Result=RenameSelectedFiles(&PanelItems,&ItemsNumber,ShowDialog);
 			break;
-		case 10:
+		case 9:
+			RenumberFiles();
+			Result=OR_CANCEL;
+			break;
+		case 11:
 			UTF8Converter();
 			Result=OR_CANCEL;
 			break;
@@ -395,7 +400,7 @@ int ConfigureCommon() {
 }
 
 void ConfigureFile() {
-	CFarDialog Dialog(60,24,"FileConfig");
+	CFarDialog Dialog(70,26,"FileConfig");
 	Dialog.AddFrame(MFileSearchSettings);
 
 	Dialog.Add(new CFarTextItem(5,3,0,MReadAtOnceLimit));
@@ -403,22 +408,34 @@ void ConfigureFile() {
 	Dialog.Add(new CFarTextItem(42,3,0,MKB));
 
 	Dialog.Add(new CFarTextItem(5,5,0,MMaskDelimiter));
-	Dialog.Add(new CFarEditItem(32,5,32,0,NULL,MaskDelimiter,NULL,DI_FIXEDIT));
+	Dialog.Add(new CFarEditItem(25,5,25,0,NULL,MaskDelimiter,NULL,DI_FIXEDIT));
 
 	Dialog.Add(new CFarTextItem(5,6,0,MMaskNegation));
-	Dialog.Add(new CFarEditItem(32,6,32,0,NULL,MaskNegation,NULL,DI_FIXEDIT));
+	Dialog.Add(new CFarEditItem(25,6,25,0,NULL,MaskNegation,NULL,DI_FIXEDIT));
 
 	Dialog.Add(new CFarCheckBoxItem(5,8,0,MAddAsterisk,&AutoappendAsterisk));
 
 	Dialog.Add(new CFarTextItem(5,10,0,MDefaultMaskCase));
-	Dialog.Add(new CFarRadioButtonItem(5,11,DIF_GROUP,MMaskSensitive,(int *)&FMaskCase,MC_SENSITIVE));
-	Dialog.Add(new CFarRadioButtonItem(5,12,0,MMaskInsensitive,(int *)&FMaskCase,MC_INSENSITIVE));
-	Dialog.Add(new CFarRadioButtonItem(5,13,0,MMaskVolumeDependent,(int *)&FMaskCase,MC_VOLUME));
+	Dialog.Add(new CFarRadioButtonItem(7,11,DIF_GROUP,MMaskSensitive,(int *)&FMaskCase,MC_SENSITIVE));
+	Dialog.Add(new CFarRadioButtonItem(7,12,0,MMaskInsensitive,(int *)&FMaskCase,MC_INSENSITIVE));
+	Dialog.Add(new CFarRadioButtonItem(7,13,0,MMaskVolumeDependent,(int *)&FMaskCase,MC_VOLUME));
 
-	Dialog.Add(new CFarTextItem(5,15,0,MReplaceReadonly));
-	Dialog.Add(new CFarRadioButtonItem(5,16,DIF_GROUP,MNever,(int *)&FRReplaceReadonly,RR_NEVER));
-	Dialog.Add(new CFarRadioButtonItem(5,17,0,MAsk,(int *)&FRReplaceReadonly,RR_ASK));
-	Dialog.Add(new CFarRadioButtonItem(5,18,0,MAlways,(int *)&FRReplaceReadonly,RR_ALWAYS));
+	Dialog.Add(new CFarTextItem(35,10,0,MReplaceReadonly));
+	Dialog.Add(new CFarRadioButtonItem(37,11,DIF_GROUP,MNever,(int *)&FRReplaceReadonly,RR_NEVER));
+	Dialog.Add(new CFarRadioButtonItem(37,12,0,MAsk,(int *)&FRReplaceReadonly,RR_ASK));
+	Dialog.Add(new CFarRadioButtonItem(37,13,0,MAlways,(int *)&FRReplaceReadonly,RR_ALWAYS));
+
+	Dialog.Add(new CFarTextItem(5,15,0,MRenumberOptions));
+	Dialog.Add(new CFarTextItem(7,16,0,MStripFromBeginning));
+	Dialog.Add(new CFarEditItem(40,16,63,DIF_HISTORY,"RESearch.Strip", g_strStrip));
+	Dialog.Add(new CFarTextItem(7,17,0,MPrefix));
+	Dialog.Add(new CFarEditItem(32,17,42,DIF_HISTORY,"RESearch.Prefix", g_strPrefix));
+	Dialog.Add(new CFarTextItem(7,18,0,MPostfix));
+	Dialog.Add(new CFarEditItem(32,18,42,DIF_HISTORY,"RESearch.Postfix", g_strPostfix));
+	Dialog.Add(new CFarTextItem(7,19,0,MStartFrom));
+	Dialog.Add(new CFarEditItem(32,19,38,0, NULL, (int &)g_nStartWith,new CFarIntegerRangeValidator(0,0x7FFFFFFF)));
+	Dialog.Add(new CFarTextItem(7,20,0,MWidth));
+	Dialog.Add(new CFarEditItem(32,20,38,0, NULL, (int &)g_nWidth,new CFarIntegerRangeValidator(0,MAX_PATH)));
 
 	Dialog.AddButtons(MOk,MCancel);
 	Dialog.Display(-1);
@@ -454,7 +471,7 @@ int WINAPI Configure(int ItemNumber) {
 	const char *ppszItems[]={GetMsg(MCommonSettings),GetMsg(MFileSearchSettings),GetMsg(MEditorSearchSettings)};
 	int iResult = 0;
 	do {
-		switch (iResult = ChooseMenu(GetMsg(MRESearch),NULL,"Config",iResult,3,ppszItems)) {
+		switch (iResult = ChooseMenu(3,ppszItems,GetMsg(MRESearch),NULL,"Config",iResult)) {
 		case 0:ConfigureCommon();break;
 		case 1:ConfigureFile();break;
 		case 2:ConfigureEditor();break;

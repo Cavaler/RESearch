@@ -19,6 +19,7 @@
 "&Replace"
 "Re&name files"
 "Rena&me selected files"
+"Renum&ber files"
 "Se&lect files"
 "&Unselect files"
 "&Flip selection"
@@ -86,6 +87,8 @@
 "&Leave matching lines"
 "&Remove matching lines"
 
+"Renumber"
+
 "UTF-8 converter"
 "&ANSI"
 "&UTF-8"
@@ -122,6 +125,12 @@
 "N&ever"
 "A&sk"
 "&Always"
+"Renumbering"
+"RegExp to strip from beginning:"
+"Prefix to number:"
+"Postfix after number:"
+"Start number from:"
+"Digits in number:"
 
 "Editor settings"
 "&Found text horizontal offset:"

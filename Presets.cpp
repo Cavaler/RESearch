@@ -162,7 +162,7 @@ int CPresetCollection::ShowMenu(CParameterBatch &Batch) {
 		int nBreakKey;
 		char szTitle[128];
 		sprintf(szTitle, "%s presets", GetName());
-		int nResult = ChooseMenu(szTitle, "Ins,Del,F4", "Presets", 0, arrItems,
+		int nResult = ChooseMenu(arrItems, szTitle, "Ins,Del,F4", "Presets", 0,
 			FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT, piBreakKeys, &nBreakKey);
 
 		switch (nBreakKey) {
@@ -284,7 +284,7 @@ int CPresetBatch::ShowMenu() {
 			arrItems[nPreset] = (*this)(nPreset)->m_strName;
 
 		int nBreakKey;
-		nResult = ChooseMenu(m_strName.c_str(), "Ins,Ctrl-\x18\x19,Del,F6", "Batch", nResult, arrItems,
+		nResult = ChooseMenu(arrItems, m_strName.c_str(), "Ins,Ctrl-\x18\x19,Del,F6", "Batch", nResult,
 			FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT, piBreakKeys, &nBreakKey);
 
 		switch (nBreakKey) {
@@ -390,7 +390,7 @@ int CPresetBatchCollection::ShowMenu(BatchExecutor Executor, CParameterBatch &Ba
 		int nBreakKey;
 		char szTitle[128];
 		sprintf(szTitle, "%s batches", m_pCollection->GetName());
-		int nResult = ChooseMenu(szTitle, "Ins,Del,F4", "Batches", 0, arrItems,
+		int nResult = ChooseMenu(arrItems, szTitle, "Ins,Del,F4", "Batches", 0,
 			FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT, piBreakKeys, &nBreakKey);
 
 		switch (nBreakKey) {
