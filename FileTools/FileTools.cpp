@@ -33,7 +33,7 @@ void FTReadRegistry(HKEY Key) {
 void FTWriteRegistry(HKEY Key) {
 	SetRegStringValue(Key, "FTRStrip",   g_strStrip);
 	SetRegStringValue(Key, "FTRPrefix",  g_strPrefix);
-	SetRegStringValue(Key, "FTRPostfix", g_strPrefix);
+	SetRegStringValue(Key, "FTRPostfix", g_strPostfix);
 	SetRegIntValue   (Key, "FTRStart",   g_nStartWith);
 	SetRegIntValue   (Key, "FTRWidth",   g_nWidth);
 }
