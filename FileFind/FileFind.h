@@ -22,10 +22,19 @@ public:
 	virtual const char *GetName() {return "FileReplace";}
 };
 
+class CFAPresetCollection:public CPresetCollection {
+public:
+	CFAPresetCollection() {Load();}
+	virtual BOOL EditPreset(CPreset *pPreset);
+	virtual const char *GetName() {return "FileAdvanced";}
+};
+
 extern CParameterBatch g_FSBatch;
 extern CParameterBatch g_FRBatch;
+extern CParameterBatch g_FABatch;
 EXTERN CFSPresetCollection *FSPresets;
 EXTERN CFRPresetCollection *FRPresets;
+EXTERN CFAPresetCollection *FAPresets;
 EXTERN CPresetBatchCollection *FRBatch;
 
 EXTERN BOOL FCaseSensitive;

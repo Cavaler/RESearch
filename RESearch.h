@@ -242,6 +242,7 @@ enum {
 	MEFPreset,
 	MFSPreset,
 	MFRPreset,
+	MFAPreset,
 	MVSPreset,
 	MPresetName,
 	MDeletePresetQuery,

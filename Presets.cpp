@@ -167,7 +167,7 @@ int CPresetCollection::ShowMenu(CParameterBatch &Batch) {
 
 		switch (nBreakKey) {
 		case -1:
-			if (&Batch && (nResult < (int)size())) at(nResult)->Apply(Batch);
+			if (&Batch && (nResult >= 0) && (nResult < (int)size())) at(nResult)->Apply(Batch);
 			return nResult;
 		case 0:{
 			CPreset *pPreset = new CPreset(Batch);
