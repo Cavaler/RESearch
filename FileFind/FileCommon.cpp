@@ -288,8 +288,8 @@ BOOL AdvancedApplies(WIN32_FIND_DATA *FindData) {
 		(FAModificationDate)?&FindData->ftLastWriteTime:&FindData->ftCreationTime,
 		&FADateAfterThis)<0)) return FALSE;
 
-	if (FASizeLess&&(FindData->nFileSizeLow>=FASizeLessLimit)) return FALSE;
-	if (FASizeGreater&&(FindData->nFileSizeLow<=FASizeGreaterLimit)) return FALSE;
+	if (FASizeLess && (FindData->nFileSizeLow >= FASizeLessLimit)) return FALSE;
+	if (FASizeGreater && (FindData->nFileSizeLow <= FASizeGreaterLimit)) return FALSE;
 
 	if (FindData->dwFileAttributes & FAAttributesCleared) return FALSE;
 	if ((FindData->dwFileAttributes & FAAttributesSet) != FAAttributesSet) return FALSE;
@@ -531,11 +531,11 @@ BOOL AdvancedSettings() {
 	Dialog.Add(new CFarTextItem(5,6,0,MRecursionLevel));
 	Dialog.Add(new CFarEditItem(32,6,40,0,NULL,(int &)FARecursionLevel,new CFarIntegerRangeValidator(0,255)));
 
-	Dialog.Add(new CFarCheckBoxItem(5,8,0,MDateBefore,&FADateBefore));
-	Dialog.Add(new CFarEditItem(30,8,50,0,NULL,new CFarDateTimeStorage(&FADateBeforeThis)));
+	Dialog.Add(new CFarCheckBoxItem(5,8,0,MDateAfter,&FADateAfter));
+	Dialog.Add(new CFarEditItem(30,8,50,0,NULL,new CFarDateTimeStorage(&FADateAfterThis)));
 	Dialog.Add(new CFarButtonItem(52,8,0,FALSE,MCurrent));
-	Dialog.Add(new CFarCheckBoxItem(5,9,0,MDateAfter,&FADateAfter));
-	Dialog.Add(new CFarEditItem(30,9,50,0,NULL,new CFarDateTimeStorage(&FADateAfterThis)));
+	Dialog.Add(new CFarCheckBoxItem(5,9,0,MDateBefore,&FADateBefore));
+	Dialog.Add(new CFarEditItem(30,9,50,0,NULL,new CFarDateTimeStorage(&FADateBeforeThis)));
 	Dialog.Add(new CFarButtonItem(52,9,0,FALSE,MCurrent));
 	Dialog.Add(new CFarRadioButtonItem(5,10,0,MCreationDate,&FAModificationDate,FALSE));
 	Dialog.Add(new CFarRadioButtonItem(30,10,0,MModificationDate,&FAModificationDate,TRUE));
