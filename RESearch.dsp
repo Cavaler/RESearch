@@ -45,8 +45,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 1
 # PROP Target_Dir "."
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /c
-# ADD CPP /nologo /G6 /Zp2 /MD /W3 /GX /Oy /Ob2 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "PCRE_STATIC" /D "FAR_USE_NAMESPACE" /FD /c
-# SUBTRACT CPP /YX
+# ADD CPP /nologo /G6 /Zp2 /MD /W3 /GX /Ox /Ot /Oa /Og /Oi /Oy- /Ob2 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "PCRE_STATIC" /D "FAR_USE_NAMESPACE" /FD /GF /c
 # ADD BASE MTL /nologo /D "NDEBUG" /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x419 /d "NDEBUG"
@@ -56,7 +55,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386
-# ADD LINK32 PavelMD.lib pcreMD.lib kernel32.lib user32.lib advapi32.lib /nologo /version:4.2 /subsystem:windows /dll /machine:I386 /out:"RESearch.dll" /force:multiple
+# ADD LINK32 PavelMD.lib pcreMD.lib kernel32.lib user32.lib advapi32.lib /nologo /version:4.2 /subsystem:windows /dll /machine:I386 /out:"RESearch.dll" /force:multiple /FILEALIGN:0x200
 # SUBTRACT LINK32 /pdb:none
 
 !ELSEIF  "$(CFG)" == "RESearch - Win32 Debug"
@@ -102,7 +101,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /G5 /Zp1 /W3 /GX /O2 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "PCRE_STATIC" /FD /c
 # SUBTRACT BASE CPP /YX
-# ADD CPP /nologo /G6 /Zp1 /MD /W3 /GX /Oy /Ob2 /X /I "\CPP\STLport-4.5.3\stlport" /I "D:\MSDEV\VC98\Include" /I "\CPP\Include" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "PCRE_STATIC" /D "FAR_USE_NAMESPACE" /D "_USE_INTEL_COMPILER" /FD /c
+# ADD CPP /nologo /G6 /Zp1 /MD /W3 /GX /Ox /Ot /Oa /Og /Oi /Oy- /Ob2 /X /I "\CPP\STLport-4.5.3\stlport" /I "D:\MSDEV\VC98\Include" /I "\CPP\Include" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "PCRE_STATIC" /D "FAR_USE_NAMESPACE" /D "_USE_INTEL_COMPILER" /FD /GF /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x809 /d "NDEBUG"
@@ -132,8 +131,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /G6 /Zp2 /MD /W3 /GX /Oy /Ob2 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "PCRE_STATIC" /D "FAR_USE_NAMESPACE" /FD /c
 # SUBTRACT BASE CPP /YX
-# ADD CPP /nologo /G6 /Zp2 /MD /W3 /GX /Oy /Ob2 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "PCRE_STATIC" /D "FAR_USE_NAMESPACE" /D _USE_COMPILER=VC7 /FD /c
-# SUBTRACT CPP /YX
+# ADD CPP /nologo /G6 /Zp2 /MD /W3 /GX /Ox /Ot /Oa /Og /Oi /Oy- /Ob2 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "PCRE_STATIC" /D "FAR_USE_NAMESPACE" /D _USE_COMPILER=VC7 /FD /GF /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x809 /d "NDEBUG"
@@ -144,7 +142,7 @@ BSC32=bscmake.exe
 LINK32=link.exe
 # ADD BASE LINK32 PavelMD.lib pcreMD.lib kernel32.lib user32.lib advapi32.lib /nologo /version:4.2 /subsystem:windows /dll /machine:I386 /out:"RESearch.dll" /force:multiple
 # SUBTRACT BASE LINK32 /pdb:none
-# ADD LINK32 PavelMD7.lib pcreMD7.lib kernel32.lib user32.lib advapi32.lib /nologo /version:4.2 /subsystem:windows /dll /machine:I386 /out:"RESearch7.dll" /D_USE_COMPILER=VC7 /force:multiple
+# ADD LINK32 PavelMD7.lib pcreMD7.lib kernel32.lib user32.lib advapi32.lib /nologo /version:4.2 /subsystem:windows /dll /machine:I386 /out:"RESearch7.dll" /FILEALIGN:0x200 /D_USE_COMPILER=VC7 /force:multiple
 # SUBTRACT LINK32 /pdb:none
 
 !ENDIF 
