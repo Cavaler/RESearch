@@ -236,51 +236,11 @@ SOURCE=.\ViewFind\ViewSearch.cpp
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=\CPP\Include\CRegExp.h
-# End Source File
-# Begin Source File
-
-SOURCE=\CPP\Include\EasyReg.h
-# End Source File
-# Begin Source File
-
-SOURCE=\CPP\Include\FAR.h
-# End Source File
-# Begin Source File
-
-SOURCE=\CPP\Include\FarDlg.h
-# End Source File
-# Begin Source File
-
-SOURCE=\CPP\Include\FarKeys.hpp
-# End Source File
-# Begin Source File
-
-SOURCE=\CPP\Include\pcre\pcre.h
-# End Source File
-# Begin Source File
-
-SOURCE=\CPP\Include\Plugin.hpp
-# End Source File
-# Begin Source File
-
-SOURCE=\CPP\Include\plugin_viewer.hpp
-# End Source File
-# Begin Source File
-
 SOURCE=.\Presets.h
 # End Source File
 # Begin Source File
 
-SOURCE=\CPP\Include\ptr.h
-# End Source File
-# Begin Source File
-
-SOURCE=\CPP\Include\StringEx.h
-# End Source File
-# Begin Source File
-
-SOURCE=\CPP\Include\UTF8.h
+SOURCE=.\RESearch.h
 # End Source File
 # End Group
 # Begin Group "Source Files"
@@ -297,10 +257,6 @@ SOURCE=.\Presets.cpp
 # Begin Source File
 
 SOURCE=.\RESearch.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\RESearch.h
 # End Source File
 # End Group
 # Begin Source File
