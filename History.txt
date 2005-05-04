@@ -6,13 +6,14 @@ Regular Expression Search and Replace
  * Minor change
 
 Version 4.50 (planned)
-	! Regular Expression Search in viewer (thanks to Vadim Yegorov)
+	! Regular Expression Search in viewer
 
 Version 4.40 (04.05.2005)
 	+ Russian help file (thanks to Tim Sobolev)
 	* Presets for Advanced search options
 	* Compiled with MSVC 7.1
 	- "Search in first bytes" option only applies when Advanced search options are in effect
+	- Other crash/incorrect fixes
 
 Version 4.35 (15.01.2005)
 	- Fixed saving of postfix for file renumbering
