@@ -18,6 +18,7 @@ in file masks, searched text, and using various macros in replacement text.
     This plugin uses ~PCRE 4.5 library~@PCRE@, compiled with ~UTF-8~@UTF8@ support
 
    ~Regular Expression Basics~@RegularExpressions@
+   ~Replacement Text~@RegularReplace@
 
    ~Regular Expression Search~@SearchDlg@
    ~Regular Expression Replace~@ReplaceDlg@
@@ -81,7 +82,7 @@ as much as possible to as few as possible.
 
     ()      groups patterns into one and makes matched part referrable as #\nn# from the
 following part of pattern and as #$nn# from replacing string (!). #nn# is simply the number
-of opening bracket in pattern.
+of opening bracket in pattern, counted from 1.
     NOTE: to separate match number #nn# from subsequent digits #mm#, you can use form
 #${nn}mm# in replacement. In pattern, you can group it: #(\nn)mm#
 
@@ -99,6 +100,41 @@ preceding decimal number.
    (?!#pattern#)  Zero-width negative lookahead assertion. Matches if the text after this point does not match #pattern#.
    (?<=#pattern#) Zero-width positive lookbehind assertion. Matches if the text before this point matches #pattern#.
    (?<!#pattern#) Zero-width negative lookbehind assertion. Matches if the text before this point does not match #pattern#.
+@RegularReplace
+$ #Replacement text#
+    Certain special symbols and constructions can be used in replacement text:
+
+    The following macros are accepted in replace text:
+    \l      - lowercase next character.
+    \u      - uppercase next character.
+    \L      - lowercase all charachers until \E.
+    \U      - uppercase all charachers until \E.
+    \E      - end case modification.
+    \xnn    - symbol with hexadecimal code nn (can be 1 or 2 characters).
+    \nnn    - symbol with octal code nnn (can be 1 to 3 characters).
+    When searching as regular expression, also #$nn# or #${nn}# is replaced with given
+group in regular expression (counted from 1). $0 is replaced with whole matched portion.
+
+    When replacing in editor:
+    $L      - current line number (from 0)
+    $N      - current line number, counted from start of replacing (from 0)
+    $R      - current replacement number (from 0)
+    
+    When replacing in files:
+    	Currently none additional
+    
+    When renaming files:
+    $L, $N  - current file number (from 0)
+    $R      - current replacement number (from 0)
+
+    Also standard C-like metacharacters: \a, \b, \e, \f, \n, \r, \t, \v are recognized.
+
+    #NOTE#: Single-char and multiple-char case modification can be combined, i.e. '\u\L$0\E'
+(or '\L\u$0\E') will be replaced with whole matched string capitalized.
+
+    #NOTE#: $nn, $L, $N, $R can be extended by using the following form: ${L+/-nnn}.
+In this case #nnnn# (may be negative as well) is added to a number to be inserted, and its
+length is used for right-aligning the resulting number with zeros (so you can do ${L+0000}).
 @UTF8
 $ #UTF-8 support#
   From version 4.0 RESearch provides a limited support for searching UTF-8 text.
@@ -271,7 +307,7 @@ $ #Regular Expression Replace#
   #[ \ ]#              This button will quote all special symbols in search string,
 if regular expression search is selected.
 
-  #Replace with#       Specifies text to replace found with.
+  #Replace with#       Specifies ~text to replace found with~@RegularReplace@.
   #[ / ]#              This button will quote special symbols '\' and '$' in replace string.
 
   #Remove empty lines#  If, after replacing, line becomes empty, delete it.
@@ -280,34 +316,6 @@ if regular expression search is selected.
 
  For other options, see ~Regular Expression Search~@SearchDlg@.
 
-    The following macros are accepted in replace text:
-    \l      - lowercase next character.
-    \u      - uppercase next character.
-    \L      - lowercase all charachers until \E.
-    \U      - uppercase all charachers until \E.
-    \E      - end case modification.
-    \xnn    - symbol with hexadecimal code nn (can be 1 or 2 characters).
-    \nnn    - symbol with octal code nnn (can be 1 to 3 characters).
-    When replacing in editor:
-    $L      - current line number (from 0)
-    $N      - current line number, counted from start of replacing (from 0)
-    $R      - current replacement number (from 0)
-    When replacing in files:
-    	Currently none additional
-    When renaming files:
-    $L, $N  - current file number (from 0)
-    $R      - current replacement number (from 0)
-
-    Also standard C-like metacharacters: \a, \b, \e, \f, \n, \r, \t, \v are recognized.
-
-    #NOTE#: Single-char and multiple-char case modification can be combined, i.e. '\u\L$0\E'
-(or '\L\u$0\E') will be replaced with whole matched string capitalized.
-    #NOTE#: $L,$N,$R can be extended by using the following form: ${L+/-nnn}.
-In this case #nnnn# (may be negative as well) is added to a number to be inserted, and its
-length is used for right-aligning the resulting number with zeros (so you can do ${L+0000}).
-
-    When searching as regular expression, also #$nnn# or #${nnn}# is replaced with given
-group in regular expression. $0 is replaced with whole matched portion.
 @FilterDlg
 $ #Regular Expression Filter#
   This command allows you to filter text in editor, by deleting (or leaving instead)
@@ -427,8 +435,7 @@ text in any number of files.
   #[ \ ]#                    This button will quote all special symbols in search string,
 if regular expression search is selected.
 
-  #Replace with#             Specifies text to replace found with. For details with replacing
-using regular expressions, see ~Regular Expression Replace~@ReplaceDlg@.
+  #Replace with#             Specifies ~text to replace found with~@RegularReplace@.
   #[ / ]#                    This button will quote special symbols '\' and '$' in replace string.
 
   #View modified files#      If checked, temporary panel with modified files will be shown.
