@@ -5,9 +5,18 @@ Regular Expression Search and Replace
  - Bug fixed
  * Minor change
 
-Version 4.35 (15.05.2005)
+Version 4.50 (planned)
+	! Regular Expression Search in viewer (thanks to Vadim Yegorov)
+
+Version 4.40 (04.05.2005)
+	+ Russian help file (thanks to Tim Sobolev)
+	* Presets for Advanced search options
+	* Compiled with MSVC 7.1
+	- "Search in first bytes" option only applies when Advanced search options are in effect
+
+Version 4.35 (15.01.2005)
 	- Fixed saving of postfix for file renumbering
-	* (Ctrl-)+/- in renumber menu change initial number
+	* (Ctrl-)+/- in renumber menu changes initial number
 
 Version 4.30 (29.11.2004)
 	- Presets/batches with special characters in names saved correctly.

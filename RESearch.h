@@ -57,6 +57,7 @@ EXTERN FindTextAtCursor EFindTextAtCursor;
 EXTERN BOOL EFindSelection;
 
 EXTERN BOOL Interrupt;
+EXTERN bool g_bFromCmdLine;
 
 enum OperationResult {OR_CANCEL,OR_FAILED,OR_OK,OR_PANEL};
 

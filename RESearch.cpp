@@ -9,7 +9,8 @@ void WINAPI GetPluginInfo(PluginInfo *Info) {
 	static const char *ConfigStrings[]={GetMsg(MRESearch)};
 	static const char *MenuStrings[]={GetMsg(MRESearch)};
 	Info->StructSize=sizeof(PluginInfo);
-	Info->Flags=PF_EDITOR|PF_VIEWER|PF_FULLCMDLINE;
+//	Info->Flags=PF_EDITOR|PF_VIEWER|PF_FULLCMDLINE;
+	Info->Flags=PF_EDITOR|PF_FULLCMDLINE;
 	Info->DiskMenuStringsNumber=0;
 	Info->PluginMenuStrings=MenuStrings;
 	Info->PluginMenuStringsNumber=1;
@@ -289,15 +290,16 @@ int ShowViewerMenu() {
 }
 
 HANDLE WINAPI OpenPlugin(int OpenFrom,int Item) {
-	BOOL FromCmdLine=FALSE,ShowDialog=TRUE;
+	BOOL ShowDialog=TRUE;
+	g_bFromCmdLine = false;
 
 	switch (OpenFrom) {
 	case OPEN_COMMANDLINE:
-		FromCmdLine=TRUE;
+		g_bFromCmdLine = true;
 		if (!ProcessCommandLine((char *)Item,&ShowDialog,&Item)) return INVALID_HANDLE_VALUE;
 	case OPEN_PLUGINSMENU:{
 		OperationResult Result=OR_CANCEL;
-		if (!FromCmdLine) {
+		if (!g_bFromCmdLine) {
 			Item=ShowFileMenu();
 			if (Item==-1) return INVALID_HANDLE_VALUE;
 		}

@@ -255,7 +255,8 @@ BOOL RenameFilesPrompt() {
 	Dialog.SetFocus(4);
 
 	if (FSearchAs>=SA_SEVERALLINE) FSearchAs=SA_PLAINTEXT;
-	FACaseSensitive=FCaseSensitive=MaskCaseHere();
+	if (!g_bFromCmdLine) FCaseSensitive=MaskCaseHere();
+	FACaseSensitive=FCaseSensitive;
 
 	MaskText=FMask;
 	SearchText=FText;
@@ -364,7 +365,7 @@ BOOL RenameSelectedFilesPrompt() {
 	Dialog.SetFocus(4);
 
 	if (FSearchAs>=SA_SEVERALLINE) FSearchAs=SA_PLAINTEXT;
-	FCaseSensitive=MaskCaseHere();
+	if (!g_bFromCmdLine) FCaseSensitive=MaskCaseHere();
 
 	int ExitCode;
 	SearchText=FText;

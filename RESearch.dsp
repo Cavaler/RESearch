@@ -101,7 +101,7 @@ LINK32=link.exe
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /G5 /Zp1 /W3 /GX /O2 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "PCRE_STATIC" /FD /c
 # SUBTRACT BASE CPP /YX
-# ADD CPP /nologo /G6 /Zp1 /MD /W3 /GX /Ox /Ot /Oa /Og /Oi /Oy- /Ob2 /X /I "\CPP\STLport-4.5.3\stlport" /I "D:\MSDEV\VC98\Include" /I "\CPP\Include" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "PCRE_STATIC" /D "FAR_USE_NAMESPACE" /D "_USE_INTEL_COMPILER" /FD /GF /c
+# ADD CPP /nologo /G6 /Zp1 /MD /W3 /GX /Ox /Ot /Oa /Og /Oi /Oy /Ob2 /X /I "\CPP\STLport-4.5.3\stlport" /I "D:\MSDEV\VC98\Include" /I "\CPP\Include" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "PCRE_STATIC" /D "FAR_USE_NAMESPACE" /D _USE_COMPILER=INTEL /FD /GF /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x809 /d "NDEBUG"
@@ -112,7 +112,7 @@ BSC32=bscmake.exe
 LINK32=link.exe
 # ADD BASE LINK32 LibCTiny.lib Pavel.lib PCRegEx.lib kernel32.lib user32.lib advapi32.lib /nologo /version:4.0 /subsystem:windows /dll /machine:I386 /force /out:"RESearch.dll"
 # SUBTRACT BASE LINK32 /pdb:none /incremental:yes
-# ADD LINK32 LibCTinyMDI.lib PavelMDI.lib pcreMDI.lib kernel32.lib user32.lib advapi32.lib /nologo /version:4.0 /subsystem:windows /dll /machine:I386 /out:"RESearch.dll.icl" /force:multiple
+# ADD LINK32 LibCTinyMDI.lib PavelMDI.lib pcreMDI.lib kernel32.lib user32.lib advapi32.lib /nologo /version:4.0 /subsystem:windows /dll /machine:I386 /out:"RESearchI.dll" /force:multiple /D_USE_INTEL_COMPILER
 # SUBTRACT LINK32 /pdb:none
 
 !ELSEIF  "$(CFG)" == "RESearch - Win32 Release NET"
