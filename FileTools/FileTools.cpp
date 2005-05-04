@@ -408,7 +408,7 @@ OperationResult RenameSelectedFiles(PluginPanelItem **PanelItems,int *ItemsNumbe
 	FTAskOverwrite=true;
 
 	PerformRenameSelectedFiles(PInfo,PanelItems,ItemsNumber);
-	return OR_OK;
+	return (*ItemsNumber==0)?NoFilesFound():OR_OK;
 }
 
 void ProcessNames(vector<string> &arrFileNames, vector<string> &arrProcessedNames) {
