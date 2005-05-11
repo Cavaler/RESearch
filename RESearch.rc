@@ -68,7 +68,7 @@ VS_VERSION_INFO VERSIONINFO
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
-        BLOCK "00000000"
+        BLOCK "000004E4"
         BEGIN
             VALUE "Comments", "\0"
             VALUE "CompanyName", "Pavel Kostromitinov\0"
@@ -86,7 +86,7 @@ BEGIN
     END
     BLOCK "VarFileInfo"
     BEGIN
-        VALUE "Translation", 0x0, 1200
+        VALUE "Translation", 0x0, 1252
     END
 END
 
