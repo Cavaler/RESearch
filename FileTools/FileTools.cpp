@@ -418,21 +418,26 @@ void ProcessNames(vector<string> &arrFileNames, vector<string> &arrProcessedName
 	for (size_t nItem = 0; nItem < arrFileNames.size(); nItem++) {
 		string strName = arrFileNames[nItem];
 
-		vector<string> arrMatches;
-		if (reStrip.Match(strName, PCRE_ANCHORED, &arrMatches)) {
-			strName.erase(0, arrMatches[0].length());
-		}
-		char szNumber[16];
-		sprintf(szNumber, "%0*d", g_nWidth, nItem+g_nStartWithNow);
-		strName = g_strPrefix + szNumber + g_strPostfix + strName;
+		if (!strName.empty()) {
+			vector<string> arrMatches;
+			if (reStrip.Match(strName, PCRE_ANCHORED, &arrMatches)) {
+				strName.erase(0, arrMatches[0].length());
+			}
+			char szNumber[16];
+			sprintf(szNumber, "%0*d", g_nWidth, nItem+g_nStartWithNow);
+			strName = g_strPrefix + szNumber + g_strPostfix + strName;
 
-		arrProcessedNames.push_back(strName);
+			arrProcessedNames.push_back(strName);
+		} else {
+			arrProcessedNames.push_back("---");
+		}
 	}
 }
 
 void PerformRename(vector<string> &arrFileNames, vector<string> &arrProcessedNames) {
 	for (size_t nItem = 0; nItem < arrFileNames.size(); nItem++) {
-		MoveFile(arrFileNames[nItem].c_str(), arrProcessedNames[nItem].c_str());
+		if (!arrFileNames[nItem].empty())
+			MoveFile(arrFileNames[nItem].c_str(), arrProcessedNames[nItem].c_str());
 	}
 }
 
@@ -448,9 +453,9 @@ OperationResult RenumberFiles() {
 		arrFileNames.push_back(PInfo.SelectedItems[nItem].FindData.cFileName);
 
 	int BreakKeys[] = {
-		VK_F2, VK_F7,
-		(PKF_CONTROL<<16)|VK_UP, (PKF_CONTROL<<16)|VK_DOWN,
-		VK_ADD, (PKF_CONTROL<<16)|VK_ADD, VK_SUBTRACT, (PKF_CONTROL<<16)|VK_SUBTRACT, VK_F10, 0
+		VK_F2, VK_F7, (PKF_CONTROL<<16)|VK_UP, (PKF_CONTROL<<16)|VK_DOWN,
+		VK_ADD, (PKF_CONTROL<<16)|VK_ADD, VK_SUBTRACT, (PKF_CONTROL<<16)|VK_SUBTRACT, VK_F10,
+		VK_INSERT, VK_DELETE, 0
 	};
 
 	bool bOriginal = false;
@@ -467,7 +472,7 @@ OperationResult RenumberFiles() {
 		if (nPosition >= nOK) nPosition++;
 
 		int nBreakKey = 0;
-		nPosition = ChooseMenu(arrNames, GetMsg(MRenumber), "F2, F7, Ctrl-\x18\x19, (Ctrl-)+/-, F10-Go", "Renumber",
+		nPosition = ChooseMenu(arrNames, GetMsg(MRenumber), "F2, F7, Ctrl-\x18\x19, F10=Go", "Renumber",
 			nPosition, FMENU_WRAPMODE, BreakKeys, &nBreakKey);
 		if (nPosition >= nOK) nPosition--; else
 			if (nPosition < 0) nPosition = -2;		// -1 is not Esc
@@ -489,9 +494,13 @@ OperationResult RenumberFiles() {
 		case 0:
 			bOriginal = !bOriginal;
 			break;
-		case 1:
+		case 1:{
 			nOK = 0;
+			for (size_t nItem = 0; nItem < arrFileNames.size(); ) {
+				if (arrFileNames[nItem].empty()) arrFileNames.erase(arrFileNames.begin()+nItem); else nItem++;
+			}
 			break;
+			  }
 		case 2:
 			if (nPosition > nOK) {
 				string strPrev = arrFileNames[nPosition-1];
@@ -523,6 +532,17 @@ OperationResult RenumberFiles() {
 		case 8:
 			PerformRename(arrFileNames, arrProcessedNames);
 			return OR_OK;
+		case 9:
+			arrFileNames.insert(arrFileNames.begin()+nOK, "");
+			nPosition = ++nOK;
+			break;
+		case 10:
+			if (nOK > 0) {
+				if (arrFileNames[nOK-1].empty()) arrFileNames.erase(arrFileNames.begin()+nOK-1);
+				nOK--;
+			}
+			nPosition = nOK;
+			break;
 		}
 	} while (true);
 	return OR_CANCEL;
