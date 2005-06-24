@@ -148,7 +148,7 @@
 
 "Value not integer or not in range %d..%d"
 
-"Repeat&ing replace"
+"R&epeating replace"
 
 "&Search for"
 "Replace w&ith"
@@ -173,6 +173,7 @@
 "Error renaming"
 "File"
 "Already exists. Overwrite with"
+"Path not Found. Create it?"
 
 "Invalid command line"
 
