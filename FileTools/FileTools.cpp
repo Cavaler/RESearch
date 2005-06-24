@@ -16,6 +16,7 @@ CParameterBatch g_QRBatch(2, 2,
 
 int FileNumber;
 bool FTAskOverwrite;
+bool FTAskCreatePath;
 int g_nStartWithNow;
 
 void FTReadRegistry(HKEY Key) {
@@ -164,18 +165,16 @@ void RenameFile(WIN32_FIND_DATA *FindData,PluginPanelItem **PanelItems,int *Item
 				Modified=TRUE;ReplaceNumber++;
 				if (!FRepeating) break;
 			} else {
-				DWORD Error=GetLastError();
-				if (Error==ERROR_ALREADY_EXISTS) {
-
+				DWORD Error = GetLastError();
+				switch (Error) {
+				case ERROR_ALREADY_EXISTS:
 					if (FTAskOverwrite) {
-						bool bOverwrite;
 						const char *Lines[]={GetMsg(MMenuRename),GetMsg(MFile),NewName,
 							GetMsg(MAskOverwrite),FindData->cFileName,GetMsg(MOk),GetMsg(MAll),GetMsg(MSkip),GetMsg(MCancel)};
 						switch (StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"FRenameOverwrite",Lines,9,4)) {
 						case 1:
 							FTAskOverwrite=false;
 						case 0:
-							bOverwrite = true;
 							break;
 						case 3:
 							Interrupt=TRUE;
@@ -188,16 +187,49 @@ void RenameFile(WIN32_FIND_DATA *FindData,PluginPanelItem **PanelItems,int *Item
 						if (MoveFile(FindData->cFileName,NewName)) {
 							strcpy(FileName,NewName+(FileName-FindData->cFileName));
 							Modified=TRUE;ReplaceNumber++;
-							if (!FRepeating) break;
-							continue;
+							Error = ERROR_SUCCESS;
+							break;
+						}
+					}
+					Error=GetLastError();
+					break;
+
+				case ERROR_PATH_NOT_FOUND:
+					if (FTAskCreatePath) {
+						const char *Lines[]={GetMsg(MMenuRename),GetMsg(MFile),NewName,
+							GetMsg(MAskCreatePath),GetMsg(MOk),GetMsg(MAll),GetMsg(MSkip),GetMsg(MCancel)};
+						switch (StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"FRenameCreatePath",Lines,9,4)) {
+						case 1:
+							FTAskCreatePath=false;
+						case 0:
+							break;
+						case 3:
+							Interrupt=TRUE;
+						case 2:
+							return;
+						}
+					}
+
+					if (CreateDirectoriesForFile(NewName)) {
+						if (MoveFile(FindData->cFileName,NewName)) {
+							strcpy(FileName,NewName+(FileName-FindData->cFileName));
+							Modified=TRUE;ReplaceNumber++;
+							Error = ERROR_SUCCESS;
+							break;
 						}
 					}
 					Error=GetLastError();
 				}
-				const char *Lines[]={GetMsg(MMenuRename),GetMsg(MRenameError),FindData->cFileName,
-					GetMsg(MAskTo),NewName,GetMsg(MOk),GetMsg(MCancel)};
-				if (StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"FRenameError",Lines,7,2)==1) Interrupt=TRUE;
-				return;
+
+				if (Error != ERROR_SUCCESS) {
+					const char *Lines[]={GetMsg(MMenuRename),GetMsg(MRenameError),FindData->cFileName,
+						GetMsg(MAskTo),NewName,GetMsg(MOk),GetMsg(MCancel)};
+					if (StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"FRenameError",Lines,7,2)==1) Interrupt=TRUE;
+					return;
+				} else {
+					if (!FRepeating) break;
+					continue;
+				}
 			}
 		}
 		if (Interrupt) return;
@@ -210,7 +242,7 @@ BOOL RenameFilesExecutor(CParameterBatch &Batch) {
 	FText=SearchText;
 	FRReplace=ReplaceText;
 	if (!FPreparePattern()) return FALSE;
-	FTAskOverwrite=true;
+	FTAskOverwrite = FTAskCreatePath = true;
 	FileNumber=-1;Interrupt=FALSE;
 
 	FRConfirmFileThisRun = FALSE;//FRConfirmFile;
@@ -297,7 +329,7 @@ OperationResult RenameFiles(PluginPanelItem **PanelItems,int *ItemsNumber,BOOL S
 
 	FRConfirmFileThisRun=FRConfirmFile;
 	FRConfirmLineThisRun=FRConfirmLine;
-	FTAskOverwrite=true;
+	FTAskOverwrite = FTAskCreatePath = true;
 	FileNumber=-1;Interrupt=FALSE;
 
 	if (ScanDirectories(PanelItems,ItemsNumber,RenameFile)) {
@@ -330,7 +362,7 @@ BOOL RenameSelectedFilesExecutor(CParameterBatch &Batch) {
 	FText=SearchText;
 	FRReplace=ReplaceText;
 	if (!FPreparePattern()) return FALSE;
-	FTAskOverwrite=true;
+	FTAskOverwrite = FTAskCreatePath = true;
 
 	FRConfirmFileThisRun = FALSE;//FRConfirmFile;
 	FRConfirmLineThisRun = FALSE;//FRConfirmLine;
@@ -405,7 +437,7 @@ OperationResult RenameSelectedFiles(PluginPanelItem **PanelItems,int *ItemsNumbe
 	*ItemsNumber=0;*PanelItems=NULL;
 	FRConfirmFileThisRun=FRConfirmFile;
 	FRConfirmLineThisRun=FRConfirmLine;
-	FTAskOverwrite=true;
+	FTAskOverwrite = FTAskCreatePath = true;
 
 	PerformRenameSelectedFiles(PInfo,PanelItems,ItemsNumber);
 	return (*ItemsNumber==0)?NoFilesFound():OR_OK;
