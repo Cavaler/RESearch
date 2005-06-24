@@ -25,6 +25,7 @@ using namespace std;
 #include <pcre\pcre.h>
 #include <CRegExp.h>
 #include <CMapping.h>
+#include <Directory.h>
 
 #include "Presets.h"
 
@@ -235,6 +236,7 @@ enum {
 	MRenameError,
 	MFile,
 	MAskOverwrite,
+	MAskCreatePath,
 
 	MInvalidCmdLine,
 
