@@ -196,7 +196,7 @@ void AddFile(WIN32_FIND_DATA *FindData,PluginPanelItem **PanelItems,int *ItemsNu
 	(*ItemsNumber)++;
 }
 
-int AddSlash(char *Directory) {
+int AddSlashLen(char *Directory) {
 	int Len=strlen(Directory);
 	if ((Len==0)||(Directory[Len-1]!='\\')) {strcat(Directory,"\\");Len++;}
 	return Len;
@@ -329,7 +329,7 @@ int DoScanDirectory(char *Directory,PluginPanelItem **PanelItems,int *ItemsNumbe
 	WIN32_FIND_DATA *FindDataArray=NULL;
 	int FindDataCount=0;
 	HANDLE HSearch;
-	int Len=AddSlash(Directory);
+	int Len=AddSlashLen(Directory);
 	HANDLE hScreen=StartupInfo.SaveScreen(0,0,-1,-1);
 	
 	char ConsoleTitle[MAX_PATH*2];
@@ -440,7 +440,7 @@ int ScanDirectories(PluginPanelItem **PanelItems,int *ItemsNumber,ProcessFilePro
 	case SI_FROMCURRENT:case SI_CURRENTONLY:
 		DoScanDirectory(PInfo.CurDir,PanelItems,ItemsNumber,ProcessFile);return TRUE;
 	case SI_SELECTED:{
-			int Len=AddSlash(PInfo.CurDir);
+			int Len=AddSlashLen(PInfo.CurDir);
 			if (PInfo.ItemsNumber==0) return FALSE;
 
 			for (int I=0;I<PInfo.SelectedItemsNumber;I++) {
