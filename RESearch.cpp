@@ -292,6 +292,7 @@ int ShowViewerMenu() {
 HANDLE WINAPI OpenPlugin(int OpenFrom,int Item) {
 	BOOL ShowDialog=TRUE;
 	g_bFromCmdLine = false;
+	Interrupt = FALSE;
 
 	switch (OpenFrom) {
 	case OPEN_COMMANDLINE:
