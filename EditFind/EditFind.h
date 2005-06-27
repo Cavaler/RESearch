@@ -41,6 +41,7 @@ EXTERN BOOL ERegExp;
 EXTERN BOOL ESeveralLine;
 EXTERN BOOL ECaseSensitive;
 EXTERN string ERReplace;
+EXTERN string ERReplace_O2E;
 EXTERN BOOL ERRemoveEmpty;
 EXTERN BOOL ERRemoveNoMatch;
 EXTERN BOOL EFLeaveFilter;
@@ -78,7 +79,9 @@ void ShowCurrentLine(int CurLine,int TotalLines,int TotalColumns);
 string PickupText();
 void EditorToOEM(char *Buffer,int Length);
 void EditorToOEM(EditorGetString &String);
+void EditorToOEM(string &String);
 void OEMToEditor(char *Buffer,int Length);
+void OEMToEditor(string &String);
 
 void SynchronizeWithFile(BOOL Replace);
 void EReadRegistry(HKEY Key);

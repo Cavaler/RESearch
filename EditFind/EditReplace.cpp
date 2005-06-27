@@ -20,8 +20,6 @@ void DoReplace(int FirstLine,int StartPos,int &LastLine,int &EndPos,char *Replac
 		if (LastLine>FirstLine+1) LastLine=FirstLine+1;
 	}
 
-	OEMToEditor(Replace,ReplaceLength);
-
 	Position.CurLine=FirstLine;
 	StartupInfo.EditorControl(ECTL_SETPOSITION,&Position);
 	StartupInfo.EditorControl(ECTL_GETSTRING,&GetString);
@@ -137,7 +135,7 @@ void QuoteStrings(char *Source,char **&Dest,int &Count,int MaxWidth) {
 	QuoteString(Source,Dest,Count,MaxWidth);
 }
 
-eReplaceResult EditorReplaceOK(int FirstLine,int StartPos,int &LastLine,int &EndPos,char *Original,char *Replace,int ReplaceLength) {
+eReplaceResult EditorReplaceOK(int FirstLine,int StartPos,int &LastLine,int &EndPos,char *Original,char *Replace,char *Replace_O2E,int ReplaceLength) {
 	EditorInfo EdInfo;
 	StartupInfo.EditorControl(ECTL_GETINFO,&EdInfo);
 
@@ -221,7 +219,7 @@ eReplaceResult EditorReplaceOK(int FirstLine,int StartPos,int &LastLine,int &End
 		Select.BlockType=BTYPE_NONE;
 		StartupInfo.EditorControl(ECTL_SELECT,&Select);
 	case 0:
-		DoReplace(FirstLine,StartPos,LastLine,EndPos,Replace,ReplaceLength);
+		DoReplace(FirstLine,StartPos,LastLine,EndPos,Replace_O2E,ReplaceLength);
 		return RR_OK;
 	case 2:return RR_SKIP;
 	default:
@@ -245,9 +243,13 @@ BOOL ReplaceInText(int FirstLine,int StartPos,int LastLine,int EndPos) {
 		int Numbers[3]={MatchFirstLine,MatchFirstLine-ReplaceStartLine,ReplaceNumber};
 		int ReplaceLength,FoundLastLine=MatchLastLine;
 		BOOL ZeroMatch=(MatchFirstLine==MatchLastLine)&&(MatchStartPos==MatchEndPos);
-		char *Replace=CreateReplaceString(MatchedLine,Match,MatchCount,ERReplace.c_str(),"\n",Numbers,ReplaceLength);
-		eReplaceResult Result=EditorReplaceOK(MatchFirstLine,MatchStartPos,MatchLastLine,MatchEndPos,MatchedLine,Replace,ReplaceLength);
-		free(Replace);DeleteMatchInfo();
+		char *Replace_O2E=CreateReplaceString(MatchedLine,Match,MatchCount,ERReplace_O2E.c_str(),"\n",Numbers,ReplaceLength);
+		char *Replace=_strdup(Replace_O2E);
+		EditorToOEM(Replace, ReplaceLength);
+		eReplaceResult Result=EditorReplaceOK(MatchFirstLine,MatchStartPos,MatchLastLine,MatchEndPos,MatchedLine,Replace,Replace_O2E,ReplaceLength);
+		free(Replace);free(Replace_O2E);
+		DeleteMatchInfo();
+
 		if (Result==RR_CANCEL) return TRUE;
 		if (!EReverse) LastLine+=MatchLastLine-FoundLastLine;
 
@@ -283,12 +285,16 @@ BOOL ReplaceInTextByLine(int FirstLine,int StartPos,int LastLine,int EndPos,BOOL
 
 			int Numbers[3]={MatchFirstLine,MatchFirstLine-ReplaceStartLine,ReplaceNumber};
 			int ReplaceLength;
-			char *Replace=CreateReplaceString(MatchedLine,Match,MatchCount,ERReplace.c_str(),"\n",Numbers,ReplaceLength);
+			char *Replace_O2E=CreateReplaceString(MatchedLine,Match,MatchCount,ERReplace_O2E.c_str(),"\n",Numbers,ReplaceLength);
+			char *Replace=_strdup(Replace_O2E);
+			EditorToOEM(Replace, ReplaceLength);
 			int TailLength=MatchEndPos-FoundEndPos;
 			int FoundLastLine=MatchLastLine;
 			BOOL ZeroMatch=(FoundStartPos==FoundEndPos);
-			eReplaceResult Result=EditorReplaceOK(MatchFirstLine,FoundStartPos,MatchLastLine,FoundEndPos,MatchedLine,Replace,ReplaceLength);
-			free(Replace);DeleteMatchInfo();
+			eReplaceResult Result=EditorReplaceOK(MatchFirstLine,FoundStartPos,MatchLastLine,FoundEndPos,MatchedLine,Replace,Replace_O2E,ReplaceLength);
+			free(Replace);free(Replace_O2E);
+			DeleteMatchInfo();
+
 			if (Result==RR_CANCEL) return TRUE;
 			if (!EReverse) LastLine+=MatchLastLine-FoundLastLine;
 
@@ -472,7 +478,8 @@ BOOL EditorReplace() {
 		}
 	} while ((ExitCode>=2)||!EPreparePattern(SearchText));
 	EText=SearchText;
-	ERReplace=ReplaceText;
+	ERReplace=ERReplace_O2E=ReplaceText;
+	OEMToEditor(ERReplace_O2E);
 
 	NoAsking=(ExitCode==1);ReplaceStartLine=-1;ReplaceNumber=0;
 	Interrupt=FALSE;

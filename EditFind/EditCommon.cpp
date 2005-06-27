@@ -76,12 +76,16 @@ BOOL SearchInLine(const char *Line,int Length,int Start,int End,int *MatchStart,
 	if ((End==-1)||(End>Length)) Len=Length-Start; else Len=End-Start;
 	if (Len<=0) return FALSE;
 
-	char *OEMLine=(char *)malloc(Length);
-	memmove(OEMLine,Line,Length);
-	EditorToOEM(OEMLine,Length);
-	int Result=SearchIn(OEMLine,Start,Len,MatchStart,MatchLength,NeedMatch);
-	free(OEMLine);
-	return Result;
+	if (ERegExp) {
+		return SearchIn(Line,Start,Len,MatchStart,MatchLength,NeedMatch);
+	} else {
+		char *OEMLine=(char *)malloc(Length);
+		memmove(OEMLine,Line,Length);
+		EditorToOEM(OEMLine,Length);
+		int Result=SearchIn(OEMLine,Start,Len,MatchStart,MatchLength,NeedMatch);
+		free(OEMLine);
+		return Result;
+	}
 }
 
 void Relative2Absolute(int Line,char *Lines,int MatchStart,int MatchLength,int &FirstLine,int &StartPos,int &LastLine,int &EndPos) {
@@ -249,7 +253,13 @@ void RestoreSelection() {
 
 BOOL EPreparePattern(string &SearchText) {
 	ECleanup(TRUE);
-	if (!ERegExp) {
+	if (ERegExp) {
+		char *OEMLine = _strdup(SearchText.c_str());
+		OEMToEditor(OEMLine, SearchText.size());
+		BOOL Result = PreparePattern(&EPattern,&EPatternExtra,OEMLine,ECaseSensitive,EUTF8);
+		free(OEMLine);
+		return Result;
+	} else {
 		ETextUpcase=SearchText;
 		if (!ECaseSensitive) {
 			for (size_t I=0; I<SearchText.size(); I++)
@@ -259,7 +269,6 @@ BOOL EPreparePattern(string &SearchText) {
 		PrepareBMHSearch(ETextUpcase.data(), ETextUpcase.length());
 		return TRUE;
 	}
-	return PreparePattern(&EPattern,&EPatternExtra,SearchText,ECaseSensitive,EUTF8);
 }
 
 void DeleteMatchInfo() {
@@ -401,7 +410,21 @@ void EditorToOEM(EditorGetString &String) {
 	EditorToOEM((char *)String.StringText,String.StringLength);
 }
 
+void EditorToOEM(string &String) {
+	char *szString = _strdup(String.c_str());
+	EditorToOEM(szString, String.length());
+	String = szString;
+	free(szString);
+}
+
 void OEMToEditor(char *Buffer,int Length) {
 	EditorConvertText Convert={Buffer,Length};
 	StartupInfo.EditorControl(ECTL_OEMTOEDITOR,&Convert);
+}
+
+void OEMToEditor(string &String) {
+	char *szString = _strdup(String.c_str());
+	OEMToEditor(szString, String.length());
+	String = szString;
+	free(szString);
 }
