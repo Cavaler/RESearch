@@ -68,7 +68,7 @@ void WriteRegistry() {
 	RegCloseKey(Key);
 }
 
-BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,string &Text,int CaseSensitive,BOOL bUTF8) {
+BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,int CaseSensitive,BOOL bUTF8) {
 	if (Text.empty()) return TRUE;						// Not needed if empty
 	const char *ErrPtr;
 	int ErrOffset;
