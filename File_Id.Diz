@@ -1,4 +1,4 @@
-Regular Expression Search and Replace, version 4.40
+Regular Expression Search and Replace, version 4.45
 by Kostromitinov Pavel, 2:5030/661.14
 
 - Search using plain-text, regular expressions and "search engine-like" in files.
@@ -7,6 +7,6 @@ by Kostromitinov Pavel, 2:5030/661.14
 
 - Renaming and selecting files using regular expressions
 
-- All non-editor operations accessible form command line
+- All non-editor operations accessible from command line
 
 Updates now available at http://www.kostrom.spb.ru/programs/far.en.html
