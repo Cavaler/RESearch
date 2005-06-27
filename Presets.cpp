@@ -395,7 +395,7 @@ int CPresetBatchCollection::ShowMenu(BatchExecutor Executor, CParameterBatch &Ba
 
 		switch (nBreakKey) {
 		case -1:
-			if (Executor && (nResult < (int)size())) {
+			if (Executor && (nResult >= 0) && (nResult < (int)size())) {
 				CPresetBatch *pBatch = at(nResult);
 				const char *Lines[]={"Execute", GetMsg(MExecuteBatchQuery),
 					pBatch->m_strName.c_str(), GetMsg(MOk), GetMsg(MCancel)};
