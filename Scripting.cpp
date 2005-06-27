@@ -1,0 +1,6 @@
+#include "RESearch.h"
+#include "FileFind\FileFind.h"
+#include "FileTools\FileTools.h"
+#include "EditFind\EditFind.h"
+#include "ViewFind\ViewFind.h"
+#include "UTF8.h"
