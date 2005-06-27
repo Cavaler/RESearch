@@ -148,15 +148,42 @@ int GetDelta(char *&String) {
 	return (Minus)?(-Number):Number;
 }
 
+bool GetNumber(const string &str, int &nValue) {
+	CRegExp reNumber("^[-+]?\\d+$");
+	if (reNumber.Match(str)) {
+		nValue = atoi(str.c_str());
+		return true;
+	} else return false;
+}
+
 BOOL ExpandParameter(const char *Matched,char *&String,int &Length,string Param,int *Match,int Count,int *Numbers) {
 	int Number=0;
 	if (Param.size()==0) return TRUE;
 	if (isdigit((unsigned char)Param[0])) {
 		if (Count) {
-			sscanf(Param.c_str(),"%d",&Number);
-			if (Number>=Count) return FALSE;
-			if (Match[Number*2]==-1) return FALSE;
-			AddString(String,Length,Matched+Match[Number*2],Match[Number*2+1]-Match[Number*2]);
+			Number = Param[0] - '0';
+			size_t nPos = 1;
+			while ((nPos < Param.length()) && isdigit((unsigned char)Param[nPos])) {
+				Number = Number*10 + Param[nPos] - '0';
+				nPos++;
+			}
+			if ((Number >= Count) || (Match[Number*2] == -1)) return FALSE;
+
+			string strMatch = string(Matched+Match[Number*2], Match[Number*2+1]-Match[Number*2]);
+			if ((nPos < Param.length()) && ((Param[nPos] == '+') || (Param[nPos] == '-'))) {
+				int nMatch, nAdd;
+				if (GetNumber(strMatch, nMatch) && GetNumber(Param.substr(nPos), nAdd)) {
+					int MinLen = 1;
+					if (Param.length() >= nPos+1) MinLen = Param.length() - nPos - 1;
+
+					char sz[16];
+					sprintf(sz,"%0*d", MinLen, nMatch + nAdd);
+					strMatch = sz;
+				} else {
+					strMatch += Param.substr(nPos);
+				}
+			}
+			AddString(String, Length, strMatch.data(), strMatch.length());
 		} else AddChar(String,Length,'$');
 		return TRUE;
 	}
@@ -175,7 +202,7 @@ BOOL ExpandParameter(const char *Matched,char *&String,int &Length,string Param,
 	}
 	char S[16];
 	sprintf(S,"%0*d",MinLen, Number);
-	AddString(String,Length,S,strlen(S));
+	AddString(String, Length, S, strlen(S));
 	return TRUE;
 }
 
