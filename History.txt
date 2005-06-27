@@ -5,10 +5,21 @@ Regular Expression Search and Replace
  - Bug fixed
  * Minor change
 
-Version 4.50 (planned)
+Version 5.00 (planned)
 	! Regular Expression Search in viewer
 
+Version 4.45 (27.06.2005)
+	* Ins/Del in Renumber
+	+ Rename can create directories
+	- Esc from Batch menu does not crash Far anymore
+	- Correctly interrupts Search
+	- Search/replace for '\xNN' in editor in non-OEM mode yields correct results
+
 Version 4.40 (04.05.2005)
+	# WARNING! From this version on you would need to have MSVC 7.1 runtime
+	(msvcp71.dll and msvcr71.dll) available at your PC. Sorry about inconveniences.
+	You can download them here: http://www.kostrom.spb.ru/FILES/msvc71.rar
+
 	+ Russian help file (thanks to Tim Sobolev)
 	* Presets for Advanced search options
 	* Compiled with MSVC 7.1
