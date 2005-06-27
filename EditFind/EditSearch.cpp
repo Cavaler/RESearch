@@ -33,7 +33,7 @@ BOOL EditorSearchAgain() {
 		}
 	} else {
 		if (EReverse) {
-			for (FirstLine=EdInfo.CurLine;FirstLine>=0;FirstLine--) {
+			for (FirstLine=EdInfo.CurLine; !Interrupt && FirstLine>=0; FirstLine--) {
 				LastLine=FirstLine;
 				StartPos=0;
 				EndPos=(FirstLine==EdInfo.CurLine)?EdInfo.CurPos:-1;
@@ -43,7 +43,7 @@ BOOL EditorSearchAgain() {
 				}
 			}
 		} else {
-			for (FirstLine=EdInfo.CurLine;FirstLine<EdInfo.TotalLines;FirstLine++) {
+			for (FirstLine=EdInfo.CurLine; !Interrupt && FirstLine<EdInfo.TotalLines; FirstLine++) {
 				LastLine=FirstLine;
 				StartPos=(FirstLine==EdInfo.CurLine)?EdInfo.CurPos:0;
 				EndPos=-1;
