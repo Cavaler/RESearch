@@ -89,7 +89,7 @@ BOOL ProcessPlainTextBuffer(char *Buffer,int BufLen,WIN32_FIND_DATA *FindData) {
 	while (Current+FText.size()<=Buffer+BufLen) {
 		if (((FCaseSensitive)?memcmp(Current,FText.data(),FText.size()):_memicmp(Current,FText.data(),FText.size()))==0) {
 			int ReplaceLength;
-			char *Replace=CreateReplaceString(Buffer,NULL,0,FRReplace.c_str(),"\n",NULL,ReplaceLength);
+			char *Replace=CreateReplaceString(Buffer,NULL,0,FRReplace.c_str(),"\n",NULL,-1,ReplaceLength);
 			if (!DoReplace(hFile,Current,FText.size(),Replace,ReplaceLength,Skip,Current-Skip,FindData)) {free(Replace);break;}
 			free(Replace);
 		} else Current++;
@@ -112,7 +112,7 @@ BOOL ProcessRegExpBuffer(char *Buffer,int BufLen,WIN32_FIND_DATA *FindData) {
 		SkipNoCRLF(BufEnd,&BufLen);
 		while ((BufEnd!=Buffer)&&do_pcre_exec(FPattern,FPatternExtra,Buffer,BufEnd-Buffer,Start,0,Match,MatchCount*3)>=0) {
 			int ReplaceLength;
-			char *Replace=CreateReplaceString(Buffer,Match,MatchCount,FRReplace.c_str(),"\n",NULL,ReplaceLength);
+			char *Replace=CreateReplaceString(Buffer,Match,MatchCount,FRReplace.c_str(),"\n",NULL,-1,ReplaceLength);
 			char *NewBuffer=Buffer+Match[0];
 			if (!DoReplace(hFile,NewBuffer,Match[1]-Match[0],Replace,ReplaceLength,Skip,NewBuffer-Skip,FindData)) {
 				free(Replace);Error=TRUE;break;
@@ -146,7 +146,7 @@ BOOL ReplaceSeveralLineBuffer(HANDLE &hFile,char *&Buffer,char *BufEnd,int *Matc
 		int ReplaceLength;
 		char *NewBuffer=Buffer+Match[0];
 		if (NewBuffer>=LineEnd) break;
-		char *Replace=CreateReplaceString(Buffer,Match,MatchCount,FRReplace.c_str(),"\n",NULL,ReplaceLength);
+		char *Replace=CreateReplaceString(Buffer,Match,MatchCount,FRReplace.c_str(),"\n",NULL,-1,ReplaceLength);
 		if (!DoReplace(hFile,NewBuffer,Match[1]-Match[0],Replace,ReplaceLength,Skip,NewBuffer-Skip,FindData)) {
 			free(Replace);return FALSE;
 		}

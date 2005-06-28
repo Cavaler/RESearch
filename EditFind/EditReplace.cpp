@@ -243,7 +243,12 @@ BOOL ReplaceInText(int FirstLine,int StartPos,int LastLine,int EndPos) {
 		int Numbers[3]={MatchFirstLine,MatchFirstLine-ReplaceStartLine,ReplaceNumber};
 		int ReplaceLength,FoundLastLine=MatchLastLine;
 		BOOL ZeroMatch=(MatchFirstLine==MatchLastLine)&&(MatchStartPos==MatchEndPos);
-		char *Replace_O2E=CreateReplaceString(MatchedLine,Match,MatchCount,ERReplace_O2E.c_str(),"\n",Numbers,ReplaceLength);
+		char *Replace_O2E=CreateReplaceString(MatchedLine,Match,MatchCount,ERReplace_O2E.c_str(),"\n",Numbers,(EREvaluate ? EREvaluateScript : -1),ReplaceLength);
+		if (Interrupt) {	// Script failed
+			if (Replace_O2E) free(Replace_O2E);
+			break;
+		}
+
 		char *Replace=_strdup(Replace_O2E);
 		EditorToOEM(Replace, ReplaceLength);
 		eReplaceResult Result=EditorReplaceOK(MatchFirstLine,MatchStartPos,MatchLastLine,MatchEndPos,MatchedLine,Replace,Replace_O2E,ReplaceLength);
@@ -285,7 +290,12 @@ BOOL ReplaceInTextByLine(int FirstLine,int StartPos,int LastLine,int EndPos,BOOL
 
 			int Numbers[3]={MatchFirstLine,MatchFirstLine-ReplaceStartLine,ReplaceNumber};
 			int ReplaceLength;
-			char *Replace_O2E=CreateReplaceString(MatchedLine,Match,MatchCount,ERReplace_O2E.c_str(),"\n",Numbers,ReplaceLength);
+			char *Replace_O2E=CreateReplaceString(MatchedLine,Match,MatchCount,ERReplace_O2E.c_str(),"\n",Numbers,(EREvaluate ? EREvaluateScript : -1),ReplaceLength);
+			if (Interrupt) {	// Script failed
+				if (Replace_O2E) free(Replace_O2E);
+				break;
+			}
+
 			char *Replace=_strdup(Replace_O2E);
 			EditorToOEM(Replace, ReplaceLength);
 			int TailLength=MatchEndPos-FoundEndPos;
@@ -378,8 +388,7 @@ BOOL EditorReplaceAgain() {
 	StartupInfo.EditorControl(ECTL_SETPOSITION,&Position);
 
 	if (NoAsking||Interrupt) return TRUE;
-	const char *Lines[]={GetMsg(MREReplace),GetMsg(MCannotFind),EText.c_str(),GetMsg(MOk)};
-	StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"ECannotFind",Lines,4,1);
+	ShowErrorMsg(GetMsg(MCannotFind), EText.c_str(), "ECannotFind");
 	return FALSE;
 }
 
@@ -418,7 +427,7 @@ BOOL EditorReplace() {
 	StartupInfo.EditorControl(ECTL_GETINFO,&EdInfo);
 	EInSelection=(EdInfo.BlockType!=BTYPE_NONE);
 
-	CFarDialog Dialog(76,16,"ReplaceDlg");
+	CFarDialog Dialog(76,17,"ReplaceDlg");
 	Dialog.AddFrame(MREReplace);
 	Dialog.Add(new CFarTextItem(5,2,0,MSearchFor));
 	Dialog.Add(new CFarEditItem(5,3,65,DIF_HISTORY,"SearchText",SearchText));
@@ -440,11 +449,13 @@ BOOL EditorReplace() {
 	if (EInSelection) Dialog.Add(new CFarCheckBoxItem(30,9,0,MInSelection,&EInSelection));
 	Dialog.Add(new CFarCheckBoxItem(5,10,0,MRemoveEmpty,&ERRemoveEmpty));
 	Dialog.Add(new CFarCheckBoxItem(30,10,0,MRemoveNoMatch,&ERRemoveNoMatch));
+	Dialog.Add(new CFarCheckBoxItem(5,11,0,MEvaluateAsScript,&EREvaluate));
+	Dialog.Add(new CFarComboBoxItem(30,11,60,0,new CFarListData(m_lstEngines, false),EREvaluateScript));
 
-	Dialog.Add(new CFarButtonItem(0,12,DIF_CENTERGROUP,TRUE,MReplace));
-	Dialog.Add(new CFarButtonItem(0,12,DIF_CENTERGROUP,FALSE,MAll));
-	Dialog.Add(new CFarButtonItem(0,12,DIF_CENTERGROUP,FALSE,MCancel));
-	Dialog.Add(new CFarButtonItem(60,12,0,0,MBatch));
+	Dialog.Add(new CFarButtonItem(0,13,DIF_CENTERGROUP,TRUE,MReplace));
+	Dialog.Add(new CFarButtonItem(0,13,DIF_CENTERGROUP,FALSE,MAll));
+	Dialog.Add(new CFarButtonItem(0,13,DIF_CENTERGROUP,FALSE,MCancel));
+	Dialog.Add(new CFarButtonItem(60,13,0,0,MBatch));
 	Dialog.Add(new CFarButtonItem(60,7,0,FALSE,MPresets));
 
 	SearchText=PickupText();

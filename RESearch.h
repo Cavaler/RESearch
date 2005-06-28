@@ -4,6 +4,10 @@
 #define WIN32_LEAN_AND_MEAN
 #define STRICT
 #include <windows.h>
+#include <ole2.h>
+#include <comdef.h>
+#include <activscp.h>
+#include <comcat.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,9 +36,11 @@ using namespace std;
 #ifdef DEFINE_VARS
 #define EXTERN
 #define VALUE(n) = n
+#define CONSTRUCT(n) n
 #else
 #define EXTERN extern
 #define VALUE(n)
+#define CONSTRUCT(n)
 #endif
 
 // Common
@@ -59,6 +65,13 @@ EXTERN BOOL EFindSelection;
 
 EXTERN BOOL Interrupt;
 EXTERN bool g_bFromCmdLine;
+
+struct sActiveScript {
+	string m_strName;
+	CLSID  m_clsid;
+};
+EXTERN vector<sActiveScript> m_arrEngines;
+EXTERN CFarListData m_lstEngines CONSTRUCT((NULL, 0));
 
 enum OperationResult {OR_CANCEL,OR_FAILED,OR_OK,OR_PANEL};
 
@@ -221,7 +234,12 @@ enum {
 	MInSelection,
 	MRemoveEmpty,
 	MRemoveNoMatch,
+	MEvaluateAsScript,
 	MCannotFind,
+	MErrorCreatingEngine, 
+	MErrorParsingText, 
+	MErrorLoadingTypeLib, 
+	MErrorExecutingScript, 
 
 	MAskReplace,
 	MAskWith,
@@ -256,14 +274,19 @@ enum {
 
 void ReadRegistry();
 void WriteRegistry();
+void EnumActiveScripts();
 
 void PrepareBMHSearch(const char *String,int StringLength,size_t nPattern = 0);
 BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,int CaseSensitive,BOOL bUTF8=FALSE);
-char *CreateReplaceString(const char *Matched,int *Match,int Count,const char *Replace,const char *EOL,int *Numbers,int &ResultLength);
+char *CreateReplaceString(const char *Matched,int *Match,int Count,const char *Replace,const char *EOL,int *Numbers,int Engine,int &ResultLength);
+char *EvaluateReplaceString(const char *Matched,int *Match,int Count,const char *Replace,const char *EOL,int *Numbers,int Engine,int &ResultLength);
 
 BOOL LoadPresets(char *Which,char **StringNames,int StringCount,char **IntNames,int IntCount,void **PresetData,int *PresetCount);
 BOOL SavePresets(char *Which,char **StringNames,int StringCount,char **IntNames,int IntCount,void *PresetData,int PresetCount);
 BOOL Interrupted();
+
+void ShowErrorMsg(const char *sz1, const char *sz2 = NULL, const char *szHelp = NULL);
+void ShowHResultError(int nError, HRESULT hResult, const char *szHelp = NULL);
 
 EXTERN char UpCaseTable[256];
 void SetANSILocale();

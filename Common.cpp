@@ -1,4 +1,5 @@
 #define DEFINE_VARS
+#define INITGUID
 #include "RESearch.h"
 #include "FileFind\FileFind.h"
 #include "FileTools\FileTools.h"
@@ -206,7 +207,10 @@ BOOL ExpandParameter(const char *Matched,char *&String,int &Length,string Param,
 	return TRUE;
 }
 
-char *CreateReplaceString(const char *Matched,int *Match,int Count,const char *Replace,const char *EOL,int *Numbers,int &ResultLength) {
+char *CreateReplaceString(const char *Matched,int *Match,int Count,const char *Replace,const char *EOL,int *Numbers,int Engine,int &ResultLength) {
+	if ((Engine >= 0) && (Engine < m_arrEngines.size()))
+		return EvaluateReplaceString(Matched, Match, Count, Replace, EOL, Numbers, Engine, ResultLength);
+
 	char *String=_strdup("");
 	OneCaseConvert=CaseConvert=CCV_NONE;
 	ResultLength=0;
@@ -452,6 +456,25 @@ void QuoteReplaceString(string &strText) {
 			continue;
 		}
 	}
+}
+
+void ShowErrorMsg(const char *sz1, const char *sz2, const char *szHelp) {
+	const char *Lines[]={GetMsg(MREReplace),sz1,sz2,GetMsg(MOk)};
+	StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,szHelp,Lines,4,1);
+}
+
+void ShowHResultError(int nError, HRESULT hResult, const char *szHelp) {
+	char *szMessage;
+	FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER|FORMAT_MESSAGE_FROM_SYSTEM,
+		NULL, hResult, 0, (LPSTR)&szMessage, 0, NULL);
+
+	char *szEnd = strchr(szMessage, '\r');
+	if (szEnd) *szEnd = 0;
+	char szFullMsg[1024];
+	sprintf(szFullMsg, "%s (0x%08X)", szMessage, hResult);
+
+	ShowErrorMsg(GetMsg(nError), szFullMsg, szHelp);
+	LocalFree(szMessage);
 }
 
 HANDLE g_hREThread = NULL;

@@ -28,6 +28,9 @@ void WINAPI SetStartupInfo(const PluginStartupInfo *Info) {
 	g_pszErrorTitle = GetMsg(MError);
 	CFarIntegerRangeValidator::s_szErrorMsg = GetMsg(MInvalidNumber);
 	CFarIntegerRangeValidator::s_szHelpTopic = "REInvalidNumber";
+	
+	CoInitialize(NULL);
+	EnumActiveScripts();
 }
 
 void BadCmdLine() {
@@ -522,4 +525,5 @@ void WINAPI ExitFAR() {
 	FCleanup(FALSE);
 	FTCleanup(FALSE);
 	StopREThread();
+	CoUninitialize();
 }

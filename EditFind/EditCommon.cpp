@@ -21,6 +21,7 @@ void EReadRegistry(HKEY Key) {
 	QueryRegIntValue(Key,"ECaseSensitive",&ECaseSensitive,0,0,1);
 	QueryRegStringValue(Key,"ERReplace",ERReplace,"");
 	QueryRegBoolValue(Key,"EFLeaveFilter",&EFLeaveFilter,TRUE);
+	QueryRegIntValue(Key,"EREvaluateScript",&EREvaluateScript,0,0);
 	SelType=BTYPE_NONE;
 
 	ESPresets=new CESPresetCollection();
@@ -38,6 +39,7 @@ void EWriteRegistry(HKEY Key) {
 	SetRegIntValue(Key,"ECaseSensitive",ECaseSensitive);
 	SetRegStringValue(Key,"ERReplace",ERReplace);
 	SetRegBoolValue(Key,"EFLeaveFilter",EFLeaveFilter);
+	SetRegIntValue(Key,"EREvaluateScript",EREvaluateScript);
 }
 
 BOOL SearchIn(const char *Line,int Start,int Length,int *MatchStart,int *MatchLength,BOOL NeedMatch) {

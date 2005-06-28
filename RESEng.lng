@@ -158,7 +158,12 @@
 "In se&lection only"
 "Remove empt&y lines"
 "Remove &not matched lines"
+"Eval&uate as script:"
 "Could not find the string"
+"Error creating script engine"
+"Error parsing script text"
+"Error loading type library"
+"Error executing script"
 
 "Replace"
 "with"

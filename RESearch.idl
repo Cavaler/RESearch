@@ -1,0 +1,37 @@
+// RESearch.idl : IDL source for RESearch.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (RESearch.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[	object,
+	uuid(22B6F9B8-CDB4-4cb9-9D5F-F2B36C3F76BC),
+	dual,
+	helpstring("IReplaceParameters Interface"),
+	pointer_default(unique),
+	nonextensible
+] interface IReplaceParameters : IUnknown {
+	[id(1)] HRESULT match([in]long lPos, [out,retval]BSTR *pbstrMatch);
+	[id(2),propget] HRESULT eol([out,retval]BSTR *pbstrEOL);
+	[id(3),propget] HRESULT l([out,retval]long *pValue);
+	[id(4),propget] HRESULT n([out,retval]long *pValue);
+	[id(5),propget] HRESULT r([out,retval]long *pValue);
+	[id(6)] HRESULT result([in]BSTR bstrResult);
+};
+
+[	uuid(B6CA758A-78FB-4093-84D3-0A88D8EA7285),
+	version(1.0),
+	helpstring("RESearch 1.0 Type Library")
+] library RESearchLib {
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+	[	uuid(8E5DB420-B249-40b7-81B7-2E0049F4DB92),
+		helpstring("ReplaceParameters Class")
+	] coclass ReplaceParameters {
+		[default] interface IReplaceParameters;
+	};
+}

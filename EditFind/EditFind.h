@@ -44,6 +44,8 @@ EXTERN string ERReplace;
 EXTERN string ERReplace_O2E;
 EXTERN BOOL ERRemoveEmpty;
 EXTERN BOOL ERRemoveNoMatch;
+EXTERN bool EREvaluate VALUE(false);
+EXTERN int EREvaluateScript;
 EXTERN BOOL EFLeaveFilter;
 EXTERN BOOL EReverse VALUE(FALSE);
 EXTERN BOOL EInSelection;
