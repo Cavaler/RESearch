@@ -184,12 +184,12 @@ eReplaceResult EditorReplaceOK(int FirstLine,int StartPos,int &LastLine,int &End
 		int  ReplacedCount=0;
 		QuoteStrings(Replace,Replaced,ReplacedCount,EdInfo.WindowSizeX-12);
 
-		int Len=30,L,H,I,TotalCount=FoundCount+ReplacedCount;								// Calclulate dialog width
+		int Len=30,L,H,I,TotalCount=FoundCount+ReplacedCount;					// Calclulate dialog width
 		for (I=0;I<FoundCount;I++) {L=strlen(Found[I]);if (L>Len) Len=L;}
 		for (I=0;I<ReplacedCount;I++) {L=strlen(Replaced[I]);if (L>Len) Len=L;}
 		if (Len>EdInfo.WindowSizeX-2) Len=EdInfo.WindowSizeX-2;
 
-		L=EdInfo.CurLine-Position.TopScreenLine;		// Calclulate dialog position
+		L=Position.CurLine-Position.TopScreenLine;		// Calclulate dialog position
 		if (L<1+EdInfo.WindowSizeY/2) {
 			H=(EdInfo.WindowSizeY+L-9)/2;
 		} else {
