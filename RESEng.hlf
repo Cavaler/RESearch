@@ -2,10 +2,11 @@
 .PluginContents=Regular Expression Search
 
 @Contents
-$ #Regular Expression Search and Replace, version 4.45#
+$ #Regular Expression Search and Replace, version 5.00#
     This plugin allows you to:
 
     - Perform text search and replace in editor
+    - Perform text search in viewer
     - Perform file search
     - Perform text replacing in multiple files
     - Rename files
@@ -14,8 +15,9 @@ $ #Regular Expression Search and Replace, version 4.45#
     Its difference from standard Far tools, it allows using ~Regular Expressions~@RegularExpressions@
 in file masks, searched text, and using various macros in replacement text.
     Due to this, you can perform complicated searches and context-dependent replacing.
+	Furthermore, it supports ~scripting replacement~@RegularReplaceScripting@.
 
-    This plugin uses ~PCRE 4.5 library~@PCRE@, compiled with ~UTF-8~@UTF8@ support
+    This plugin uses ~PCRE 5.0 library~@PCRE@, compiled with ~UTF-8~@UTF8@ support
 
    ~Regular Expression Basics~@RegularExpressions@
    ~Replacement Text~@RegularReplace@
@@ -135,6 +137,19 @@ group in regular expression (counted from 1). $0 is replaced with whole matched 
     #NOTE#: $nn, $L, $N, $R can be extended by using the following form: ${L+/-nnn}.
 In this case #nnnn# (may be negative as well) is added to a number to be inserted, and its
 length is used for right-aligning the resulting number with zeros (so you can do ${L+0000}).
+@RegularReplaceScripting
+$ #Using scripting#
+    To allow a user to achieve a much greater level of flexibility in replacing text, RESearch
+allows evaluating a line of script code as replacement text, using any installed script engine
+(VBScript and JScript come pre-installed with all modern versions of Windows, Perl/Python/Ruby
+and many others are also available)
+    The following functions are available for the script:
+
+    #match(n)#      Returns the same as $n in usual replace
+    #l/n/r()#       Returns the same as $L/$N/$R in usual replace
+    #eol()#         Returns a suitable end-of-line sequence
+    #result(str)#   Has to be called to return a resulting value back to RESearch
+
 @UTF8
 $ #UTF-8 support#
   From version 4.0 RESearch provides a limited support for searching UTF-8 text.
@@ -313,6 +328,9 @@ if regular expression search is selected.
   #Remove empty lines#  If, after replacing, line becomes empty, delete it.
 
   #Remove not matched lines# If there were no matches within line, delete it.
+
+  #Evaluate as script# Forces evaluating of a replace string as script in a specified language.
+For more information, see ~Replace Scripting~@RegularReplaceScripting@.
 
  For other options, see ~Regular Expression Search~@SearchDlg@.
 

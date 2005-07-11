@@ -5,8 +5,11 @@ Regular Expression Search and Replace
  - Bug fixed
  * Minor change
 
-Version 5.00 (planned)
-	! Regular Expression Search in viewer
+Version 5.00 (04.07.2005)
+	# WARNING! Far versions before 1.70 not supported, sorry
+	! Can evaluate Replace string (only in editor for now) as any registered script language. Read help for details
+	! Regular Expression Search in viewer - BETA!, for Far 1.70.1914 and later
+	- Replace confirmation dialog position fixed
 
 Version 4.45 (27.06.2005)
 	* Ins/Del in Renumber
@@ -23,6 +26,7 @@ Version 4.40 (04.05.2005)
 	+ Russian help file (thanks to Tim Sobolev)
 	* Presets for Advanced search options
 	* Compiled with MSVC 7.1
+	* PCRE library version 5.0 used
 	- "Search in first bytes" option only applies when Advanced search options are in effect
 	- Other crash/incorrect fixes
 
