@@ -18,6 +18,7 @@ int FileNumber;
 bool FTAskOverwrite;
 bool FTAskCreatePath;
 int g_nStartWithNow;
+bool g_bFRStripCommon;
 
 void FTReadRegistry(HKEY Key) {
 	QueryRegStringValue(Key, "FTRStrip",   g_strStrip,   "^\\d+\\s*([-.]\\s*)?");
@@ -443,18 +444,40 @@ OperationResult RenameSelectedFiles(PluginPanelItem **PanelItems,int *ItemsNumbe
 	return (*ItemsNumber==0)?NoFilesFound():OR_OK;
 }
 
+void StripCommonPart(vector<string> &arrFileNames) {
+	int nCommon = -1;
+	for (size_t nStr = 0; nStr < arrFileNames.size(); nStr++) {
+		if (arrFileNames[nStr].empty()) continue;
+		if (nCommon < 0) {nCommon = arrFileNames[nStr].length();continue;}
+		while ((nCommon > 0) && (strncmp(arrFileNames[0].c_str(), arrFileNames[nStr].c_str(), nCommon) != 0)) nCommon--;
+		if (nCommon == 0) return;
+	}
+
+	for (nStr = 0; nStr < arrFileNames.size(); nStr++)
+		arrFileNames[nStr].erase(0, nCommon);
+}
+
 void ProcessNames(vector<string> &arrFileNames, vector<string> &arrProcessedNames) {
 	arrProcessedNames.resize(0);
 	CRegExp reStrip(g_strStrip, PCRE_CASELESS);
 
-	for (size_t nItem = 0; nItem < arrFileNames.size(); nItem++) {
-		string strName = arrFileNames[nItem];
+	vector<string> arrStripped = arrFileNames;
+
+	if (g_bFRStripCommon) StripCommonPart(arrStripped);
+	for (size_t nItem = 0; nItem < arrStripped.size(); nItem++) {
+		if (!arrStripped[nItem].empty()) {
+			vector<string> arrMatches;
+			if (reStrip.Match(arrStripped[nItem], PCRE_ANCHORED, &arrMatches)) {
+				arrStripped[nItem].erase(0, arrMatches[0].length());
+			}
+		}
+	}
+	if (g_bFRStripCommon) StripCommonPart(arrStripped);
+
+	for (nItem = 0; nItem < arrStripped.size(); nItem++) {
+		string strName = arrStripped[nItem];
 
 		if (!strName.empty()) {
-			vector<string> arrMatches;
-			if (reStrip.Match(strName, PCRE_ANCHORED, &arrMatches)) {
-				strName.erase(0, arrMatches[0].length());
-			}
 			char szNumber[16];
 			sprintf(szNumber, "%0*d", g_nWidth, nItem+g_nStartWithNow);
 			strName = g_strPrefix + szNumber + g_strPostfix + strName;
@@ -487,12 +510,13 @@ OperationResult RenumberFiles() {
 	int BreakKeys[] = {
 		VK_F2, VK_F7, (PKF_CONTROL<<16)|VK_UP, (PKF_CONTROL<<16)|VK_DOWN,
 		VK_ADD, (PKF_CONTROL<<16)|VK_ADD, VK_SUBTRACT, (PKF_CONTROL<<16)|VK_SUBTRACT, VK_F10,
-		VK_INSERT, VK_DELETE, 0
+		VK_INSERT, VK_DELETE, VK_F8, 0
 	};
 
 	bool bOriginal = false;
 	int nPosition = 0;
 	int nOK = 0;
+	g_bFRStripCommon = false;
 	do {
 		vector<string> arrProcessedNames;
 		ProcessNames(arrFileNames, arrProcessedNames);
@@ -574,6 +598,9 @@ OperationResult RenumberFiles() {
 				nOK--;
 			}
 			nPosition = nOK;
+			break;
+		case 11:
+			g_bFRStripCommon = !g_bFRStripCommon;
 			break;
 		}
 	} while (true);
