@@ -1,4 +1,5 @@
 #include "EditFind.h"
+#include "pcre\internal.h"
 
 CParameterBatch g_ESBatch(1, 4,
 	"Text", &SearchText,
@@ -258,7 +259,24 @@ BOOL EPreparePattern(string &SearchText) {
 	if (ERegExp) {
 		char *OEMLine = _strdup(SearchText.c_str());
 		OEMToEditor(OEMLine, SearchText.size());
-		BOOL Result = PreparePattern(&EPattern,&EPatternExtra,OEMLine,ECaseSensitive,EUTF8);
+
+		if (ECharacterTables) pcre_free((void *)ECharacterTables);
+		EditorInfo EdInfo;
+		StartupInfo.EditorControl(ECTL_GETINFO, &EdInfo);
+
+		if (EdInfo.TableNum >= 0) {
+			CharTableSet TableSet;
+			StartupInfo.CharTable(EdInfo.TableNum, (char *)&TableSet, sizeof(TableSet));
+			setlocale(LC_CTYPE, ".OCP");
+			ECharacterTables = far_maketables(&TableSet);
+		} else if (EdInfo.AnsiMode) {
+			setlocale(LC_CTYPE, ".ACP");
+			ECharacterTables = pcre_maketables();
+		} else {
+			ECharacterTables = NULL;
+		}
+
+		BOOL Result = PreparePattern(&EPattern,&EPatternExtra,OEMLine,ECaseSensitive,EUTF8,ECharacterTables);
 		free(OEMLine);
 		return Result;
 	} else {

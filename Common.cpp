@@ -69,7 +69,7 @@ void WriteRegistry() {
 	RegCloseKey(Key);
 }
 
-BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,int CaseSensitive,BOOL bUTF8) {
+BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,int CaseSensitive,BOOL bUTF8,const unsigned char *pTables) {
 	if (Text.empty()) return TRUE;						// Not needed if empty
 	const char *ErrPtr;
 	int ErrOffset;
@@ -78,7 +78,7 @@ BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,
 	if (!CaseSensitive) iFlags |= PCRE_CASELESS;
 	if (bUTF8) iFlags |= PCRE_UTF8;
 
-	*Pattern=pcre_compile(Text.c_str(),iFlags,&ErrPtr,&ErrOffset,NULL);
+	*Pattern=pcre_compile(Text.c_str(),iFlags,&ErrPtr,&ErrOffset,pTables);
 	if (!(*Pattern)) {
 		string ErrPos(Text.length(),' ');
 		const char *Lines[]={"RegExp error",(char *)ErrPtr,"\x01",Text.c_str(),ErrPos.c_str(),GetMsg(MOk)};

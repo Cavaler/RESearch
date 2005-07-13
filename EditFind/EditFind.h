@@ -54,6 +54,7 @@ EXTERN BOOL EUTF8 VALUE(FALSE);
 EXTERN string ETextUpcase;
 EXTERN pcre *EPattern VALUE(NULL);
 EXTERN pcre_extra *EPatternExtra VALUE(NULL);
+EXTERN const unsigned char *ECharacterTables VALUE(NULL);
 EXTERN int *Match VALUE(NULL);
 EXTERN int MatchCount VALUE(0);
 EXTERN char *MatchedLine VALUE(NULL);
@@ -90,5 +91,7 @@ void EReadRegistry(HKEY Key);
 void EWriteRegistry(HKEY Key);
 void DeleteMatchInfo();
 void ECleanup(BOOL PatternOnly);
+
+extern "C" const unsigned char *far_maketables(struct CharTableSet *pTable);
 
 #endif
