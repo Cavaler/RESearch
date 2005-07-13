@@ -5,6 +5,10 @@ Regular Expression Search and Replace
  - Bug fixed
  * Minor change
 
+Version 5.10 (04.07.2005)
+	* F8 in Renumber Files - strip common part
+	- Fixed character classes and case sensivity for RegExps in non-OEM character page
+
 Version 5.00 (04.07.2005)
 	# WARNING! Far versions before 1.70 not supported, sorry
 	! Can evaluate Replace string (only in editor for now) as any registered script language. Read help for details
