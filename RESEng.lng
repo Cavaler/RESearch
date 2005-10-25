@@ -26,6 +26,7 @@
 "Search &again"
 "Search/replace &again"
 "&Filter text"
+"&Transliterate"
 "UTF-&8 converter"
 
 "Regular Expression Search"
@@ -164,6 +165,10 @@
 "Error parsing script text"
 "Error loading type library"
 "Error executing script"
+
+"Transliterate"
+"Source characters"
+"Target characters"
 
 "Replace"
 "with"

@@ -50,6 +50,8 @@ EXTERN BOOL EFLeaveFilter;
 EXTERN BOOL EReverse VALUE(FALSE);
 EXTERN BOOL EInSelection;
 EXTERN BOOL EUTF8 VALUE(FALSE);
+EXTERN string ETSource;
+EXTERN string ETTarget;
 
 EXTERN string ETextUpcase;
 EXTERN pcre *EPattern VALUE(NULL);
@@ -68,6 +70,8 @@ BOOL EditorReplaceAgain();
 BOOL _EditorReplaceAgain();
 BOOL EditorFilter();
 BOOL EditorFilterAgain();
+BOOL EditorTransliterate();
+BOOL EditorTransliterateAgain();
 
 BOOL SearchInLine(const char *Line,int Length,int Start,int End,int *MatchStart,int *MatchLength,BOOL NeedMatch);
 BOOL SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,BOOL NeedMatch);

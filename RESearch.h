@@ -3,6 +3,8 @@
 
 #define WIN32_LEAN_AND_MEAN
 #define STRICT
+#pragma warning(disable:4786)
+
 #include <windows.h>
 #include <ole2.h>
 #include <comdef.h>
@@ -13,7 +15,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#pragma warning(disable:4786)
 #include <vector>
 #include <string>
 #include <map>
@@ -102,6 +103,7 @@ enum {
 	MMenuSearchAgain,
 	MMenuSearchReplaceAgain,
 	MMenuFilterText,
+	MMenuTransliterate,
 	MMenuUTF8Converter,
 
 	MRESearch,
@@ -240,6 +242,10 @@ enum {
 	MErrorParsingText, 
 	MErrorLoadingTypeLib, 
 	MErrorExecutingScript, 
+
+	MTransliterate,
+	MTransSource,
+	MTransTarget,
 
 	MAskReplace,
 	MAskWith,
