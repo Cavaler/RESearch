@@ -181,6 +181,10 @@ SOURCE=.\EditFind\EditSearch.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\EditFind\EditTransliterate.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\EditFind\maketables.c
 # End Source File
 # End Group
@@ -296,6 +300,89 @@ SOURCE=.\RESearch.def
 # End Source File
 # Begin Source File
 
+SOURCE=.\RESearch.msg
+
+!IF  "$(CFG)" == "RESearch - Win32 Release"
+
+# Begin Custom Build - Compiling language file $(InputPath)...
+TargetName=RESearch
+InputPath=.\RESearch.msg
+
+BuildCmds= \
+	call ..\MakeLng.bat \
+	echo Copying resulting language files... \
+	copy *.lng "C:\Program Files\Far\Plugins\_Debug\$(TargetName)\" \
+	
+
+"$(TargetName)Eng.lng" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+   $(BuildCmds)
+
+"$(TargetName)Rus.lng" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+   $(BuildCmds)
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "RESearch - Win32 Debug"
+
+# Begin Custom Build - Compiling language file $(InputPath)...
+TargetName=RESearch
+InputPath=.\RESearch.msg
+
+BuildCmds= \
+	call ..\MakeLng.bat \
+	echo Copying resulting language files... \
+	copy *.lng "C:\Program Files\Far\Plugins\_Debug\$(TargetName)\" \
+	
+
+"$(TargetName)Eng.lng" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+   $(BuildCmds)
+
+"$(TargetName)Rus.lng" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+   $(BuildCmds)
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "RESearch - Win32 Release Intel"
+
+# Begin Custom Build - Compiling language file $(InputPath)...
+TargetName=RESearchI
+InputPath=.\RESearch.msg
+
+BuildCmds= \
+	call ..\MakeLng.bat \
+	echo Copying resulting language files... \
+	copy *.lng "C:\Program Files\Far\Plugins\_Debug\$(TargetName)\" \
+	
+
+"$(TargetName)Eng.lng" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+   $(BuildCmds)
+
+"$(TargetName)Rus.lng" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+   $(BuildCmds)
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "RESearch - Win32 Release NET"
+
+# Begin Custom Build - Compiling language file $(InputPath)...
+TargetName=RESearch7
+InputPath=.\RESearch.msg
+
+BuildCmds= \
+	call ..\MakeLng.bat \
+	echo Copying resulting language files... \
+	copy *.lng "C:\Program Files\Far\Plugins\_Debug\$(TargetName)\" \
+	
+
+"$(TargetName)Eng.lng" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+   $(BuildCmds)
+
+"$(TargetName)Rus.lng" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+   $(BuildCmds)
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=.\RESearch.rc
 # End Source File
 # Begin Source File
@@ -304,19 +391,11 @@ SOURCE=.\RESearch.tlb
 # End Source File
 # Begin Source File
 
-SOURCE=.\RESEng.hlf
+SOURCE=.\RESearchEng.hlf
 # End Source File
 # Begin Source File
 
-SOURCE=.\RESEng.lng
-# End Source File
-# Begin Source File
-
-SOURCE=.\RESRus.hlf
-# End Source File
-# Begin Source File
-
-SOURCE=.\RESRus.lng
+SOURCE=.\RESearchRus.hlf
 # End Source File
 # End Target
 # End Project
