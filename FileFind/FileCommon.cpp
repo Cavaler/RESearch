@@ -266,7 +266,7 @@ void ShortenFileName(const char *szFrom, char *szTo) {
 		if ((nLength = strlen(szName)) > 74) {
 			strcpy(szTo, szName+nLength-74);
 		} else {
-			strncpy(szTo, szFrom, 71-nLength);
+			strncpy(szTo, szFrom, 74-nLength);
 			szTo[71-nLength] = '.';
 			szTo[72-nLength] = '.';
 			szTo[73-nLength] = '.';
