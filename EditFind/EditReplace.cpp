@@ -237,7 +237,6 @@ BOOL ReplaceInText(int FirstLine,int StartPos,int LastLine,int EndPos) {
 		if (!SearchInText(MatchFirstLine,MatchStartPos,MatchLastLine,MatchEndPos,TRUE)) return FALSE;
 
 		// Assuming that MatchedLine starts from the needed line
-		EditorToOEM(MatchedLine,MatchedLineLength);
 		StartupInfo.EditorControl(ECTL_GETINFO,&EdInfo);
 
 		int Numbers[3]={MatchFirstLine,MatchFirstLine-ReplaceStartLine,ReplaceNumber};
@@ -251,6 +250,8 @@ BOOL ReplaceInText(int FirstLine,int StartPos,int LastLine,int EndPos) {
 
 		char *Replace=_strdup(Replace_O2E);
 		EditorToOEM(Replace, ReplaceLength);
+		EditorToOEM(MatchedLine,MatchedLineLength);
+
 		eReplaceResult Result=EditorReplaceOK(MatchFirstLine,MatchStartPos,MatchLastLine,MatchEndPos,MatchedLine,Replace,Replace_O2E,ReplaceLength);
 		free(Replace);free(Replace_O2E);
 		DeleteMatchInfo();
@@ -281,11 +282,11 @@ BOOL ReplaceInTextByLine(int FirstLine,int StartPos,int LastLine,int EndPos,BOOL
 		int MatchFirstLine=Line,MatchStartPos=(Line==FirstLine)||EachLineLimited?StartPos:0;
 		int MatchLastLine=Line,MatchEndPos=(Line==LastLine)||EachLineLimited?EndPos:-1;
 		int FoundStartPos=MatchStartPos,FoundEndPos=MatchEndPos;
+
 		while (SearchInText(MatchFirstLine,FoundStartPos,MatchLastLine,FoundEndPos,TRUE)) {
 			if (Interrupted()) return FALSE;
 			Matched=TRUE;
 			// Assuming that MatchedLine starts from the needed line
-			EditorToOEM(MatchedLine,MatchedLineLength);
 			StartupInfo.EditorControl(ECTL_GETINFO,&EdInfo);
 
 			int Numbers[3]={MatchFirstLine,MatchFirstLine-ReplaceStartLine,ReplaceNumber};
@@ -298,6 +299,8 @@ BOOL ReplaceInTextByLine(int FirstLine,int StartPos,int LastLine,int EndPos,BOOL
 
 			char *Replace=_strdup(Replace_O2E);
 			EditorToOEM(Replace, ReplaceLength);
+			EditorToOEM(MatchedLine,MatchedLineLength);
+
 			int TailLength=MatchEndPos-FoundEndPos;
 			int FoundLastLine=MatchLastLine;
 			BOOL ZeroMatch=(FoundStartPos==FoundEndPos);
