@@ -358,11 +358,10 @@ BOOL EditorReplaceAgain() {
 	if (EInSelection) {		// ***************** REPLACE IN SELECTION
 		SaveSelection();
 		ReplaceStartLine=SelStartLine;
-
-		if (SelType==BTYPE_STREAM) {
-			ReplaceInText(SelStartLine,SelStartPos,SelEndLine,SelEndPos);
+		if ((!ESeveralLine)||ERRemoveEmpty||ERRemoveNoMatch) {
+			ReplaceInTextByLine(SelStartLine,SelStartPos,SelEndLine,SelEndPos, SelType == BTYPE_COLUMN);
 		} else {
-			ReplaceInTextByLine(SelStartLine,SelStartPos,SelEndLine,SelEndPos,TRUE);
+			ReplaceInText(SelStartLine,SelStartPos,SelEndLine,SelEndPos);
 		}
 		RestoreSelection();
 	} else {				// ***************** PLAIN REPLACE
