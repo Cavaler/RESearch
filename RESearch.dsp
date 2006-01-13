@@ -342,41 +342,7 @@ BuildCmds= \
 
 !ELSEIF  "$(CFG)" == "RESearch - Win32 Release Intel"
 
-# Begin Custom Build - Compiling language file $(InputPath)...
-TargetName=RESearchI
-InputPath=.\RESearch.msg
-
-BuildCmds= \
-	call ..\MakeLng.bat \
-	echo Copying resulting language files... \
-	copy *.lng "C:\Program Files\Far\Plugins\_Debug\$(TargetName)\" \
-	
-
-"$(TargetName)Eng.lng" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-   $(BuildCmds)
-
-"$(TargetName)Rus.lng" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-   $(BuildCmds)
-# End Custom Build
-
 !ELSEIF  "$(CFG)" == "RESearch - Win32 Release NET"
-
-# Begin Custom Build - Compiling language file $(InputPath)...
-TargetName=RESearch7
-InputPath=.\RESearch.msg
-
-BuildCmds= \
-	call ..\MakeLng.bat \
-	echo Copying resulting language files... \
-	copy *.lng "C:\Program Files\Far\Plugins\_Debug\$(TargetName)\" \
-	
-
-"$(TargetName)Eng.lng" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-   $(BuildCmds)
-
-"$(TargetName)Rus.lng" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-   $(BuildCmds)
-# End Custom Build
 
 !ENDIF 
 
