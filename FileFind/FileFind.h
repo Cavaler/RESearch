@@ -95,6 +95,7 @@ EXTERN vector<string> FSWords;
 
 EXTERN pcre *FMaskPattern VALUE(NULL);
 EXTERN pcre_extra *FMaskPatternExtra VALUE(NULL);
+EXTERN CFarMaskSet *FMaskSet VALUE(NULL);
 
 EXTERN pcre *FAFullFileNamePattern VALUE(NULL);
 EXTERN pcre_extra *FAFullFileNamePatternExtra VALUE(NULL);
@@ -127,7 +128,7 @@ BOOL MaskCaseHere();
 
 OperationResult NoFilesFound();
 
-BOOL MultipleMasksApply(string Masks,char *Filename);
+BOOL MultipleMasksApply(const string &Masks, const char *Filename);
 void AddFile(WIN32_FIND_DATA *FindData,PluginPanelItem **PanelItems,int *ItemsNumber);
 int  ScanDirectories(PluginPanelItem **PanelItems,int *ItemsNumber,ProcessFileProc ProcessFile);
 int  FPreparePattern();

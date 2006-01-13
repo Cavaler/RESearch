@@ -128,6 +128,7 @@ void FCleanup(BOOL PatternOnly) {
 	if (FPatternExtra) {pcre_free(FPatternExtra);FPatternExtra=NULL;}
 	if (FMaskPattern) {pcre_free(FMaskPattern);FMaskPattern=NULL;}
 	if (FMaskPatternExtra) {pcre_free(FMaskPatternExtra);FMaskPatternExtra=NULL;}
+	if (FMaskSet) {delete FMaskSet;FMaskPatternExtra=NULL;}
 	if (!PatternOnly) {
 		if (FAFullFileNamePattern) {pcre_free(FAFullFileNamePattern);FAFullFileNamePattern=NULL;}
 		if (FAFullFileNamePatternExtra) {pcre_free(FAFullFileNamePatternExtra);FAFullFileNamePatternExtra=NULL;}
@@ -144,6 +145,12 @@ int FPreparePattern() {
 	FCleanup(TRUE);
 	if (FMaskAsRegExp) {
 		if (!PreparePattern(&FMaskPattern,&FMaskPatternExtra,FMask,FALSE)) return FALSE;
+	} else {
+		FMaskSet = new CFarMaskSet(FMask.c_str());
+		if (!FMaskSet->Valid()) {
+			delete FMaskSet; FMaskSet = NULL;
+			return FALSE;
+		}
 	}
 
 	if ((FSearchAs==SA_PLAINTEXT)||(FSearchAs==SA_MULTITEXT)) {
@@ -221,37 +228,14 @@ BOOL MaskApplies(string &Mask,size_t Start,char *Filename,BOOL AppendAsterisk) {
 	}
 }
 
-BOOL MultipleMasksApply(string Masks,char *Filename) {
+BOOL MultipleMasksApply(const string &Masks, const char *Filename) {
 	BOOL Result=FALSE,AnyPositive=FALSE;
 
 	if (FMaskAsRegExp) {
 		return do_pcre_exec(FMaskPattern,FMaskPatternExtra,Filename,strlen(Filename),0,0,NULL,NULL)>=0;
+	} else {
+		return (*FMaskSet)(Filename);
 	}
-	if (!strchr(Filename,'.')) strcat(Filename,".");
-
-	do {
-		BOOL AppendAsterisk=AutoappendAsterisk;
-		string Mask;
-		int nPos=Masks.find(MaskDelimiter);
-		if (nPos!=string::npos) {
-			Mask=Masks.substr(0,nPos);
-			Masks.erase(0,nPos+1);
-		} else {
-			Mask=Masks;Masks="";
-		}
-
-		if (Mask[0]==MaskNegation) {
-			if (Mask.find('.')!=string::npos) AppendAsterisk=FALSE;
-			if (MaskApplies(Mask,1,Filename,AppendAsterisk)) return FALSE;
-		} else {
-			if (Mask.find('.')!=string::npos) AppendAsterisk=FALSE;
-			AnyPositive=TRUE;
-			if ((!Result)&&(MaskApplies(Mask,0,Filename,AppendAsterisk))) {
-				Result=TRUE;
-			}
-		}
-	} while (!Masks.empty());
-	return Result||(!AnyPositive);
 }
 
 void ShortenFileName(const char *szFrom, char *szTo) {
