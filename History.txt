@@ -5,10 +5,12 @@ Regular Expression Search and Replace
  - Bug fixed
  * Minor change
 
-Version 5.20 (.01.2006)
+Version 5.20 (13.01.2006)
 	+ 'Transliterate' feature in editor
 	- Fixed (?) replacing in non-OEM character page
 	- Fixed single-line replace in selection
+	- Fixed multiple masks
+	- Fixed rename for names without extension (dot not added)
 
 Version 5.10 (13.07.2005)
 	* F8 in Renumber Files - strip common part
