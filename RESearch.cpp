@@ -6,8 +6,11 @@
 #include "FarDlg.h"
 
 void WINAPI GetPluginInfo(PluginInfo *Info) {
-	static const char *ConfigStrings[]={GetMsg(MRESearch)};
-	static const char *MenuStrings[]={GetMsg(MRESearch)};
+	static const char *ConfigStrings[1];
+	static const char *MenuStrings[1];
+	ConfigStrings[0] = GetMsg(MRESearch);
+	MenuStrings[0] = GetMsg(MRESearch);
+
 	Info->StructSize=sizeof(PluginInfo);
 	Info->Flags=PF_EDITOR|PF_VIEWER|PF_FULLCMDLINE;
 //	Info->Flags=PF_EDITOR|PF_FULLCMDLINE;
