@@ -39,6 +39,7 @@ void FReadRegistry(HKEY Key) {
 	QueryRegIntValue(Key,"FRConfirmFile",&FRConfirmFile,0,0,1);
 	QueryRegIntValue(Key,"FRConfirmLine",&FRConfirmLine,0,0,1);
 	QueryRegIntValue(Key,"FRSaveOriginal",&FRSaveOriginal,0,0,1);
+	QueryRegIntValue(Key,"FROverwriteBackup",&FROverwriteBackup,0,0,1);
 	QueryRegStringValue(Key,"FRReplace",FRReplace,"");
 	QueryRegIntValue(Key,"FRepeating",&FRepeating,0,0,1);
 
@@ -101,6 +102,7 @@ void FWriteRegistry(HKEY Key) {
 	SetRegIntValue(Key,"FRConfirmFile",FRConfirmFile);
 	SetRegIntValue(Key,"FRConfirmLine",FRConfirmLine);
 	SetRegIntValue(Key,"FRSaveOriginal",FRSaveOriginal);
+	SetRegIntValue(Key,"FROverwriteBackup",FROverwriteBackup);
 	SetRegStringValue(Key,"FRReplace",FRReplace);
 	SetRegIntValue(Key,"FRepeating",FRepeating);
 
@@ -474,7 +476,7 @@ BOOL ConfirmFile(int Title,const char *FileName) {
 	return FALSE;
 }
 
-void SkipNoCRLF(char *&Buffer,int *Size) {
+void SkipNoCRLF(const char *&Buffer,int *Size) {
 	if (Size) {
 		while ((*Size)&&(*Buffer!=0x0D)&&(*Buffer!=0x0A)) {Buffer++;(*Size)--;}
 	} else {
@@ -482,7 +484,7 @@ void SkipNoCRLF(char *&Buffer,int *Size) {
 	}
 }
 
-void SkipCRLF(char *&Buffer,int *Size) {
+void SkipCRLF(const char *&Buffer,int *Size) {
 	if (Size) {
 		if ((*Size)&&(*Buffer==0x0D)) {Buffer++;(*Size)--;}
 		if ((*Size)&&(*Buffer==0x0A)) {Buffer++;(*Size)--;}
@@ -492,7 +494,7 @@ void SkipCRLF(char *&Buffer,int *Size) {
 	}
 }
 
-void SkipWholeLine(char *&Buffer,int *Size) {
+void SkipWholeLine(const char *&Buffer,int *Size) {
 	SkipNoCRLF(Buffer,Size);SkipCRLF(Buffer,Size);
 }
 

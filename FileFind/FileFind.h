@@ -54,6 +54,7 @@ EXTERN BOOL FROpenModified;
 EXTERN BOOL FRConfirmFile;
 EXTERN BOOL FRConfirmLine;
 EXTERN BOOL FRSaveOriginal;
+EXTERN BOOL FROverwriteBackup;
 EXTERN BOOL FRepeating;
 
 // Advanced options
@@ -134,9 +135,9 @@ int  ScanDirectories(PluginPanelItem **PanelItems,int *ItemsNumber,ProcessFilePr
 int  FPreparePattern();
 
 BOOL ConfirmFile(int Title,const char *FileName);
-void SkipNoCRLF(char *&Buffer,int *Size);
-void SkipCRLF(char *&Buffer,int *Size);
-void SkipWholeLine(char *&Buffer,int *Size);
+void SkipNoCRLF(const char *&Buffer,int *Size);
+void SkipCRLF(const char *&Buffer,int *Size);
+void SkipWholeLine(const char *&Buffer,int *Size);
 
 void FReadRegistry(HKEY Key);
 void FWriteRegistry(HKEY Key);

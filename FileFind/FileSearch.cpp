@@ -4,14 +4,14 @@ void XLatBuffer(BYTE *Buffer,int Length,int Table) {
 	for (register int I=0;I<Length;I++) Buffer[I]=XLatTables[Table][Buffer[I]];
 }
 
-BOOL FindTextInBufferWithTable(char *Buffer,int Size,string &Text,char *Table) {
+BOOL FindTextInBufferWithTable(const char *Buffer,int Size,string &Text,char *Table) {
 	string TextUpcase=Text;
 
 	int Position=BMHSearch(Buffer,Size,FTextUpcase.data(),FTextUpcase.size(),Table);
 	return Position>=0;
 }
 
-BOOL FindTextInBuffer(char *Buffer,int Size,string &Text) {
+BOOL FindTextInBuffer(const char *Buffer,int Size,string &Text) {
 	char *Table=(FCaseSensitive)?NULL:UpCaseTable;
 	if (FindTextInBufferWithTable(Buffer,Size,Text,Table)) return TRUE;
 
@@ -25,11 +25,11 @@ BOOL FindTextInBuffer(char *Buffer,int Size,string &Text) {
 	return FALSE;
 }
 
-BOOL FindPlainText(char *Buffer,int Size) {
+BOOL FindPlainText(const char *Buffer,int Size) {
 	return FindTextInBuffer(Buffer,Size,FText);
 }
 
-BOOL FindPattern(pcre *Pattern,pcre_extra *PatternExtra,char *Buffer,int Length) {
+BOOL FindPattern(pcre *Pattern,pcre_extra *PatternExtra,const char *Buffer,int Length) {
 	if (do_pcre_exec(Pattern,PatternExtra,Buffer,Length,0,0,NULL,0)>=0) return TRUE;
 	if (!FAllCharTables||!XLatTableCount) return FALSE;
 
@@ -44,8 +44,8 @@ BOOL FindPattern(pcre *Pattern,pcre_extra *PatternExtra,char *Buffer,int Length)
 	return FALSE;
 }
 
-BOOL FindRegExp(char *Buffer,int Size) {
-	char *BufEnd=Buffer;
+BOOL FindRegExp(const char *Buffer,int Size) {
+	const char *BufEnd=Buffer;
 	do {
 		Buffer=BufEnd;
 		SkipNoCRLF(BufEnd,&Size);
@@ -55,8 +55,8 @@ BOOL FindRegExp(char *Buffer,int Size) {
 	return FALSE;
 }
 
-BOOL FindSeveralLineRegExp(char *Buffer,int Size) {
-	char *BufEnd=Buffer;
+BOOL FindSeveralLineRegExp(const char *Buffer,int Size) {
+	const char *BufEnd=Buffer;
 	int LinesIn=0,Len;
 	do {
 		SkipNoCRLF(BufEnd,&Size);
@@ -78,11 +78,11 @@ BOOL FindSeveralLineRegExp(char *Buffer,int Size) {
 	return FALSE;
 }
 
-BOOL FindMultiLineRegExp(char *Buffer,int Size) {
+BOOL FindMultiLineRegExp(const char *Buffer,int Size) {
 	return (do_pcre_exec(FPattern,FPatternExtra,Buffer,Size,0,0,NULL,0)>=0);
 }
 
-BOOL FindRegExpInBuffer(char *Buffer,int Size,string &Text) {
+BOOL FindRegExpInBuffer(const char *Buffer,int Size,string &Text) {
 	if (!Text[0]) return TRUE;
 	pcre *Pattern;
 	pcre_extra *PatternExtra;
@@ -93,7 +93,7 @@ BOOL FindRegExpInBuffer(char *Buffer,int Size,string &Text) {
 	} else {Interrupt=TRUE;return FALSE;}
 }
 
-BOOL FindMulti(char *Buffer,int Size,BOOL (*Searcher)(char *,int,string &)) {
+BOOL FindMulti(const char *Buffer,int Size,BOOL (*Searcher)(const char *,int,string &)) {
 	string What=FText;
 	string Word;
 	BOOL Return=TRUE,WereAnyMaybes=FALSE,AnyMaybesFound=FALSE;
@@ -120,35 +120,20 @@ BOOL FindMulti(char *Buffer,int Size,BOOL (*Searcher)(char *,int,string &)) {
 	return Return;
 }
 
-BOOL FindMultiPlainText(char *Buffer,int Size) {return FindMulti(Buffer,Size,FindTextInBuffer);}
-BOOL FindMultiRegExp(char *Buffer,int Size) {return FindMulti(Buffer,Size,FindRegExpInBuffer);}
+BOOL FindMultiPlainText(const char *Buffer,int Size) {return FindMulti(Buffer,Size,FindTextInBuffer);}
+BOOL FindMultiRegExp(const char *Buffer,int Size) {return FindMulti(Buffer,Size,FindRegExpInBuffer);}
 
-BOOL FindMemoryMapped(char *FileName,BOOL (*Searcher)(char *,int)) {
-	BOOL IsFound;
-
-	__try {
-		HANDLE hFile=CreateFile(FileName,GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
-		if (hFile==INVALID_HANDLE_VALUE) throw;
-		__try {
-			HANDLE hMap=CreateFileMapping(hFile,NULL,PAGE_READONLY|SEC_COMMIT,0,0,NULL);
-			if (hMap==NULL) throw;
-			__try {
-				char *FileData=(char *)MapViewOfFile(hMap,FILE_MAP_READ,0,0,0);
-				if (FileData==NULL) throw;
-
-				DWORD FileSize=GetFileSize(hFile,NULL);
-				if (FAdvanced && FASearchHead && (FileSize>FASearchHeadLimit)) FileSize=FASearchHeadLimit;
-				IsFound=Searcher(FileData,FileSize);
-				UnmapViewOfFile(FileData);
-			} __finally {CloseHandle(hMap);}
-		} __finally {CloseHandle(hFile);}
-	} __except (1) {
+BOOL FindMemoryMapped(char *FileName,BOOL (*Searcher)(const char *,int)) {
+	CFileMapping mapFile;
+	if (!mapFile.Open(FileName)) {
 		const char *Lines[]={GetMsg(MREReplace),GetMsg(MFileOpenError),FileName,GetMsg(MOk)};
 		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"FSOpenError",Lines,4,1);
 		return FALSE;
 	}
 
-	return IsFound;
+	DWORD FileSize = mapFile.Size();
+	if (FAdvanced && FASearchHead && (FileSize>FASearchHeadLimit)) FileSize=FASearchHeadLimit;
+	return Searcher(mapFile, FileSize);
 }
 
 void SearchFile(WIN32_FIND_DATA *FindData,PluginPanelItem **PanelItems,int *ItemsNumber) {
