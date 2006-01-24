@@ -52,10 +52,6 @@ EXTERN bool g_bUseSeparateThread;
 EXTERN int  g_nMaxInThreadLength;
 EXTERN int  g_nThreadStackMB;
 
-EXTERN int  ReadAtOnceLimit;
-EXTERN char MaskDelimiter;
-EXTERN char MaskNegation;
-EXTERN BOOL AutoappendAsterisk;
 enum   ShowPosition {SP_TOP,SP_CENTER,SP_BOTTOM};
 EXTERN ShowPosition EShowPosition;
 EXTERN int  EShowPositionOffset;
@@ -77,6 +73,7 @@ EXTERN CFarListData m_lstEngines CONSTRUCT((NULL, 0));
 enum OperationResult {OR_CANCEL,OR_FAILED,OR_OK,OR_PANEL};
 
 enum eStringTable {
+
 	MOk,
 	MCancel,
 	MPresets,
@@ -157,6 +154,7 @@ enum eStringTable {
 	MConfirmFile,
 	MConfirmLine,
 	MSaveOriginal,
+	MOverwriteBackup,
 	MConfirmRequest,
 	MInFile,
 	MTheFile,

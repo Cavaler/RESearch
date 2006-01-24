@@ -25,10 +25,6 @@ void ReadRegistry() {
 	QueryRegIntValue(Key, "MaxInThreadLength", &g_nMaxInThreadLength, 1024, 0);
 	QueryRegIntValue(Key, "ThreadStackMB", &g_nThreadStackMB, 64, 0);
 
-	QueryRegIntValue(Key,"ReadAtOnceLimit",&ReadAtOnceLimit,1024,0,0x1FFFF);
-	QueryRegIntValue(Key,"MaskDelimiter",(int *)&MaskDelimiter,',',0,255);
-	QueryRegIntValue(Key,"MaskNegation",(int *)&MaskNegation,'!',0,255);
-	QueryRegBoolValue(Key,"AutoappendAsterisk",&AutoappendAsterisk,TRUE);
 	QueryRegIntValue(Key,"EShowPosition",(int *)&EShowPosition,1,0,2);
 	QueryRegIntValue(Key,"EShowPositionOffset",&EShowPositionOffset,0,-1024,1024);
 	QueryRegIntValue(Key,"ERightSideOffset",&ERightSideOffset,5,0,1024);
@@ -52,10 +48,6 @@ void WriteRegistry() {
 	SetRegIntValue(Key, "MaxInThreadLength", g_nMaxInThreadLength);
 	SetRegIntValue(Key, "ThreadStackMB", g_nThreadStackMB);
 
-	SetRegIntValue(Key,"ReadAtOnceLimit",ReadAtOnceLimit);
-	SetRegIntValue(Key,"MaskDelimiter",MaskDelimiter);
-	SetRegIntValue(Key,"MaskNegation",MaskNegation);
-	SetRegBoolValue(Key,"AutoappendAsterisk",AutoappendAsterisk);
 	SetRegIntValue(Key,"EShowPosition",EShowPosition);
 	SetRegIntValue(Key,"EShowPositionOffset",EShowPositionOffset);
 	SetRegIntValue(Key,"ERightSideOffset",ERightSideOffset);
