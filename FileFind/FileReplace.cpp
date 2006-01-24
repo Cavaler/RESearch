@@ -215,7 +215,7 @@ void ReplaceFile(WIN32_FIND_DATA *FindData, PluginPanelItem **PanelItems, int *I
 		}
 		strBackupFileName += ".bak";
 
-		if (FROverwriteBackup) {
+		if (FRSaveOriginal && FROverwriteBackup) {
 			if (MoveFileEx(FindData->cFileName, strBackupFileName.c_str(), MOVEFILE_REPLACE_EXISTING)) {
 				break;
 			}
