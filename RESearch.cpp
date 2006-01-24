@@ -438,7 +438,7 @@ int ConfigureCommon() {
 	Dialog.Add(new CFarCheckBoxItem(5,5,0,MAllowEmptyMatch,&AllowEmptyMatch));
 	Dialog.Add(new CFarCheckBoxItem(5,6,0,MDotMatchesNewline,&DotMatchesNewline));
 
-	Dialog.Add(new CFarCheckBoxItem(5,7,0,MUseSeparateThread,&g_bUseSeparateThread));
+	Dialog.Add(new CFarCheckBoxItem(5,8,0,MUseSeparateThread,&g_bUseSeparateThread));
 	Dialog.Add(new CFarTextItem(9,9,0,MMaxInThreadLength));
 	Dialog.Add(new CFarEditItem(34,9,40,0,NULL,(int &)g_nMaxInThreadLength,new CFarIntegerRangeValidator(0,0x7FFFFFFF)));
 	Dialog.Add(new CFarTextItem(9,10,0,MThreadStackMB));
@@ -449,42 +449,30 @@ int ConfigureCommon() {
 }
 
 void ConfigureFile() {
-	CFarDialog Dialog(70,26,"FileConfig");
+	CFarDialog Dialog(70,21,"FileConfig");
 	Dialog.AddFrame(MFileSearchSettings);
 
-	Dialog.Add(new CFarTextItem(5,3,0,MReadAtOnceLimit));
-	Dialog.Add(new CFarEditItem(32,3,40,0,NULL,(int &)ReadAtOnceLimit,new CFarIntegerRangeValidator(0,0xFFFF)));
-	Dialog.Add(new CFarTextItem(42,3,0,MKB));
+	Dialog.Add(new CFarBoxItem(FALSE,5,3,33,7,DIF_LEFTTEXT,MDefaultMaskCase));
+	Dialog.Add(new CFarRadioButtonItem(7,4,DIF_GROUP,MMaskSensitive,(int *)&FMaskCase,MC_SENSITIVE));
+	Dialog.Add(new CFarRadioButtonItem(7,5,0,MMaskInsensitive,(int *)&FMaskCase,MC_INSENSITIVE));
+	Dialog.Add(new CFarRadioButtonItem(7,6,0,MMaskVolumeDependent,(int *)&FMaskCase,MC_VOLUME));
 
-	Dialog.Add(new CFarTextItem(5,5,0,MMaskDelimiter));
-	Dialog.Add(new CFarEditItem(25,5,25,0,NULL,MaskDelimiter,NULL,DI_FIXEDIT));
+	Dialog.Add(new CFarBoxItem(FALSE,35,3,64,7,DIF_LEFTTEXT,MReplaceReadonly));
+	Dialog.Add(new CFarRadioButtonItem(37,4,DIF_GROUP,MNever,(int *)&FRReplaceReadonly,RR_NEVER));
+	Dialog.Add(new CFarRadioButtonItem(37,5,0,MAsk,(int *)&FRReplaceReadonly,RR_ASK));
+	Dialog.Add(new CFarRadioButtonItem(37,6,0,MAlways,(int *)&FRReplaceReadonly,RR_ALWAYS));
 
-	Dialog.Add(new CFarTextItem(5,6,0,MMaskNegation));
-	Dialog.Add(new CFarEditItem(25,6,25,0,NULL,MaskNegation,NULL,DI_FIXEDIT));
-
-	Dialog.Add(new CFarCheckBoxItem(5,8,0,MAddAsterisk,&AutoappendAsterisk));
-
-	Dialog.Add(new CFarTextItem(5,10,0,MDefaultMaskCase));
-	Dialog.Add(new CFarRadioButtonItem(7,11,DIF_GROUP,MMaskSensitive,(int *)&FMaskCase,MC_SENSITIVE));
-	Dialog.Add(new CFarRadioButtonItem(7,12,0,MMaskInsensitive,(int *)&FMaskCase,MC_INSENSITIVE));
-	Dialog.Add(new CFarRadioButtonItem(7,13,0,MMaskVolumeDependent,(int *)&FMaskCase,MC_VOLUME));
-
-	Dialog.Add(new CFarTextItem(35,10,0,MReplaceReadonly));
-	Dialog.Add(new CFarRadioButtonItem(37,11,DIF_GROUP,MNever,(int *)&FRReplaceReadonly,RR_NEVER));
-	Dialog.Add(new CFarRadioButtonItem(37,12,0,MAsk,(int *)&FRReplaceReadonly,RR_ASK));
-	Dialog.Add(new CFarRadioButtonItem(37,13,0,MAlways,(int *)&FRReplaceReadonly,RR_ALWAYS));
-
-	Dialog.Add(new CFarTextItem(5,15,0,MRenumberOptions));
-	Dialog.Add(new CFarTextItem(7,16,0,MStripFromBeginning));
-	Dialog.Add(new CFarEditItem(40,16,63,DIF_HISTORY,"RESearch.Strip", g_strStrip));
-	Dialog.Add(new CFarTextItem(7,17,0,MPrefix));
-	Dialog.Add(new CFarEditItem(32,17,42,DIF_HISTORY,"RESearch.Prefix", g_strPrefix));
-	Dialog.Add(new CFarTextItem(7,18,0,MPostfix));
-	Dialog.Add(new CFarEditItem(32,18,42,DIF_HISTORY,"RESearch.Postfix", g_strPostfix));
-	Dialog.Add(new CFarTextItem(7,19,0,MStartFrom));
-	Dialog.Add(new CFarEditItem(32,19,38,0, NULL, (int &)g_nStartWith,new CFarIntegerRangeValidator(0,0x7FFFFFFF)));
-	Dialog.Add(new CFarTextItem(7,20,0,MWidth));
-	Dialog.Add(new CFarEditItem(32,20,38,0, NULL, (int &)g_nWidth,new CFarIntegerRangeValidator(0,MAX_PATH)));
+	Dialog.Add(new CFarBoxItem(FALSE, 5,9,64,15,DIF_LEFTTEXT,MRenumberOptions));
+	Dialog.Add(new CFarTextItem(7,10,0,MStripFromBeginning));
+	Dialog.Add(new CFarEditItem(40,10,61,DIF_HISTORY,"RESearch.Strip", g_strStrip));
+	Dialog.Add(new CFarTextItem(7,11,0,MPrefix));
+	Dialog.Add(new CFarEditItem(32,11,42,DIF_HISTORY,"RESearch.Prefix", g_strPrefix));
+	Dialog.Add(new CFarTextItem(7,12,0,MPostfix));
+	Dialog.Add(new CFarEditItem(32,12,42,DIF_HISTORY,"RESearch.Postfix", g_strPostfix));
+	Dialog.Add(new CFarTextItem(7,13,0,MStartFrom));
+	Dialog.Add(new CFarEditItem(32,13,38,0, NULL, (int &)g_nStartWith,new CFarIntegerRangeValidator(0,0x7FFFFFFF)));
+	Dialog.Add(new CFarTextItem(7,14,0,MWidth));
+	Dialog.Add(new CFarEditItem(32,14,38,0, NULL, (int &)g_nWidth,new CFarIntegerRangeValidator(0,MAX_PATH)));
 
 	Dialog.AddButtons(MOk,MCancel);
 	Dialog.Display(-1);
@@ -506,11 +494,11 @@ void ConfigureEditor() {
 	Dialog.Add(new CFarEditItem(32,8,39,0,NULL,(int &)ERightSideOffset,new CFarIntegerRangeValidator(0,1024)));
 
 	Dialog.Add(new CFarTextItem(5,10,0,MFindTextAtCursor));
-	Dialog.Add(new CFarRadioButtonItem(5,11,DIF_GROUP,MNone,(int *)&EFindTextAtCursor,FT_NONE));
-	Dialog.Add(new CFarRadioButtonItem(5,12,0,MWordOnly,(int *)&EFindTextAtCursor,FT_WORD));
-	Dialog.Add(new CFarRadioButtonItem(5,13,0,MAnyText,(int *)&EFindTextAtCursor,FT_ANY));
+	Dialog.Add(new CFarRadioButtonItem(7,11,DIF_GROUP,MNone,(int *)&EFindTextAtCursor,FT_NONE));
+	Dialog.Add(new CFarRadioButtonItem(7,12,0,MWordOnly,(int *)&EFindTextAtCursor,FT_WORD));
+	Dialog.Add(new CFarRadioButtonItem(7,13,0,MAnyText,(int *)&EFindTextAtCursor,FT_ANY));
 
-	Dialog.Add(new CFarCheckBoxItem(5,14,0,MFindSelection,&EFindSelection));
+	Dialog.Add(new CFarCheckBoxItem(7,14,0,MFindSelection,&EFindSelection));
 
 	Dialog.AddButtons(MOk,MCancel);
 	Dialog.Display(-1);
