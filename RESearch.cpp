@@ -79,6 +79,12 @@ BOOL ProcessFFLine(char *Line,BOOL *ShowDialog,int *Item) {
 		case 'D':*ShowDialog=FALSE;break;
 		case 'u':FUTF8=TRUE;break;
 		case 'U':FUTF8=FALSE;break;
+		case '0':FSearchIn=SI_ALLDRIVES;break;
+		case '1':FSearchIn=SI_ALLLOCAL;break;
+		case '2':FSearchIn=SI_FROMROOT;break;
+		case '3':FSearchIn=SI_FROMCURRENT;break;
+		case '4':FSearchIn=SI_CURRENTONLY;break;
+		case '5':FSearchIn=SI_SELECTED;break;
 		default:BadCmdLine();return FALSE;
 		}
 		Line++;
@@ -128,10 +134,18 @@ BOOL ProcessFRLine(char *Line,BOOL *ShowDialog,int *Item) {
 		case 'L':FRConfirmLine=FALSE;break;
 		case 'o':FRSaveOriginal=TRUE;break;
 		case 'O':FRSaveOriginal=FALSE;break;
+		case 'b':FROverwriteBackup=TRUE;break;
+		case 'B':FROverwriteBackup=FALSE;break;
 		case 'd':*ShowDialog=TRUE;break;
 		case 'D':*ShowDialog=FALSE;break;
 		case 'u':FUTF8=TRUE;break;
 		case 'U':FUTF8=FALSE;break;
+		case '0':FSearchIn=SI_ALLDRIVES;break;
+		case '1':FSearchIn=SI_ALLLOCAL;break;
+		case '2':FSearchIn=SI_FROMROOT;break;
+		case '3':FSearchIn=SI_FROMCURRENT;break;
+		case '4':FSearchIn=SI_CURRENTONLY;break;
+		case '5':FSearchIn=SI_SELECTED;break;
 		default:BadCmdLine();return FALSE;
 		}
 		Line++;
@@ -180,6 +194,12 @@ BOOL ProcessRNLine(char *Line,BOOL *ShowDialog,int *Item) {
 		case 'L':FRConfirmLine=FALSE;break;
 		case 'd':*ShowDialog=TRUE;break;
 		case 'D':*ShowDialog=FALSE;break;
+		case '0':FSearchIn=SI_ALLDRIVES;break;
+		case '1':FSearchIn=SI_ALLLOCAL;break;
+		case '2':FSearchIn=SI_FROMROOT;break;
+		case '3':FSearchIn=SI_FROMCURRENT;break;
+		case '4':FSearchIn=SI_CURRENTONLY;break;
+		case '5':FSearchIn=SI_SELECTED;break;
 		default:BadCmdLine();return FALSE;
 		}
 		Line++;
