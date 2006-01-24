@@ -449,7 +449,7 @@ void StripCommonPart(vector<string> &arrFileNames) {
 	for (size_t nStr = 0; nStr < arrFileNames.size(); nStr++) {
 		if (arrFileNames[nStr].empty()) continue;
 		if (nCommon < 0) {nCommon = arrFileNames[nStr].length();continue;}
-		while ((nCommon > 0) && (strncmp(arrFileNames[0].c_str(), arrFileNames[nStr].c_str(), nCommon) != 0)) nCommon--;
+		while ((nCommon > 0) && (strnicmp(arrFileNames[0].c_str(), arrFileNames[nStr].c_str(), nCommon) != 0)) nCommon--;
 		if (nCommon == 0) return;
 	}
 
@@ -516,7 +516,7 @@ OperationResult RenumberFiles() {
 	bool bOriginal = false;
 	int nPosition = 0;
 	int nOK = 0;
-	g_bFRStripCommon = false;
+	g_bFRStripCommon = true;
 	do {
 		vector<string> arrProcessedNames;
 		ProcessNames(arrFileNames, arrProcessedNames);
