@@ -2,7 +2,7 @@
 .PluginContents=Regular Expression Search
 
 @Contents
-$ #Regular Expression Search and Replace, version 5.20#
+$ #Regular Expression Search and Replace, version 5.30#
     This plugin allows you to:
 
     - Perform text search and replace in editor
@@ -250,9 +250,10 @@ there's 4 of them or more.
     #s# - Several-line regular expression
     #m# - Multi-line regular expression
     #a# - Multiple plain text
-    #a# - Multiple regular expressions
+    #l# - Multiple regular expressions
     #u# - Use UTF-8
 
+    #0..5# - "Search in" as in dialog
     #d# - View search dialog
 
     #fr:/FileMask/SearchText/ReplaceText[/options]#
@@ -267,6 +268,9 @@ there's 4 of them or more.
     #f# - Confirm each file
     #l# - Confirm each replacement
     #o# - Save original file
+    #b# - Overwrite previous backup
+
+    #0..5# - "Search in" as in dialog
     #d# - View replace dialog
 
     #rn:/FileMask/SearchText/ReplaceText[/options]#
@@ -277,7 +281,8 @@ there's 4 of them or more.
 
     #f# - Confirm each file
     #l# - Confirm each replacement
-    #d# - View replace dialog
+    #0..5# - "Search in" as in dialog
+    #d# - View rename dialog
 
     #qr:/SearchText/ReplaceText[/options]#
     ~Quick rename (selected) files~@SelectedFileRenameDlg@. Options are:
@@ -287,7 +292,7 @@ there's 4 of them or more.
 
     #f# - Confirm each file
     #l# - Confirm each replacement
-    #d# - View replace dialog
+    #d# - View rename dialog
 @EditorMenu
 $ #RESearch menu in editor#
   ~#Search#~@SearchDlg@               - Search for text or regular expression
@@ -466,7 +471,10 @@ to confirm replacing in this file.
 this very string.
 
   #Save original file#       If file is modified, it will be saved under the same name,
-but added '.old' extension, i.e. 'This.txt' will become 'This.txt.old'.
+but added '.bak' extension, i.e. 'This.txt' will become 'This.txt.bak'.
+
+  #Overwrite prev version#   If '.bak' already existed, it will be overwritten. If option is not
+set, backups will be named ".01.bak", etc.
 
  For other options, see ~Regular Expression File Search~@FileSearchDlg@.
 @AdvancedFileSearchDlg
