@@ -13,9 +13,38 @@ void EditorSearchOK(int FirstLine,int StartPos,int LastLine,int EndPos) {
 	StartupInfo.EditorControl(ECTL_SETPOSITION,&Position);
 }
 
+void PatchEditorInfo(EditorInfo &EdInfo) {
+	// Skipping over selection - for "Search Again inverse"
+	if (ESearchAgainCalled && (EdInfo.BlockType == BTYPE_STREAM)) {
+		EditorGetString String = {EdInfo.BlockStartLine};
+		StartupInfo.EditorControl(ECTL_GETSTRING, &String);
+		int BlockStartPos = String.SelStart;
+		while (String.SelEnd > 0) {
+			String.StringNumber++;
+			StartupInfo.EditorControl(ECTL_GETSTRING, &String);
+		}
+		int BlockEndLine = String.StringNumber;
+		int BlockEndPos = String.SelEnd;
+
+		if (EReverse) {
+			if ((EdInfo.CurLine == BlockEndLine) && (EdInfo.CurPos == BlockEndPos)) {
+				EdInfo.CurLine = EdInfo.BlockStartLine;
+				EdInfo.CurPos = BlockStartPos;
+			}
+		} else {
+			if ((EdInfo.CurLine == EdInfo.BlockStartLine) && (EdInfo.CurPos == BlockStartPos)) {
+				EdInfo.CurLine = BlockEndLine;
+				EdInfo.CurPos = BlockEndPos;
+			}
+		}
+	}
+}
+
 BOOL EditorSearchAgain() {
 	EditorInfo EdInfo;
 	StartupInfo.EditorControl(ECTL_GETINFO,&EdInfo);
+	PatchEditorInfo(EdInfo);
+
 	int FirstLine,StartPos,LastLine,EndPos;
 
 	if (ESeveralLine) {

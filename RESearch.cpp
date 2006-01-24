@@ -292,15 +292,16 @@ int ShowFileMenu() {
 }
 
 int ShowEditorMenu() {
-	FarMenuItem MenuItems[7];
+	FarMenuItem MenuItems[8];
 	memset(MenuItems,0,sizeof(MenuItems));
 	strcpy(MenuItems[0].Text,GetMsg(MMenuSearch));
 	strcpy(MenuItems[1].Text,GetMsg(MMenuReplace));
 	strcpy(MenuItems[2].Text,GetMsg(MMenuFilterText));
 	strcpy(MenuItems[3].Text,GetMsg(MMenuTransliterate));
 	strcpy(MenuItems[4].Text,GetMsg(MMenuSearchReplaceAgain));
-	MenuItems[5].Separator=TRUE;
-	strcpy(MenuItems[6].Text,GetMsg(MMenuUTF8Converter));
+	strcpy(MenuItems[5].Text,GetMsg(MMenuSearchReplaceAgainRev));
+	MenuItems[6].Separator=TRUE;
+	strcpy(MenuItems[7].Text,GetMsg(MMenuUTF8Converter));
 	return StartupInfo.Menu(StartupInfo.ModuleNumber,-1,-1,0,FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT,GetMsg(MMenuHeader),
 		NULL,"EditorMenu",NULL,NULL,MenuItems,sizeof(MenuItems)/sizeof(MenuItems[0]));
 }
@@ -310,6 +311,7 @@ int ShowViewerMenu() {
 	memset(MenuItems,0,sizeof(MenuItems));
 	strcpy(MenuItems[0].Text,GetMsg(MMenuSearch));
 	strcpy(MenuItems[1].Text,GetMsg(MMenuSearchAgain));
+//	strcpy(MenuItems[2].Text,GetMsg(MMenuSearchAgainRev));
 	MenuItems[2].Separator=TRUE;
 	strcpy(MenuItems[3].Text,GetMsg(MMenuUTF8Converter));
 	return StartupInfo.Menu(StartupInfo.ModuleNumber,-1,-1,0,FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT,GetMsg(MMenuHeader),
@@ -320,6 +322,9 @@ HANDLE WINAPI OpenPlugin(int OpenFrom,int Item) {
 	BOOL ShowDialog=TRUE;
 	g_bFromCmdLine = false;
 	Interrupt = FALSE;
+
+	int nMenu;
+	ESearchAgainCalled = FALSE;
 
 	switch (OpenFrom) {
 	case OPEN_COMMANDLINE:
@@ -371,7 +376,7 @@ HANDLE WINAPI OpenPlugin(int OpenFrom,int Item) {
 						  }
 	case OPEN_EDITOR:
 		FindIfClockPresent();
-		switch (ShowEditorMenu()) {
+		switch (nMenu = ShowEditorMenu()) {
 		case 0:
 			if (EditorSearch()) LastAction=0;
 			break;
@@ -384,9 +389,13 @@ HANDLE WINAPI OpenPlugin(int OpenFrom,int Item) {
 		case 3:
 			if (EditorTransliterate()) LastAction=3;
 			break;
+		case 5:
+			EReverse = !EReverse;
 		case 4:
+			ESearchAgainCalled = TRUE;
 			switch (LastAction) {
 			case -1:
+				ESearchAgainCalled = FALSE;
 				if (EditorSearch()) LastAction=0;
 				break;
 			case 0:
@@ -402,27 +411,33 @@ HANDLE WINAPI OpenPlugin(int OpenFrom,int Item) {
 				EditorTransliterateAgain();
 				break;
 			};
+			if (nMenu == 5) EReverse = !EReverse;
 			break;
-		case 6:
+		case 7:
 			UTF8Converter();
 			break;
 		}
 		return INVALID_HANDLE_VALUE;
 
 	case OPEN_VIEWER:
-		switch (ShowViewerMenu()) {
+		switch (nMenu = ShowViewerMenu()) {
 		case 0:
 			if (ViewerSearch()) LastAction = 0;
 			break;
+//		case 2:
+//			EReverse = !EReverse;
 		case 1:
+			ESearchAgainCalled = TRUE;
 			switch (LastAction) {
 			case -1:
-				if (EditorSearch()) LastAction = 0;
+				ESearchAgainCalled = FALSE;
+				if (ViewerSearch()) LastAction = 0;
 				break;
 			default:
 				if (ViewerSearchAgain()) LastAction = 0;
 				break;
 			}
+//			if (nMenu == 2) EReverse = !EReverse;
 			break;
 		case 3:
 			UTF8Converter();

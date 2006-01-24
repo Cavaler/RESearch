@@ -351,8 +351,9 @@ BOOL _EditorReplaceAgain() {
 
 BOOL EditorReplaceAgain() {
 	EditorInfo EdInfo;
-
 	StartupInfo.EditorControl(ECTL_GETINFO,&EdInfo);
+	PatchEditorInfo(EdInfo);
+
 	LastReplaceLine=EdInfo.CurLine;
 	LastReplacePos=EdInfo.CurPos;
 	if (EInSelection) {		// ***************** REPLACE IN SELECTION
