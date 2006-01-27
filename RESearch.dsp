@@ -173,6 +173,10 @@ SOURCE=.\EditFind\EditFind.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\EditFind\EditList.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\EditFind\EditReplace.cpp
 # End Source File
 # Begin Source File
