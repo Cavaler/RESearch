@@ -5,6 +5,13 @@ Regular Expression Search and Replace
  - Bug fixed
  * Minor change
 
+Version 5.30 (27.01.2006)
+	* Obsolete options removed
+	* "Overwrite previous version" when backing up is optional ('b' option in command line)
+	* Command-line options for 'Search In' (0..5)
+	+ Editor | Show all occurences
+	+ Editor | Search/Replace Again in another direction
+
 Version 5.20 (13.01.2006)
 	+ 'Transliterate' feature in editor
 	- Fixed (?) replacing in non-OEM character page
