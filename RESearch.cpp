@@ -292,16 +292,17 @@ int ShowFileMenu() {
 }
 
 int ShowEditorMenu() {
-	FarMenuItem MenuItems[8];
+	FarMenuItem MenuItems[9];
 	memset(MenuItems,0,sizeof(MenuItems));
 	strcpy(MenuItems[0].Text,GetMsg(MMenuSearch));
 	strcpy(MenuItems[1].Text,GetMsg(MMenuReplace));
 	strcpy(MenuItems[2].Text,GetMsg(MMenuFilterText));
 	strcpy(MenuItems[3].Text,GetMsg(MMenuTransliterate));
-	strcpy(MenuItems[4].Text,GetMsg(MMenuSearchReplaceAgain));
-	strcpy(MenuItems[5].Text,GetMsg(MMenuSearchReplaceAgainRev));
-	MenuItems[6].Separator=TRUE;
-	strcpy(MenuItems[7].Text,GetMsg(MMenuUTF8Converter));
+	strcpy(MenuItems[4].Text,GetMsg(MMenuAllOccurrences));
+	strcpy(MenuItems[5].Text,GetMsg(MMenuSearchReplaceAgain));
+	strcpy(MenuItems[6].Text,GetMsg(MMenuSearchReplaceAgainRev));
+	MenuItems[7].Separator=TRUE;
+	strcpy(MenuItems[8].Text,GetMsg(MMenuUTF8Converter));
 	return StartupInfo.Menu(StartupInfo.ModuleNumber,-1,-1,0,FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT,GetMsg(MMenuHeader),
 		NULL,"EditorMenu",NULL,NULL,MenuItems,sizeof(MenuItems)/sizeof(MenuItems[0]));
 }
@@ -389,9 +390,12 @@ HANDLE WINAPI OpenPlugin(int OpenFrom,int Item) {
 		case 3:
 			if (EditorTransliterate()) LastAction=3;
 			break;
-		case 5:
-			EReverse = !EReverse;
 		case 4:
+			if (EditorListAll()) LastAction=4;
+			break;
+		case 6:
+			EReverse = !EReverse;
+		case 5:
 			ESearchAgainCalled = TRUE;
 			switch (LastAction) {
 			case -1:
@@ -410,10 +414,13 @@ HANDLE WINAPI OpenPlugin(int OpenFrom,int Item) {
 			case 3:
 				EditorTransliterateAgain();
 				break;
+			case 4:
+				EditorListAllAgain();
+				break;
 			};
-			if (nMenu == 5) EReverse = !EReverse;
+			if (nMenu == 6) EReverse = !EReverse;
 			break;
-		case 7:
+		case 8:
 			UTF8Converter();
 			break;
 		}

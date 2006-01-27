@@ -27,6 +27,7 @@ MMenuSearchAgain	"Search &again"				"&Искать еще раз"
 MMenuSearchAgainRev	"Search a&gain in other direction"				"Искать еще раз в &другом направлении"
 MMenuSearchReplaceAgain	"Search/replace &again"	"&Искать/заменить еще раз"
 MMenuSearchReplaceAgainRev	"Search/replace a&gain in other direction"	"Искать/заменить еще раз в &другом направлении"
+MMenuAllOccurrences	"Show all &occurrences"		"Показать все &вхождения"
 MMenuFilterText		"&Filter text"				"&Фильтрация текста"
 MMenuTransliterate	"&Transliterate"			"&Транслитерация"
 MMenuUTF8Converter	"UTF-&8 converter"			"Конвертер UTF-&8"
@@ -91,6 +92,8 @@ MModifyReadonlyRequest	"is read-only. Should it be modified anyway?"	"помечен 'т
 MFilterLines		"Filter text"				"Фильтрация текста"
 MLeaveMatching		"&Leave matching lines"		"&Оставить совпадающие строки"
 MRemoveMatching		"&Remove matching lines"	"&Убрать совпадающие строки"
+
+MListAllLines		"List all lines"			"Вывести все строки"
 
 MRenumber			"Renumber"			"Перенумеровать"
 

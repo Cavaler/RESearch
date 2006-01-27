@@ -73,6 +73,8 @@ BOOL EditorFilter();
 BOOL EditorFilterAgain();
 BOOL EditorTransliterate();
 BOOL EditorTransliterateAgain();
+BOOL EditorListAll();
+BOOL EditorListAllAgain();
 
 void PatchEditorInfo(EditorInfo &EdInfo);
 
