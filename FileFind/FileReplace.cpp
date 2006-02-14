@@ -238,9 +238,11 @@ void ReplaceFile(WIN32_FIND_DATA *FindData, PluginPanelItem **PanelItems, int *I
 	CFileMapping mapFile;
 	if (mapFile.Open(strBackupFileName.c_str())) {
 		if (ProcessBuffer(mapFile, FindData->nFileSizeLow, FindData)) {
+			mapFile.Close();
 			if (!FRSaveOriginal) DeleteFile(strBackupFileName.c_str());
 			AddFile(FindData,PanelItems,ItemsNumber);
 		} else {
+			mapFile.Close();
 			MoveFile(strBackupFileName.c_str(),FindData->cFileName);
 		}
 	} else {
