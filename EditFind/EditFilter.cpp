@@ -101,10 +101,10 @@ BOOL CEFPresetCollection::EditPreset(CPreset *pPreset) {
 
 	Dialog.Add(new CFarCheckBoxItem(5,7,0,MRegExp,&pPreset->m_mapInts["IsRegExp"]));
 	Dialog.Add(new CFarCheckBoxItem(5,8,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
-	Dialog.Add(new CFarCheckBoxItem(5,9,0,"",&pPreset->m_mapInts["UTF8"]));
-	Dialog.Add(new CFarButtonItem(30,9,0,0,MUTF8));
 	Dialog.Add(new CFarRadioButtonItem(30,7,0,MLeaveMatching,&pPreset->m_mapInts["LeaveFilter"],TRUE));
 	Dialog.Add(new CFarRadioButtonItem(30,8,0,MRemoveMatching,&pPreset->m_mapInts["LeaveFilter"],FALSE));
+	Dialog.Add(new CFarCheckBoxItem(30,9,0,"",&pPreset->m_mapInts["UTF8"]));
+	Dialog.Add(new CFarButtonItem(34,9,0,0,MUTF8));
 	Dialog.AddButtons(MOk,MCancel);
 
 	do {
