@@ -15,7 +15,10 @@ BOOL EditorListAllAgain() {
 
 			char szNumber[8];
 			sprintf(szNumber, "%3d|", CurrentLine);
-			arrString.push_back(string(szNumber) + String.StringText);
+
+			string str = string(szNumber) + String.StringText;
+			EditorToOEM(str);
+			arrString.push_back(str);
 			arrLines.push_back(CurrentLine);
 		}
 	}
