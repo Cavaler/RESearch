@@ -14,6 +14,10 @@ CParameterBatch g_EFBatch(1, 4,
 	"Text", &SearchText,
 	"LeaveFilter", &EFLeaveFilter, "IsRegExp", &ERegExp, "CaseSensitive", &ECaseSensitive, "UTF8", &EUTF8
 					 );
+CParameterBatch g_ELBatch(1, 3,
+	"Text", &SearchText,
+	"IsRegExp", &ERegExp, "CaseSensitive", &ECaseSensitive, "UTF8", &EUTF8
+					 );
 
 void EReadRegistry(HKEY Key) {
 	QueryRegStringValue(Key,"EText",EText,"");
@@ -30,6 +34,7 @@ void EReadRegistry(HKEY Key) {
 	ESPresets=new CESPresetCollection();
 	ERPresets=new CERPresetCollection();
 	EFPresets=new CEFPresetCollection();
+	ELPresets=new CELPresetCollection();
 
 	ERBatch=new CPresetBatchCollection(ERPresets);
 	EFBatch=new CPresetBatchCollection(EFPresets);
@@ -311,6 +316,7 @@ void ECleanup(BOOL PatternOnly) {
 		delete ESPresets;
 		delete ERPresets;
 		delete EFPresets;
+		delete ELPresets;
 	}
 }
 

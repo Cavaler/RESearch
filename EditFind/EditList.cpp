@@ -26,6 +26,10 @@ BOOL EditorListAllAgain() {
 			TopLine(arrLines[nResult], EdInfo.WindowSizeY, EdInfo.TotalLines),
 			0, -1};
 		StartupInfo.EditorControl(ECTL_SETPOSITION,&Position);
+	} else {
+		EditorSetPosition Position = {EdInfo.CurLine, EdInfo.CurPos, EdInfo.CurTabPos, 
+			EdInfo.TopScreenLine, EdInfo.LeftPos, -1};
+		StartupInfo.EditorControl(ECTL_SETPOSITION,&Position);
 	}
 
 	return TRUE;
@@ -58,7 +62,7 @@ BOOL EditorListAll() {
 			if (ERegExp) QuoteRegExpString(SearchText);
 			break;
 		case 2:
-//			ESPresets->ShowMenu(g_ESBatch);
+			ELPresets->ShowMenu(g_ELBatch);
 			break;
 		case 3:
 			UTF8Converter(SearchText);
@@ -72,4 +76,34 @@ BOOL EditorListAll() {
 	Interrupt=FALSE;
 	if (!EText.empty()) EditorListAllAgain();
 	return TRUE;
+}
+
+BOOL CELPresetCollection::EditPreset(CPreset *pPreset) {
+	CFarDialog Dialog(76,14,"ELPresetDlg");
+	Dialog.AddFrame(MEFPreset);
+	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
+	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,"RESearch.PresetName",pPreset->m_strName));
+
+	Dialog.Add(new CFarTextItem(5,4,0,MSearchFor));
+	Dialog.Add(new CFarEditItem(5,5,70,DIF_HISTORY,"SearchText",pPreset->m_mapStrings["Text"]));
+
+	Dialog.Add(new CFarCheckBoxItem(5,7,0,MRegExp,&pPreset->m_mapInts["IsRegExp"]));
+	Dialog.Add(new CFarCheckBoxItem(5,8,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
+	Dialog.Add(new CFarCheckBoxItem(30,8,0,"",&pPreset->m_mapInts["UTF8"]));
+	Dialog.Add(new CFarButtonItem(34,8,0,0,MUTF8));
+	Dialog.AddButtons(MOk,MCancel);
+
+	do {
+		switch (Dialog.Display(2, -2, -3)) {
+		case 0:
+			return TRUE;
+		case 1:{		// avoid Internal Error for icl
+			string str = pPreset->m_mapStrings["Text"];
+			UTF8Converter(str);
+			break;
+			  }
+		default:
+			return FALSE;
+		}
+	} while (true);
 }
