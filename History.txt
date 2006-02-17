@@ -5,6 +5,19 @@ Regular Expression Search and Replace
  - Bug fixed
  * Minor change
 
+Version 5.xx (planned)
+	* Several-line 'Show all'
+	? Moving 'Show all' to 'Search' dialog
+    + Cache for 'Show all'
+
+Version 5.35 (17.02.2006)
+    - Correctly working 'Show all occurences" for non-OEM files
+    - Search/replace again do not bring up "Show all" sometimes
+    - Hotkeys fixed
+    - Replace in fiels fixed (no leftover backups etc)
+    * Cancelling 'Show all' returns you to previous position
+    * Presets for 'Show all'
+
 Version 5.30 (27.01.2006)
 	* Obsolete options removed
 	* "Overwrite previous version" when backing up is optional ('b' option in command line)

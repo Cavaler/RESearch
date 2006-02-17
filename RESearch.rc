@@ -54,8 +54,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 5,3,0,0
- PRODUCTVERSION 5,3,0,0
+ FILEVERSION 5,3,5,0
+ PRODUCTVERSION 5,3,5,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -73,14 +73,14 @@ BEGIN
             VALUE "Comments", "\0"
             VALUE "CompanyName", "Pavel Kostromitinov\0"
             VALUE "FileDescription", "Regular Expression Search plugin for FAR\0"
-            VALUE "FileVersion", "5, 3, 0, 0\0"
+            VALUE "FileVersion", "5, 3, 5, 0\0"
             VALUE "InternalName", "RESearch\0"
             VALUE "LegalCopyright", "Copyright © Pavel Kostromitinov, 1999-2006\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "RESearch.dll\0"
             VALUE "PrivateBuild", "\0"
             VALUE "ProductName", "RESearch plugin for FAR\0"
-            VALUE "ProductVersion", "5, 3, 0, 0\0"
+            VALUE "ProductVersion", "5, 3, 5, 0\0"
             VALUE "SpecialBuild", "\0"
         END
     END
