@@ -327,7 +327,11 @@ void PrepareBMHSearch(const char *String,int StringLength,size_t nPattern) {
 
 	BMHTable &g_BMHTable = g_BMHTables[nPattern].m_Table;
 	for (int I=0;I<256;I++) g_BMHTable[I]=StringLength;
-	for (I=0;I<StringLength-1;I++) g_BMHTable[((unsigned char *)String)[I]]=StringLength-I-1;
+
+	if (EReverse)
+		for (I=StringLength-1;I>0;I--) g_BMHTable[((unsigned char *)String)[I]]=I;
+	else
+		for (I=0;I<StringLength-1;I++) g_BMHTable[((unsigned char *)String)[I]]=StringLength-I-1;
 }
 
 int BMHSearch(const char *Buffer,int BufferLength,const char *String,int StringLength,char *XLatTable,int nPattern) {

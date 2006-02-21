@@ -397,6 +397,8 @@ HANDLE WINAPI OpenPlugin(int OpenFrom,int Item) {
 			EReverse = !EReverse;
 		case 5:
 			ESearchAgainCalled = TRUE;
+			if (!ERegExp) EPreparePattern(EText);	// Not needed for RegExp
+
 			switch (LastAction) {
 			case -1:
 				ESearchAgainCalled = FALSE;
