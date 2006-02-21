@@ -19,7 +19,7 @@ void PatchEditorInfo(EditorInfo &EdInfo) {
 		EditorGetString String = {EdInfo.BlockStartLine};
 		StartupInfo.EditorControl(ECTL_GETSTRING, &String);
 		int BlockStartPos = String.SelStart;
-		while (String.SelEnd > 0) {
+		while (String.SelEnd == -1) {
 			String.StringNumber++;
 			StartupInfo.EditorControl(ECTL_GETSTRING, &String);
 		}
