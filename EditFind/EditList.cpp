@@ -5,7 +5,7 @@ BOOL EditorListAllAgain() {
 	StartupInfo.EditorControl(ECTL_GETINFO,&EdInfo);
 
 	vector<string> arrString;
-	vector<int>    arrLines;
+	vector<pair<int, int> > arrLines;
 
 	for (int CurrentLine = 0; CurrentLine < EdInfo.TotalLines; CurrentLine++) {
 		int FirstLine = CurrentLine, StartPos = 0, LastLine = CurrentLine, EndPos = -1;
@@ -19,15 +19,15 @@ BOOL EditorListAllAgain() {
 			string str = string(szNumber) + String.StringText;
 			EditorToOEM(str);
 			arrString.push_back(str);
-			arrLines.push_back(CurrentLine);
+			arrLines.push_back(pair<int, int>(CurrentLine, StartPos));
 		}
 	}
 
 	int nResult = ChooseMenu(arrString, GetMsg(MListAllLines), NULL, "ListAll", 0, FMENU_WRAPMODE);
 	if (nResult >= 0) {
-		EditorSetPosition Position = {arrLines[nResult], 0, -1, 
-			TopLine(arrLines[nResult], EdInfo.WindowSizeY, EdInfo.TotalLines),
-			0, -1};
+		EditorSetPosition Position = {arrLines[nResult].first, arrLines[nResult].second, -1,
+			TopLine(arrLines[nResult].first, EdInfo.WindowSizeY, EdInfo.TotalLines),
+			LeftColumn(arrLines[nResult].second, EdInfo.WindowSizeY), -1};
 		StartupInfo.EditorControl(ECTL_SETPOSITION,&Position);
 	} else {
 		EditorSetPosition Position = {EdInfo.CurLine, EdInfo.CurPos, EdInfo.CurTabPos, 
