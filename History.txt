@@ -10,6 +10,11 @@ Version 5.xx (planned)
 	? Moving 'Show all' to 'Search' dialog
     + Cache for 'Show all'
 
+Version 5.36 (26.02.2006)
+	- Reverse plain-text search fixed
+	- 'Show all' positions to beginning of found fragment
+	* A bit updated English help file
+
 Version 5.35 (17.02.2006)
     - Correctly working 'Show all occurences" for non-OEM files
     - Search/replace again do not bring up "Show all" sometimes
