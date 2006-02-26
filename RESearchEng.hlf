@@ -2,7 +2,7 @@
 .PluginContents=Regular Expression Search
 
 @Contents
-$ #Regular Expression Search and Replace, version 5.30#
+$ #Regular Expression Search and Replace, version 5.36#
     This plugin allows you to:
 
     - Perform text search and replace in editor
@@ -345,7 +345,7 @@ $ #Regular Expression Filter#
   This command allows you to filter text in editor, by deleting (or leaving instead)
 lines in which a specified txt is found, or pattern matches.
 
-  #Search for#           Specifies text or regular expression to search for.
+  #Search for#           Specifies text or ~regular expression~@RegularExpressions@ to search for.
   #[ \ ]#                This button will quote all special symbols in search string,
 if regular expression search is selected.
 
@@ -361,6 +361,34 @@ regard to symbol case. ANSI and OEM codepages are supported.
 
   #[ UTF-8 ]#            If checked, regular expresiion search will use UTF-8 rules.
 Press the button to bring up ~UTF-8 Converter~@UTF8Converter@
+
+@TransliterateDlg
+$ #Transliterate#
+
+Transliterates _all_ text in editor, replacing each letter found in 'Source characters' to
+letter at the same position in 'Target characters' (or the last one if latter string is too short).
+
+@ListAllDlg
+$ #Show all occurrences#
+
+Displays a list of all lines in text containing a search pattern, allowing you to jump instantly
+to needed line.
+
+  #Search for#           Specifies text or ~regular expression~@RegularExpressions@ to search for.
+  #[ \ ]#                This button will quote all special symbols in search string,
+if regular expression search is selected.
+
+  #Regular expression#   When checked, ~regular expression~@RegularExpressions@ search is performed.
+
+  #Case sensitive#       If unchecked, text or regular expression is matched without
+regard to symbol case. ANSI and OEM codepages are supported.
+
+  #[ UTF-8 ]#            If checked, regular expresiion search will use UTF-8 rules.
+
+@ListAll
+$ #All occurrences#
+
+You can either select a line to jump to, or give up.
 
 @ERAskReplace
 $ #Replace confirmation#
