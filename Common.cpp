@@ -89,9 +89,8 @@ enum ECaseConvert {CCV_NONE,CCV_UPPER,CCV_LOWER,CCV_FLIP};
 ECaseConvert CaseConvert;
 ECaseConvert OneCaseConvert;
 
-char ConvertCase(char C) {
+char ConvertCase_OEM(char C) {
 	char Ansi,Oem;
-	if (OneCaseConvert==CCV_NONE) return C;
 
 	OemToCharBuff(&C,&Ansi,1);
 	CharToOemBuff(&Ansi,&Oem,1);
@@ -108,8 +107,32 @@ char ConvertCase(char C) {
 		break;
 				  }
 	}
-	OneCaseConvert=CaseConvert;
+
 	CharToOemBuff(&Ansi,&C,1);
+	return C;
+}
+
+char ConvertCase(char C) {
+	if (OneCaseConvert == CCV_NONE) return C;
+
+	if (m_pReplaceTable) {
+		char cUp = m_pReplaceTable->UpperTable[(BYTE)C], cDn = m_pReplaceTable->LowerTable[(BYTE)C];
+		switch (OneCaseConvert) {
+		case CCV_UPPER:
+			C = cUp;
+			break;
+		case CCV_LOWER:
+			C = cDn;
+			break;
+		case CCV_FLIP:
+			C = (C == cUp) ? cDn : cUp;
+			break;
+		}
+	} else {
+		C = ConvertCase_OEM(C);
+	}
+
+	OneCaseConvert=CaseConvert;
 	return C;
 }
 
