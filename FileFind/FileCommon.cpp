@@ -74,12 +74,26 @@ void FReadRegistry(HKEY Key) {
 
 	CharTableSet2 Table;
 
-	while (StartupInfo.CharTable(XLatTables.size(),(char *)&Table,sizeof(Table))>=0) {
+	while (StartupInfo.CharTable(XLatTables.size(), (char *)&Table, sizeof(CharTableSet))>=0) {
 		memmove(Table.UpperDecodeTable, Table.DecodeTable, 256);
 		for (int I=0;I<256;I++) Table.UpperDecodeTable[I]=UpCaseTable[Table.UpperDecodeTable[I]];
 
 		XLatTables.push_back(Table);
 	}
+
+	// Generating "ANSI" table
+	strcpy(Table.TableName, "(ANSI)");
+	for (int I=0;I<256;I++) {
+		Table.DecodeTable[I] = Table.EncodeTable[I] = I;
+		Table.UpperTable[I] = (int)CharUpper((LPSTR)I);
+		Table.LowerTable[I] = (int)CharLower((LPSTR)I);
+	}
+	CharToOemBuff((LPCSTR)Table.DecodeTable, (LPSTR)Table.DecodeTable, 256);
+	OemToCharBuff((LPCSTR)Table.EncodeTable, (LPSTR)Table.EncodeTable, 256);
+	memmove(Table.UpperDecodeTable, Table.DecodeTable, 256);
+	for (I=0;I<256;I++) Table.UpperDecodeTable[I]=UpCaseTable[Table.UpperDecodeTable[I]];
+
+	XLatTables.push_back(Table);
 }
 
 void FWriteRegistry(HKEY Key) {

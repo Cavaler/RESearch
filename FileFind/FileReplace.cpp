@@ -183,8 +183,9 @@ BOOL ProcessSeveralLineBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *Fin
 }
 
 BOOL ProcessBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindData) {
-	FRConfirmLineThisFile=FRConfirmLineThisRun;
-	FileConfirmed=!FRConfirmFileThisRun;
+	FRConfirmLineThisFile = FRConfirmLineThisRun;
+	FileConfirmed = !FRConfirmFileThisRun;
+	m_pReplaceTable = NULL;
 	switch (FSearchAs) {
 	case SA_PLAINTEXT:	return ProcessPlainTextBuffer(Buffer,BufLen,FindData);
 	case SA_REGEXP:	return ProcessRegExpBuffer(Buffer,BufLen,FindData);
