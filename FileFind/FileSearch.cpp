@@ -1,7 +1,7 @@
 #include "FileFind.h"
 
 void XLatBuffer(BYTE *Buffer,int Length,int Table) {
-	for (register int I=0;I<Length;I++) Buffer[I]=XLatTables[Table][Buffer[I]];
+	for (register int I=0;I<Length;I++) Buffer[I]=XLatTables[Table].DecodeTable[Buffer[I]];
 }
 
 BOOL FindTextInBufferWithTable(const char *Buffer,int Size,string &Text,char *Table) {
@@ -16,8 +16,8 @@ BOOL FindTextInBuffer(const char *Buffer,int Size,string &Text) {
 	if (FindTextInBufferWithTable(Buffer,Size,Text,Table)) return TRUE;
 
 	if (FAllCharTables) {
-		for (int I=0;I<XLatTableCount;I++) {
-			Table=(FCaseSensitive)?XLatTables[I]:UpCaseXLatTables[I];
+		for (int I=0;I<XLatTables.size();I++) {
+			Table = (char *)((FCaseSensitive) ? XLatTables[I].DecodeTable : XLatTables[I].UpperDecodeTable);
 			if (FindTextInBufferWithTable(Buffer,Size,Text,Table)) return TRUE;
 		}
 	}
@@ -31,10 +31,10 @@ BOOL FindPlainText(const char *Buffer,int Size) {
 
 BOOL FindPattern(pcre *Pattern,pcre_extra *PatternExtra,const char *Buffer,int Length) {
 	if (do_pcre_exec(Pattern,PatternExtra,Buffer,Length,0,0,NULL,0)>=0) return TRUE;
-	if (!FAllCharTables||!XLatTableCount) return FALSE;
+	if (!FAllCharTables || XLatTables.empty()) return FALSE;
 
 	char *SaveBuf=(char *)malloc(Length);
-	for (int I=0;I<XLatTableCount;I++) {
+	for (int I=0; I < XLatTables.size(); I++) {
 		memmove(SaveBuf,Buffer,Length);
 		XLatBuffer((BYTE *)SaveBuf,Length,I);
 		if (do_pcre_exec(Pattern,PatternExtra,SaveBuf,Length,0,0,NULL,0)>=0) {

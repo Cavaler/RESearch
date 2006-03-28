@@ -72,17 +72,13 @@ void FReadRegistry(HKEY Key) {
 	FAPresets=new CFAPresetCollection();
 	FRBatch=new CPresetBatchCollection(FRPresets);
 
-	XLatTables=NULL;UpCaseXLatTables=NULL;XLatTableCount=0;
-	CharTableSet Table;
+	CharTableSet2 Table;
 
-	while (StartupInfo.CharTable(XLatTableCount,(char *)&Table,sizeof(Table))>=0) {
-		XLatTables=(XLatTable *)realloc(XLatTables,(XLatTableCount+1)*sizeof(XLatTable));
-		memmove(XLatTables[XLatTableCount],Table.DecodeTable,256);
+	while (StartupInfo.CharTable(XLatTables.size(),(char *)&Table,sizeof(Table))>=0) {
+		memmove(Table.UpperDecodeTable, Table.DecodeTable, 256);
+		for (int I=0;I<256;I++) Table.UpperDecodeTable[I]=UpCaseTable[Table.UpperDecodeTable[I]];
 
-		UpCaseXLatTables=(XLatTable *)realloc(UpCaseXLatTables,(XLatTableCount+1)*sizeof(XLatTable));
-		memmove(UpCaseXLatTables[XLatTableCount],Table.DecodeTable,256);
-		for (int I=0;I<256;I++) UpCaseXLatTables[XLatTableCount][I]=UpCaseTable[*((unsigned char *)UpCaseXLatTables[XLatTableCount]+I)];
-		XLatTableCount++;
+		XLatTables.push_back(Table);
 	}
 }
 
@@ -134,7 +130,6 @@ void FCleanup(BOOL PatternOnly) {
 	if (!PatternOnly) {
 		if (FAFullFileNamePattern) {pcre_free(FAFullFileNamePattern);FAFullFileNamePattern=NULL;}
 		if (FAFullFileNamePatternExtra) {pcre_free(FAFullFileNamePatternExtra);FAFullFileNamePatternExtra=NULL;}
-		free(XLatTables);free(UpCaseXLatTables);
 
 		delete FRBatch;
 		delete FSPresets;

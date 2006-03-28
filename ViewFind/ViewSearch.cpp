@@ -14,12 +14,12 @@ string ToOEM(ViewerInfo &VInfo, const char *szData, int nLength) {
 		CharToOemBuff(&arrData[0], &arrData[0], nLength);
 		return string(&arrData[0], arrData.size());
 	}
-	if (!VInfo.CurMode.UseDecodeTable || (VInfo.CurMode.TableNum >= XLatTableCount)) return string(szData, nLength);
+	if (!VInfo.CurMode.UseDecodeTable || (VInfo.CurMode.TableNum >= XLatTables.size())) return string(szData, nLength);
 
 	string strResult;
 	strResult.reserve(nLength);
 	while (nLength--) {
-		strResult += XLatTables[VInfo.CurMode.TableNum][(BYTE)(*szData)];
+		strResult += XLatTables[VInfo.CurMode.TableNum].DecodeTable[(BYTE)(*szData)];
 		szData++;
 	}
 	return strResult;

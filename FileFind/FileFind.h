@@ -115,10 +115,11 @@ EXTERN int  FRConfirmLineThisRun,FRConfirmLineThisFile;
 EXTERN PluginPanelItem *PanelItems;
 EXTERN int ItemsNumber;
 
-typedef char XLatTable[256];
-EXTERN XLatTable *XLatTables;
-EXTERN XLatTable *UpCaseXLatTables;
-EXTERN int XLatTableCount;
+struct CharTableSet2 : public CharTableSet {
+  unsigned char UpperDecodeTable[256];
+};
+
+EXTERN vector<CharTableSet2> XLatTables;
 
 typedef void (*ProcessFileProc)(WIN32_FIND_DATA *FindData,PluginPanelItem **PanelItems,int *ItemsNumber);
 
