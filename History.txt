@@ -10,6 +10,9 @@ Version 5.xx (planned)
 	? Moving 'Show all' to 'Search' dialog
     + Cache for 'Show all'
 
+Version 5.38 (28.03.2006)
+	- Fixed case-changing while replacing in non-OEM mode
+
 Version 5.37 (27.02.2006)
 	- 'Transliterate' dialog fixed
 
