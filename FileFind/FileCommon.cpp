@@ -480,6 +480,7 @@ BOOL ConfirmFile(int Title,const char *FileName) {
 	switch (StartupInfo.Message(StartupInfo.ModuleNumber,0,"FRConfirmFile",Lines,7,4)) {
 	case 1:FRConfirmFileThisRun=FALSE;
 	case 0:return (FileConfirmed=TRUE);
+	case -1:
 	case 3:Interrupt=TRUE;
 	}
 	return FALSE;
