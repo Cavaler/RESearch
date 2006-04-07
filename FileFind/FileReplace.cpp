@@ -1,7 +1,7 @@
 #include "FileFind.h"
 
 BOOL ConfirmFileReadonly(char *FileName) {
-	if (FRConfirmReadonlyThisRun) return TRUE;
+	if (!FRConfirmReadonlyThisRun) return TRUE;
 	if (FRReplaceReadonly == RR_NEVER) return FALSE;
 	const char *Lines[]={
 		GetMsg(MREReplace),GetMsg(MTheFile),FileName,GetMsg(MModifyReadonlyRequest),
@@ -10,6 +10,7 @@ BOOL ConfirmFileReadonly(char *FileName) {
 	switch (StartupInfo.Message(StartupInfo.ModuleNumber,0,"FRConfirmReadonly",Lines,8,4)) {
 	case 1:FRConfirmReadonlyThisRun=FALSE;
 	case 0:return TRUE;
+	case -1:
 	case 3:Interrupt=TRUE;
 	}
 	return FALSE;
@@ -26,6 +27,7 @@ BOOL ConfirmReplacement(const char *Found, const char *Replaced, const char *Fil
 	case 2:FRConfirmLineThisRun=FALSE;
 	case 1:FRConfirmLineThisFile=FALSE;
 	case 0:return TRUE;
+	case -1:
 	case 4:Interrupt=TRUE;
 	}
 	return FALSE;
@@ -260,9 +262,9 @@ BOOL FileReplaceExecutor(CParameterBatch &Batch) {
 	if (!FPreparePattern()) return FALSE;
 	if (FUTF8) FAllCharTables=FALSE;
 
-	FRConfirmFileThisRun = FALSE;//FRConfirmFile;
-	FRConfirmReadonlyThisRun = FALSE;//(FRReplaceReadonly == RR_ALWAYS);
-	FRConfirmLineThisRun = FALSE;//FRConfirmLine;
+	FRConfirmFileThisRun = FALSE;		// FRConfirmFile;
+	FRConfirmReadonlyThisRun = FALSE;	// (FRReplaceReadonly == RR_ALWAYS);
+	FRConfirmLineThisRun = FALSE;		// FRConfirmLine;
 	ScanDirectories(&PanelItems,&ItemsNumber,ReplaceFile);
 
 	return TRUE;
@@ -375,7 +377,7 @@ OperationResult FileReplace(PluginPanelItem **PanelItems,int *ItemsNumber,BOOL S
 	}
 
 	FRConfirmFileThisRun=FRConfirmFile;
-	FRConfirmReadonlyThisRun = (FRReplaceReadonly == RR_ALWAYS);
+	FRConfirmReadonlyThisRun = (FRReplaceReadonly != RR_ALWAYS);
 	FRConfirmLineThisRun=FRConfirmLine;
 	if (ScanDirectories(PanelItems,ItemsNumber,ReplaceFile)) {
 		if (!FROpenModified) return OR_OK; else

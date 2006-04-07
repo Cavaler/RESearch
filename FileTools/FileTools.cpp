@@ -104,6 +104,7 @@ BOOL ConfirmRename(const char *From,const char *To) {
 	case 2:FRConfirmLineThisRun=FALSE;
 	case 1:FRConfirmLineThisFile=FALSE;
 	case 0:return TRUE;
+	case -1:
 	case 3:return FALSE;
 	}
 	Interrupt=TRUE;
