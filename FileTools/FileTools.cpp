@@ -449,7 +449,12 @@ void StripCommonPart(vector<string> &arrFileNames) {
 	int nCommon = -1;
 	for (size_t nStr = 0; nStr < arrFileNames.size(); nStr++) {
 		if (arrFileNames[nStr].empty()) continue;
-		if (nCommon < 0) {nCommon = arrFileNames[nStr].length();continue;}
+		if (nCommon < 0) {
+			nCommon = arrFileNames[nStr].rfind('.');
+			if (nCommon == string::npos)
+				nCommon = arrFileNames[nStr].length();
+			continue;
+		}
 		while ((nCommon > 0) && (strnicmp(arrFileNames[0].c_str(), arrFileNames[nStr].c_str(), nCommon) != 0)) nCommon--;
 		if (nCommon == 0) return;
 	}
@@ -467,9 +472,13 @@ void ProcessNames(vector<string> &arrFileNames, vector<string> &arrProcessedName
 	if (g_bFRStripCommon) StripCommonPart(arrStripped);
 	for (size_t nItem = 0; nItem < arrStripped.size(); nItem++) {
 		if (!arrStripped[nItem].empty()) {
+			// Preserving extensions!
+			size_t nExt = arrStripped[nItem].rfind('.');
+			string strReplacing = arrStripped[nItem].substr(0, nExt);
+
 			vector<string> arrMatches;
-			if (reStrip.Match(arrStripped[nItem], PCRE_ANCHORED, &arrMatches)) {
-				arrStripped[nItem].erase(0, arrMatches[0].length());
+			if (reStrip.Match(strReplacing, PCRE_ANCHORED, &arrMatches)) {
+				arrStripped[nItem] = strReplacing.substr(arrMatches[0].length()) + arrStripped[nItem].substr(nExt);
 			}
 		}
 	}
@@ -510,8 +519,9 @@ OperationResult RenumberFiles() {
 
 	int BreakKeys[] = {
 		VK_F2, VK_F7, (PKF_CONTROL<<16)|VK_UP, (PKF_CONTROL<<16)|VK_DOWN,
-		VK_ADD, (PKF_CONTROL<<16)|VK_ADD, VK_SUBTRACT, (PKF_CONTROL<<16)|VK_SUBTRACT, VK_F10,
-		VK_INSERT, VK_DELETE, VK_F8, 0
+		VK_ADD, (PKF_CONTROL<<16)|VK_ADD, ((PKF_SHIFT<<16)|VK_ADD, (PKF_ALT<<16)|VK_ADD,
+		VK_SUBTRACT, (PKF_CONTROL<<16)|VK_SUBTRACT, (PKF_SHIFT<<16)|VK_SUBTRACT, (PKF_ALT<<16)|VK_SUBTRACT,
+		VK_F10, VK_INSERT, VK_DELETE, VK_F8, 0
 	};
 
 	bool bOriginal = false;
@@ -581,26 +591,38 @@ OperationResult RenumberFiles() {
 			g_nStartWithNow+=10;
 			break;
 		case 6:
-			if (g_nStartWithNow > 0) g_nStartWithNow--;
+			g_nStartWithNow+=100;
 			break;
 		case 7:
-			if (g_nStartWithNow > 10) g_nStartWithNow -= 10; else g_nStartWithNow = 0;
+			g_nStartWithNow+=1000;
 			break;
 		case 8:
+			if (g_nStartWithNow > 0) g_nStartWithNow--;
+			break;
+		case 9:
+			if (g_nStartWithNow > 10) g_nStartWithNow -= 10; else g_nStartWithNow = 0;
+			break;
+		case 10:
+			if (g_nStartWithNow > 100) g_nStartWithNow -= 100; else g_nStartWithNow = 0;
+			break;
+		case 11:
+			if (g_nStartWithNow > 1000) g_nStartWithNow -= 1000; else g_nStartWithNow = 0;
+			break;
+		case 12:
 			PerformRename(arrFileNames, arrProcessedNames);
 			return OR_OK;
-		case 9:
+		case 13:
 			arrFileNames.insert(arrFileNames.begin()+nOK, "");
 			nPosition = ++nOK;
 			break;
-		case 10:
+		case 14:
 			if (nOK > 0) {
 				if (arrFileNames[nOK-1].empty()) arrFileNames.erase(arrFileNames.begin()+nOK-1);
 				nOK--;
 			}
 			nPosition = nOK;
 			break;
-		case 11:
+		case 15:
 			g_bFRStripCommon = !g_bFRStripCommon;
 			break;
 		}
