@@ -200,7 +200,7 @@ void RenameFile(WIN32_FIND_DATA *FindData,PluginPanelItem **PanelItems,int *Item
 					if (FTAskCreatePath) {
 						const char *Lines[]={GetMsg(MMenuRename),GetMsg(MFile),NewName,
 							GetMsg(MAskCreatePath),GetMsg(MOk),GetMsg(MAll),GetMsg(MSkip),GetMsg(MCancel)};
-						switch (StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"FRenameCreatePath",Lines,9,4)) {
+						switch (StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"FRenameCreatePath",Lines,8,4)) {
 						case 1:
 							FTAskCreatePath=false;
 						case 0:
@@ -519,7 +519,7 @@ OperationResult RenumberFiles() {
 
 	int BreakKeys[] = {
 		VK_F2, VK_F7, (PKF_CONTROL<<16)|VK_UP, (PKF_CONTROL<<16)|VK_DOWN,
-		VK_ADD, (PKF_CONTROL<<16)|VK_ADD, ((PKF_SHIFT<<16)|VK_ADD, (PKF_ALT<<16)|VK_ADD,
+		VK_ADD, (PKF_CONTROL<<16)|VK_ADD, (PKF_SHIFT<<16)|VK_ADD, (PKF_ALT<<16)|VK_ADD,
 		VK_SUBTRACT, (PKF_CONTROL<<16)|VK_SUBTRACT, (PKF_SHIFT<<16)|VK_SUBTRACT, (PKF_ALT<<16)|VK_SUBTRACT,
 		VK_F10, VK_INSERT, VK_DELETE, VK_F8, 0
 	};
