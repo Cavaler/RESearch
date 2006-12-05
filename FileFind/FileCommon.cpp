@@ -24,48 +24,8 @@ CParameterBatch g_FABatch(2, 20,
 	);
 
 void FReadRegistry(HKEY Key) {
-	QueryRegIntValue(Key,"FCaseSensitive",&FCaseSensitive,0,0,1);
-	QueryRegIntValue(Key,"FSearchAs",(int *)&FSearchAs,0,SA_PLAINTEXT,SA_MULTIREGEXP);
-	QueryRegIntValue(Key,"FSearchIn",(int *)&FSearchIn,2,SI_ALLDRIVES,SI_SELECTED);
-	QueryRegStringValue(Key,"FMask",FMask,"*.*");
-	QueryRegIntValue(Key,"FMaskAsRegExp",&FMaskAsRegExp,0,0,1);
-	QueryRegIntValue(Key,"FMaskCase",(int *)&FMaskCase,MC_VOLUME,0,2);
-	QueryRegIntValue(Key,"FRReplaceReadonly",(int *)&FRReplaceReadonly,1,0,2);
-	QueryRegStringValue(Key,"FText",FText,"");
-
-	QueryRegIntValue(Key,"FSInverse",&FSInverse,0,0,1);
-	QueryRegIntValue(Key,"FAllCharTables",&FAllCharTables,0,0,1);
-	QueryRegIntValue(Key,"FROpenModified",&FROpenModified,0,0,1);
-	QueryRegIntValue(Key,"FRConfirmFile",&FRConfirmFile,0,0,1);
-	QueryRegIntValue(Key,"FRConfirmLine",&FRConfirmLine,0,0,1);
-	QueryRegIntValue(Key,"FRSaveOriginal",&FRSaveOriginal,0,0,1);
-	QueryRegIntValue(Key,"FROverwriteBackup",&FROverwriteBackup,0,0,1);
-	QueryRegStringValue(Key,"FRReplace",FRReplace,"");
-	QueryRegIntValue(Key,"FRepeating",&FRepeating,0,0,1);
-
-	QueryRegBoolValue(Key,"FAFullFileNameMatch",&FAFullFileNameMatch,FALSE);
-	QueryRegStringValue(Key,"FAFullFileName",FAFullFileName,"");
-	QueryRegBoolValue(Key,"FAFullFileNameInverse",&FAFullFileNameInverse,FALSE);
-	QueryRegBoolValue(Key,"FADirectoryMatch",&FADirectoryMatch,FALSE);
-	QueryRegStringValue(Key,"FADirectoryName",FADirectoryName,"");
-	QueryRegBoolValue(Key,"FADirectoryInverse",&FADirectoryInverse,FALSE);
-	QueryRegIntValue(Key,"FARecursionLevel",&FARecursionLevel,0,0,255);
-
-	QueryRegIntValue(Key,"FADateBefore",&FADateBefore,0,0,1);
-	QueryRegIntValue(Key,"FADateBeforeLo",(int *)&FADateBeforeThis.dwLowDateTime,0xE1D58000);
-	QueryRegIntValue(Key,"FADateBeforeHi",(int *)&FADateBeforeThis.dwHighDateTime,0x01A8E79F);
-	QueryRegIntValue(Key,"FADateAfter",&FADateAfter,0,0,1);
-	QueryRegIntValue(Key,"FADateAfterLo",(int *)&FADateAfterThis.dwLowDateTime,0xE1D58000);
-	QueryRegIntValue(Key,"FADateAfterHi",(int *)&FADateAfterThis.dwHighDateTime,0x01A8E79F);
-	QueryRegIntValue(Key,"FAModificationDate",&FAModificationDate,1,0,1);
-	QueryRegIntValue(Key,"FASizeLess",&FASizeLess,0,0,1);
-	QueryRegIntValue(Key,"FASizeLessLimit",(int *)&FASizeLessLimit,0,0);
-	QueryRegIntValue(Key,"FASizeGreater",&FASizeGreater,0,0,1);
-	QueryRegIntValue(Key,"FASizeGreaterLimit",(int *)&FASizeGreaterLimit,0,0);
-	QueryRegIntValue(Key,"FASearchHead",&FASearchHead,0,0,1);
-	QueryRegIntValue(Key,"FASearchHeadLimit",(int *)&FASearchHeadLimit,0,0);
-	QueryRegIntValue(Key,"FAAttributesCleared",&FAAttributesCleared,0,0);
-	QueryRegIntValue(Key,"FAAttributesSet",&FAAttributesSet,0,0);
+	#define DECLARE_PERSIST_LOAD
+	#include "PersistVars.h"
 
 	FSPresets=new CFSPresetCollection();
 	FRPresets=new CFRPresetCollection();
@@ -97,42 +57,8 @@ void FReadRegistry(HKEY Key) {
 }
 
 void FWriteRegistry(HKEY Key) {
-	SetRegIntValue(Key,"FCaseSensitive",FCaseSensitive);
-	SetRegIntValue(Key,"FSearchAs",FSearchAs);
-	SetRegIntValue(Key,"FSearchIn",FSearchIn);
-	SetRegStringValue(Key,"FMask",FMask);
-	SetRegIntValue(Key,"FMaskAsRegExp",FMaskAsRegExp);
-	SetRegIntValue(Key,"FMaskCase",FMaskCase);
-	SetRegIntValue(Key,"FRReplaceReadonly",FRReplaceReadonly);
-	SetRegStringValue(Key,"FText",FText);
-
-	SetRegIntValue(Key,"FSInverse",FSInverse);
-	SetRegIntValue(Key,"FAllCharTables",FAllCharTables);
-	SetRegIntValue(Key,"FROpenModified",FROpenModified);
-	SetRegIntValue(Key,"FRConfirmFile",FRConfirmFile);
-	SetRegIntValue(Key,"FRConfirmLine",FRConfirmLine);
-	SetRegIntValue(Key,"FRSaveOriginal",FRSaveOriginal);
-	SetRegIntValue(Key,"FROverwriteBackup",FROverwriteBackup);
-	SetRegStringValue(Key,"FRReplace",FRReplace);
-	SetRegIntValue(Key,"FRepeating",FRepeating);
-
-	SetRegIntValue(Key,"FAFullFileNameMatch",FAFullFileNameMatch);
-	SetRegStringValue(Key,"FAFullFileName",FAFullFileName);
-	SetRegIntValue(Key,"FADateBefore",FADateBefore);
-	SetRegIntValue(Key,"FADateBeforeLo",FADateBeforeThis.dwLowDateTime);
-	SetRegIntValue(Key,"FADateBeforeHi",FADateBeforeThis.dwHighDateTime);
-	SetRegIntValue(Key,"FADateAfter",FADateAfter);
-	SetRegIntValue(Key,"FADateAfterLo",FADateAfterThis.dwLowDateTime);
-	SetRegIntValue(Key,"FADateAfterHi",FADateAfterThis.dwHighDateTime);
-	SetRegIntValue(Key,"FAModificationDate",FAModificationDate);
-	SetRegIntValue(Key,"FASizeLess",FASizeLess);
-	SetRegIntValue(Key,"FASizeLessLimit",FASizeLessLimit);
-	SetRegIntValue(Key,"FASizeGreater",FASizeGreater);
-	SetRegIntValue(Key,"FASizeGreaterLimit",FASizeGreaterLimit);
-	SetRegIntValue(Key,"FASearchHead",FASearchHead);
-	SetRegIntValue(Key,"FASearchHeadLimit",FASearchHeadLimit);
-	SetRegIntValue(Key,"FAAttributesCleared",FAAttributesCleared);
-	SetRegIntValue(Key,"FAAttributesSet",FAAttributesSet);
+	#define DECLARE_PERSIST_SAVE
+	#include "PersistVars.h"
 }
 
 void FCleanup(BOOL PatternOnly) {

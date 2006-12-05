@@ -37,55 +37,11 @@ EXTERN CFRPresetCollection *FRPresets;
 EXTERN CFAPresetCollection *FAPresets;
 EXTERN CPresetBatchCollection *FRBatch;
 
-EXTERN BOOL FCaseSensitive;
-EXTERN SearchAs FSearchAs;
-EXTERN SearchIn FSearchIn;
-EXTERN string FMask;
-EXTERN BOOL FMaskAsRegExp;
-EXTERN MaskCase FMaskCase;
-EXTERN eReplaceReadonly FRReplaceReadonly;
-EXTERN string FText;
+#define DECLARE_PERSIST_VARS
+#include "PersistVars.h"
+
 EXTERN BOOL FUTF8 VALUE(FALSE);
-
-EXTERN BOOL FSInverse;
-EXTERN BOOL FAllCharTables;
-EXTERN string FRReplace;
-EXTERN BOOL FROpenModified;
-EXTERN BOOL FRConfirmFile;
-EXTERN BOOL FRConfirmLine;
-EXTERN BOOL FRSaveOriginal;
-EXTERN BOOL FROverwriteBackup;
-EXTERN BOOL FRepeating;
-
-// Advanced options
 EXTERN BOOL FAdvanced VALUE(FALSE);
-EXTERN BOOL FACaseSensitive;
-EXTERN BOOL FADirectoryCaseSensitive;
-EXTERN BOOL FAFullFileNameMatch;
-EXTERN BOOL FAFullFileNameInverse;
-EXTERN string FAFullFileName;
-
-EXTERN BOOL FADirectoryMatch;
-EXTERN BOOL FADirectoryInverse;
-EXTERN string FADirectoryName;
-EXTERN DWORD FARecursionLevel;
-
-EXTERN BOOL FADateBefore;
-EXTERN FILETIME FADateBeforeThis;
-EXTERN BOOL FADateAfter;
-EXTERN FILETIME FADateAfterThis;
-EXTERN BOOL FAModificationDate;
-
-EXTERN BOOL FASizeLess;
-EXTERN DWORD FASizeLessLimit;
-EXTERN BOOL FASizeGreater;
-EXTERN DWORD FASizeGreaterLimit;
-
-EXTERN DWORD FAAttributesSet;
-EXTERN DWORD FAAttributesCleared;
-
-EXTERN BOOL FASearchHead;
-EXTERN DWORD FASearchHeadLimit;
 
 // Internals
 
