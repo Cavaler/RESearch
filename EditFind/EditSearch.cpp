@@ -148,7 +148,7 @@ BOOL CESPresetCollection::EditPreset(CPreset *pPreset) {
 	CFarDialog Dialog(76,14,"ESPresetDlg");
 	Dialog.AddFrame(MESPreset);
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
-	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,"RESearch.PresetName",pPreset->m_strName));
+	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,"RESearch.PresetName",pPreset->Name()));
 
 	Dialog.Add(new CFarTextItem(5,4,0,MSearchFor));
 	Dialog.Add(new CFarEditItem(5,5,70,DIF_HISTORY,"SearchText", pPreset->m_mapStrings["Text"]));

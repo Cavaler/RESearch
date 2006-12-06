@@ -17,7 +17,7 @@ public:
 	void Apply(CParameterBatch &Batch);
 	void Save(HKEY hKey);
 
-	string m_strName;
+	string &Name() {return m_mapStrings[""];}
 	int m_nID;
 	map<string, string> m_mapStrings;
 	map<string, int> m_mapInts;

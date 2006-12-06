@@ -390,7 +390,7 @@ BOOL CFRPresetCollection::EditPreset(CPreset *pPreset) {
 	CFarDialog Dialog(76,20,"FRPresetDlg");
 	Dialog.AddFrame(MFRPreset);
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
-	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,"RESearch.PresetName", pPreset->m_strName));
+	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,"RESearch.PresetName", pPreset->Name()));
 
 	Dialog.Add(new CFarCheckBoxItem(35,4,0,MAsRegExp,&pPreset->m_mapInts["MaskAsRegExp"]));
 	Dialog.Add(new CFarTextItem(5,4,0,MMask));

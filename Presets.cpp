@@ -15,8 +15,10 @@ CParameterBatch::CParameterBatch(int nStringCount, int nIntCount, ...) {
 	va_end(List);
 }
 
-CPreset::CPreset(CParameterBatch &Batch) : m_nID(0), m_strName("New Preset") {
+CPreset::CPreset(CParameterBatch &Batch) : m_nID(0) {
 	if (!&Batch) return;
+
+	m_mapStrings[""] = "New Preset";
 	map<string, string *>::iterator it1 = Batch.m_mapStrings.begin();
 	while (it1 != Batch.m_mapStrings.end()) {
 		m_mapStrings[it1->first] = *(it1->second);
@@ -37,7 +39,6 @@ CPreset::CPreset(string strName, HKEY hKey) {
 		return;
 	}
 	m_nID = atoi(strName.c_str());
-	QueryRegStringValue(hOwnKey, NULL, m_strName, 0);
 
 	DWORD dwIndex = 0;
 	char szName[256];
@@ -85,7 +86,6 @@ void CPreset::Save(HKEY hKey) {
 	if (RegCreateKeyEx(hKey, szName, 0, NULL, 0, KEY_ALL_ACCESS, NULL, &hOwnKey, NULL) != ERROR_SUCCESS)
 		return;
 
-	SetRegStringValue(hOwnKey, NULL, m_strName.c_str());
 	map<string, string>::iterator it1 = m_mapStrings.begin();
 	while (it1 != m_mapStrings.end()) {
 		SetRegStringValue(hOwnKey, it1->first.c_str(), it1->second);
@@ -157,7 +157,7 @@ int CPresetCollection::ShowMenu(CParameterBatch &Batch) {
 	do {
 		arrItems.resize(size());
 		for (size_t nPreset = 0; nPreset < size(); nPreset++)
-			arrItems[nPreset] = at(nPreset)->m_strName;
+			arrItems[nPreset] = at(nPreset)->Name();
 
 		int nBreakKey;
 		char szTitle[128];
@@ -183,7 +183,7 @@ int CPresetCollection::ShowMenu(CParameterBatch &Batch) {
 		case 1:
 			if (nResult < (int)size()) {
 				const char *Lines[]={"Delete", GetMsg(MDeletePresetQuery),
-					at(nResult)->m_strName.c_str(), GetMsg(MOk), GetMsg(MCancel)};
+					at(nResult)->Name().c_str(), GetMsg(MOk), GetMsg(MCancel)};
 				if (StartupInfo.Message(StartupInfo.ModuleNumber, FMSG_WARNING, "DeletePreset", Lines, 5, 2)==0) {
 					delete at(nResult);
 					erase(begin() + nResult);
@@ -281,7 +281,7 @@ int CPresetBatch::ShowMenu() {
 	do {
 		arrItems.resize(size());
 		for (size_t nPreset = 0; nPreset < size(); nPreset++)
-			arrItems[nPreset] = (*this)(nPreset)->m_strName;
+			arrItems[nPreset] = (*this)(nPreset)->Name();
 
 		int nBreakKey;
 		nResult = ChooseMenu(arrItems, m_strName.c_str(), "Ins,Ctrl-\x18\x19,Del,F6", "Batch", nResult,

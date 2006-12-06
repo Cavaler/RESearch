@@ -85,15 +85,6 @@ int FPreparePattern() {
 	FCleanup(TRUE);
 
 	if (FAdvanced && !CompileAdvancedSettings()) return FALSE;
-	if (FASkipSystemFolders) {
-		if (FASystemFoldersMask) delete FASystemFoldersMask;
-
-		FASystemFoldersMask = new CFarMaskSet(FASystemFolders.c_str());
-		if (!FASystemFoldersMask->Valid()) {
-			delete FASystemFoldersMask; FASystemFoldersMask = NULL;
-			return FALSE;
-		}
-	}
 
 	if (FMaskAsRegExp) {
 		if (!PreparePattern(&FMaskPattern,&FMaskPatternExtra,FMask,FALSE)) return FALSE;
@@ -585,7 +576,7 @@ BOOL CFAPresetCollection::EditPreset(CPreset *pPreset) {
 	CFarDialog Dialog(78,26,"FAPresetDlg");
 	Dialog.AddFrame(MFAPreset);
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
-	Dialog.Add(new CFarEditItem(20,2,70,DIF_HISTORY,"RESearch.PresetName", pPreset->m_strName));
+	Dialog.Add(new CFarEditItem(20,2,70,DIF_HISTORY,"RESearch.PresetName", pPreset->Name()));
 
 	Dialog.Add(new CFarCheckBoxItem(5,4,0,MFullFileNameMatch,&pPreset->m_mapInts["FullFileNameMatch"]));
 	Dialog.Add(new CFarEditItem(5,5,59,DIF_HISTORY,"FullPath", pPreset->m_mapStrings["FullFileName"]));
