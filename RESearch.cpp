@@ -490,7 +490,7 @@ int ConfigureCommon() {
 }
 
 void ConfigureFile() {
-	CFarDialog Dialog(70,21,"FileConfig");
+	CFarDialog Dialog(70, 23, "FileConfig");
 	Dialog.AddFrame(MFileSearchSettings);
 
 	Dialog.Add(new CFarBoxItem(FALSE,5,3,33,7,DIF_LEFTTEXT,MDefaultMaskCase));
@@ -514,6 +514,9 @@ void ConfigureFile() {
 	Dialog.Add(new CFarEditItem(32,13,38,0, NULL, (int &)g_nStartWith,new CFarIntegerRangeValidator(0,0x7FFFFFFF)));
 	Dialog.Add(new CFarTextItem(7,14,0,MWidth));
 	Dialog.Add(new CFarEditItem(32,14,38,0, NULL, (int &)g_nWidth,new CFarIntegerRangeValidator(0,MAX_PATH)));
+
+	Dialog.Add(new CFarCheckBoxItem(5,16,0,MSkipSystemFolders,&FASkipSystemFolders));
+	Dialog.Add(new CFarEditItem(9, 17, 45, DIF_HISTORY,"RESearch.SystemFolders", FASystemFolders));
 
 	Dialog.AddButtons(MOk,MCancel);
 	Dialog.Display(-1);

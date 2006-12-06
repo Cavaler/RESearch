@@ -85,6 +85,15 @@ int FPreparePattern() {
 	FCleanup(TRUE);
 
 	if (FAdvanced && !CompileAdvancedSettings()) return FALSE;
+	if (FASkipSystemFolders) {
+		if (FASystemFoldersMask) delete FASystemFoldersMask;
+
+		FASystemFoldersMask = new CFarMaskSet(FASystemFolders.c_str());
+		if (!FASystemFoldersMask->Valid()) {
+			delete FASystemFoldersMask; FASystemFoldersMask = NULL;
+			return FALSE;
+		}
+	}
 
 	if (FMaskAsRegExp) {
 		if (!PreparePattern(&FMaskPattern,&FMaskPatternExtra,FMask,FALSE)) return FALSE;
@@ -244,15 +253,15 @@ BOOL AdvancedApplies(WIN32_FIND_DATA *FindData) {
 }
 
 int DoScanDirectory(char *Directory,PluginPanelItem **PanelItems,int *ItemsNumber,ProcessFileProc ProcessFile) {
+	if (FASkipSystemFolders && FASystemFoldersMask) {
+		if ((*FASystemFoldersMask)(Directory)) return TRUE;
+	}
+
 	if (FAdvanced) {
 		if (FARecursionLevel && (CurrentRecursionLevel > FARecursionLevel)) return TRUE;
 		if (FADirectoryMatch && FADirectoryPattern && CurrentRecursionLevel) {
 			bool bNameMatches = do_pcre_exec(FADirectoryPattern,FADirectoryPatternExtra,Directory,strlen(Directory),0,0,NULL,0) >= 0;
 			if (FADirectoryInverse ? bNameMatches : !bNameMatches) return TRUE;
-		}
-
-		if (FASkipSystemFolders && FASystemFoldersMask) {
-			if ((*FASystemFoldersMask)(Directory)) return TRUE;
 		}
 	}
 
@@ -492,7 +501,6 @@ BOOL AdvancedSettings() {
 	Dialog.Add(new CFarCheckBoxItem(62,5,0,MInverse,&FADirectoryInverse));
 	Dialog.Add(new CFarTextItem(5,6,0,MRecursionLevel));
 	Dialog.Add(new CFarEditItem(25,6,30,0,NULL,(int &)FARecursionLevel,new CFarIntegerRangeValidator(0,255)));
-	Dialog.Add(new CFarCheckBoxItem(33,6,0,MSkipSystemFolders,&FASkipSystemFolders));
 
 	Dialog.Add(new CFarCheckBoxItem(5,8,0,MDateAfter,&FADateAfter));
 	Dialog.Add(new CFarEditItem(30,8,50,0,NULL,new CFarDateTimeStorage(&FADateAfterThis)));
@@ -529,7 +537,7 @@ BOOL AdvancedSettings() {
 	Dialog.SetFocus(2);
 
 	do {
-		int Result=Dialog.Display(4,-3,14,17,-1);
+		int Result=Dialog.Display(4,-3,13,16,-1);
 		switch (Result) {
 		case 0:
 			break;
@@ -568,16 +576,6 @@ BOOL CompileAdvancedSettings() {
 
 	if (FADirectoryMatch) {
 		if (PreparePattern(&FADirectoryPattern,&FADirectoryPatternExtra,FADirectoryName,FADirectoryCaseSensitive)) return FALSE;
-	}
-
-	if (FASkipSystemFolders) {
-		if (FASystemFoldersMask) delete FASystemFoldersMask;
-
-		FASystemFoldersMask = new CFarMaskSet(FASystemFolders.c_str());
-		if (!FASystemFoldersMask->Valid()) {
-			delete FASystemFoldersMask; FASystemFoldersMask = NULL;
-			return FALSE;
-		}
 	}
 
 	return TRUE;

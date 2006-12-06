@@ -105,7 +105,6 @@ enum eStringTable {
 	MDirectoryMatch,
 	MInverse,
 	MRecursionLevel,
-	MSkipSystemFolders,
 	MDateBefore,
 	MDateAfter,
 	MCurrent,
@@ -183,6 +182,7 @@ enum eStringTable {
 	MPostfix,
 	MStartFrom,
 	MWidth,
+	MSkipSystemFolders,
 
 	MEditorSearchSettings,
 	MShowPositionOffset,
