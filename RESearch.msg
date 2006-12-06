@@ -31,6 +31,7 @@ MMenuAllOccurrences	"Show all &occurrences"		"Показать все &вхождения"
 MMenuFilterText		"&Filter text"				"&Фильтрация текста"
 MMenuTransliterate	"&Transliterate"			"&Транслитерация"
 MMenuUTF8Converter	"UTF-&8 converter"			"Конвертер UTF-&8"
+MMenuShowLastResults	"Show last r&esults"	"Показать последние &результаты"
 
 MRESearch			"Regular Expression Search"				"Поиск по регулярному выражению"
 MREReplace			"Regular Expression Replace"			"Замена по регулярному выражению"

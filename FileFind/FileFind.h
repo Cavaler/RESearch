@@ -114,6 +114,8 @@ public:
 	int PutFiles(PluginPanelItem *AddItems,int AddNumber,int Move,int OpMode);
 	int ProcessKey(int Key,unsigned int ControlState);
 	void ClosePlugin();
+
+	bool m_bActive;
 private:
 	PluginPanelItem *Items;
 	int Count;
@@ -122,5 +124,6 @@ private:
 
 	void UpdateList();
 };
+EXTERN CTemporaryPanel *LastTempPanel VALUE(NULL);
 
 #endif

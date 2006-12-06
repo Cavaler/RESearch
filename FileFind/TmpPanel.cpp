@@ -34,8 +34,11 @@ void WINAPI ClosePlugin(HANDLE hPlugin) {
 // CTemporaryPanel
 
 CTemporaryPanel::CTemporaryPanel(PluginPanelItem *NewItems,int NewCount,char *CalledFolder):
-	Items(NewItems),Count(NewCount),Folder(_strdup(CalledFolder)) {
+	Items(NewItems),Count(NewCount),Folder(_strdup(CalledFolder)),m_bActive(true) {
 	for (int I=0;I<Count;I++) Items[I].UserData=FALSE;
+
+	if (LastTempPanel && !LastTempPanel->m_bActive) delete LastTempPanel;
+	LastTempPanel = this;
 }
 
 CTemporaryPanel::~CTemporaryPanel() {
@@ -153,5 +156,5 @@ int CTemporaryPanel::ProcessKey(int Key,unsigned int ControlState) {
 }
 
 void CTemporaryPanel::ClosePlugin() {
-	delete this;
+	if (LastTempPanel == this) m_bActive = false; else delete this;
 }

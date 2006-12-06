@@ -255,7 +255,6 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="0"
-						PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;$(NoInherit)"
 						BrowseInformation="1"/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -281,7 +280,6 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="0"
-						PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;$(NoInherit)"
 						BrowseInformation="1"/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -310,7 +308,6 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="0"
-						PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;$(NoInherit)"
 						BrowseInformation="1"/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -336,7 +333,6 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="0"
-						PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;$(NoInherit)"
 						BrowseInformation="1"/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -362,7 +358,6 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="0"
-						PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;$(NoInherit)"
 						BrowseInformation="1"/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -388,7 +383,6 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="0"
-						PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;$(NoInherit)"
 						BrowseInformation="1"/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -445,7 +439,6 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="0"
-						PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;$(NoInherit)"
 						BrowseInformation="1"/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -474,7 +467,6 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="0"
-						PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;$(NoInherit)"
 						BrowseInformation="1"/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -500,7 +492,6 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="0"
-						PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;$(NoInherit)"
 						BrowseInformation="1"/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -529,7 +520,6 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="0"
-						PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;$(NoInherit)"
 						BrowseInformation="1"/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -559,7 +549,6 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="0"
-						PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;$(NoInherit)"
 						BrowseInformation="1"/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -592,7 +581,6 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="0"
-						PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;$(NoInherit)"
 						BrowseInformation="1"/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -621,7 +609,6 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="0"
-						PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;$(NoInherit)"
 						BrowseInformation="1"/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -667,7 +654,6 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="0"
-						PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;$(NoInherit)"
 						BrowseInformation="1"/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -693,7 +679,6 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="0"
-						PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;$(NoInherit)"
 						BrowseInformation="1"/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -719,8 +704,7 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="0"
-						PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;$(NoInherit)"
-						UsePrecompiledHeader="1"
+						UsePrecompiledHeader="3"
 						BrowseInformation="1"/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -785,7 +769,6 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="0"
-						PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;$(NoInherit)"
 						BrowseInformation="1"/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -795,6 +778,15 @@
 						Optimization="0"
 						AdditionalIncludeDirectories=""
 						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=INTEL;$(NoInherit)"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\StdAfx.cpp">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"/>
 				</FileConfiguration>
 			</File>
 			<File

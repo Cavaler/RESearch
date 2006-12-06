@@ -1,4 +1,3 @@
-#define INITGUID
 #include "StdAfx.h"
 #include "RESearch.h"
 
@@ -270,7 +269,7 @@ BOOL ProcessCommandLine(char *Line,BOOL *ShowDialog,int *Item) {
 }
 
 int ShowFileMenu() {
-	FarMenuItem MenuItems[12];
+	FarMenuItem MenuItems[13];
 	memset(MenuItems,0,sizeof(MenuItems));
 	strcpy(MenuItems[0].Text,GetMsg(MMenuSearch));
 	strcpy(MenuItems[1].Text,GetMsg(MMenuReplace));
@@ -284,6 +283,8 @@ int ShowFileMenu() {
 	strcpy(MenuItems[9].Text,GetMsg(MMenuRenumber));
 	MenuItems[10].Separator=TRUE;
 	strcpy(MenuItems[11].Text,GetMsg(MMenuUTF8Converter));
+	strcpy(MenuItems[12].Text,GetMsg(MMenuShowLastResults));
+
 	return StartupInfo.Menu(StartupInfo.ModuleNumber,-1,-1,0,FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT,GetMsg(MMenuHeader),
 		NULL,"FileMenu",NULL,NULL,MenuItems,sizeof(MenuItems)/sizeof(MenuItems[0]));
 }
@@ -300,6 +301,7 @@ int ShowEditorMenu() {
 	strcpy(MenuItems[6].Text,GetMsg(MMenuSearchReplaceAgainRev));
 	MenuItems[7].Separator=TRUE;
 	strcpy(MenuItems[8].Text,GetMsg(MMenuUTF8Converter));
+
 	return StartupInfo.Menu(StartupInfo.ModuleNumber,-1,-1,0,FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT,GetMsg(MMenuHeader),
 		NULL,"EditorMenu",NULL,NULL,MenuItems,sizeof(MenuItems)/sizeof(MenuItems[0]));
 }
@@ -312,6 +314,7 @@ int ShowViewerMenu() {
 //	strcpy(MenuItems[2].Text,GetMsg(MMenuSearchAgainRev));
 	MenuItems[2].Separator=TRUE;
 	strcpy(MenuItems[3].Text,GetMsg(MMenuUTF8Converter));
+
 	return StartupInfo.Menu(StartupInfo.ModuleNumber,-1,-1,0,FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT,GetMsg(MMenuHeader),
 		NULL,"EditorMenu",NULL,NULL,MenuItems,sizeof(MenuItems)/sizeof(MenuItems[0]));
 }
@@ -358,6 +361,14 @@ HANDLE WINAPI OpenPlugin(int OpenFrom,int Item) {
 			UTF8Converter();
 			Result=OR_CANCEL;
 			break;
+		case 12:
+			if (LastTempPanel) {
+				LastTempPanel->m_bActive = true;
+				return (HANDLE)LastTempPanel;
+			} else {
+				Result=OR_CANCEL;
+				break;
+			}
 		}
 		if (Result!=OR_CANCEL) SynchronizeWithFile(Item);
 		if (Result==OR_PANEL) {
