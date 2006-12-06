@@ -61,6 +61,8 @@ EXTERN pcre_extra *FADirectoryPatternExtra VALUE(NULL);
 EXTERN DWORD CurrentRecursionLevel;
 EXTERN int  FilesScanned;
 
+EXTERN CFarMaskSet *FASystemFoldersMask VALUE(NULL);
+
 EXTERN string MaskText;
 EXTERN string SearchText;
 EXTERN string ReplaceText;
@@ -82,6 +84,7 @@ typedef void (*ProcessFileProc)(WIN32_FIND_DATA *FindData,PluginPanelItem **Pane
 OperationResult FileFind(PluginPanelItem **PanelItems,int *ItemsNumber,BOOL ShowDialog);
 OperationResult FileReplace(PluginPanelItem **PanelItems,int *ItemsNumber,BOOL ShowDialog);
 BOOL AdvancedSettings();
+BOOL CompileAdvancedSettings();
 BOOL MaskCaseHere();
 
 OperationResult NoFilesFound();

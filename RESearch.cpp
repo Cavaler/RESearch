@@ -1,9 +1,6 @@
+#define INITGUID
+#include "StdAfx.h"
 #include "RESearch.h"
-#include "ViewFind\ViewFind.h"
-#include "EditFind\EditFind.h"
-#include "FileFind\FileFind.h"
-#include "FileTools\FileTools.h"
-#include "FarDlg.h"
 
 void WINAPI GetPluginInfo(PluginInfo *Info) {
 	static const char *ConfigStrings[1];

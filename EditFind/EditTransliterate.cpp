@@ -1,4 +1,5 @@
-#include "EditFind.h"
+#include "StdAfx.h"
+#include "..\RESearch.h"
 
 BOOL EditorTransliterateAgain() {
 	EditorInfo EdInfo;
@@ -15,8 +16,8 @@ BOOL EditorTransliterateAgain() {
 		StartupInfo.EditorControl(ECTL_GETSTRING,&String);
 		string strData(String.StringText, String.StringLength);
 
-		for (int nChar = 0; nChar < strData.length(); nChar++) {
-			int nIndex = ETSource.find(strData[nChar]);
+		for (size_t nChar = 0; nChar < strData.length(); nChar++) {
+			size_t nIndex = ETSource.find(strData[nChar]);
 			if (nIndex != string::npos) {
 				if (nIndex >= ETTarget.length()) {
 					if (!ETTarget.empty()) {

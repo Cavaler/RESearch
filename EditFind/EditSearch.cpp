@@ -1,4 +1,5 @@
-#include "EditFind.h"
+#include "StdAfx.h"
+#include "..\RESearch.h"
 
 void EditorSearchOK(int FirstLine,int StartPos,int LastLine,int EndPos) {
 	EditorInfo EdInfo;

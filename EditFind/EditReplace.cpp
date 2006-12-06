@@ -1,4 +1,5 @@
-#include "EditFind.h"
+#include "StdAfx.h"
+#include "..\RESearch.h"
 
 BOOL NoAsking;
 int  ReplaceStartLine,ReplaceNumber;

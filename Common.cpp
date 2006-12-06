@@ -1,11 +1,6 @@
+#include "StdAfx.h"
 #define DEFINE_VARS
-#define INITGUID
 #include "RESearch.h"
-#include "FileFind\FileFind.h"
-#include "FileTools\FileTools.h"
-#include "EditFind\EditFind.h"
-#include "ViewFind\ViewFind.h"
-#include "UTF8.h"
 
 HKEY OpenRegistry() {
 	HKEY Key;
@@ -223,7 +218,7 @@ BOOL ExpandParameter(const char *Matched,char *&String,int &Length,string Param,
 }
 
 char *CreateReplaceString(const char *Matched,int *Match,int Count,const char *Replace,const char *EOL,int *Numbers,int Engine,int &ResultLength) {
-	if ((Engine >= 0) && (Engine < m_arrEngines.size()))
+	if ((Engine >= 0) && (Engine < (int)m_arrEngines.size()))
 		return EvaluateReplaceString(Matched, Match, Count, Replace, EOL, Numbers, Engine, ResultLength);
 
 	char *String=_strdup("");

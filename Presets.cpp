@@ -1,5 +1,5 @@
+#include "StdAfx.h"
 #include "RESearch.h"
-#include "Presets.h"
 
 CParameterBatch::CParameterBatch(int nStringCount, int nIntCount, ...) {
 	va_list List;

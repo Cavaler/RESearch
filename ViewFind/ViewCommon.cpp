@@ -1,5 +1,5 @@
-#include "ViewFind.h"
-#include "..\EditFind\EditFind.h"
+#include "StdAfx.h"
+#include "..\RESearch.h"
 
 CParameterBatch g_VSBatch(1, 4,
 	"Text", &SearchText,

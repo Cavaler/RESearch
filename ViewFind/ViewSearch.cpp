@@ -1,5 +1,5 @@
-#include "ViewFind.h"
-#include "..\EditFind\EditFind.h"
+#include "StdAfx.h"
+#include "..\RESearch.h"
 
 struct ViewerSearchInfo {
 	__int64  CurPos;	// Line
@@ -14,7 +14,7 @@ string ToOEM(ViewerInfo &VInfo, const char *szData, int nLength) {
 		CharToOemBuff(&arrData[0], &arrData[0], nLength);
 		return string(&arrData[0], arrData.size());
 	}
-	if (!VInfo.CurMode.UseDecodeTable || (VInfo.CurMode.TableNum >= XLatTables.size())) return string(szData, nLength);
+	if (!VInfo.CurMode.UseDecodeTable || (VInfo.CurMode.TableNum >= (int)XLatTables.size())) return string(szData, nLength);
 
 	string strResult;
 	strResult.reserve(nLength);

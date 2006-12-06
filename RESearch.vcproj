@@ -102,7 +102,8 @@
 				RuntimeLibrary="3"
 				StructMemberAlignment="1"
 				RuntimeTypeInfo="TRUE"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="3"
+				PrecompiledHeaderThrough="StdAfx.h"
 				PrecompiledHeaderFile=".\Debug/RESearch.pch"
 				AssemblerListingLocation=".\Debug/"
 				ObjectFile=".\Debug/"
@@ -414,6 +415,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="0"
 						PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;$(NoInherit)"
+						UsePrecompiledHeader="0"
 						BrowseInformation="1"/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -509,6 +511,9 @@
 						AdditionalIncludeDirectories=""
 						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=INTEL;$(NoInherit)"/>
 				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\FileFind\PersistVars.h">
 			</File>
 			<File
 				RelativePath="FileFind\TmpPanel.cpp">
@@ -641,6 +646,9 @@
 			<File
 				RelativePath="resource.h">
 			</File>
+			<File
+				RelativePath=".\StdAfx.h">
+			</File>
 		</Filter>
 		<Filter
 			Name="Source Files"
@@ -712,6 +720,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="0"
 						PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;$(NoInherit)"
+						UsePrecompiledHeader="1"
 						BrowseInformation="1"/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -803,6 +812,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="0"
 						PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;$(NoInherit)"
+						UsePrecompiledHeader="0"
 						BrowseInformation="1"/>
 				</FileConfiguration>
 				<FileConfiguration

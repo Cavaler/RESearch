@@ -1,4 +1,5 @@
-#include "FileFind.h"
+#include "StdAfx.h"
+#include "..\RESearch.h"
 
 void XLatBuffer(BYTE *Buffer,int Length,int Table) {
 	for (register int I=0;I<Length;I++) Buffer[I]=XLatTables[Table].DecodeTable[Buffer[I]];
@@ -16,7 +17,7 @@ BOOL FindTextInBuffer(const char *Buffer,int Size,string &Text) {
 	if (FindTextInBufferWithTable(Buffer,Size,Text,Table)) return TRUE;
 
 	if (FAllCharTables) {
-		for (int I=0;I<XLatTables.size();I++) {
+		for (size_t I=0; I<XLatTables.size(); I++) {
 			Table = (char *)((FCaseSensitive) ? XLatTables[I].DecodeTable : XLatTables[I].UpperDecodeTable);
 			if (FindTextInBufferWithTable(Buffer,Size,Text,Table)) return TRUE;
 		}
@@ -34,7 +35,7 @@ BOOL FindPattern(pcre *Pattern,pcre_extra *PatternExtra,const char *Buffer,int L
 	if (!FAllCharTables || XLatTables.empty()) return FALSE;
 
 	char *SaveBuf=(char *)malloc(Length);
-	for (int I=0; I < XLatTables.size(); I++) {
+	for (size_t I=0; I < XLatTables.size(); I++) {
 		memmove(SaveBuf,Buffer,Length);
 		XLatBuffer((BYTE *)SaveBuf,Length,I);
 		if (do_pcre_exec(Pattern,PatternExtra,SaveBuf,Length,0,0,NULL,0)>=0) {

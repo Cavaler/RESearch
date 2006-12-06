@@ -1,4 +1,5 @@
-#include "FileTools.h"
+#include "StdAfx.h"
+#include "..\RESearch.h"
 
 char *FRStrings[]={"Mask","Text","Replace"};
 char *FRInts[]={"MaskAsRegExp","TextAsRegExp","Repeating"};

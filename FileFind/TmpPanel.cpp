@@ -1,4 +1,5 @@
-#include "FileFind.h"
+#include "StdAfx.h"
+#include "..\RESearch.h"
 
 void WINAPI GetOpenPluginInfo(HANDLE hPlugin,OpenPluginInfo *Info) {
 	CTemporaryPanel *Panel=(CTemporaryPanel *)hPlugin;

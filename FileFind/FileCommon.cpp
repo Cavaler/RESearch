@@ -1,4 +1,5 @@
-#include "FileFind.h"
+#include "StdAfx.h"
+#include "..\RESearch.h"
 
 CParameterBatch g_FSBatch(2, 5,
 	 "Mask", &MaskText, "Text", &SearchText,
@@ -67,6 +68,8 @@ void FCleanup(BOOL PatternOnly) {
 	if (FMaskPattern) {pcre_free(FMaskPattern);FMaskPattern=NULL;}
 	if (FMaskPatternExtra) {pcre_free(FMaskPatternExtra);FMaskPatternExtra=NULL;}
 	if (FMaskSet) {delete FMaskSet;FMaskPatternExtra=NULL;}
+	if (FASystemFoldersMask) {delete FASystemFoldersMask;FASystemFoldersMask=NULL;}
+
 	if (!PatternOnly) {
 		if (FAFullFileNamePattern) {pcre_free(FAFullFileNamePattern);FAFullFileNamePattern=NULL;}
 		if (FAFullFileNamePatternExtra) {pcre_free(FAFullFileNamePatternExtra);FAFullFileNamePatternExtra=NULL;}
@@ -80,6 +83,9 @@ void FCleanup(BOOL PatternOnly) {
 
 int FPreparePattern() {
 	FCleanup(TRUE);
+
+	if (FAdvanced && !CompileAdvancedSettings()) return FALSE;
+
 	if (FMaskAsRegExp) {
 		if (!PreparePattern(&FMaskPattern,&FMaskPatternExtra,FMask,FALSE)) return FALSE;
 	} else {
@@ -243,6 +249,10 @@ int DoScanDirectory(char *Directory,PluginPanelItem **PanelItems,int *ItemsNumbe
 		if (FADirectoryMatch && FADirectoryPattern && CurrentRecursionLevel) {
 			bool bNameMatches = do_pcre_exec(FADirectoryPattern,FADirectoryPatternExtra,Directory,strlen(Directory),0,0,NULL,0) >= 0;
 			if (FADirectoryInverse ? bNameMatches : !bNameMatches) return TRUE;
+		}
+
+		if (FASkipSystemFolders && FASystemFoldersMask) {
+			if ((*FASystemFoldersMask)(Directory)) return TRUE;
 		}
 	}
 
@@ -481,7 +491,8 @@ BOOL AdvancedSettings() {
 	Dialog.Add(new CFarCheckBoxItem(50,4,0,MCaseSensitive,&FADirectoryCaseSensitive));
 	Dialog.Add(new CFarCheckBoxItem(62,5,0,MInverse,&FADirectoryInverse));
 	Dialog.Add(new CFarTextItem(5,6,0,MRecursionLevel));
-	Dialog.Add(new CFarEditItem(32,6,40,0,NULL,(int &)FARecursionLevel,new CFarIntegerRangeValidator(0,255)));
+	Dialog.Add(new CFarEditItem(25,6,30,0,NULL,(int &)FARecursionLevel,new CFarIntegerRangeValidator(0,255)));
+	Dialog.Add(new CFarCheckBoxItem(33,6,0,MSkipSystemFolders,&FASkipSystemFolders));
 
 	Dialog.Add(new CFarCheckBoxItem(5,8,0,MDateAfter,&FADateAfter));
 	Dialog.Add(new CFarEditItem(30,8,50,0,NULL,new CFarDateTimeStorage(&FADateAfterThis)));
@@ -518,7 +529,7 @@ BOOL AdvancedSettings() {
 	Dialog.SetFocus(2);
 
 	do {
-		int Result=Dialog.Display(4,-3,13,16,-1);
+		int Result=Dialog.Display(4,-3,14,17,-1);
 		switch (Result) {
 		case 0:
 			break;
@@ -541,17 +552,34 @@ BOOL AdvancedSettings() {
 			return FALSE;
 		}
 
-		if (FAFullFileNamePattern) {pcre_free(FAFullFileNamePattern);FAFullFileNamePattern=NULL;}
-		if (FAFullFileNamePatternExtra) {pcre_free(FAFullFileNamePatternExtra);FAFullFileNamePatternExtra=NULL;}
-		if (FADirectoryPattern) {pcre_free(FADirectoryPattern);FADirectoryPattern=NULL;}
-		if (FADirectoryPatternExtra) {pcre_free(FADirectoryPatternExtra);FADirectoryPatternExtra=NULL;}
+	} while (!CompileAdvancedSettings());
+	return TRUE;
+}
 
-		if (FAFullFileNameMatch) {
-			if (!PreparePattern(&FAFullFileNamePattern,&FAFullFileNamePatternExtra,FAFullFileName,FACaseSensitive)) continue;
+BOOL CompileAdvancedSettings() {
+	if (FAFullFileNamePattern) {pcre_free(FAFullFileNamePattern);FAFullFileNamePattern=NULL;}
+	if (FAFullFileNamePatternExtra) {pcre_free(FAFullFileNamePatternExtra);FAFullFileNamePatternExtra=NULL;}
+	if (FADirectoryPattern) {pcre_free(FADirectoryPattern);FADirectoryPattern=NULL;}
+	if (FADirectoryPatternExtra) {pcre_free(FADirectoryPatternExtra);FADirectoryPatternExtra=NULL;}
+
+	if (FAFullFileNameMatch) {
+		if (!PreparePattern(&FAFullFileNamePattern,&FAFullFileNamePatternExtra,FAFullFileName,FACaseSensitive)) return FALSE;
+	}
+
+	if (FADirectoryMatch) {
+		if (PreparePattern(&FADirectoryPattern,&FADirectoryPatternExtra,FADirectoryName,FADirectoryCaseSensitive)) return FALSE;
+	}
+
+	if (FASkipSystemFolders) {
+		if (FASystemFoldersMask) delete FASystemFoldersMask;
+
+		FASystemFoldersMask = new CFarMaskSet(FASystemFolders.c_str());
+		if (!FASystemFoldersMask->Valid()) {
+			delete FASystemFoldersMask; FASystemFoldersMask = NULL;
+			return FALSE;
 		}
-		if (!FADirectoryMatch) break;
-		if (PreparePattern(&FADirectoryPattern,&FADirectoryPatternExtra,FADirectoryName,FADirectoryCaseSensitive)) break;
-	} while (TRUE);
+	}
+
 	return TRUE;
 }
 

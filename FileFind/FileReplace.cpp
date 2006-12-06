@@ -1,4 +1,5 @@
-#include "FileFind.h"
+#include "StdAfx.h"
+#include "..\RESearch.h"
 
 BOOL ConfirmFileReadonly(char *FileName) {
 	if (!FRConfirmReadonlyThisRun) return TRUE;

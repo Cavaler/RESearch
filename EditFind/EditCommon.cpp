@@ -1,5 +1,5 @@
-#include "EditFind.h"
-#include "pcre\internal.h"
+#include "StdAfx.h"
+#include "..\RESearch.h"
 
 CParameterBatch g_ESBatch(1, 4,
 	"Text", &SearchText,
