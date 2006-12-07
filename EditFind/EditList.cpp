@@ -15,7 +15,7 @@ BOOL EditorListAllAgain() {
 			StartupInfo.EditorControl(ECTL_GETSTRING, &String);
 
 			char szNumber[8];
-			sprintf(szNumber, "%3d|", CurrentLine);
+			sprintf(szNumber, "%3d|", CurrentLine+1);
 
 			string str = string(szNumber) + String.StringText;
 			EditorToOEM(str);

@@ -2,7 +2,7 @@
 .PluginContents=Regular Expression Search
 
 @Contents
-$ #Regular Expression Search and Replace, version 5.36#
+$ #Regular Expression Search and Replace, version 5.50#
     This plugin allows you to:
 
     - Perform text search and replace in editor
@@ -207,6 +207,8 @@ beginning of a filename
     #Postfix after number#           String to add after number in a filename
     #Start number from#              Self-explanatory
     #Digits in number#               Number is left-padded with zeroes to at least this width
+
+  #Skip preconfigured system folders# Folders matching given masks will be always skipped
 @EditorConfig
 $ #Editor settings#
   #Found text horizontal offset:# Where does line with text found in editor appears.
@@ -299,6 +301,8 @@ $ #RESearch menu in editor#
   ~#Replace#~@ReplaceDlg@              - Replace text or regular expression
   ~#Filter text#~@FilterDlg@          - Filter text by deleting (or leaving) lines
 matching a specified pattern.
+  ~#Transliterate#~@TransliterateDlg@        - Transliterate whole text in editor
+
   #Search/Replace again# - Repeat last search/replace operation
 @SearchDlg
 $ #Regular Expression Search#
@@ -320,6 +324,8 @@ regard to symbol case. ANSI and OEM codepages are supported.
 
   #[ UTF-8 ]#          If checked, regular expresiion search will use UTF-8 rules.
 Press the button to bring up ~UTF-8 Converter~@UTF8Converter@
+
+  #[ Show all ]#       Shows all occurrences of given string in a file.
 @ReplaceDlg
 $ #Regular Expression Replace#
     This command allows you to replace text in editor.
@@ -422,6 +428,8 @@ $ #RESearch menu in panels#
 
   ~#Rename files#~@FileRenameDlg@          - find and rename files
   ~#Rename selected files#~@SelectedFileRenameDlg@ - rename selected files
+
+  #Show last results#     - Show results of last search/replace/etc
 @FileSearchDlg
 $ #Regular Expression File Search#
     Using this command, you can search for files containing given text or regular expression.
@@ -465,8 +473,9 @@ is treated as regular expression.
 
   #Inverse search#           Only files that do NOT match search criteria will be shown.
 
-  #Use all character tables# All character tables installed will be used.
-    #NOTE:# This option has no effect if #Multi-line regexp# search is used.
+  #Use all character tables# All character tables installed will be used
+    From version 5.50, this also enables searching in Unicode and UTF8 files. If you plan
+    to use it often, make sure your files have Unicode signature - this speeds up search a lot.
 
   #[ Advanced ]#             Turn on to use ~Advanced File Search options~@AdvancedFileSearchDlg@,
 press button to configure them. Note, that pressing "OK" in the Advanced dialog automatically

@@ -114,33 +114,36 @@ BOOL EditorSearch() {
 	Dialog.Add(new CFarCheckBoxItem(30,6,0,"",&EUTF8));
 	Dialog.Add(new CFarButtonItem(34,6,0,0,MUTF8));
 	Dialog.Add(new CFarCheckBoxItem(5,7,0,MReverseSearch,&EReverse));
-	Dialog.AddButtons(MOk,MCancel);
+	Dialog.AddButtons(MOk, MShowAll); Dialog.AddButton(MCancel);
 	Dialog.Add(new CFarButtonItem(60,5,0,0,MPresets));
 
 	SearchText=PickupText();
 	if (SearchText.empty()) SearchText=EText;
 	int ExitCode;
 	do {
-		switch (ExitCode=Dialog.Display(4,-3,3,-1,-5)) {
+		switch (ExitCode=Dialog.Display(5,-4,-3,3,-1,-6)) {
 		case 0:
 			break;
 		case 1:
-			if (ERegExp) QuoteRegExpString(SearchText);
+			// Show All
 			break;
 		case 2:
-			ESPresets->ShowMenu(g_ESBatch);
+			if (ERegExp) QuoteRegExpString(SearchText);
 			break;
 		case 3:
+			ESPresets->ShowMenu(g_ESBatch);
+			break;
+		case 4:
 			UTF8Converter(SearchText);
 			break;
 		case -1:
 			return FALSE;
 		}
-	} while ((ExitCode>=1)||!EPreparePattern(SearchText));
+	} while ((ExitCode>=2)||!EPreparePattern(SearchText));
 
 	EText=SearchText;
 	Interrupt=FALSE;
-	if (!EText.empty()) EditorSearchAgain();
+	if (!EText.empty()) (ExitCode == 0) ? EditorSearchAgain() : EditorListAllAgain();
 	return TRUE;
 }
 

@@ -296,7 +296,7 @@ int ShowEditorMenu() {
 	strcpy(MenuItems[1].Text,GetMsg(MMenuReplace));
 	strcpy(MenuItems[2].Text,GetMsg(MMenuFilterText));
 	strcpy(MenuItems[3].Text,GetMsg(MMenuTransliterate));
-	strcpy(MenuItems[4].Text,GetMsg(MMenuAllOccurrences));
+	MenuItems[4].Separator=TRUE;
 	strcpy(MenuItems[5].Text,GetMsg(MMenuSearchReplaceAgain));
 	strcpy(MenuItems[6].Text,GetMsg(MMenuSearchReplaceAgainRev));
 	MenuItems[7].Separator=TRUE;
@@ -398,9 +398,9 @@ HANDLE WINAPI OpenPlugin(int OpenFrom,int Item) {
 		case 3:
 			if (EditorTransliterate()) LastAction=3;
 			break;
-		case 4:
-			if (EditorListAll()) LastAction=4;
-			break;
+//		case 4:
+//			if (EditorListAll()) LastAction=4;
+//			break;
 		case 6:
 			EReverse = !EReverse;
 		case 5:
