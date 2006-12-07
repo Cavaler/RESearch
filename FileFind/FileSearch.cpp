@@ -12,14 +12,86 @@ BOOL FindTextInBufferWithTable(const char *Buffer,int Size,string &Text,char *Ta
 	return Position>=0;
 }
 
+bool LikeUnicode(const char *Buffer, int Size) {
+	if (Size < 2) return FALSE;
+	// UTF16
+	if (((Buffer[0] == '\xFE') && (Buffer[1] == '\xFF')) || ((Buffer[0] == '\xFF') && (Buffer[1] == '\xFE'))) return true;
+	// UTF8
+	return ((Size >= 3) && (Buffer[0] == '\xEF') && (Buffer[1] == '\xBB') && (Buffer[1] == '\xBF'));
+}
+
+bool FromUnicodeLE(const char *Buffer, int Size, vector<char> &arrData) {
+	arrData.resize(Size/2);
+	int nResult = WideCharToMultiByte(CP_ACP, 0, (LPCWSTR)Buffer, Size/2, &arrData[0], arrData.size(), NULL, NULL);
+	if (nResult <= 0) return false;
+	arrData.resize(nResult);
+	return true;
+}
+
+// Could be slow
+bool FromUnicodeBE(const char *Buffer, int Size, vector<char> &arrData) {
+	arrData.resize(Size/2);
+
+	for (int nChar = 0; nChar < Size/2; nChar++) {
+		wchar_t wcSingle = (Buffer[nChar*2]<<8) + Buffer[nChar*2+1];
+		WideCharToMultiByte(CP_ACP, 0, &wcSingle, 1, &arrData[nChar], 1, NULL, NULL);
+	}
+	return true;
+}
+
+bool FromUTF8(const char *Buffer, int Size, vector<char> &arrData) {
+	vector<wchar_t> arrWData(Size);
+	int nResult = MultiByteToWideChar(CP_UTF8, 0, Buffer, Size, &arrWData[0], arrWData.size());
+	if (nResult <= 0) return false;
+
+	arrData.resize(nResult);
+	nResult = WideCharToMultiByte(CP_ACP, 0, &arrWData[0], arrWData.size(), &arrData[0], arrData.size(), NULL, NULL);
+	if (nResult <= 0) return false;
+	arrData.resize(nResult);
+	return true;
+}
+
+bool FromUnicodeDetect(const char *Buffer, int Size, vector<char> &arrData) {
+	if ((Size >= 2) && (Buffer[0] == '\xFF') && (Buffer[1] == '\xFE')) {
+		return FromUnicodeLE(Buffer+2, Size-2, arrData);
+	}
+	if ((Size >= 2) && (Buffer[0] == '\xFE') && (Buffer[1] == '\xFF')) {
+		return FromUnicodeBE(Buffer+2, Size-2, arrData);
+	}
+	if ((Size >= 3) && (Buffer[0] == '\xEF') && (Buffer[1] == '\xBB') && (Buffer[1] == '\xBF')) {
+		return FromUTF8(Buffer+2, Size-2, arrData);
+	}
+	return false;
+}
+
 BOOL FindTextInBuffer(const char *Buffer,int Size,string &Text) {
 	char *Table=(FCaseSensitive)?NULL:UpCaseTable;
+
+	vector<char> arrData;
+	if (FAllCharTables && LikeUnicode(Buffer, Size)) {
+		if (FromUnicodeDetect(Buffer, Size, arrData)) {
+			if (FindTextInBufferWithTable(&arrData[0], arrData.size(), Text, Table)) return TRUE;
+		}
+	}
+
 	if (FindTextInBufferWithTable(Buffer,Size,Text,Table)) return TRUE;
 
 	if (FAllCharTables) {
 		for (size_t I=0; I<XLatTables.size(); I++) {
 			Table = (char *)((FCaseSensitive) ? XLatTables[I].DecodeTable : XLatTables[I].UpperDecodeTable);
 			if (FindTextInBufferWithTable(Buffer,Size,Text,Table)) return TRUE;
+		}
+
+		if (!LikeUnicode(Buffer, Size)) {		// No signature, but anyway Unicode?
+			if (FromUnicodeLE(Buffer, Size, arrData)) {
+				if (FindTextInBufferWithTable(&arrData[0], arrData.size(), Text, Table)) return TRUE;
+			}
+			if (FromUnicodeBE(Buffer, Size, arrData)) {
+				if (FindTextInBufferWithTable(&arrData[0], arrData.size(), Text, Table)) return TRUE;
+			}
+			if (FromUTF8(Buffer, Size, arrData)) {
+				if (FindTextInBufferWithTable(&arrData[0], arrData.size(), Text, Table)) return TRUE;
+			}
 		}
 	}
 
@@ -34,12 +106,12 @@ BOOL FindPattern(pcre *Pattern,pcre_extra *PatternExtra,const char *Buffer,int L
 	if (do_pcre_exec(Pattern,PatternExtra,Buffer,Length,0,0,NULL,0)>=0) return TRUE;
 	if (!FAllCharTables || XLatTables.empty()) return FALSE;
 
-	char *SaveBuf=(char *)malloc(Length);
+	vector<char> SaveBuf(Length);
 	for (size_t I=0; I < XLatTables.size(); I++) {
-		memmove(SaveBuf,Buffer,Length);
-		XLatBuffer((BYTE *)SaveBuf,Length,I);
-		if (do_pcre_exec(Pattern,PatternExtra,SaveBuf,Length,0,0,NULL,0)>=0) {
-			free(SaveBuf);return TRUE;
+		memmove(&SaveBuf[0], Buffer, Length);
+		XLatBuffer((BYTE *)&SaveBuf[0], Length, I);
+		if (do_pcre_exec(Pattern, PatternExtra, &SaveBuf[0], Length,0,0,NULL,0)>=0) {
+			return TRUE;
 		}
 	}
 	return FALSE;
