@@ -1,15 +1,25 @@
 #include "StdAfx.h"
 #include "..\RESearch.h"
 
-vector<string> arrListAllString;
-vector<pair<int, int> > arrListAllLines;
+struct sFindAllInfo {
+	vector<string> arrString;
+	vector<pair<int, int> > arrLines;
+};
+map<string, sFindAllInfo> FindAllInfos;
+
+string CanonicalLCName(const char *szName) {
+	string strResult = GetFullFileName(szName);
+	CharLower((LPSTR)strResult.c_str());		// Lazy!
+	return strResult;
+}
 
 BOOL EditorListAllAgain() {
 	EditorInfo EdInfo;
-	StartupInfo.EditorControl(ECTL_GETINFO,&EdInfo);
+	StartupInfo.EditorControl(ECTL_GETINFO, &EdInfo);
 
-	arrListAllString.clear();
-	arrListAllLines.clear();
+	sFindAllInfo &Info = FindAllInfos[CanonicalLCName(EdInfo.FileName)];
+	Info.arrString.clear();
+	Info.arrLines.clear();
 
 	for (int CurrentLine = 0; CurrentLine < EdInfo.TotalLines; CurrentLine++) {
 		if (Interrupted()) break;
@@ -23,12 +33,12 @@ BOOL EditorListAllAgain() {
 
 			string str = string(szNumber) + String.StringText;
 			EditorToOEM(str);
-			arrListAllString.push_back(str);
-			arrListAllLines.push_back(pair<int, int>(CurrentLine, StartPos));
+			Info.arrString.push_back(str);
+			Info.arrLines.push_back(pair<int, int>(CurrentLine, StartPos));
 		}
 	}
 
-	if (!Interrupt && (arrListAllLines.size() == 0)) {
+	if (!Interrupt && (Info.arrLines.size() == 0)) {
 		const char *Lines[]={GetMsg(MRESearch),GetMsg(MCannotFind),EText.c_str(),GetMsg(MOk)};
 		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"ECannotFind",Lines,4,1);
 		return TRUE;
@@ -38,16 +48,17 @@ BOOL EditorListAllAgain() {
 }
 
 BOOL EditorListAllShowResults() {
-	if (arrListAllLines.size() == 0) return TRUE;
-
 	EditorInfo EdInfo;
 	StartupInfo.EditorControl(ECTL_GETINFO,&EdInfo);
 
-	int nResult = ChooseMenu(arrListAllString, GetMsg(MListAllLines), NULL, "ListAll", 0, FMENU_WRAPMODE);
+	sFindAllInfo &Info = FindAllInfos[CanonicalLCName(EdInfo.FileName)];
+	if (Info.arrLines.size() == 0) return TRUE;
+
+	int nResult = ChooseMenu(Info.arrString, GetMsg(MListAllLines), NULL, "ListAll", 0, FMENU_WRAPMODE);
 	if (nResult >= 0) {
-		EditorSetPosition Position = {arrListAllLines[nResult].first, arrListAllLines[nResult].second, -1,
-			TopLine(arrListAllLines[nResult].first, EdInfo.WindowSizeY, EdInfo.TotalLines),
-			LeftColumn(arrListAllLines[nResult].second, EdInfo.WindowSizeY), -1};
+		EditorSetPosition Position = {Info.arrLines[nResult].first, Info.arrLines[nResult].second, -1,
+			TopLine(Info.arrLines[nResult].first, EdInfo.WindowSizeY, EdInfo.TotalLines),
+			LeftColumn(Info.arrLines[nResult].second, EdInfo.WindowSizeY), -1};
 		StartupInfo.EditorControl(ECTL_SETPOSITION,&Position);
 	} else {
 		EditorSetPosition Position = {EdInfo.CurLine, EdInfo.CurPos, EdInfo.CurTabPos, 
