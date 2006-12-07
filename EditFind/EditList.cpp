@@ -23,18 +23,23 @@ BOOL EditorListAllAgain() {
 
 	for (int CurrentLine = 0; CurrentLine < EdInfo.TotalLines; CurrentLine++) {
 		if (Interrupted()) break;
-		int FirstLine = CurrentLine, StartPos = 0, LastLine = CurrentLine, EndPos = -1;
+		int FirstLine = CurrentLine, StartPos = 0, EndPos = -1;
+		int LastLine = (ESeveralLine) ? EdInfo.TotalLines-1 : CurrentLine;
+
 		if (SearchInText(FirstLine, StartPos, LastLine, EndPos, FALSE)) {
+			EditorSetPosition Position={FirstLine,-1,-1,-1,-1,-1};
+			StartupInfo.EditorControl(ECTL_SETPOSITION,&Position);
 			EditorGetString String = {-1};
 			StartupInfo.EditorControl(ECTL_GETSTRING, &String);
 
 			char szNumber[8];
-			sprintf(szNumber, "%3d|", CurrentLine+1);
+			sprintf(szNumber, "%3d|", FirstLine+1);
 
 			string str = string(szNumber) + String.StringText;
 			EditorToOEM(str);
 			Info.arrString.push_back(str);
-			Info.arrLines.push_back(pair<int, int>(CurrentLine, StartPos));
+			Info.arrLines.push_back(pair<int, int>(FirstLine, StartPos));
+			CurrentLine = FirstLine;
 		}
 	}
 
