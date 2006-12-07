@@ -74,6 +74,7 @@ enum eStringTable {
 	MMenuFilterText,
 	MMenuTransliterate,
 	MMenuUTF8Converter,
+	MMenuShowLastResults,
 
 	MRESearch,
 	MREReplace,
