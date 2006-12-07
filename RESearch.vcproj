@@ -35,6 +35,7 @@
 				StructMemberAlignment="2"
 				EnableFunctionLevelLinking="TRUE"
 				RuntimeTypeInfo="TRUE"
+				UsePrecompiledHeader="3"
 				PrecompiledHeaderFile=".\Release_NET/RESearch.pch"
 				AssemblerListingLocation=".\Release_NET/"
 				ObjectFile=".\Release_NET/"
@@ -247,8 +248,7 @@
 					Name="Release|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=VC7;$(NoInherit)"/>
+						Optimization="0"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32">
@@ -272,8 +272,7 @@
 					Name="Release|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=VC7;$(NoInherit)"/>
+						Optimization="0"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32">
@@ -300,8 +299,7 @@
 					Name="Release|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=VC7;$(NoInherit)"/>
+						Optimization="0"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32">
@@ -325,8 +323,7 @@
 					Name="Release|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=VC7;$(NoInherit)"/>
+						Optimization="0"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32">
@@ -350,8 +347,7 @@
 					Name="Release|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=VC7;$(NoInherit)"/>
+						Optimization="0"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32">
@@ -375,8 +371,7 @@
 					Name="Release|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=VC7;$(NoInherit)"/>
+						Optimization="0"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32">
@@ -401,7 +396,7 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="0"
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=VC7;$(NoInherit)"/>
+						UsePrecompiledHeader="0"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32">
@@ -431,8 +426,7 @@
 					Name="Release|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=VC7;$(NoInherit)"/>
+						Optimization="0"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32">
@@ -459,8 +453,7 @@
 					Name="Release|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=VC7;$(NoInherit)"/>
+						Optimization="0"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32">
@@ -484,8 +477,7 @@
 					Name="Release|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=VC7;$(NoInherit)"/>
+						Optimization="0"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32">
@@ -512,8 +504,7 @@
 					Name="Release|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=VC7;$(NoInherit)"/>
+						Optimization="0"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32">
@@ -541,8 +532,7 @@
 					Name="Release|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=VC7;$(NoInherit)"/>
+						Optimization="0"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32">
@@ -573,8 +563,7 @@
 					Name="Release|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=VC7;$(NoInherit)"/>
+						Optimization="0"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32">
@@ -601,8 +590,7 @@
 					Name="Release|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=VC7;$(NoInherit)"/>
+						Optimization="0"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32">
@@ -646,8 +634,7 @@
 					Name="Release|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=VC7;$(NoInherit)"/>
+						Optimization="0"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32">
@@ -671,8 +658,7 @@
 					Name="Release|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=VC7;$(NoInherit)"/>
+						Optimization="0"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32">
@@ -696,8 +682,7 @@
 					Name="Release|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=VC7;$(NoInherit)"/>
+						Optimization="0"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32">
@@ -761,8 +746,7 @@
 					Name="Release|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=VC7;$(NoInherit)"/>
+						Optimization="0"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32">
@@ -783,6 +767,12 @@
 			<File
 				RelativePath=".\StdAfx.cpp">
 				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Debug|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
@@ -796,7 +786,7 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="0"
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=VC7;$(NoInherit)"/>
+						UsePrecompiledHeader="0"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32">

@@ -304,6 +304,8 @@ matching a specified pattern.
   ~#Transliterate#~@TransliterateDlg@        - Transliterate whole text in editor
 
   #Search/Replace again# - Repeat last search/replace operation
+  #Show last results#    - Results of last "Show All" for current file. Could be incorrect
+if file has been modified
 @SearchDlg
 $ #Regular Expression Search#
   This command allows you to search for text or regular expression in editor.

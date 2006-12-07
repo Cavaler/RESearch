@@ -1,4 +1,4 @@
-//Microsoft Developer Studio generated resource script.
+// Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
 
@@ -27,18 +27,18 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE DISCARDABLE 
+1 TEXTINCLUDE 
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE DISCARDABLE 
+2 TEXTINCLUDE 
 BEGIN
     "#include ""afxres.h""\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE DISCARDABLE 
+3 TEXTINCLUDE 
 BEGIN
     "\r\n"
     "\0"
@@ -47,15 +47,14 @@ END
 #endif    // APSTUDIO_INVOKED
 
 
-#ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 5,3,9,0
- PRODUCTVERSION 5,3,9,0
+ FILEVERSION 5,5,0,0
+ PRODUCTVERSION 5,5,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -70,18 +69,14 @@ BEGIN
     BEGIN
         BLOCK "000004e4"
         BEGIN
-            VALUE "Comments", "\0"
-            VALUE "CompanyName", "Pavel Kostromitinov\0"
-            VALUE "FileDescription", "Regular Expression Search plugin for FAR\0"
-            VALUE "FileVersion", "5, 3, 9, 0\0"
-            VALUE "InternalName", "RESearch\0"
-            VALUE "LegalCopyright", "Copyright © Pavel Kostromitinov, 1999-2006\0"
-            VALUE "LegalTrademarks", "\0"
-            VALUE "OriginalFilename", "RESearch.dll\0"
-            VALUE "PrivateBuild", "\0"
-            VALUE "ProductName", "RESearch plugin for FAR\0"
-            VALUE "ProductVersion", "5, 3, 9, 0\0"
-            VALUE "SpecialBuild", "\0"
+            VALUE "CompanyName", "Pavel Kostromitinov"
+            VALUE "FileDescription", "Regular Expression Search plugin for FAR"
+            VALUE "FileVersion", "5, 5, 0, 0"
+            VALUE "InternalName", "RESearch"
+            VALUE "LegalCopyright", "Copyright © Pavel Kostromitinov, 1999-2006"
+            VALUE "OriginalFilename", "RESearch.dll"
+            VALUE "ProductName", "RESearch plugin for FAR"
+            VALUE "ProductVersion", "5, 5, 0, 0"
         END
     END
     BLOCK "VarFileInfo"
@@ -89,8 +84,6 @@ BEGIN
         VALUE "Translation", 0x0, 1252
     END
 END
-
-#endif    // !_MAC
 
 #endif    // Neutral resources
 /////////////////////////////////////////////////////////////////////////////
@@ -110,7 +103,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // TYPELIB
 //
 
-1                       TYPELIB DISCARDABLE     "RESearch.tlb"
+1                       TYPELIB                 "RESearch.tlb"
 #endif    // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
 

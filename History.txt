@@ -5,10 +5,22 @@ Regular Expression Search and Replace
  - Bug fixed
  * Minor change
 
-Version 5.xx (planned)
+Planned:
 	* Several-line 'Show all'
-	? Moving 'Show all' to 'Search' dialog
-	+ Cache for 'Show all'
+
+Version 5.50 (14.04.2006)
+	+ "Use all character tables" searches in Unicode (both endings) and UTF8
+		Optimized for files with Unicode signatures
+	* "Use all character tables" does work with multi-line regexps, however beware of excess memory usage!
+
+	* "Show last results" in file panels
+	* "Skip predefined system folders" in configuration - for "CVS", ".svn" and stuff
+	- Creating folders while renaming fixed
+	- Renaming presets fixed
+	- Memory leak in RE file search fixed
+
+	* "Show all" moved to "Search" dialog in editor
+	+ "Show last results" in editor - last "Show all" results for this file
 
 Version 5.39 (14.04.2006)
 	- Fixed various confirmation dialogs
