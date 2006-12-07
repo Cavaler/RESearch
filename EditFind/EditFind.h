@@ -84,6 +84,7 @@ BOOL EditorTransliterate();
 BOOL EditorTransliterateAgain();
 BOOL EditorListAll();
 BOOL EditorListAllAgain();
+BOOL EditorListAllShowResults();
 
 void PatchEditorInfo(EditorInfo &EdInfo);
 

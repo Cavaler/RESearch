@@ -1,14 +1,18 @@
 #include "StdAfx.h"
 #include "..\RESearch.h"
 
+vector<string> arrListAllString;
+vector<pair<int, int> > arrListAllLines;
+
 BOOL EditorListAllAgain() {
 	EditorInfo EdInfo;
 	StartupInfo.EditorControl(ECTL_GETINFO,&EdInfo);
 
-	vector<string> arrString;
-	vector<pair<int, int> > arrLines;
+	arrListAllString.clear();
+	arrListAllLines.clear();
 
 	for (int CurrentLine = 0; CurrentLine < EdInfo.TotalLines; CurrentLine++) {
+		if (Interrupted()) break;
 		int FirstLine = CurrentLine, StartPos = 0, LastLine = CurrentLine, EndPos = -1;
 		if (SearchInText(FirstLine, StartPos, LastLine, EndPos, FALSE)) {
 			EditorGetString String = {-1};
@@ -19,16 +23,31 @@ BOOL EditorListAllAgain() {
 
 			string str = string(szNumber) + String.StringText;
 			EditorToOEM(str);
-			arrString.push_back(str);
-			arrLines.push_back(pair<int, int>(CurrentLine, StartPos));
+			arrListAllString.push_back(str);
+			arrListAllLines.push_back(pair<int, int>(CurrentLine, StartPos));
 		}
 	}
 
-	int nResult = ChooseMenu(arrString, GetMsg(MListAllLines), NULL, "ListAll", 0, FMENU_WRAPMODE);
+	if (!Interrupt && (arrListAllLines.size() == 0)) {
+		const char *Lines[]={GetMsg(MRESearch),GetMsg(MCannotFind),EText.c_str(),GetMsg(MOk)};
+		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"ECannotFind",Lines,4,1);
+		return TRUE;
+	}
+
+	return EditorListAllShowResults();
+}
+
+BOOL EditorListAllShowResults() {
+	if (arrListAllLines.size() == 0) return TRUE;
+
+	EditorInfo EdInfo;
+	StartupInfo.EditorControl(ECTL_GETINFO,&EdInfo);
+
+	int nResult = ChooseMenu(arrListAllString, GetMsg(MListAllLines), NULL, "ListAll", 0, FMENU_WRAPMODE);
 	if (nResult >= 0) {
-		EditorSetPosition Position = {arrLines[nResult].first, arrLines[nResult].second, -1,
-			TopLine(arrLines[nResult].first, EdInfo.WindowSizeY, EdInfo.TotalLines),
-			LeftColumn(arrLines[nResult].second, EdInfo.WindowSizeY), -1};
+		EditorSetPosition Position = {arrListAllLines[nResult].first, arrListAllLines[nResult].second, -1,
+			TopLine(arrListAllLines[nResult].first, EdInfo.WindowSizeY, EdInfo.TotalLines),
+			LeftColumn(arrListAllLines[nResult].second, EdInfo.WindowSizeY), -1};
 		StartupInfo.EditorControl(ECTL_SETPOSITION,&Position);
 	} else {
 		EditorSetPosition Position = {EdInfo.CurLine, EdInfo.CurPos, EdInfo.CurTabPos, 

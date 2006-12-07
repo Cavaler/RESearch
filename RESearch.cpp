@@ -290,7 +290,7 @@ int ShowFileMenu() {
 }
 
 int ShowEditorMenu() {
-	FarMenuItem MenuItems[9];
+	FarMenuItem MenuItems[10];
 	memset(MenuItems,0,sizeof(MenuItems));
 	strcpy(MenuItems[0].Text,GetMsg(MMenuSearch));
 	strcpy(MenuItems[1].Text,GetMsg(MMenuReplace));
@@ -301,6 +301,7 @@ int ShowEditorMenu() {
 	strcpy(MenuItems[6].Text,GetMsg(MMenuSearchReplaceAgainRev));
 	MenuItems[7].Separator=TRUE;
 	strcpy(MenuItems[8].Text,GetMsg(MMenuUTF8Converter));
+	strcpy(MenuItems[9].Text,GetMsg(MMenuShowLastResults));
 
 	return StartupInfo.Menu(StartupInfo.ModuleNumber,-1,-1,0,FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT,GetMsg(MMenuHeader),
 		NULL,"EditorMenu",NULL,NULL,MenuItems,sizeof(MenuItems)/sizeof(MenuItems[0]));
@@ -398,9 +399,9 @@ HANDLE WINAPI OpenPlugin(int OpenFrom,int Item) {
 		case 3:
 			if (EditorTransliterate()) LastAction=3;
 			break;
-//		case 4:
-//			if (EditorListAll()) LastAction=4;
-//			break;
+		case 9:
+			if (EditorListAllShowResults()) LastAction=4;
+			break;
 		case 6:
 			EReverse = !EReverse;
 		case 5:
