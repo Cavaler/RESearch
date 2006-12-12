@@ -5,7 +5,10 @@ Regular Expression Search and Replace
  - Bug fixed
  * Minor change
 
-Version 5.50 (14.04.2006)
+Planned:
+	+ Support for C-like escapes ("\n" mostly) for plain text searches
+
+Version 5.50 (07.12.2006)
 	+ "Use all character tables" searches in Unicode (both endings) and UTF8
 		Optimized for files with Unicode signatures
 	* "Use all character tables" does work with multi-line regexps, however beware of excess memory usage!

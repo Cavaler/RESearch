@@ -47,7 +47,6 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="TRUE"
-				AdditionalOptions="/FILEALIGN:0x200 /D_USE_COMPI /D_USE_COMPILER=VC7 /force:multiple  /force:multiple "
 				AdditionalDependencies="PavelMD7.lib pcreMD7.lib"
 				OutputFile="RESearch7.dll"
 				Version="4.2"
@@ -194,7 +193,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="TRUE"
-				AdditionalOptions="/force:multiple /D_USE_INTEL /D_USE_INTEL_COMPILER "
+				AdditionalOptions="/D_USE_INTEL_COMPILER "
 				AdditionalDependencies="LibCTinyMDI.lib PavelMDI.lib pcreMDI.lib"
 				OutputFile="RESearchI.dll"
 				Version="4.0"

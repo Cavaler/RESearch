@@ -70,7 +70,6 @@ enum eStringTable {
 	MMenuSearchAgainRev,
 	MMenuSearchReplaceAgain,
 	MMenuSearchReplaceAgainRev,
-	MMenuAllOccurrences,
 	MMenuFilterText,
 	MMenuTransliterate,
 	MMenuUTF8Converter,
@@ -228,6 +227,7 @@ enum eStringTable {
 	MAll,
 	MAllFiles,
 	MSkip,
+	MShowAll,
 
 	MAskRename,
 	MAskTo,
