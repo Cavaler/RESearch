@@ -85,6 +85,15 @@ int FPreparePattern() {
 	FCleanup(TRUE);
 
 	if (FAdvanced && !CompileAdvancedSettings()) return FALSE;
+	if (FASkipSystemFolders) {
+		if (FASystemFoldersMask) delete FASystemFoldersMask;
+
+		FASystemFoldersMask = new CFarMaskSet(FASystemFolders.c_str());
+		if (!FASystemFoldersMask->Valid()) {
+			delete FASystemFoldersMask; FASystemFoldersMask = NULL;
+//			return FALSE;
+		}
+	}
 
 	if (FMaskAsRegExp) {
 		if (!PreparePattern(&FMaskPattern,&FMaskPatternExtra,FMask,FALSE)) return FALSE;
