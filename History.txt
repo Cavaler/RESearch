@@ -8,6 +8,9 @@ Regular Expression Search and Replace
 Planned:
 	+ Support for C-like escapes ("\n" mostly) for plain text searches
 
+Version 5.51 (14.12.2006)
+	- "Skip predefined system folders" really works
+
 Version 5.50 (07.12.2006)
 	+ "Use all character tables" searches in Unicode (both endings) and UTF8
 		Optimized for files with Unicode signatures
