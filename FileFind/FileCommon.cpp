@@ -536,8 +536,9 @@ BOOL AdvancedSettings() {
 	Dialog.AddButton(MPresets);
 	Dialog.SetFocus(2);
 
+	int Result;
 	do {
-		int Result=Dialog.Display(4,-3,13,16,-1);
+		Result=Dialog.Display(4,-3,13,16,-1);
 		switch (Result) {
 		case 0:
 			break;
@@ -560,7 +561,7 @@ BOOL AdvancedSettings() {
 			return FALSE;
 		}
 
-	} while (!CompileAdvancedSettings());
+	} while (!CompileAdvancedSettings() || (Result != 0));
 	return TRUE;
 }
 
