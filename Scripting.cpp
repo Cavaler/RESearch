@@ -72,7 +72,7 @@ public:
 
 	// IReplaceParameters methods
 	STDMETHOD(match)(long lPos, BSTR *pbstrMatch) {
-		if ((lPos < 0) || (lPos > m_nCount)) return E_INVALIDARG;
+		if ((lPos < 0) || (lPos >= m_nCount)) return E_INVALIDARG;
 		*pbstrMatch = _bstr_t(string(m_szMatched + m_pMatch[lPos*2], m_pMatch[lPos*2+1] - m_pMatch[lPos*2]).c_str()).copy();
 		return S_OK;
 	}
