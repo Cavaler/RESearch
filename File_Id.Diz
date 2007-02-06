@@ -1,9 +1,9 @@
-Regular Expression Search and Replace, version 5.51
+Regular Expression Search and Replace, version 5.52
 by Kostromitinov Pavel, pavel@kostorm.spb.ru
 
-- Search using plain-text, regular expressions and "search engine-like" in files.
+- Search using plain-text and regular expressions in files.
 
-- Search and Replace in editor using regular expressions
+- Search and Replace in editor using regular expressions and even script evaluation
 
 - Renaming and selecting files using regular expressions
 
