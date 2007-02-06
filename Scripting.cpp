@@ -39,20 +39,22 @@ public:
 		, m_nCount(Count)
 		, m_szEOL(EOL)
 		, m_pNumbers(Numbers)
+		, m_pOuter(NULL)
 	{
 	}
 
 	string Result() {return m_strResult;}
+	void SetOuter(IDispatch *pOuter) {m_pOuter = pOuter;}
 	~CReplaceParameters() {}
 
 	// IUnknown methods
 	STDMETHOD(QueryInterface)(REFIID riid, void** ppvObj) {
 		if (riid==IID_IUnknown) {
 			*ppvObj=static_cast<IReplaceParameters *>(this);
-		} else if (riid==IID_IDispatch) {
-			*ppvObj=static_cast<IReplaceParameters *>(this);
 		} else if (riid==IID_IReplaceParameters) {
 			*ppvObj=static_cast<IReplaceParameters *>(this);
+		} else if (m_pOuter) {
+			return m_pOuter->QueryInterface(riid, ppvObj);
 		} else {
 			*ppvObj=NULL;return E_NOINTERFACE;
 		}
@@ -108,6 +110,8 @@ private:
 	const char *m_szEOL;
 	int *m_pNumbers;
 	string m_strResult;
+
+	IDispatch *m_pOuter;
 };
 
 // --------------------------------------------------
@@ -139,6 +143,9 @@ public:
 			ShowHResultError(MErrorLoadingTypeLib, hResult);
 			Interrupt = TRUE;
 		}
+
+		pParams->SetOuter(m_pParams);
+
 		pInfo->Release();
 		pLib->Release();
 	}
@@ -231,6 +238,12 @@ char *EvaluateReplaceString(const char *Matched,int *Match,int Count,const char 
 		return NULL;
 	}
 
+	CReplaceParameters *pParams = new CReplaceParameters(Matched, Match, Count, EOL, Numbers);
+	pParams->AddRef();
+	CReplaceScriptSite *pSite = new CReplaceScriptSite(pParams);
+	pSite->AddRef();
+	spEngine->SetScriptSite(pSite);
+
 	IActiveScriptParsePtr spParser = spEngine;
 	spParser->InitNew();
 	hResult = spParser->ParseScriptText(_bstr_t(Replace), NULL, NULL, NULL, 0, 0, 0, NULL, &ExcepInfo);
@@ -240,12 +253,6 @@ char *EvaluateReplaceString(const char *Matched,int *Match,int Count,const char 
 		return NULL;
 	}
 
-	CReplaceParameters *pParams = new CReplaceParameters(Matched, Match, Count, EOL, Numbers);
-	pParams->AddRef();
-	CReplaceScriptSite *pSite = new CReplaceScriptSite(pParams);
-	pSite->AddRef();
-
-	spEngine->SetScriptSite(pSite);
 	spEngine->AddNamedItem(L"research", SCRIPTITEM_ISVISIBLE|SCRIPTITEM_NOCODE|SCRIPTITEM_GLOBALMEMBERS);
 	spEngine->SetScriptState(SCRIPTSTATE_CONNECTED);
 
