@@ -482,10 +482,15 @@ void ShowHResultError(int nError, HRESULT hResult, const char *szHelp) {
 	FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER|FORMAT_MESSAGE_FROM_SYSTEM,
 		NULL, hResult, 0, (LPSTR)&szMessage, 0, NULL);
 
-	char *szEnd = strchr(szMessage, '\r');
-	if (szEnd) *szEnd = 0;
 	char szFullMsg[1024];
-	sprintf(szFullMsg, "%s (0x%08X)", szMessage, hResult);
+
+	if (szMessage) {
+		char *szEnd = strchr(szMessage, '\r');
+		if (szEnd) *szEnd = 0;
+		sprintf(szFullMsg, "%s (0x%08X)", szMessage, hResult);
+	} else {
+		sprintf(szFullMsg, "0x%08X", hResult);
+	}
 
 	ShowErrorMsg(GetMsg(nError), szFullMsg, szHelp);
 	LocalFree(szMessage);
