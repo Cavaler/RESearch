@@ -12,14 +12,14 @@ BOOL ConfirmFileReadonly(char *FileName) {
 	case 1:FRConfirmReadonlyThisRun=FALSE;
 	case 0:return TRUE;
 	case -1:
-	case 3:Interrupt=TRUE;
+	case 3:g_bInterrupted=TRUE;
 	}
 	return FALSE;
 }
 
 BOOL ConfirmReplacement(const char *Found, const char *Replaced, const char *FileName) {
 	if (!FRConfirmLineThisFile) return TRUE;
-	if (Interrupt) return FALSE;
+	if (g_bInterrupted) return FALSE;
 	const char *Lines[]={
 		GetMsg(MREReplace),GetMsg(MAskReplace),Found,GetMsg(MAskWith),Replaced,
 		GetMsg(MInFile),FileName,GetMsg(MReplace),GetMsg(MAll),GetMsg(MAllFiles),GetMsg(MSkip),GetMsg(MCancel)
@@ -29,7 +29,7 @@ BOOL ConfirmReplacement(const char *Found, const char *Replaced, const char *Fil
 	case 1:FRConfirmLineThisFile=FALSE;
 	case 0:return TRUE;
 	case -1:
-	case 4:Interrupt=TRUE;
+	case 4:g_bInterrupted=TRUE;
 	}
 	return FALSE;
 }

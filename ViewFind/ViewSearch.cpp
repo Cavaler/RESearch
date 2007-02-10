@@ -51,14 +51,14 @@ void SetViewerSelection(__int64 nStart, int nLength) {
 
 	ViewerSetPosition VPos = {/*VSP_NOREDRAW*/0, (nStart > 256) ? nStart-256 : 0, 0};
 	StartupInfo.ViewerControl(VCTL_SETPOSITION, &VPos);
-	Interrupt = TRUE;
+	g_bInterrupted = TRUE;
 }
 
 BOOL ViewerSearchAgain() {
 	ViewerInfo VInfo;
 	VInfo.StructSize=sizeof(VInfo);
 	StartupInfo.ViewerControl(VCTL_GETINFO, &VInfo);
-	Interrupt = FALSE;
+	g_bInterrupted = FALSE;
 
 	map<int, ViewerSearchInfo>::iterator it = g_ViewerInfo.find(VInfo.ViewerID);
 	if (it == g_ViewerInfo.end()) {
@@ -114,7 +114,7 @@ BOOL ViewerSearchAgain() {
 	}
 
 	if (ERegExp) delete[] pMatch;
-	if (!Interrupt) {
+	if (!g_bInterrupted) {
 		const char *Lines[]={GetMsg(MRESearch),GetMsg(MCannotFind),EText.c_str(),GetMsg(MOk)};
 		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"ECannotFind",Lines,4,1);
 	}

@@ -43,7 +43,7 @@ BOOL EditorListAllAgain() {
 		}
 	}
 
-	if (!Interrupt && (Info.arrLines.size() == 0)) {
+	if (!g_bInterrupted && (Info.arrLines.size() == 0)) {
 		const char *Lines[]={GetMsg(MRESearch),GetMsg(MCannotFind),EText.c_str(),GetMsg(MOk)};
 		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"ECannotFind",Lines,4,1);
 		return TRUE;
@@ -112,7 +112,7 @@ BOOL EditorListAll() {
 	} while ((ExitCode>=1)||!EPreparePattern(SearchText));
 
 	EText=SearchText;
-	Interrupt=FALSE;
+	g_bInterrupted=FALSE;
 	if (!EText.empty()) EditorListAllAgain();
 	return TRUE;
 }

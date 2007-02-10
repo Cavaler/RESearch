@@ -63,7 +63,7 @@ BOOL EditorSearchAgain() {
 		}
 	} else {
 		if (EReverse) {
-			for (FirstLine=EdInfo.CurLine; !Interrupt && FirstLine>=0; FirstLine--) {
+			for (FirstLine=EdInfo.CurLine; !g_bInterrupted && FirstLine>=0; FirstLine--) {
 				LastLine=FirstLine;
 				StartPos=0;
 				EndPos=(FirstLine==EdInfo.CurLine)?EdInfo.CurPos:-1;
@@ -73,7 +73,7 @@ BOOL EditorSearchAgain() {
 				}
 			}
 		} else {
-			for (FirstLine=EdInfo.CurLine; !Interrupt && FirstLine<EdInfo.TotalLines; FirstLine++) {
+			for (FirstLine=EdInfo.CurLine; !g_bInterrupted && FirstLine<EdInfo.TotalLines; FirstLine++) {
 				LastLine=FirstLine;
 				StartPos=(FirstLine==EdInfo.CurLine)?EdInfo.CurPos:0;
 				EndPos=-1;
@@ -93,7 +93,7 @@ BOOL EditorSearchAgain() {
 	Position.LeftPos=EdInfo.LeftPos;
 	Position.Overtype=EdInfo.Overtype;
 	StartupInfo.EditorControl(ECTL_SETPOSITION,&Position);
-	if (!Interrupt) {
+	if (!g_bInterrupted) {
 		const char *Lines[]={GetMsg(MRESearch),GetMsg(MCannotFind),EText.c_str(),GetMsg(MOk)};
 		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"ECannotFind",Lines,4,1);
 	}
@@ -142,7 +142,7 @@ BOOL EditorSearch() {
 	} while ((ExitCode>=2)||!EPreparePattern(SearchText));
 
 	EText=SearchText;
-	Interrupt=FALSE;
+	g_bInterrupted=FALSE;
 	if (!EText.empty()) (ExitCode == 0) ? EditorSearchAgain() : EditorListAllAgain();
 	return TRUE;
 }

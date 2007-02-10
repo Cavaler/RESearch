@@ -125,7 +125,7 @@ public:
 		HRESULT hResult = LoadTypeLib(_bstr_t(szModule), &pLib);
 		if (FAILED(hResult)) {
 			ShowHResultError(MErrorLoadingTypeLib, hResult);
-			Interrupt = TRUE;
+			g_bInterrupted = TRUE;
 			return;
 		}
 
@@ -134,14 +134,14 @@ public:
 		if (FAILED(hResult)) {
 			ShowHResultError(MErrorLoadingTypeLib, hResult);
 			pLib->Release();
-			Interrupt = TRUE;
+			g_bInterrupted = TRUE;
 			return;
 		}
 
 		hResult = CreateStdDispatch(pParams, pParams, pInfo, (IUnknown **)&m_pParams);
 		if (FAILED(hResult)) {
 			ShowHResultError(MErrorLoadingTypeLib, hResult);
-			Interrupt = TRUE;
+			g_bInterrupted = TRUE;
 		}
 
 		pParams->SetOuter(m_pParams);
@@ -214,7 +214,7 @@ public:
 		} else {
 			ShowErrorMsg(GetMsg(MErrorExecutingScript));
 		}
-		Interrupt = TRUE;
+		g_bInterrupted = TRUE;
 		return S_OK;
 	}
 	STDMETHOD(OnEnterScript)() {return S_OK;}
@@ -227,14 +227,14 @@ private:
 char *EvaluateReplaceString(const char *Matched,int *Match,int Count,const char *Replace,const char *EOL,int *Numbers,int Engine,int &ResultLength) {
 	EXCEPINFO ExcepInfo;
 	HRESULT hResult;
-	
+
 	if (Interrupted()) return NULL;
 
 	IActiveScriptPtr spEngine;
 	hResult = spEngine.CreateInstance(m_arrEngines[Engine].m_clsid);
 	if (FAILED(hResult)) {
 		ShowHResultError(MErrorCreatingEngine, hResult);
-		Interrupt = TRUE;
+		g_bInterrupted = TRUE;
 		return NULL;
 	}
 
@@ -249,7 +249,7 @@ char *EvaluateReplaceString(const char *Matched,int *Match,int Count,const char 
 	hResult = spParser->ParseScriptText(_bstr_t(Replace), NULL, NULL, NULL, 0, 0, 0, NULL, &ExcepInfo);
 	if (FAILED(hResult)) {
 		ShowHResultError(MErrorParsingText, hResult);
-		Interrupt = TRUE;
+		g_bInterrupted = TRUE;
 		return NULL;
 	}
 

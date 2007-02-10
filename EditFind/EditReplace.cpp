@@ -244,7 +244,7 @@ BOOL ReplaceInText(int FirstLine,int StartPos,int LastLine,int EndPos) {
 		int ReplaceLength,FoundLastLine=MatchLastLine;
 		BOOL ZeroMatch=(MatchFirstLine==MatchLastLine)&&(MatchStartPos==MatchEndPos);
 		char *Replace_O2E=CreateReplaceString(MatchedLine,Match,MatchCount,ERReplace_O2E.c_str(),"\n",Numbers,(EREvaluate ? EREvaluateScript : -1),ReplaceLength);
-		if (Interrupt) {	// Script failed
+		if (g_bInterrupted) {	// Script failed
 			if (Replace_O2E) free(Replace_O2E);
 			break;
 		}
@@ -293,7 +293,7 @@ BOOL ReplaceInTextByLine(int FirstLine,int StartPos,int LastLine,int EndPos,BOOL
 			int Numbers[3]={MatchFirstLine,MatchFirstLine-ReplaceStartLine,ReplaceNumber};
 			int ReplaceLength;
 			char *Replace_O2E=CreateReplaceString(MatchedLine,Match,MatchCount,ERReplace_O2E.c_str(),"\n",Numbers,(EREvaluate ? EREvaluateScript : -1),ReplaceLength);
-			if (Interrupt) {	// Script failed
+			if (g_bInterrupted) {	// Script failed
 				if (Replace_O2E) free(Replace_O2E);
 				break;
 			}
@@ -341,7 +341,7 @@ BOOL ReplaceInTextByLine(int FirstLine,int StartPos,int LastLine,int EndPos,BOOL
 			StartupInfo.EditorControl(ECTL_DELETESTRING,NULL);
 			if (EReverse) Line--; else LastLine--;
 		} else (EReverse)?Line--:Line++;
-	} while (!Interrupt && ((EReverse)?Line>=FirstLine:Line<=LastLine));
+	} while (!g_bInterrupted && ((EReverse)?Line>=FirstLine:Line<=LastLine));
 	return FALSE;
 }
 
@@ -393,7 +393,7 @@ BOOL EditorReplaceAgain() {
 		LeftColumn(LastReplacePos,EdInfo.WindowSizeX),-1};
 	StartupInfo.EditorControl(ECTL_SETPOSITION,&Position);
 
-	if (NoAsking||Interrupt) return TRUE;
+	if (NoAsking||g_bInterrupted) return TRUE;
 	ShowErrorMsg(GetMsg(MCannotFind), EText.c_str(), "ECannotFind");
 	return FALSE;
 }
@@ -499,7 +499,7 @@ BOOL EditorReplace() {
 	OEMToEditor(ERReplace_O2E);
 
 	NoAsking=(ExitCode==1);ReplaceStartLine=-1;ReplaceNumber=0;
-	Interrupt=FALSE;
+	g_bInterrupted=FALSE;
 	if (!EText.empty()) EditorReplaceAgain();
 	return TRUE;
 }

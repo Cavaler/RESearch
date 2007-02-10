@@ -95,7 +95,7 @@ void ChangeSelection(int How) {
 
 BOOL ConfirmRename(const char *From,const char *To) {
 	if (!ConfirmFile(MMenuRename,From)) return FALSE;
-	if (Interrupt) return FALSE;
+	if (g_bInterrupted) return FALSE;
 	if (!FRConfirmLineThisFile) return TRUE;
 	const char *Lines[]={
 		GetMsg(MMenuRename),GetMsg(MAskRename),From,GetMsg(MAskTo),To,
@@ -108,7 +108,7 @@ BOOL ConfirmRename(const char *From,const char *To) {
 	case -1:
 	case 3:return FALSE;
 	}
-	Interrupt=TRUE;
+	g_bInterrupted=TRUE;
 	return FALSE;
 }
 
@@ -180,7 +180,7 @@ void RenameFile(WIN32_FIND_DATA *FindData,PluginPanelItem **PanelItems,int *Item
 						case 0:
 							break;
 						case 3:
-							Interrupt=TRUE;
+							g_bInterrupted=TRUE;
 						case 2:
 							return;
 						}
@@ -207,7 +207,7 @@ void RenameFile(WIN32_FIND_DATA *FindData,PluginPanelItem **PanelItems,int *Item
 						case 0:
 							break;
 						case 3:
-							Interrupt=TRUE;
+							g_bInterrupted=TRUE;
 						case 2:
 							return;
 						}
@@ -227,7 +227,7 @@ void RenameFile(WIN32_FIND_DATA *FindData,PluginPanelItem **PanelItems,int *Item
 				if (Error != ERROR_SUCCESS) {
 					const char *Lines[]={GetMsg(MMenuRename),GetMsg(MRenameError),FindData->cFileName,
 						GetMsg(MAskTo),NewName,GetMsg(MOk),GetMsg(MCancel)};
-					if (StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"FRenameError",Lines,7,2)==1) Interrupt=TRUE;
+					if (StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"FRenameError",Lines,7,2)==1) g_bInterrupted=TRUE;
 					return;
 				} else {
 					if (!FRepeating) break;
@@ -235,7 +235,7 @@ void RenameFile(WIN32_FIND_DATA *FindData,PluginPanelItem **PanelItems,int *Item
 				}
 			}
 		}
-		if (Interrupt) return;
+		if (g_bInterrupted) return;
 	}
 	if (Modified) AddFile(FindData,PanelItems,ItemsNumber);
 }
@@ -246,7 +246,7 @@ BOOL RenameFilesExecutor(CParameterBatch &Batch) {
 	FRReplace=ReplaceText;
 	if (!FPreparePattern()) return FALSE;
 	FTAskOverwrite = FTAskCreatePath = true;
-	FileNumber=-1;Interrupt=FALSE;
+	FileNumber=-1;g_bInterrupted=FALSE;
 
 	FRConfirmFileThisRun = FALSE;//FRConfirmFile;
 	FRConfirmLineThisRun = FALSE;//FRConfirmLine;
@@ -333,7 +333,7 @@ OperationResult RenameFiles(PluginPanelItem **PanelItems,int *ItemsNumber,BOOL S
 	FRConfirmFileThisRun=FRConfirmFile;
 	FRConfirmLineThisRun=FRConfirmLine;
 	FTAskOverwrite = FTAskCreatePath = true;
-	FileNumber=-1;Interrupt=FALSE;
+	FileNumber=-1;g_bInterrupted=FALSE;
 
 	if (ScanDirectories(PanelItems,ItemsNumber,RenameFile)) {
 		if (!FROpenModified) return OR_OK; else
@@ -342,7 +342,7 @@ OperationResult RenameFiles(PluginPanelItem **PanelItems,int *ItemsNumber,BOOL S
 }
 
 BOOL PerformRenameSelectedFiles(PanelInfo &PInfo,PluginPanelItem **PanelItems,int *ItemsNumber) {
-	FileNumber=-1;Interrupt=FALSE;
+	FileNumber=-1;g_bInterrupted=FALSE;
 
 	if ((PInfo.SelectedItemsNumber==0)&&(PInfo.ItemsNumber>0)&&
 		(strcmp(PInfo.PanelItems[PInfo.CurrentItem].FindData.cFileName,"..")==0)) {

@@ -296,26 +296,6 @@ char *CreateReplaceString(const char *Matched,int *Match,int Count,const char *R
 	return String;
 }
 
-BOOL Interrupted() {
-	if (Interrupt) return TRUE;
-
-	static HANDLE InputHandle=GetStdHandle(STD_INPUT_HANDLE);
-	INPUT_RECORD InputRecord;
-	DWORD Read;
-	do {
-		if (!PeekConsoleInput(InputHandle,&InputRecord,1,&Read)) return FALSE;
-		if (!Read) return FALSE;
-		if (!ReadConsoleInput(InputHandle,&InputRecord,1,&Read)) return FALSE;
-		if ((InputRecord.EventType==KEY_EVENT) && (InputRecord.Event.KeyEvent.bKeyDown)) {
-			if (InputRecord.Event.KeyEvent.wVirtualScanCode==VK_ESCAPE) {
-				Interrupt = TRUE;
-				return TRUE;
-			}
-		}
-	} while (Read);
-	return FALSE;
-}
-
 void SetANSILocale() {
 	char Locale[10];
 	sprintf(Locale,".%d",GetACP());

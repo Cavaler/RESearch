@@ -65,7 +65,7 @@ BOOL EditorTransliterate() {
 	ETSource = SearchText;
 	ETTarget = ReplaceText;
 
-	Interrupt=FALSE;
+	g_bInterrupted=FALSE;
 	if (!ETSource.empty()) EditorTransliterateAgain();
 	return TRUE;
 }

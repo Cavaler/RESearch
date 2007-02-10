@@ -323,7 +323,7 @@ int ShowViewerMenu() {
 HANDLE WINAPI OpenPlugin(int OpenFrom,int Item) {
 	BOOL ShowDialog=TRUE;
 	g_bFromCmdLine = false;
-	Interrupt = FALSE;
+	g_bInterrupted = FALSE;
 
 	int nMenu;
 	ESearchAgainCalled = FALSE;

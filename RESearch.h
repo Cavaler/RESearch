@@ -29,7 +29,6 @@ enum   FindTextAtCursor {FT_NONE,FT_WORD,FT_ANY};
 EXTERN FindTextAtCursor EFindTextAtCursor;
 EXTERN BOOL EFindSelection;
 
-EXTERN BOOL Interrupt;
 EXTERN bool g_bFromCmdLine;
 
 struct sActiveScript {
@@ -264,7 +263,6 @@ char *EvaluateReplaceString(const char *Matched,int *Match,int Count,const char 
 
 BOOL LoadPresets(char *Which,char **StringNames,int StringCount,char **IntNames,int IntCount,void **PresetData,int *PresetCount);
 BOOL SavePresets(char *Which,char **StringNames,int StringCount,char **IntNames,int IntCount,void *PresetData,int PresetCount);
-BOOL Interrupted();
 
 void ShowErrorMsg(const char *sz1, const char *sz2 = NULL, const char *szHelp = NULL);
 void ShowHResultError(int nError, HRESULT hResult, const char *szHelp = NULL);

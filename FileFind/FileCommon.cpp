@@ -128,7 +128,7 @@ int FPreparePattern() {
 			GetStripWord(What,Word);
 			if (Word.size()==0) break;
 			FSWords.push_back(Word);
-		} while (Word.size()&&(!Interrupt));
+		} while (Word.size()&&(!g_bInterrupted));
 						}
 		return FALSE;
 
@@ -279,7 +279,7 @@ int DoScanDirectory(char *Directory,PluginPanelItem **PanelItems,int *ItemsNumbe
 	strcat(Directory,"*");
 	if ((HSearch=FindFirstFile(Directory,&FindData))!=INVALID_HANDLE_VALUE) do {
 		Sleep(0);
-		Interrupt|=Interrupted();
+		g_bInterrupted|=Interrupted();
 		if (FindData.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) {
 			if (!strcmp(FindData.cFileName,".")) continue;
 			if (!strcmp(FindData.cFileName,"..")) continue;
@@ -290,13 +290,13 @@ int DoScanDirectory(char *Directory,PluginPanelItem **PanelItems,int *ItemsNumbe
 
 		FindDataArray=(WIN32_FIND_DATA *)realloc(FindDataArray,(++FindDataCount)*sizeof(WIN32_FIND_DATA));
 		FindDataArray[FindDataCount-1]=FindData;
-	} while (FindNextFile(HSearch,&FindData)&&!Interrupt);
+	} while (FindNextFile(HSearch,&FindData)&&!g_bInterrupted);
 	FindClose(HSearch);
 
 	Directory[Len]=0;
 	if (!FindDataCount) ShowProgress(Directory,*PanelItems,*ItemsNumber);
 	for (int I=0;I<FindDataCount;I++) {
-		Interrupt|=Interrupted();if (Interrupt) break;
+		g_bInterrupted|=Interrupted();if (g_bInterrupted) break;
 		if (!FAdvanced||AdvancedApplies(&FindDataArray[I])) {
 			ProcessFile(&FindDataArray[I],PanelItems,ItemsNumber);
 			Sleep(0);FilesScanned++;
@@ -307,7 +307,7 @@ int DoScanDirectory(char *Directory,PluginPanelItem **PanelItems,int *ItemsNumbe
 	free(FindDataArray);
 	StartupInfo.RestoreScreen(hScreen);
 	if (FSearchIn==SI_CURRENTONLY) return TRUE;
-	if (Interrupt) return FALSE;
+	if (g_bInterrupted) return FALSE;
 
 	strcpy(Directory+Len,"*");
 	if ((HSearch=FindFirstFile(Directory,&FindData))==INVALID_HANDLE_VALUE) return TRUE;
@@ -342,7 +342,7 @@ int ScanPluginDirectories(PanelInfo &Info,PluginPanelItem **PanelItems,int *Item
 			if (!DoScanDirectory(CurDir,PanelItems,ItemsNumber,ProcessFile)) break;
 		} else {
 			if (!MultipleMasksApply(FMask,Items[I].FindData.cFileName)) continue;
-			Interrupt|=Interrupted();if (Interrupt) break;
+			g_bInterrupted|=Interrupted();if (g_bInterrupted) break;
 
 			WIN32_FIND_DATA CurFindData=Items[I].FindData;
 			GetFullPathName(Items[I].FindData.cFileName,sizeof(CurFindData.cFileName),CurFindData.cFileName,NULL);
@@ -356,7 +356,7 @@ int ScanPluginDirectories(PanelInfo &Info,PluginPanelItem **PanelItems,int *Item
 int ScanDirectories(PluginPanelItem **PanelItems,int *ItemsNumber,ProcessFileProc ProcessFile) {
 	PanelInfo PInfo;
 	StartupInfo.Control(INVALID_HANDLE_VALUE,FCTL_GETPANELINFO,&PInfo);
-	*ItemsNumber=0;*PanelItems=NULL;Interrupt=FALSE;FilesScanned=0;
+	*ItemsNumber=0;*PanelItems=NULL;g_bInterrupted=FALSE;FilesScanned=0;
 	CurrentRecursionLevel=0;
 
 	if (PInfo.Plugin) return ScanPluginDirectories(PInfo,PanelItems,ItemsNumber,ProcessFile);
@@ -400,7 +400,7 @@ int ScanDirectories(PluginPanelItem **PanelItems,int *ItemsNumber,ProcessFilePro
 					}
 				} else {
 					if (!MultipleMasksApply(FMask,CurFindData.cFileName)) continue;
-					Interrupt|=Interrupted();if (Interrupt) break;
+					g_bInterrupted|=Interrupted();if (g_bInterrupted) break;
 					strcat(strcpy(CurFindData.cFileName,PInfo.CurDir),PInfo.SelectedItems[I].FindData.cFileName);
 					ProcessFile(&CurFindData,PanelItems,ItemsNumber);FilesScanned++;
 				}
@@ -426,7 +426,7 @@ BOOL ConfirmFile(int Title,const char *FileName) {
 	case 1:FRConfirmFileThisRun=FALSE;
 	case 0:return (FileConfirmed=TRUE);
 	case -1:
-	case 3:Interrupt=TRUE;
+	case 3:g_bInterrupted=TRUE;
 	}
 	return FALSE;
 }

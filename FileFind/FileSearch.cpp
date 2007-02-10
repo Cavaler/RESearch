@@ -188,7 +188,7 @@ BOOL FindRegExpInBuffer(const char *Buffer,int Size,string &Text) {
 		BOOL Return=FindPattern(Pattern,PatternExtra,Buffer,Size);
 		pcre_free(Pattern);pcre_free(PatternExtra);
 		return Return;
-	} else {Interrupt=TRUE;return FALSE;}
+	} else {g_bInterrupted=TRUE;return FALSE;}
 }
 
 BOOL FindMulti(const char *Buffer,int Size,BOOL (*Searcher)(const char *,int,string &)) {
@@ -210,10 +210,10 @@ BOOL FindMulti(const char *Buffer,int Size,BOOL (*Searcher)(const char *,int,str
 		WereAnyMaybes=TRUE;
 		if (AnyMaybesFound) continue;
 		if (Searcher(Buffer,Size,Word)) AnyMaybesFound=TRUE;
-	} while (Word.size()&&(!Interrupt));
+	} while (Word.size()&&(!g_bInterrupted));
 
 	// All OK with Require end Exclude
-	if (Interrupt) Return=FALSE;
+	if (g_bInterrupted) Return=FALSE;
 	if (Return) Return=(!WereAnyMaybes)||AnyMaybesFound;
 	return Return;
 }
