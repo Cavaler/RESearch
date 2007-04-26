@@ -475,11 +475,18 @@ void ProcessNames(vector<string> &arrFileNames, vector<string> &arrProcessedName
 		if (!arrStripped[nItem].empty()) {
 			// Preserving extensions!
 			size_t nExt = arrStripped[nItem].rfind('.');
-			string strReplacing = arrStripped[nItem].substr(0, nExt);
+			if (nExt != string::npos) {
+				string strReplacing = arrStripped[nItem].substr(0, nExt);
 
-			vector<string> arrMatches;
-			if (reStrip.Match(strReplacing, PCRE_ANCHORED, &arrMatches)) {
-				arrStripped[nItem] = strReplacing.substr(arrMatches[0].length()) + arrStripped[nItem].substr(nExt);
+				vector<string> arrMatches;
+				if (reStrip.Match(strReplacing, PCRE_ANCHORED, &arrMatches)) {
+					arrStripped[nItem] = strReplacing.substr(arrMatches[0].length()) + arrStripped[nItem].substr(nExt);
+				}
+			} else {
+				vector<string> arrMatches;
+				if (reStrip.Match(arrStripped[nItem], PCRE_ANCHORED, &arrMatches)) {
+					arrStripped[nItem] = arrStripped[nItem].substr(arrMatches[0].length());
+				}
 			}
 		}
 	}
