@@ -250,10 +250,10 @@ BOOL ProcessCommandLine(char *Line,BOOL *ShowDialog,int *Item) {
 //	fr:/mask/findtext/replacetext/options
 //	rn:/mask/findtext/replacetext/options
 //	qr:/findtext/replacetext/options
-	if (strnicmp(Line,"ff:",3)==0) return ProcessFFLine(Line+3,ShowDialog,Item);
-	if (strnicmp(Line,"fr:",3)==0) return ProcessFRLine(Line+3,ShowDialog,Item);
-	if (strnicmp(Line,"rn:",3)==0) return ProcessRNLine(Line+3,ShowDialog,Item);
-	if (strnicmp(Line,"qr:",3)==0) return ProcessQRLine(Line+3,ShowDialog,Item);
+	if (_strnicmp(Line,"ff:",3)==0) return ProcessFFLine(Line+3,ShowDialog,Item);
+	if (_strnicmp(Line,"fr:",3)==0) return ProcessFRLine(Line+3,ShowDialog,Item);
+	if (_strnicmp(Line,"rn:",3)==0) return ProcessRNLine(Line+3,ShowDialog,Item);
+	if (_strnicmp(Line,"qr:",3)==0) return ProcessQRLine(Line+3,ShowDialog,Item);
 
 	char Switch=Line[0];
 	if (!Switch) {BadCmdLine();return FALSE;}

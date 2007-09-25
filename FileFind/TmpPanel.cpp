@@ -84,7 +84,7 @@ void CTemporaryPanel::UpdateList() {
 			if (Items[I].UserData=(Find==INVALID_HANDLE_VALUE)) NewCount--; else {
 				strcpy(Items[I].FindData.cFileName,SaveName);
 				for (J=0;J<I;J++) {
-					if (!stricmp(Items[I].FindData.cFileName,Items[J].FindData.cFileName)) {
+					if (!_stricmp(Items[I].FindData.cFileName,Items[J].FindData.cFileName)) {
 						Items[I].UserData=TRUE;NewCount--;
 					}
 				}

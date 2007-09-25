@@ -52,7 +52,7 @@ void FReadRegistry(HKEY Key) {
 	CharToOemBuff((LPCSTR)Table.DecodeTable, (LPSTR)Table.DecodeTable, 256);
 	OemToCharBuff((LPCSTR)Table.EncodeTable, (LPSTR)Table.EncodeTable, 256);
 	memmove(Table.UpperDecodeTable, Table.DecodeTable, 256);
-	for (I=0;I<256;I++) Table.UpperDecodeTable[I]=UpCaseTable[Table.UpperDecodeTable[I]];
+	for (int I=0;I<256;I++) Table.UpperDecodeTable[I]=UpCaseTable[Table.UpperDecodeTable[I]];
 
 	XLatTables.push_back(Table);
 }
@@ -550,8 +550,8 @@ BOOL AdvancedSettings() {
 			continue;
 			  }
 		case 3:
-			g_dwDateAfterThis = FTtoTime_t(FADateAfterThis);
-			g_dwDateBeforeThis = FTtoTime_t(FADateBeforeThis);
+			g_dwDateAfterThis = (DWORD)FTtoTime_t(FADateAfterThis);
+			g_dwDateBeforeThis = (DWORD)FTtoTime_t(FADateBeforeThis);
 			if (FAPresets->ShowMenu(g_FABatch) >= 0) {
 				Time_tToFT(g_dwDateAfterThis, FADateAfterThis);
 				Time_tToFT(g_dwDateBeforeThis, FADateBeforeThis);
@@ -644,8 +644,8 @@ BOOL CFAPresetCollection::EditPreset(CPreset *pPreset) {
 			FILETIME ftCurTime;
 			GetLocalTime(&stCurTime);
 			SystemTimeToFileTime(&stCurTime,&ftCurTime);
-			if (Result==1) pPreset->m_mapInts["DateAfterThis"] = FTtoTime_t(ftCurTime);
-					else pPreset->m_mapInts["DateBeforeThis"] = FTtoTime_t(ftCurTime);
+			if (Result==1) pPreset->m_mapInts["DateAfterThis"] = (int)FTtoTime_t(ftCurTime);
+					else pPreset->m_mapInts["DateBeforeThis"] = (int)FTtoTime_t(ftCurTime);
 			continue;
 			  }
 		default:
@@ -662,7 +662,7 @@ BOOL MaskCaseHere() {
 		DWORD Flags;
 		char szFSName[32];
 		if (!GetVolumeInformation(NULL,NULL,0,NULL,NULL,&Flags,szFSName,sizeof(szFSName))) return FALSE;
-		return stricmp(szFSName, "NTFS") && (Flags&FS_CASE_SENSITIVE);
+		return _stricmp(szFSName, "NTFS") && (Flags&FS_CASE_SENSITIVE);
 				   }
 	}
 	return FALSE;

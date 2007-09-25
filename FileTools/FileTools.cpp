@@ -456,11 +456,11 @@ void StripCommonPart(vector<string> &arrFileNames) {
 				nCommon = arrFileNames[nStr].length();
 			continue;
 		}
-		while ((nCommon > 0) && (strnicmp(arrFileNames[0].c_str(), arrFileNames[nStr].c_str(), nCommon) != 0)) nCommon--;
+		while ((nCommon > 0) && (_strnicmp(arrFileNames[0].c_str(), arrFileNames[nStr].c_str(), nCommon) != 0)) nCommon--;
 		if (nCommon == 0) return;
 	}
 
-	for (nStr = 0; nStr < arrFileNames.size(); nStr++)
+	for (size_t nStr = 0; nStr < arrFileNames.size(); nStr++)
 		arrFileNames[nStr].erase(0, nCommon);
 }
 
@@ -492,7 +492,7 @@ void ProcessNames(vector<string> &arrFileNames, vector<string> &arrProcessedName
 	}
 	if (g_bFRStripCommon) StripCommonPart(arrStripped);
 
-	for (nItem = 0; nItem < arrStripped.size(); nItem++) {
+	for (size_t nItem = 0; nItem < arrStripped.size(); nItem++) {
 		string strName = arrStripped[nItem];
 
 		if (!strName.empty()) {

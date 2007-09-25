@@ -8,6 +8,9 @@ Regular Expression Search and Replace
 Planned:
 	+ Support for C-like escapes ("\n" mostly) for plain text searches
 
+Version 5.53
+	- Doesn't crash trying to rename files without extension
+
 Version 5.52 (06.02.2007)
 	- "Evaluate as script" works correctly with VBScript and JScript
 
