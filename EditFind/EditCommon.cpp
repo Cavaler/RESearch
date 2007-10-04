@@ -124,54 +124,124 @@ void Relative2Absolute(int Line,char *Lines,int MatchStart,int MatchLength,int &
 	} while (TRUE);
 }
 
-BOOL SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,BOOL NeedMatch) {
-	int I,Line,MatchStart,MatchLength;
-	char *Lines;int LinesLength;
-	EditorInfo EdInfo;
+vector<char>	g_LineBuffer;
+vector<int>		g_LineOffsets;
+size_t			g_FirstLine;
+
+void ClearLineBuffer() {
+	g_LineBuffer.clear();
+	g_LineOffsets.clear();
+	g_FirstLine = 0;
+}
+
+void FillLineBuffer(size_t FirstLine, size_t LastLine) {
+	if (g_FirstLine < FirstLine) {
+		if (g_FirstLine+g_LineOffsets.size() > FirstLine) {
+			size_t nCut = g_LineOffsets[FirstLine-g_FirstLine];
+			g_LineBuffer.erase(g_LineBuffer.begin(), g_LineBuffer.begin()+nCut);
+			g_LineOffsets.erase(g_LineOffsets.begin(), g_LineOffsets.begin()+(FirstLine-g_FirstLine));
+			for (size_t nOff = 0; nOff < g_LineOffsets.size(); nOff++) {
+				g_LineOffsets[nOff] -= nCut;
+			}
+		} else {
+			g_LineBuffer.clear();
+			g_LineOffsets.clear();
+		}
+		g_FirstLine = FirstLine;
+	}
+
+	if (LastLine+1 < g_FirstLine+g_LineOffsets.size()) {
+		if (LastLine >= g_FirstLine) {
+			size_t nCut = g_LineOffsets[LastLine-g_FirstLine+1];
+			g_LineBuffer.resize(nCut);
+			g_LineOffsets.resize(LastLine-g_FirstLine+1);
+		} else {
+			g_LineBuffer.clear();
+			g_LineOffsets.clear();
+			g_FirstLine = FirstLine;
+		}
+	}
+
 	EditorGetString String;
 	EditorSetPosition Position={0,-1,-1,-1,-1,-1};
 
-	StartupInfo.EditorControl(ECTL_GETINFO,&EdInfo);
 	String.StringNumber=-1;
+
+	if (FirstLine < g_FirstLine) {
+		vector<char> NewBuffer;
+
+		g_LineOffsets.insert(g_LineOffsets.begin(), g_FirstLine-FirstLine, 0);
+
+		for (Position.CurLine = (int)FirstLine; Position.CurLine < (int)g_FirstLine; Position.CurLine++) {
+			StartupInfo.EditorControl(ECTL_SETPOSITION,&Position);
+			StartupInfo.EditorControl(ECTL_GETSTRING,&String);
+
+			size_t nStart = NewBuffer.size();
+			g_LineOffsets[String.StringNumber-FirstLine] = nStart;
+
+			NewBuffer.resize(nStart + String.StringLength + 1);
+			memmove(&NewBuffer[nStart], String.StringText, String.StringLength);
+			NewBuffer[nStart+String.StringLength] = '\n';
+		}
+
+		g_LineBuffer.insert(g_LineBuffer.begin(), NewBuffer.begin(), NewBuffer.end());
+		for (size_t nOff = g_FirstLine-FirstLine; nOff < g_LineOffsets.size(); nOff++) {
+			g_LineOffsets[nOff] += NewBuffer.size();
+		}
+
+		g_FirstLine = FirstLine;
+	}
+
+	if (LastLine >= FirstLine+g_LineOffsets.size()) {
+		for (Position.CurLine = (int)(FirstLine+g_LineOffsets.size()); Position.CurLine <= (int)LastLine; Position.CurLine++) {
+			StartupInfo.EditorControl(ECTL_SETPOSITION,&Position);
+			StartupInfo.EditorControl(ECTL_GETSTRING,&String);
+
+			g_LineOffsets.push_back(g_LineBuffer.size());
+			g_LineBuffer.insert(g_LineBuffer.end(), String.StringText, String.StringText+String.StringLength);
+			g_LineBuffer.insert(g_LineBuffer.end(), '\n');
+		}
+	}
+}
+
+BOOL SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,BOOL NeedMatch) {
+	int Line,MatchStart,MatchLength;
+	char *Lines;int LinesLength;
+	EditorInfo EdInfo;
+
+	ClearLineBuffer();
+	StartupInfo.EditorControl(ECTL_GETINFO,&EdInfo);
 
 	if (EReverse) {
 		for (Line=LastLine;Line>=FirstLine;Line--) {
 			ShowCurrentLine(Line,EdInfo.TotalLines,EdInfo.WindowSizeX);
 			if (Interrupted()) return FALSE;
 
-			Position.CurLine=Line;
-			StartupInfo.EditorControl(ECTL_SETPOSITION,&Position);
-			StartupInfo.EditorControl(ECTL_GETSTRING,&String);
+			FillLineBuffer(max(0, FirstLine), Line);
+			Lines = &g_LineBuffer[0];
+			LinesLength = g_LineBuffer.size();
 
-			LinesLength=((Line==LastLine)&&(EndPos!=-1)&&(EndPos<String.StringLength))?EndPos:String.StringLength;
-			Lines=(char *)malloc(LinesLength);
-			memmove(Lines,String.StringText,LinesLength);
-
-			for (I=1;(I<SeveralLines)&&(Line-I>=FirstLine);I++) {
-				Position.CurLine=Line-I;
-				StartupInfo.EditorControl(ECTL_SETPOSITION,&Position);
-				StartupInfo.EditorControl(ECTL_GETSTRING,&String);
-				Lines=(char *)realloc(Lines,LinesLength+String.StringLength+1);
-				memmove(Lines+String.StringLength+1,Lines,LinesLength);
-				memmove(Lines,String.StringText,String.StringLength);
-				Lines[String.StringLength]='\n';
-				LinesLength+=String.StringLength+1;
+			if (Line == LastLine) {
+				int nLastLength = g_LineBuffer.size()-g_LineOffsets[g_LineOffsets.size()-1];
+				if (nLastLength >= EndPos) {
+					LinesLength -= nLastLength-EndPos;
+				}
 			}
 
-			if (SearchInLine(Lines,LinesLength,(Line-I+1==FirstLine)?StartPos:0,-1,&MatchStart,&MatchLength,NeedMatch)) {
-				Relative2Absolute(Line-I+1,Lines,MatchStart,MatchLength,FirstLine,StartPos,LastLine,EndPos);
+			int CurFirstLine = Line - g_LineOffsets.size() + 1;
+			if (SearchInLine(Lines,LinesLength,(CurFirstLine==FirstLine)?StartPos:0,-1,&MatchStart,&MatchLength,NeedMatch)) {
+				Relative2Absolute(CurFirstLine,Lines,MatchStart,MatchLength,FirstLine,StartPos,LastLine,EndPos);
 				if (NeedMatch) {
-					for (I=0;I<FirstLine-Line;I++) {
+/*					for (I=0;I<FirstLine-Line;I++) {
 						char *CR=strchr(Lines,'\n');
-						LinesLength-=(CR-Lines)+1;
+WTF?					LinesLength-=(CR-Lines)+1;
 						memmove(Lines,CR+1,LinesLength);
-					}
+					}*/
 					MatchedLine=Lines;
 					MatchedLineLength=LinesLength;
-				} else free(Lines);
+				}
 				return TRUE;
 			}
-			free(Lines);
 		}
 	} else {
 		int FirstLineLength;
@@ -179,22 +249,17 @@ BOOL SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,BOOL Ne
 			ShowCurrentLine(Line,EdInfo.TotalLines,EdInfo.WindowSizeX);
 			if (Interrupted()) return FALSE;
 
-			Position.CurLine=Line;
-			StartupInfo.EditorControl(ECTL_SETPOSITION,&Position);
-			StartupInfo.EditorControl(ECTL_GETSTRING,&String);
+			FillLineBuffer(Line, min(LastLine, Line+SeveralLines-1));
+			Lines = &g_LineBuffer[0];
+			LinesLength = g_LineBuffer.size();
+			FirstLineLength = (g_LineOffsets.size() <= 1) ? LinesLength : g_LineOffsets[1]-1;
 
-			LinesLength=FirstLineLength=((Line==LastLine)&&(EndPos!=-1)&&(EndPos<String.StringLength))?EndPos:String.StringLength;
-			Lines=(char *)malloc(LinesLength);
-			memmove(Lines,String.StringText,LinesLength);
-			for (int I=1;(I<SeveralLines)&&(Line+I<=LastLine);I++) {
-				Position.CurLine=Line+I;
-				StartupInfo.EditorControl(ECTL_SETPOSITION,&Position);
-				StartupInfo.EditorControl(ECTL_GETSTRING,&String);
-				int Len=((Line+I==LastLine)&&(EndPos!=-1)&&(EndPos<String.StringLength))?EndPos:String.StringLength;
-				Lines=(char *)realloc(Lines,LinesLength+Len+1);
-				Lines[LinesLength]='\n';
-				memmove(Lines+LinesLength+1,String.StringText,Len);
-				LinesLength+=Len+1;
+			if ((Line + g_LineOffsets.size() - 1 == LastLine) && (EndPos!=-1)) {
+				int nLastLength = g_LineBuffer.size()-g_LineOffsets[g_LineOffsets.size()-1];
+				if (nLastLength >= EndPos) {
+					LinesLength -= nLastLength-EndPos;
+					if (g_LineOffsets.size() <= 1) FirstLineLength -= nLastLength-EndPos;
+				}
 			}
 
 			if (SearchInLine(Lines,LinesLength,(Line==FirstLine)?StartPos:0,-1,&MatchStart,&MatchLength,NeedMatch)) {
@@ -203,11 +268,10 @@ BOOL SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,BOOL Ne
 					if (NeedMatch) {
 						MatchedLine=Lines;
 						MatchedLineLength=LinesLength;
-					} else free(Lines);
+					}
 					return TRUE;
 				}
 			}
-			free(Lines);
 		}
 	}
 	return FALSE;
@@ -303,7 +367,7 @@ BOOL EPreparePattern(string &SearchText) {
 void DeleteMatchInfo() {
 	if (Match) {delete[] Match;Match=NULL;}
 	MatchCount=0;
-	if (MatchedLine) {free(MatchedLine);MatchedLine=NULL;}
+	MatchedLine=NULL;
 }
 
 void ECleanup(BOOL PatternOnly) {
