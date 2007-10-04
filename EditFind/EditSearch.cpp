@@ -48,7 +48,31 @@ BOOL EditorSearchAgain() {
 
 	int FirstLine,StartPos,LastLine,EndPos;
 
-	if (ESeveralLine) {
+	if (EInSelection) {		// ***************** SEARCH IN SELECTION
+		if (ESearchAgainCalled) {
+			if (EReverse) {
+				FirstLine = SelStartLine;
+				StartPos = SelStartPos;
+
+				EditorGetString String;
+				String.StringNumber = LastLine = EdInfo.BlockStartLine;
+				StartupInfo.EditorControl(ECTL_GETSTRING,&String);
+
+				EndPos = String.SelEnd-1;
+			} else {
+				FirstLine = EdInfo.CurLine;
+				StartPos = EdInfo.CurPos;
+				LastLine = SelEndLine;
+				EndPos = SelEndPos;
+			}
+		} else {
+			SaveSelection();
+			FirstLine = SelStartLine;
+			StartPos = SelStartPos;
+			LastLine = SelEndLine;
+			EndPos = SelEndPos;
+		}
+	} else {
 		if (EReverse) {
 			FirstLine=0;StartPos=0;
 			LastLine=EdInfo.CurLine;EndPos=EdInfo.CurPos;
@@ -56,29 +80,31 @@ BOOL EditorSearchAgain() {
 			FirstLine=EdInfo.CurLine;StartPos=EdInfo.CurPos;
 			LastLine=EdInfo.TotalLines-1;EndPos=-1;
 		}
+	}
 
+	if (ESeveralLine) {
 		if (SearchInText(FirstLine,StartPos,LastLine,EndPos,FALSE)) {
 			EditorSearchOK(FirstLine,StartPos,LastLine,EndPos);
 			return TRUE;
 		}
 	} else {
 		if (EReverse) {
-			for (FirstLine=EdInfo.CurLine; !g_bInterrupted && FirstLine>=0; FirstLine--) {
-				LastLine=FirstLine;
-				StartPos=0;
-				EndPos=(FirstLine==EdInfo.CurLine)?EdInfo.CurPos:-1;
-				if (SearchInText(FirstLine,StartPos,LastLine,EndPos,FALSE)) {
-					EditorSearchOK(FirstLine,StartPos,LastLine,EndPos);
+			for (int Line = LastLine; !g_bInterrupted && (Line >= FirstLine); Line--) {
+				int CurLastLine = Line;
+				int CurStartPos = (Line == FirstLine) ? StartPos : 0;
+				int CurEndPos = (Line == LastLine) ? EndPos : -1;
+				if (SearchInText(Line, CurStartPos, CurLastLine, CurEndPos,FALSE)) {
+					EditorSearchOK(Line, CurStartPos, CurLastLine, CurEndPos);
 					return TRUE;
 				}
 			}
 		} else {
-			for (FirstLine=EdInfo.CurLine; !g_bInterrupted && FirstLine<EdInfo.TotalLines; FirstLine++) {
-				LastLine=FirstLine;
-				StartPos=(FirstLine==EdInfo.CurLine)?EdInfo.CurPos:0;
-				EndPos=-1;
-				if (SearchInText(FirstLine,StartPos,LastLine,EndPos,FALSE)) {
-					EditorSearchOK(FirstLine,StartPos,LastLine,EndPos);
+			for (int Line = FirstLine; !g_bInterrupted && (Line<=LastLine); Line++) {
+				int CurLastLine = Line;
+				int CurStartPos = (Line == FirstLine) ? StartPos : 0;
+				int CurEndPos = (Line == LastLine) ? EndPos : -1;
+				if (SearchInText(Line, CurStartPos, CurLastLine, CurEndPos,FALSE)) {
+					EditorSearchOK(Line, CurStartPos, CurLastLine, CurEndPos);
 					return TRUE;
 				}
 			}
@@ -93,14 +119,21 @@ BOOL EditorSearchAgain() {
 	Position.LeftPos=EdInfo.LeftPos;
 	Position.Overtype=EdInfo.Overtype;
 	StartupInfo.EditorControl(ECTL_SETPOSITION,&Position);
+
 	if (!g_bInterrupted) {
 		const char *Lines[]={GetMsg(MRESearch),GetMsg(MCannotFind),EText.c_str(),GetMsg(MOk)};
 		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"ECannotFind",Lines,4,1);
 	}
+
+	if (EInSelection) RestoreSelection();
 	return FALSE;
 }
 
 BOOL EditorSearch() {
+	EditorInfo EdInfo;
+	StartupInfo.EditorControl(ECTL_GETINFO,&EdInfo);
+	EInSelection=(EdInfo.BlockType!=BTYPE_NONE);
+
 	CFarDialog Dialog(76,13,"SearchDlg");
 	Dialog.AddFrame(MRESearch);
 	Dialog.Add(new CFarTextItem(5,2,0,MSearchFor));
@@ -114,6 +147,7 @@ BOOL EditorSearch() {
 	Dialog.Add(new CFarCheckBoxItem(30,6,0,"",&EUTF8));
 	Dialog.Add(new CFarButtonItem(34,6,0,0,MUTF8));
 	Dialog.Add(new CFarCheckBoxItem(5,7,0,MReverseSearch,&EReverse));
+	if (EInSelection) Dialog.Add(new CFarCheckBoxItem(30,7,0,MInSelection,&EInSelection));
 	Dialog.AddButtons(MOk, MShowAll); Dialog.AddButton(MCancel);
 	Dialog.Add(new CFarButtonItem(60,5,0,0,MPresets));
 
