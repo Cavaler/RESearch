@@ -143,11 +143,11 @@ void FillLineBuffer(size_t FirstLine, size_t LastLine) {
 			for (size_t nOff = 0; nOff < g_LineOffsets.size(); nOff++) {
 				g_LineOffsets[nOff] -= nCut;
 			}
+			g_FirstLine = FirstLine;
 		} else {
 			g_LineBuffer.clear();
 			g_LineOffsets.clear();
 		}
-		g_FirstLine = FirstLine;
 	}
 
 	if (LastLine+1 < g_FirstLine+g_LineOffsets.size()) {
@@ -158,8 +158,11 @@ void FillLineBuffer(size_t FirstLine, size_t LastLine) {
 		} else {
 			g_LineBuffer.clear();
 			g_LineOffsets.clear();
-			g_FirstLine = FirstLine;
 		}
+	}
+
+	if (g_LineOffsets.empty()) {
+		g_FirstLine = (EReverse) ? LastLine : FirstLine;
 	}
 
 	EditorGetString String;
@@ -170,36 +173,33 @@ void FillLineBuffer(size_t FirstLine, size_t LastLine) {
 	if (FirstLine < g_FirstLine) {
 		vector<char> NewBuffer;
 
-		g_LineOffsets.insert(g_LineOffsets.begin(), g_FirstLine-FirstLine, 0);
-
-		for (Position.CurLine = (int)FirstLine; Position.CurLine < (int)g_FirstLine; Position.CurLine++) {
+		for (Position.CurLine = g_FirstLine-1; Position.CurLine >= (int)FirstLine; Position.CurLine--) {
 			StartupInfo.EditorControl(ECTL_SETPOSITION,&Position);
 			StartupInfo.EditorControl(ECTL_GETSTRING,&String);
 
-			size_t nStart = NewBuffer.size();
-			g_LineOffsets[String.StringNumber-FirstLine] = nStart;
+			g_LineOffsets.insert(g_LineOffsets.begin(), 0);
+			for (size_t nOff = 1; nOff < g_LineOffsets.size(); nOff++) g_LineOffsets[nOff] += String.StringLength+1;
 
-			NewBuffer.resize(nStart + String.StringLength + 1);
-			memmove(&NewBuffer[nStart], String.StringText, String.StringLength);
-			NewBuffer[nStart+String.StringLength] = '\n';
+			NewBuffer.insert(NewBuffer.begin(), String.StringText, String.StringText+String.StringLength);
+			NewBuffer.insert(NewBuffer.begin()+String.StringLength, '\n');
+
+			if (g_LineBuffer.size()+NewBuffer.size() >= SeveralLinesKB*1024u) break;
 		}
 
 		g_LineBuffer.insert(g_LineBuffer.begin(), NewBuffer.begin(), NewBuffer.end());
-		for (size_t nOff = g_FirstLine-FirstLine; nOff < g_LineOffsets.size(); nOff++) {
-			g_LineOffsets[nOff] += NewBuffer.size();
-		}
-
-		g_FirstLine = FirstLine;
+		g_FirstLine = Position.CurLine;
 	}
 
-	if (LastLine >= FirstLine+g_LineOffsets.size()) {
-		for (Position.CurLine = (int)(FirstLine+g_LineOffsets.size()); Position.CurLine <= (int)LastLine; Position.CurLine++) {
+	if (LastLine >= g_FirstLine+g_LineOffsets.size()) {
+		for (Position.CurLine = (int)(g_FirstLine+g_LineOffsets.size()); Position.CurLine <= (int)LastLine; Position.CurLine++) {
 			StartupInfo.EditorControl(ECTL_SETPOSITION,&Position);
 			StartupInfo.EditorControl(ECTL_GETSTRING,&String);
 
 			g_LineOffsets.push_back(g_LineBuffer.size());
 			g_LineBuffer.insert(g_LineBuffer.end(), String.StringText, String.StringText+String.StringLength);
 			g_LineBuffer.insert(g_LineBuffer.end(), '\n');
+
+			if (g_LineBuffer.size() >= SeveralLinesKB*1024u) break;
 		}
 	}
 }
@@ -346,6 +346,7 @@ BOOL EPreparePattern(string &SearchText) {
 			setlocale(LC_CTYPE, ".ACP");
 			ECharacterTables = pcre_maketables();
 		} else {
+			setlocale(LC_CTYPE, ".OCP");
 			ECharacterTables = NULL;
 		}
 
