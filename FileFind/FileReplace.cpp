@@ -89,14 +89,17 @@ BOOL ProcessPlainTextBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindD
 	const char *Skip=Buffer;
 	HANDLE hFile=INVALID_HANDLE_VALUE;
 
+	char *Table=(FCaseSensitive) ? NULL : UpCaseTable;
+
 	while (Current+FText.size()<=Buffer+BufLen) {
-		// WTF?? Why not BMHSearch?
-		if (((FCaseSensitive)?memcmp(Current,FText.data(),FText.size()):_memicmp(Current,FText.data(),FText.size()))==0) {
-			int ReplaceLength;
-			char *Replace=CreateReplaceString(Buffer,NULL,0,FRReplace.c_str(),"\n",NULL,-1,ReplaceLength);
-			if (!DoReplace(hFile,Current,FText.size(),Replace,ReplaceLength,Skip,Current-Skip,FindData)) {free(Replace);break;}
-			free(Replace);
-		} else Current++;
+		int nPosition = BMHSearch(Current, Current-Buffer+BufLen, FTextUpcase.data(), FTextUpcase.size(), Table);
+		if (nPosition < 0) break;
+		Current += nPosition;
+
+		int ReplaceLength;
+		char *Replace=CreateReplaceString(Buffer,NULL,0,FRReplace.c_str(),"\n",NULL,-1,ReplaceLength);
+		if (!DoReplace(hFile,Current,FText.size(),Replace,ReplaceLength,Skip,Current-Skip,FindData)) {free(Replace);break;}
+		free(Replace);
 	}
 
 	return FinishReplace(hFile,Skip,Buffer+BufLen-Skip,FindData);
