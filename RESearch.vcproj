@@ -48,11 +48,12 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="0"
+				Optimization="2"
 				InlineFunctionExpansion="2"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
+				WholeProgramOptimization="false"
 				PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -82,8 +83,8 @@
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
 				AdditionalDependencies="PavelMD8.lib pcreMD8.lib"
-				OutputFile="RESearch7.dll"
-				Version="4.2"
+				OutputFile="RESearch.dll"
+				Version="6.0"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\RESearch.def"
@@ -154,6 +155,7 @@
 				PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="3"
 				StructMemberAlignment="1"
+				EnableFunctionLevelLinking="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="StdAfx.h"
@@ -333,14 +335,6 @@
 				RelativePath="EditFind\EditCommon.cpp"
 				>
 				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -363,14 +357,6 @@
 			<File
 				RelativePath="EditFind\EditFilter.cpp"
 				>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-					/>
-				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
 					>
@@ -399,14 +385,6 @@
 				RelativePath="EditFind\EditList.cpp"
 				>
 				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -429,14 +407,6 @@
 			<File
 				RelativePath="EditFind\EditReplace.cpp"
 				>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-					/>
-				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
 					>
@@ -461,14 +431,6 @@
 				RelativePath="EditFind\EditSearch.cpp"
 				>
 				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -491,14 +453,6 @@
 			<File
 				RelativePath="EditFind\EditTransliterate.cpp"
 				>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-					/>
-				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
 					>
@@ -527,7 +481,6 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="0"
 						UsePrecompiledHeader="0"
 					/>
 				</FileConfiguration>
@@ -561,14 +514,6 @@
 				RelativePath="FileFind\FileCommon.cpp"
 				>
 				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -596,14 +541,6 @@
 				RelativePath="FileFind\FileReplace.cpp"
 				>
 				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -626,14 +563,6 @@
 			<File
 				RelativePath="FileFind\FileSearch.cpp"
 				>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-					/>
-				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
 					>
@@ -662,14 +591,6 @@
 				RelativePath="FileFind\TmpPanel.cpp"
 				>
 				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -696,14 +617,6 @@
 			<File
 				RelativePath="FileTools\FileTools.cpp"
 				>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-					/>
-				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
 					>
@@ -736,14 +649,6 @@
 				RelativePath="ViewFind\ViewCommon.cpp"
 				>
 				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -770,14 +675,6 @@
 			<File
 				RelativePath="ViewFind\ViewSearch.cpp"
 				>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-					/>
-				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
 					>
@@ -826,14 +723,6 @@
 				RelativePath="Common.cpp"
 				>
 				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -857,14 +746,6 @@
 				RelativePath="Presets.cpp"
 				>
 				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -887,14 +768,6 @@
 			<File
 				RelativePath="RESearch.cpp"
 				>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-					/>
-				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
 					>
@@ -966,14 +839,6 @@
 				RelativePath="Scripting.cpp"
 				>
 				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -1021,7 +886,6 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="0"
 						UsePrecompiledHeader="0"
 					/>
 				</FileConfiguration>
