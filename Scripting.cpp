@@ -49,9 +49,9 @@ public:
 
 	// IUnknown methods
 	STDMETHOD(QueryInterface)(REFIID riid, void** ppvObj) {
-		if (riid==IID_IUnknown) {
+		if (riid == __uuidof(IUnknown)) {
 			*ppvObj=static_cast<IReplaceParameters *>(this);
-		} else if (riid==IID_IReplaceParameters) {
+		} else if (riid == __uuidof(IReplaceParameters)) {
 			*ppvObj=static_cast<IReplaceParameters *>(this);
 		} else if (m_pOuter) {
 			return m_pOuter->QueryInterface(riid, ppvObj);
@@ -118,7 +118,7 @@ private:
 
 class CReplaceScriptSite : public IActiveScriptSite {
 public:
-	CReplaceScriptSite(CReplaceParameters *pParams) : m_nCounter(0), m_pParams(NULL) {
+	CReplaceScriptSite(CReplaceParameters *pParams) : m_nCounter(0), m_pParams(pParams), m_pDispatch(NULL) {
 		char szModule[MAX_PATH];
 		GetModuleFileName(GetModuleHandle("RESearch.dll"), szModule, MAX_PATH);
 		ITypeLib *pLib;
@@ -130,7 +130,7 @@ public:
 		}
 
 		ITypeInfo *pInfo;
-		hResult = pLib->GetTypeInfoOfGuid(IID_IReplaceParameters, &pInfo);
+		hResult = pLib->GetTypeInfoOfGuid(__uuidof(IReplaceParameters), &pInfo);
 		if (FAILED(hResult)) {
 			ShowHResultError(MErrorLoadingTypeLib, hResult);
 			pLib->Release();
@@ -138,19 +138,19 @@ public:
 			return;
 		}
 
-		hResult = CreateStdDispatch(pParams, pParams, pInfo, (IUnknown **)&m_pParams);
+		hResult = CreateStdDispatch(pParams, pParams, pInfo, (IUnknown **)&m_pDispatch);
 		if (FAILED(hResult)) {
 			ShowHResultError(MErrorLoadingTypeLib, hResult);
 			g_bInterrupted = TRUE;
 		}
 
-		pParams->SetOuter(m_pParams);
+		pParams->SetOuter(m_pDispatch);
 
 		pInfo->Release();
 		pLib->Release();
 	}
 	~CReplaceScriptSite() {
-		if (m_pParams) m_pParams->Release();
+		if (m_pDispatch) m_pDispatch->Release();
 	}
 
 	// IUnknown methods
@@ -191,6 +191,10 @@ public:
 		}
 
 		if (m_pParams && (_wcsicmp(pstrName, L"research") == 0)) {
+			if (dwReturnMask & SCRIPTINFO_ITYPEINFO) {
+				HRESULT hr = m_pDispatch->GetTypeInfo(0, 0, ppti);
+				if (FAILED(hr)) return hr;
+			}
 			if (dwReturnMask & SCRIPTINFO_IUNKNOWN) {
 				*ppiunkItem = m_pParams;
 				(*ppiunkItem)->AddRef();
@@ -221,7 +225,9 @@ public:
 	STDMETHOD(OnLeaveScript)() {return S_OK;}
 private:
 	ULONG m_nCounter;
-	IDispatch *m_pParams;
+
+	CReplaceParameters *m_pParams;
+	IDispatch *m_pDispatch;
 };
 
 char *EvaluateReplaceString(const char *Matched,int *Match,int Count,const char *Replace,const char *EOL,int *Numbers,int Engine,int &ResultLength) {
