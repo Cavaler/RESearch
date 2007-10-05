@@ -15,6 +15,7 @@
 
 // Common
 EXTERN int  SeveralLines;
+EXTERN int  SeveralLinesKB;
 EXTERN BOOL AllowEmptyMatch;
 EXTERN BOOL DotMatchesNewline;
 EXTERN bool g_bUseSeparateThread;
@@ -155,6 +156,7 @@ enum eStringTable {
 
 	MCommonSettings,
 	MSeveralLinesIs,
+	MLinesOr,
 	MAllowEmptyMatch,
 	MDotMatchesNewline,
 	MUseSeparateThread,
@@ -254,6 +256,7 @@ enum eStringTable {
 void ReadRegistry();
 void WriteRegistry();
 void EnumActiveScripts();
+int  ConfigureSeveralLines();
 
 void PrepareBMHSearch(const char *String,int StringLength,size_t nPattern = 0);
 BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,int CaseSensitive,BOOL bUTF8=FALSE,const unsigned char *pTables=NULL);

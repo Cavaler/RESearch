@@ -481,12 +481,29 @@ BOOL AtoI(char *String,int *Number,int Min,int Max) {
 	} else return FALSE;
 }
 
+int ConfigureSeveralLines() {
+	CFarDialog Dialog(60,9,"CommonConfig");
+	Dialog.AddFrame(MCommonSettings);
+
+	Dialog.Add(new CFarTextItem(5,3,0,MSeveralLinesIs));
+	Dialog.Add(new CFarEditItem(32,3,36,0,NULL,(int &)SeveralLines,new CFarIntegerRangeValidator(1, 65535)));
+	Dialog.Add(new CFarTextItem(38,3,0,MLinesOr));
+	Dialog.Add(new CFarEditItem(48,3,52,0,NULL,(int &)SeveralLinesKB,new CFarIntegerRangeValidator(1, 1024)));
+	Dialog.Add(new CFarTextItem(53,3,0,MKB));
+
+	Dialog.AddButtons(MOk,MCancel);
+	return Dialog.Display(-1);
+}
+
 int ConfigureCommon() {
 	CFarDialog Dialog(60,16,"CommonConfig");
 	Dialog.AddFrame(MCommonSettings);
 
 	Dialog.Add(new CFarTextItem(5,3,0,MSeveralLinesIs));
-	Dialog.Add(new CFarEditItem(32,3,40,0,NULL,(int &)SeveralLines,new CFarIntegerRangeValidator(1,255)));
+	Dialog.Add(new CFarEditItem(32,3,36,0,NULL,(int &)SeveralLines,new CFarIntegerRangeValidator(1, 65535)));
+	Dialog.Add(new CFarTextItem(38,3,0,MLinesOr));
+	Dialog.Add(new CFarEditItem(48,3,52,0,NULL,(int &)SeveralLinesKB,new CFarIntegerRangeValidator(1, 1024)));
+	Dialog.Add(new CFarTextItem(53,3,0,MKB));
 
 	Dialog.Add(new CFarCheckBoxItem(5,5,0,MAllowEmptyMatch,&AllowEmptyMatch));
 	Dialog.Add(new CFarCheckBoxItem(5,6,0,MDotMatchesNewline,&DotMatchesNewline));

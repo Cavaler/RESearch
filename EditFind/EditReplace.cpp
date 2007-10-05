@@ -448,6 +448,8 @@ BOOL EditorReplace() {
 
 	Dialog.Add(new CFarCheckBoxItem(5,7,0,MRegExp,&ERegExp));
 	Dialog.Add(new CFarCheckBoxItem(30,7,0,MSeveralLine,&ESeveralLine));
+	Dialog.Add(new CFarButtonItem(48,7,0,0,"..."));
+
 	Dialog.Add(new CFarCheckBoxItem(5,8,0,MCaseSensitive,&ECaseSensitive));
 	Dialog.Add(new CFarCheckBoxItem(30,8,0,"",&EUTF8));
 	Dialog.Add(new CFarButtonItem(34,8,0,0,MUTF8));
@@ -470,7 +472,7 @@ BOOL EditorReplace() {
 
 	int ExitCode;
 	do {
-		switch (ExitCode=Dialog.Display(7,-5,-4,5,6,-2,-1,12)) {
+		switch (ExitCode=Dialog.Display(8,-5,-4,5,6,10,-2,-1,13)) {
 		case 0:
 		case 1:
 			break;
@@ -481,13 +483,16 @@ BOOL EditorReplace() {
 			QuoteReplaceString(ReplaceText);
 			break;
 		case 4:
+			ConfigureSeveralLines();
+			break;
+		case 5:
 			if (ERBatch->ShowMenu(EditorReplaceExecutor, g_ERBatch) >= 0)
 				return TRUE;
 			break;
-		case 5:
+		case 6:
 			ERPresets->ShowMenu(g_ERBatch);
 			break;
-		case 6:
+		case 7:
 			UTF8Converter(SearchText);
 			break;
 		case -1:

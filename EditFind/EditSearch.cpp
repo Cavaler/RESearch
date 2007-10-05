@@ -143,6 +143,8 @@ BOOL EditorSearch() {
 	Dialog.Add(new CFarTextItem(5,4,DIF_BOXCOLOR|DIF_SEPARATOR,""));
 	Dialog.Add(new CFarCheckBoxItem(5,5,0,MRegExp,&ERegExp));
 	Dialog.Add(new CFarCheckBoxItem(30,5,0,MSeveralLine,&ESeveralLine));
+	Dialog.Add(new CFarButtonItem(48,5,0,0,"..."));
+
 	Dialog.Add(new CFarCheckBoxItem(5,6,0,MCaseSensitive,&ECaseSensitive));
 	Dialog.Add(new CFarCheckBoxItem(30,6,0,"",&EUTF8));
 	Dialog.Add(new CFarButtonItem(34,6,0,0,MUTF8));
@@ -155,7 +157,7 @@ BOOL EditorSearch() {
 	if (SearchText.empty()) SearchText=EText;
 	int ExitCode;
 	do {
-		switch (ExitCode=Dialog.Display(5,-4,-3,3,-1,-6)) {
+		switch (ExitCode=Dialog.Display(6,-4,-3,3,7,-1,-6)) {
 		case 0:
 			break;
 		case 1:
@@ -165,9 +167,12 @@ BOOL EditorSearch() {
 			if (ERegExp) QuoteRegExpString(SearchText);
 			break;
 		case 3:
-			ESPresets->ShowMenu(g_ESBatch);
+			ConfigureSeveralLines();
 			break;
 		case 4:
+			ESPresets->ShowMenu(g_ESBatch);
+			break;
+		case 5:
 			UTF8Converter(SearchText);
 			break;
 		case -1:
