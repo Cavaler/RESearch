@@ -129,7 +129,7 @@ int CTemporaryPanel::PutFiles(PluginPanelItem *AddItems,int AddNumber,int Move,i
 		Items[I+Count]=AddItems[I];
 		GetFullPathName(Items[I+Count].FindData.cFileName,MAX_PATH,PathBuffer,NULL);
 		strcpy(Items[I+Count].FindData.cFileName,PathBuffer);
-		Items[I+Count].UserData=FALSE;
+		Items[I+Count].UserData = (DWORD)new TempUserData();
 	}
 	Count+=AddNumber;UpdateList();
 	return TRUE;
