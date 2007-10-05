@@ -90,6 +90,7 @@ BOOL ProcessPlainTextBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindD
 	HANDLE hFile=INVALID_HANDLE_VALUE;
 
 	while (Current+FText.size()<=Buffer+BufLen) {
+		// WTF?? Why not BMHSearch?
 		if (((FCaseSensitive)?memcmp(Current,FText.data(),FText.size()):_memicmp(Current,FText.data(),FText.size()))==0) {
 			int ReplaceLength;
 			char *Replace=CreateReplaceString(Buffer,NULL,0,FRReplace.c_str(),"\n",NULL,-1,ReplaceLength);
@@ -124,6 +125,8 @@ BOOL ProcessRegExpBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindData
 			free(Replace);
 		}
 		SkipCRLF(BufEnd,&BufLen);
+
+		if (hFile == INVALID_HANDLE_VALUE) g_nFoundLine++;	// Yet looking for first match
 	} while (BufLen&&(!Error));
 
 	delete[] Match;
@@ -145,6 +148,7 @@ BOOL ReplaceSeveralLineBuffer(HANDLE &hFile,const char *&Buffer,const char *BufE
 	const char *LineEnd=Buffer;
 	int LineLen=Len;
 	SkipWholeLine(LineEnd,&LineLen);
+
 	while (Len&&do_pcre_exec(FPattern,FPatternExtra,Buffer,Len,Start,0,Match,MatchCount*3)>=0) {
 		int ReplaceLength;
 		const char *NewBuffer=Buffer+Match[0];
@@ -157,6 +161,7 @@ BOOL ReplaceSeveralLineBuffer(HANDLE &hFile,const char *&Buffer,const char *BufE
 		free(Replace);
 	}
 	Buffer=LineEnd;Len=LineLen;
+	if (hFile == INVALID_HANDLE_VALUE) g_nFoundLine++;	// Yet looking for first match
 	LinesIn=CountLinesIn(Buffer,BufEnd-Buffer);
 	return TRUE;
 }
@@ -173,7 +178,7 @@ BOOL ProcessSeveralLineBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *Fin
 	do {
 		SkipWholeLine(BufEnd,&BufLen);
 		LinesIn++;
-		if (LinesIn==SeveralLines) {
+		if ((LinesIn==SeveralLines) || (BufLen >= SeveralLinesKB*1024)) {
 			if (!ReplaceSeveralLineBuffer(hFile,Buffer,BufEnd,Match,MatchCount,Skip,LinesIn,FindData)) {Error=TRUE;break;};
 		}
 	} while (BufLen);
@@ -191,7 +196,7 @@ BOOL ProcessBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindData) {
 	m_pReplaceTable = NULL;
 	switch (FSearchAs) {
 	case SA_PLAINTEXT:	return ProcessPlainTextBuffer(Buffer,BufLen,FindData);
-	case SA_REGEXP:	return ProcessRegExpBuffer(Buffer,BufLen,FindData);
+	case SA_REGEXP:		return ProcessRegExpBuffer(Buffer,BufLen,FindData);
 	case SA_SEVERALLINE:return ProcessSeveralLineBuffer(Buffer,BufLen,FindData);
 	}
 	return FALSE;
@@ -205,6 +210,8 @@ char *AddExtension(char *FileName,char *Extension) {
 void ReplaceFile(WIN32_FIND_DATA *FindData, PluginPanelItem **PanelItems, int *ItemsNumber) {
 	string strBackupFileName;
 	BOOL ReturnValue=FALSE;
+
+	InitFoundPosition();
 
 	if (FindData->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) return;
 	if ((FRReplaceReadonly == RR_NEVER) && (FindData->dwFileAttributes&FILE_ATTRIBUTE_READONLY)) return;

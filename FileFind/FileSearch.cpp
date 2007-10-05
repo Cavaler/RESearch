@@ -148,6 +148,7 @@ BOOL FindRegExp(const char *Buffer,int Size) {
 		SkipNoCRLF(BufEnd,&Size);
 		if (FindPattern(FPattern,FPatternExtra,Buffer,BufEnd-Buffer)) return TRUE;
 		SkipCRLF(BufEnd,&Size);
+		g_nFoundLine++;
 	} while (Size);
 	return FALSE;
 }
@@ -163,6 +164,7 @@ BOOL FindSeveralLineRegExp(const char *Buffer,int Size) {
 			Len=BufEnd-Buffer;
 			if (FindPattern(FPattern,FPatternExtra,Buffer,Len)) return TRUE;
 			SkipWholeLine(Buffer,&Len);
+			g_nFoundLine++;
 			LinesIn--;
 		}
 	} while (Size);
@@ -171,6 +173,7 @@ BOOL FindSeveralLineRegExp(const char *Buffer,int Size) {
 	while (Len) {
 		if (FindPattern(FPattern,FPatternExtra,Buffer,Len)) return TRUE;
 		SkipWholeLine(Buffer,&Len);
+		g_nFoundLine++;
 	}
 	return FALSE;
 }
@@ -236,11 +239,15 @@ BOOL FindMemoryMapped(char *FileName,BOOL (*Searcher)(const char *,int)) {
 
 void SearchFile(WIN32_FIND_DATA *FindData,PluginPanelItem **PanelItems,int *ItemsNumber) {
 	BOOL IsFound;
+
+	InitFoundPosition();
+
 	if (FindData->dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) {
-		if (FText[0]==0) AddFile(FindData,PanelItems,ItemsNumber);
+		if (FText.empty()) AddFile(FindData,PanelItems,ItemsNumber);
 		return;
 	}
-	if (FText[0]==0) IsFound=TRUE; else 
+
+	if (FText.empty()) IsFound=TRUE; else 
 	if (FindData->nFileSizeLow==0) IsFound=FALSE; else 
 	switch (FSearchAs) {
 	case SA_PLAINTEXT		:IsFound=FindMemoryMapped(FindData->cFileName,FindPlainText);break;

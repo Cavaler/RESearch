@@ -33,15 +33,22 @@ void WINAPI ClosePlugin(HANDLE hPlugin) {
 
 // CTemporaryPanel
 
-CTemporaryPanel::CTemporaryPanel(PluginPanelItem *NewItems,int NewCount,char *CalledFolder):
-	Items(NewItems),Count(NewCount),Folder(_strdup(CalledFolder)),m_bActive(true) {
-	for (int I=0;I<Count;I++) Items[I].UserData=FALSE;
+CTemporaryPanel::CTemporaryPanel(PluginPanelItem *NewItems,int NewCount,char *CalledFolder)
+: Items(NewItems),Count(NewCount),Folder(_strdup(CalledFolder)),m_bActive(true)
+{
+	for (int I=0;I<Count;I++) {
+		if (!Items[I].UserData) Items[I].UserData = (DWORD)new TempUserData();
+	}
 
 	if (LastTempPanel && !LastTempPanel->m_bActive) delete LastTempPanel;
 	LastTempPanel = this;
 }
 
 CTemporaryPanel::~CTemporaryPanel() {
+	for (int I=0;I<Count;I++) {
+		if (Items[I].UserData) delete (TempUserData *)Items[I].UserData;
+	}
+
 	free(Items);
 	if (Folder) free(Folder);
 }
@@ -72,20 +79,22 @@ void CTemporaryPanel::GetOpenPluginInfo(OpenPluginInfo *Info) {
 	Info->ShortcutData=Info->CurDir;
 }
 
+#define Deleted(i) ((TempUserData *)Items[I].UserData)->ToBeDeleted
+
 void CTemporaryPanel::UpdateList() {
 	int I,J,NewCount=Count;
 
 	for (I=0;I<Count;I++) {
-		if (Items[I].UserData) NewCount--; else {
+		if (Deleted(I)) NewCount--; else {
 			char SaveName[MAX_PATH];
 			strcpy(SaveName,Items[I].FindData.cFileName);
 			HANDLE Find=FindFirstFile(Items[I].FindData.cFileName,&Items[I].FindData);
 			FindClose(Find);
-			if (Items[I].UserData=(Find==INVALID_HANDLE_VALUE)) NewCount--; else {
+			if (Deleted(I)=(Find==INVALID_HANDLE_VALUE)) NewCount--; else {
 				strcpy(Items[I].FindData.cFileName,SaveName);
 				for (J=0;J<I;J++) {
 					if (!_stricmp(Items[I].FindData.cFileName,Items[J].FindData.cFileName)) {
-						Items[I].UserData=TRUE;NewCount--;
+						Deleted(I)=TRUE;NewCount--;
 					}
 				}
 			}
@@ -96,7 +105,7 @@ void CTemporaryPanel::UpdateList() {
 	NewItems=(PluginPanelItem *)malloc(NewCount*sizeof(PluginPanelItem));
 	J=0;
 	for (I=0;I<Count;I++) {
-		if (!Items[I].UserData) NewItems[J++]=Items[I];
+		if (!Deleted(I)) NewItems[J++]=Items[I];
 	}
 	free(Items);Items=NewItems;Count=NewCount;	
 }
@@ -127,6 +136,42 @@ int CTemporaryPanel::PutFiles(PluginPanelItem *AddItems,int AddNumber,int Move,i
 }
 
 int CTemporaryPanel::ProcessKey(int Key,unsigned int ControlState) {
+	if ((ControlState==0) && (Key==VK_F3)) {
+		struct PanelInfo PInfo;
+		StartupInfo.Control((HANDLE)this,FCTL_GETPANELINFO,&PInfo);
+
+		if (PInfo.CurrentItem <= PInfo.ItemsNumber) {
+			PluginPanelItem &Item = PInfo.PanelItems[PInfo.CurrentItem];
+
+			if ((Item.FindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0) {
+				TempUserData *pData = (TempUserData *)Item.UserData;
+				StartupInfo.Editor(Item.FindData.cFileName, NULL, 0, 0, -1, -1, EF_NONMODAL|EF_IMMEDIATERETURN|EF_ENABLE_F6,
+					pData ? pData->FoundLine : 0, pData ? pData->FoundColumn : 1);
+
+				StartupInfo.EditorControl(ECTL_PROCESSKEY, (void *)KEY_F6);
+				return TRUE;
+			}
+		}
+		return FALSE;
+	}
+
+	if ((ControlState==0) && (Key==VK_F4)) {
+		struct PanelInfo PInfo;
+		StartupInfo.Control((HANDLE)this,FCTL_GETPANELINFO,&PInfo);
+
+		if (PInfo.CurrentItem <= PInfo.ItemsNumber) {
+			PluginPanelItem &Item = PInfo.PanelItems[PInfo.CurrentItem];
+
+			if ((Item.FindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0) {
+				TempUserData *pData = (TempUserData *)Item.UserData;
+				StartupInfo.Editor(Item.FindData.cFileName, NULL, 0, 0, -1, -1, EF_NONMODAL|EF_IMMEDIATERETURN|EF_ENABLE_F6,
+					pData ? pData->FoundLine+1 : 0, pData ? pData->FoundColumn : 1);
+				return TRUE;
+			}
+		}
+		return FALSE;
+	}
+
 	if ((ControlState==0)&&(Key==VK_F7)) {
 		struct PanelInfo PInfo;
 
@@ -134,7 +179,7 @@ int CTemporaryPanel::ProcessKey(int Key,unsigned int ControlState) {
 		for (int I=0;I<Count;I++) {
 			for (int J=0;J<PInfo.SelectedItemsNumber;J++) {
 				if (!strcmp(PInfo.SelectedItems[J].FindData.cFileName,Items[I].FindData.cFileName)) {
-					Items[I].UserData=TRUE;break;
+					Deleted(I)=TRUE;break;
 				}
 			}
 		}

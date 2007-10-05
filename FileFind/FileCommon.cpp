@@ -140,6 +140,11 @@ int FPreparePattern() {
 	}
 }
 
+void InitFoundPosition() {
+	g_nFoundLine = 0;
+	g_nFoundColumn = 1;
+}
+
 void AddFile(WIN32_FIND_DATA *FindData,PluginPanelItem **PanelItems,int *ItemsNumber) {
 	*PanelItems=(PluginPanelItem *)realloc(*PanelItems,sizeof(PluginPanelItem)*((*ItemsNumber)+1));
 	(*PanelItems)[*ItemsNumber].FindData=*FindData;
@@ -151,7 +156,7 @@ void AddFile(WIN32_FIND_DATA *FindData,PluginPanelItem **PanelItems,int *ItemsNu
 	(*PanelItems)[*ItemsNumber].Owner=NULL;
 	(*PanelItems)[*ItemsNumber].CustomColumnData=NULL;
 	(*PanelItems)[*ItemsNumber].CustomColumnNumber=0;
-	(*PanelItems)[*ItemsNumber].UserData=0;
+	(*PanelItems)[*ItemsNumber].UserData=(DWORD)new TempUserData(g_nFoundLine, g_nFoundColumn);
 	(*ItemsNumber)++;
 }
 

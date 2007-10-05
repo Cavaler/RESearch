@@ -72,6 +72,8 @@ EXTERN int  FRConfirmLineThisRun,FRConfirmLineThisFile;
 
 EXTERN PluginPanelItem *PanelItems;
 EXTERN int ItemsNumber;
+EXTERN int g_nFoundLine;
+EXTERN int g_nFoundColumn;
 
 struct CharTableSet2 : public CharTableSet {
   unsigned char UpperDecodeTable[256];
@@ -88,6 +90,7 @@ BOOL CompileAdvancedSettings();
 BOOL MaskCaseHere();
 
 OperationResult NoFilesFound();
+void InitFoundPosition();
 
 BOOL MultipleMasksApply(const string &Masks, const char *Filename);
 void AddFile(WIN32_FIND_DATA *FindData,PluginPanelItem **PanelItems,int *ItemsNumber);
@@ -103,13 +106,22 @@ void FReadRegistry(HKEY Key);
 void FWriteRegistry(HKEY Key);
 void FCleanup(BOOL PatternOnly);
 
+struct TempUserData {
+	TempUserData() : FoundLine(0), FoundColumn(1), ToBeDeleted(false) {}
+	TempUserData(int nLine, int nColumn) : FoundLine(nLine), FoundColumn(nColumn), ToBeDeleted(false) {}
+
+	int		FoundLine;
+	int		FoundColumn;
+	bool	ToBeDeleted;
+};
+
 class CTemporaryPanel {
 public:
 	CTemporaryPanel(PluginPanelItem *NewItems,int NewCount,char *CalledFolder);
 	~CTemporaryPanel();
 
 	void GetOpenPluginInfo(OpenPluginInfo *Info);
-	int GetFindData(PluginPanelItem **PanelItem,int *ItemsNumber,int OpMode);
+	int  GetFindData(PluginPanelItem **PanelItem,int *ItemsNumber,int OpMode);
 	int _SetDirectory(char *Name,int OpMode);
 	int PutFiles(PluginPanelItem *AddItems,int AddNumber,int Move,int OpMode);
 	int ProcessKey(int Key,unsigned int ControlState);
