@@ -7,6 +7,7 @@ enum SearchAs {SA_PLAINTEXT,SA_REGEXP,SA_SEVERALLINE,SA_MULTILINE,SA_MULTITEXT,S
 enum SearchIn {SI_ALLDRIVES,SI_ALLLOCAL,SI_FROMROOT,SI_FROMCURRENT,SI_CURRENTONLY,SI_SELECTED};
 enum MaskCase {MC_SENSITIVE,MC_INSENSITIVE,MC_VOLUME};
 enum eReplaceReadonly {RR_NEVER, RR_ASK, RR_ALWAYS};
+enum GrepWhat {GREP_NAMES, GREP_NAMES_COUNT, GREP_LINES, GREP_NAMES_LINES};
 
 class CFSPresetCollection:public CPresetCollection {
 public:
@@ -85,6 +86,7 @@ typedef void (*ProcessFileProc)(WIN32_FIND_DATA *FindData,PluginPanelItem **Pane
 
 OperationResult FileFind(PluginPanelItem **PanelItems,int *ItemsNumber,BOOL ShowDialog);
 OperationResult FileReplace(PluginPanelItem **PanelItems,int *ItemsNumber,BOOL ShowDialog);
+OperationResult FileGrep(BOOL ShowDialog);
 BOOL AdvancedSettings();
 BOOL CompileAdvancedSettings();
 BOOL MaskCaseHere();

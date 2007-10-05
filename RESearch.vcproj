@@ -538,6 +538,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FileFind\FileGrep.cpp"
+				>
+			</File>
+			<File
 				RelativePath="FileFind\FileReplace.cpp"
 				>
 				<FileConfiguration

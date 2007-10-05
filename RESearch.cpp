@@ -269,21 +269,22 @@ BOOL ProcessCommandLine(char *Line,BOOL *ShowDialog,int *Item) {
 }
 
 int ShowFileMenu() {
-	FarMenuItem MenuItems[13];
+	FarMenuItem MenuItems[14];
 	memset(MenuItems,0,sizeof(MenuItems));
 	strcpy(MenuItems[0].Text,GetMsg(MMenuSearch));
 	strcpy(MenuItems[1].Text,GetMsg(MMenuReplace));
-	MenuItems[2].Separator=TRUE;
-	strcpy(MenuItems[3].Text,GetMsg(MMenuSelect));
-	strcpy(MenuItems[4].Text,GetMsg(MMenuUnselect));
-	strcpy(MenuItems[5].Text,GetMsg(MMenuFlipSelection));
-	MenuItems[6].Separator=TRUE;
-	strcpy(MenuItems[7].Text,GetMsg(MMenuRename));
-	strcpy(MenuItems[8].Text,GetMsg(MMenuRenameSelected));
-	strcpy(MenuItems[9].Text,GetMsg(MMenuRenumber));
-	MenuItems[10].Separator=TRUE;
-	strcpy(MenuItems[11].Text,GetMsg(MMenuUTF8Converter));
-	strcpy(MenuItems[12].Text,GetMsg(MMenuShowLastResults));
+	strcpy(MenuItems[2].Text,GetMsg(MMenuGrep));
+	MenuItems[3].Separator=TRUE;
+	strcpy(MenuItems[4].Text,GetMsg(MMenuSelect));
+	strcpy(MenuItems[5].Text,GetMsg(MMenuUnselect));
+	strcpy(MenuItems[6].Text,GetMsg(MMenuFlipSelection));
+	MenuItems[7].Separator=TRUE;
+	strcpy(MenuItems[8].Text,GetMsg(MMenuRename));
+	strcpy(MenuItems[9].Text,GetMsg(MMenuRenameSelected));
+	strcpy(MenuItems[10].Text,GetMsg(MMenuRenumber));
+	MenuItems[11].Separator=TRUE;
+	strcpy(MenuItems[12].Text,GetMsg(MMenuUTF8Converter));
+	strcpy(MenuItems[13].Text,GetMsg(MMenuShowLastResults));
 
 	return StartupInfo.Menu(StartupInfo.ModuleNumber,-1,-1,0,FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT,GetMsg(MMenuHeader),
 		NULL,"FileMenu",NULL,NULL,MenuItems,sizeof(MenuItems)/sizeof(MenuItems[0]));
@@ -345,24 +346,27 @@ HANDLE WINAPI OpenPlugin(int OpenFrom,int Item) {
 		case 1:
 			Result=FileReplace(&PanelItems,&ItemsNumber,ShowDialog);
 			break;
-		case 3:ChangeSelection(MMenuSelect);break;
-		case 4:ChangeSelection(MMenuUnselect);break;
-		case 5:ChangeSelection(MMenuFlipSelection);break;
-		case 7:
+		case 2:
+			Result=FileGrep(ShowDialog);
+			break;
+		case 4:ChangeSelection(MMenuSelect);break;
+		case 5:ChangeSelection(MMenuUnselect);break;
+		case 6:ChangeSelection(MMenuFlipSelection);break;
+		case 8:
 			Result=RenameFiles(&PanelItems,&ItemsNumber,ShowDialog);
 			break;
-		case 8:
+		case 9:
 			Result=RenameSelectedFiles(&PanelItems,&ItemsNumber,ShowDialog);
 			break;
-		case 9:
+		case 10:
 			RenumberFiles();
 			Result=OR_CANCEL;
 			break;
-		case 11:
+		case 12:
 			UTF8Converter();
 			Result=OR_CANCEL;
 			break;
-		case 12:
+		case 13:
 			if (LastTempPanel) {
 				LastTempPanel->m_bActive = true;
 				return (HANDLE)LastTempPanel;
