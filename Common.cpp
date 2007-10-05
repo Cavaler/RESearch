@@ -13,7 +13,8 @@ HKEY OpenRegistry() {
 void ReadRegistry() {
 	HKEY Key=OpenRegistry();
 //	Configuration
-	QueryRegIntValue(Key,"SeveralLines",&SeveralLines,5,1,256);
+	QueryRegIntValue(Key,"SeveralLines",&SeveralLines,32,1,65535);
+	QueryRegIntValue(Key,"SeveralLinesKB",&SeveralLinesKB,16,1,1024);
 	QueryRegBoolValue(Key,"AllowEmptyMatch",&AllowEmptyMatch,FALSE);
 	QueryRegBoolValue(Key,"DotMatchesNewline",&DotMatchesNewline,TRUE);
 	QueryRegBoolValue(Key, "UseSeparateThread", &g_bUseSeparateThread, true);
@@ -37,6 +38,7 @@ void WriteRegistry() {
 	HKEY Key=OpenRegistry();
 //	Configuration
 	SetRegIntValue(Key,"SeveralLines",SeveralLines);
+	SetRegIntValue(Key,"SeveralLinesKB",SeveralLinesKB);
 	SetRegBoolValue(Key,"AllowEmptyMatch",AllowEmptyMatch);
 	SetRegBoolValue(Key,"DotMatchesNewline",DotMatchesNewline);
 	SetRegBoolValue(Key, "UseSeparateThread", g_bUseSeparateThread);
@@ -57,7 +59,7 @@ void WriteRegistry() {
 }
 
 BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,int CaseSensitive,BOOL bUTF8,const unsigned char *pTables) {
-	if (Text.empty()) return TRUE;						// Not needed if empty
+	if (Text.empty()) return FALSE;		// WAS: Not needed if empty NOW: what is search for nothing?
 	const char *ErrPtr;
 	int ErrOffset;
 	int iFlags=PCRE_MULTILINE;
@@ -327,9 +329,9 @@ void PrepareBMHSearch(const char *String,int StringLength,size_t nPattern) {
 	for (int I=0;I<256;I++) g_BMHTable[I]=StringLength;
 
 	if (EReverse)
-		for (I=StringLength-1;I>0;I--) g_BMHTable[((unsigned char *)String)[I]]=I;
+		for (int I=StringLength-1;I>0;I--) g_BMHTable[((unsigned char *)String)[I]]=I;
 	else
-		for (I=0;I<StringLength-1;I++) g_BMHTable[((unsigned char *)String)[I]]=StringLength-I-1;
+		for (int I=0;I<StringLength-1;I++) g_BMHTable[((unsigned char *)String)[I]]=StringLength-I-1;
 }
 
 int BMHSearch(const char *Buffer,int BufferLength,const char *String,int StringLength,char *XLatTable,int nPattern) {
