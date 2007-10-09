@@ -100,7 +100,8 @@ void InitFoundPosition();
 BOOL MultipleMasksApply(const string &Masks, const char *Filename);
 void AddFile(WIN32_FIND_DATA *FindData,PluginPanelItem **PanelItems,int *ItemsNumber);
 int  ScanDirectories(PluginPanelItem **PanelItems,int *ItemsNumber,ProcessFileProc ProcessFile);
-int  FPreparePattern();
+int  FPrepareMaskPattern();
+int  FPreparePattern(bool bAcceptEmpty);
 
 BOOL ConfirmFile(int Title,const char *FileName);
 void SkipNoCRLF(const char *&Buffer,int *Size);

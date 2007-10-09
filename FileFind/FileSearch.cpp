@@ -328,7 +328,7 @@ int SearchPrompt(BOOL Plugin) {
 		case -1:
 			return FALSE;
 		}
-	} while ((ExitCode>=1)||!FPreparePattern());
+	} while ((ExitCode>=1)||!FPreparePattern(true));
 	if (FUTF8) FAllCharTables=FALSE;
 	return TRUE;
 }
@@ -342,7 +342,7 @@ OperationResult FileFind(PluginPanelItem **PanelItems,int *ItemsNumber,BOOL Show
 	if (ShowDialog) {
 		if (!SearchPrompt(PInfo.Plugin)) return OR_CANCEL;
 	} else {
-		if (!FPreparePattern()) return OR_CANCEL;
+		if (!FPreparePattern(true)) return OR_CANCEL;
 	}
 
 	if (ScanDirectories(PanelItems,ItemsNumber,SearchFile)) {

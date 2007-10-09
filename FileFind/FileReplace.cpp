@@ -270,7 +270,7 @@ BOOL FileReplaceExecutor(CParameterBatch &Batch) {
 	FMask=MaskText;
 	FText=SearchText;
 	FRReplace=ReplaceText;
-	if (!FPreparePattern()) return FALSE;
+	if (!FPreparePattern(false)) return FALSE;
 	if (FUTF8) FAllCharTables=FALSE;
 
 	FRConfirmFileThisRun = FALSE;		// FRConfirmFile;
@@ -363,7 +363,8 @@ int ReplacePrompt(BOOL Plugin) {
 		case -1:
 			return FALSE;
 		}
-	} while ((ExitCode>=1)||!FPreparePattern());
+	} while ((ExitCode>=1)||!FPreparePattern(false));
+
 	if (FUTF8) FAllCharTables=FALSE;
 	return TRUE;
 }
@@ -377,7 +378,7 @@ OperationResult FileReplace(PluginPanelItem **PanelItems,int *ItemsNumber,BOOL S
 	if (ShowDialog) {
 		if (!ReplacePrompt(PInfo.Plugin)) return OR_CANCEL;
 	} else {
-		if (!FPreparePattern()) return OR_CANCEL;
+		if (!FPreparePattern(false)) return OR_CANCEL;
 	}
 
 	FRConfirmFileThisRun=FRConfirmFile;

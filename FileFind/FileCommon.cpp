@@ -92,7 +92,7 @@ void FCleanup(BOOL PatternOnly) {
 	}
 }
 
-int FPreparePattern() {
+int FPrepareMaskPattern() {
 	FCleanup(TRUE);
 
 	if (FAdvanced && !CompileAdvancedSettings()) return FALSE;
@@ -115,6 +115,14 @@ int FPreparePattern() {
 			return FALSE;
 		}
 	}
+
+	return TRUE;
+}
+
+int FPreparePattern(bool bAcceptEmpty) {
+	if (!FPrepareMaskPattern()) return FALSE;
+
+	if (FText.empty() && !bAcceptEmpty) return FALSE;
 
 	if ((FSearchAs==SA_PLAINTEXT)||(FSearchAs==SA_MULTITEXT)) {
 		FTextUpcase=FText;
@@ -146,8 +154,10 @@ int FPreparePattern() {
 	case SA_REGEXP:
 	case SA_SEVERALLINE:
 	case SA_MULTILINE:
-	default:
+		if (FText.empty()) return TRUE;
 		return PreparePattern(&FPattern,&FPatternExtra,FText,FCaseSensitive,FUTF8);
+	default:
+		return FALSE;
 	}
 }
 
