@@ -256,7 +256,7 @@ BOOL RenameFilesExecutor(CParameterBatch &Batch) {
 }
 
 BOOL RenameFilesPrompt() {
-	CFarDialog Dialog(76,20,"FileRenameDlg");
+	CFarDialog Dialog(76,19,"FileRenameDlg");
 	Dialog.AddFrame(MMenuRename);
 
 	Dialog.Add(new CFarCheckBoxItem(25,2,0,MAsRegExp,&FMaskAsRegExp));
@@ -274,18 +274,14 @@ BOOL RenameFilesPrompt() {
 	Dialog.Add(new CFarCheckBoxItem(25,6,0,MRepeating,&FRepeating));
 	Dialog.Add(new CFarTextItem(5,8,DIF_BOXCOLOR|DIF_SEPARATOR,""));
 
-	Dialog.Add(new CFarRadioButtonItem(5,9,DIF_GROUP,MAllDrives,(int *)&FSearchIn,SI_ALLDRIVES));
-	Dialog.Add(new CFarRadioButtonItem(5,10,0,MAllLocalDrives,	(int *)&FSearchIn,SI_ALLLOCAL));
-	Dialog.Add(new CFarRadioButtonItem(5,11,0,MFromRoot,		(int *)&FSearchIn,SI_FROMROOT));
-	Dialog.Add(new CFarRadioButtonItem(5,12,0,MFromCurrent,		(int *)&FSearchIn,SI_FROMCURRENT));
-	Dialog.Add(new CFarRadioButtonItem(5,13,0,MCurrentOnly,		(int *)&FSearchIn,SI_CURRENTONLY));
-	Dialog.Add(new CFarRadioButtonItem(5,14,0,MSelected,		(int *)&FSearchIn,SI_SELECTED));
+	Dialog.Add(new CFarTextItem(5,9,0,MSearchIn));
+	Dialog.Add(new CFarComboBoxItem(15,9,45,0,new CFarListData(g_WhereToSearch, false),(int *)&FSearchIn));
 
-	Dialog.Add(new CFarCheckBoxItem(44,11,0,MViewModified,&FROpenModified));
-	Dialog.Add(new CFarCheckBoxItem(44,12,0,MConfirmFile,&FRConfirmFile));
-	Dialog.Add(new CFarCheckBoxItem(44,13,0,MConfirmLine,&FRConfirmLine));
+	Dialog.Add(new CFarCheckBoxItem(5,11,0,MViewModified,&FROpenModified));
+	Dialog.Add(new CFarCheckBoxItem(5,12,0,MConfirmFile,&FRConfirmFile));
+	Dialog.Add(new CFarCheckBoxItem(5,13,0,MConfirmLine,&FRConfirmLine));
 	Dialog.AddButtons(MOk,MCancel);
-	Dialog.Add(new CFarButtonItem(60,16,0,0,MBatch));
+	Dialog.Add(new CFarButtonItem(60,11,0,0,MBatch));
 	Dialog.Add(new CFarButtonItem(60,9,0,0,MPresets));
 	Dialog.SetFocus(4);
 

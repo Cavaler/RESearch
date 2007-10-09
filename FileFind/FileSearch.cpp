@@ -263,7 +263,7 @@ void SearchFile(WIN32_FIND_DATA *FindData,PluginPanelItem **PanelItems,int *Item
 }
 
 int SearchPrompt(BOOL Plugin) {
-	CFarDialog Dialog(76,25,"FileSearchDlg");
+	CFarDialog Dialog(76,24,"FileSearchDlg");
 	Dialog.AddFrame(MRESearch);
 
 	Dialog.Add(new CFarCheckBoxItem(35,2,0,MAsRegExp,&FMaskAsRegExp));
@@ -275,29 +275,23 @@ int SearchPrompt(BOOL Plugin) {
 	Dialog.Add(new CFarButtonItem(67,5,0,0,"&\\"));
 
 	Dialog.Add(new CFarTextItem(5,6,DIF_BOXCOLOR|DIF_SEPARATOR,(char *)NULL));
-	Dialog.Add(new CFarCheckBoxItem(5,7,0,MCaseSensitive,&FCaseSensitive));
-	Dialog.Add(new CFarRadioButtonItem(5,8,DIF_GROUP,MPlainText,(int *)&FSearchAs,SA_PLAINTEXT));
-	Dialog.Add(new CFarRadioButtonItem(5,9,0,MRegExp,			(int *)&FSearchAs,SA_REGEXP));
-	Dialog.Add(new CFarRadioButtonItem(5,10,0,MSeveralLineRegExp,(int *)&FSearchAs,SA_SEVERALLINE));
-	Dialog.Add(new CFarRadioButtonItem(5,11,0,MMultiLineRegExp,	(int *)&FSearchAs,SA_MULTILINE));
-	Dialog.Add(new CFarRadioButtonItem(5,12,0,MMultiPlainText,	(int *)&FSearchAs,SA_MULTITEXT));
-	Dialog.Add(new CFarRadioButtonItem(5,13,0,MMultiRegExp,		(int *)&FSearchAs,SA_MULTIREGEXP));
-	Dialog.Add(new CFarCheckBoxItem(5,14,0,MInverseSearch,&FSInverse));
-	Dialog.Add(new CFarCheckBoxItem(35,14,0,MAllCharTables,&FAllCharTables));
+	Dialog.Add(new CFarRadioButtonItem(5,7,DIF_GROUP,MPlainText,(int *)&FSearchAs,SA_PLAINTEXT));
+	Dialog.Add(new CFarRadioButtonItem(5,8,0,MRegExp,			(int *)&FSearchAs,SA_REGEXP));
+	Dialog.Add(new CFarRadioButtonItem(5,9,0,MSeveralLineRegExp,(int *)&FSearchAs,SA_SEVERALLINE));
+	Dialog.Add(new CFarRadioButtonItem(5,10,0,MMultiLineRegExp,	(int *)&FSearchAs,SA_MULTILINE));
+	Dialog.Add(new CFarRadioButtonItem(5,11,0,MMultiPlainText,	(int *)&FSearchAs,SA_MULTITEXT));
+	Dialog.Add(new CFarRadioButtonItem(5,12,0,MMultiRegExp,		(int *)&FSearchAs,SA_MULTIREGEXP));
 
-	Dialog.Add(new CFarTextItem(5,15,DIF_BOXCOLOR|DIF_SEPARATOR,""));
+	Dialog.Add(new CFarCheckBoxItem(5,14,0,MCaseSensitive,&FCaseSensitive));
+	Dialog.Add(new CFarCheckBoxItem(5,15,0,MInverseSearch,&FSInverse));
+	Dialog.Add(new CFarCheckBoxItem(5,16,0,MAllCharTables,&FAllCharTables));
+
+	Dialog.Add(new CFarTextItem(5,18,0,MSearchIn));
 	if (Plugin) {
 		if (FSearchIn<SI_FROMCURRENT) FSearchIn=SI_FROMCURRENT;
-		Dialog.Add(new CFarRadioButtonItem(5,16,DIF_GROUP,MFromCurrent,		(int *)&FSearchIn,SI_FROMCURRENT));
-		Dialog.Add(new CFarRadioButtonItem(5,17,0,MCurrentOnly,		(int *)&FSearchIn,SI_CURRENTONLY));
-		Dialog.Add(new CFarRadioButtonItem(5,18,0,MSelected,		(int *)&FSearchIn,SI_SELECTED));
+		Dialog.Add(new CFarComboBoxItem(15,18,45,0,new CFarListData(g_WhereToSearchPlugin, false),(int *)&FSearchIn,NULL,3));
 	} else {
-		Dialog.Add(new CFarRadioButtonItem(5,16,DIF_GROUP,MAllDrives,(int *)&FSearchIn,SI_ALLDRIVES));
-		Dialog.Add(new CFarRadioButtonItem(5,17,0,MAllLocalDrives,	(int *)&FSearchIn,SI_ALLLOCAL));
-		Dialog.Add(new CFarRadioButtonItem(5,18,0,MFromRoot,		(int *)&FSearchIn,SI_FROMROOT));
-		Dialog.Add(new CFarRadioButtonItem(5,19,0,MFromCurrent,		(int *)&FSearchIn,SI_FROMCURRENT));
-		Dialog.Add(new CFarRadioButtonItem(5,20,0,MCurrentOnly,		(int *)&FSearchIn,SI_CURRENTONLY));
-		Dialog.Add(new CFarRadioButtonItem(5,21,0,MSelected,		(int *)&FSearchIn,SI_SELECTED));
+		Dialog.Add(new CFarComboBoxItem(15,18,45,0,new CFarListData(g_WhereToSearch, false),(int *)&FSearchIn));
 	}
 
 	Dialog.AddButtons(MOk,MCancel);

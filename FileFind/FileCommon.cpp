@@ -55,6 +55,17 @@ void FReadRegistry(HKEY Key) {
 	for (int I=0;I<256;I++) Table.UpperDecodeTable[I]=UpCaseTable[Table.UpperDecodeTable[I]];
 
 	XLatTables.push_back(Table);
+
+	g_WhereToSearch.Append(GetMsg(MAllDrives));
+	g_WhereToSearch.Append(GetMsg(MAllLocalDrives));
+	g_WhereToSearch.Append(GetMsg(MFromRoot));
+	g_WhereToSearch.Append(GetMsg(MFromCurrent));
+	g_WhereToSearch.Append(GetMsg(MCurrentOnly));
+	g_WhereToSearch.Append(GetMsg(MSelected));
+
+	g_WhereToSearchPlugin.Append(GetMsg(MFromCurrent));
+	g_WhereToSearchPlugin.Append(GetMsg(MCurrentOnly));
+	g_WhereToSearchPlugin.Append(GetMsg(MSelected));
 }
 
 void FWriteRegistry(HKEY Key) {

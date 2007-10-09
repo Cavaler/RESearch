@@ -299,31 +299,24 @@ int ReplacePrompt(BOOL Plugin) {
 	Dialog.Add(new CFarButtonItem(67,7,0,0,"&/"));
 
 	Dialog.Add(new CFarTextItem(5,8,DIF_BOXCOLOR|DIF_SEPARATOR,""));
-	Dialog.Add(new CFarCheckBoxItem(5,9,0,MCaseSensitive,&FCaseSensitive));
-	Dialog.Add(new CFarRadioButtonItem(5,10,DIF_GROUP,MPlainText,(int *)&FSearchAs,SA_PLAINTEXT));
-	Dialog.Add(new CFarRadioButtonItem(5,11,0,MRegExp,			 (int *)&FSearchAs,SA_REGEXP));
-	Dialog.Add(new CFarRadioButtonItem(5,12,0,MSeveralLineRegExp,(int *)&FSearchAs,SA_SEVERALLINE));
+	Dialog.Add(new CFarRadioButtonItem(5,9,DIF_GROUP,MPlainText,(int *)&FSearchAs,SA_PLAINTEXT));
+	Dialog.Add(new CFarRadioButtonItem(5,10,0,MRegExp,			 (int *)&FSearchAs,SA_REGEXP));
+	Dialog.Add(new CFarRadioButtonItem(5,11,0,MSeveralLineRegExp,(int *)&FSearchAs,SA_SEVERALLINE));
+	Dialog.Add(new CFarCheckBoxItem(5,12,0,MCaseSensitive,&FCaseSensitive));
 
-	Dialog.Add(new CFarTextItem(5,13,DIF_BOXCOLOR|DIF_SEPARATOR,""));
+	Dialog.Add(new CFarTextItem(5,14,0,MSearchIn));
 	if (Plugin) {
 		if (FSearchIn<SI_FROMCURRENT) FSearchIn=SI_FROMCURRENT;
-		Dialog.Add(new CFarRadioButtonItem(5,14,DIF_GROUP,MFromCurrent,		(int *)&FSearchIn,SI_FROMCURRENT));
-		Dialog.Add(new CFarRadioButtonItem(5,15,0,MCurrentOnly,		(int *)&FSearchIn,SI_CURRENTONLY));
-		Dialog.Add(new CFarRadioButtonItem(5,16,0,MSelected,		(int *)&FSearchIn,SI_SELECTED));
+		Dialog.Add(new CFarComboBoxItem(15,14,45,0,new CFarListData(g_WhereToSearchPlugin, false),(int *)&FSearchIn,NULL,3));
 	} else {
-		Dialog.Add(new CFarRadioButtonItem(5,14,DIF_GROUP,MAllDrives,(int *)&FSearchIn,SI_ALLDRIVES));
-		Dialog.Add(new CFarRadioButtonItem(5,15,0,MAllLocalDrives,	(int *)&FSearchIn,SI_ALLLOCAL));
-		Dialog.Add(new CFarRadioButtonItem(5,16,0,MFromRoot,		(int *)&FSearchIn,SI_FROMROOT));
-		Dialog.Add(new CFarRadioButtonItem(5,17,0,MFromCurrent,		(int *)&FSearchIn,SI_FROMCURRENT));
-		Dialog.Add(new CFarRadioButtonItem(5,18,0,MCurrentOnly,		(int *)&FSearchIn,SI_CURRENTONLY));
-		Dialog.Add(new CFarRadioButtonItem(5,19,0,MSelected,		(int *)&FSearchIn,SI_SELECTED));
+		Dialog.Add(new CFarComboBoxItem(15,14,45,0,new CFarListData(g_WhereToSearch, false),(int *)&FSearchIn));
 	}
 
-	Dialog.Add(new CFarCheckBoxItem(44,14,0,MViewModified,&FROpenModified));
-	Dialog.Add(new CFarCheckBoxItem(44,15,0,MConfirmFile,&FRConfirmFile));
-	Dialog.Add(new CFarCheckBoxItem(44,16,0,MConfirmLine,&FRConfirmLine));
-	Dialog.Add(new CFarCheckBoxItem(44,17,0,MSaveOriginal,&FRSaveOriginal));
-	Dialog.Add(new CFarCheckBoxItem(46,18,0,MOverwriteBackup,&FROverwriteBackup));
+	Dialog.Add(new CFarCheckBoxItem(5,16,0,MViewModified,&FROpenModified));
+	Dialog.Add(new CFarCheckBoxItem(5,17,0,MConfirmFile,&FRConfirmFile));
+	Dialog.Add(new CFarCheckBoxItem(5,18,0,MConfirmLine,&FRConfirmLine));
+	Dialog.Add(new CFarCheckBoxItem(40,16,0,MSaveOriginal,&FRSaveOriginal));
+	Dialog.Add(new CFarCheckBoxItem(42,17,0,MOverwriteBackup,&FROverwriteBackup));
 
 	Dialog.AddButtons(MOk,MCancel);
 	Dialog.Add(new CFarButtonItem(60,20,0,0,MBatch));

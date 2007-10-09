@@ -68,6 +68,9 @@ EXTERN string MaskText;
 EXTERN string SearchText;
 EXTERN string ReplaceText;
 
+EXTERN CFarListData g_WhereToSearch;
+EXTERN CFarListData g_WhereToSearchPlugin;
+
 EXTERN int  FileConfirmed,FRConfirmFileThisRun,FRConfirmReadonlyThisRun;
 EXTERN int  FRConfirmLineThisRun,FRConfirmLineThisFile;
 
