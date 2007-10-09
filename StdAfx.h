@@ -29,3 +29,4 @@ using namespace std;
 #include <CMapping.h>
 #include <Directory.h>
 #include <UTF8.h>
+#include <Handles.h>
