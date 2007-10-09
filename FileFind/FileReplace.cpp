@@ -405,13 +405,16 @@ BOOL CFRPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.Add(new CFarTextItem(5,8,0,MReplaceWith));
 	Dialog.Add(new CFarEditItem(5,9,70,DIF_HISTORY,"ReplaceText", pPreset->m_mapStrings["Replace"]));
 
-	Dialog.Add(new CFarCheckBoxItem(5,11,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
+	Dialog.Add(new CFarTextItem(5,10,DIF_BOXCOLOR|DIF_SEPARATOR,(char *)NULL));
+
 	int *pSearchAs = &pPreset->m_mapInts["SearchAs"];
-	Dialog.Add(new CFarRadioButtonItem(5,12,DIF_GROUP,MPlainText,pSearchAs,SA_PLAINTEXT));
-	Dialog.Add(new CFarRadioButtonItem(5,13,0,MRegExp,		pSearchAs,SA_REGEXP));
-	Dialog.Add(new CFarRadioButtonItem(5,14,0,MSeveralLineRegExp,pSearchAs,SA_SEVERALLINE));
-	Dialog.Add(new CFarCheckBoxItem(35,11,0,"",&pPreset->m_mapInts["UTF8"]));
-	Dialog.Add(new CFarButtonItem(39,11,0,0,MUTF8));
+	Dialog.Add(new CFarRadioButtonItem(5,11,DIF_GROUP,MPlainText,pSearchAs,SA_PLAINTEXT));
+	Dialog.Add(new CFarRadioButtonItem(5,12,0,MRegExp,		pSearchAs,SA_REGEXP));
+	Dialog.Add(new CFarRadioButtonItem(5,13,0,MSeveralLineRegExp,pSearchAs,SA_SEVERALLINE));
+
+	Dialog.Add(new CFarCheckBoxItem(5,14,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
+	Dialog.Add(new CFarCheckBoxItem(56,12,0,"",&pPreset->m_mapInts["UTF8"]));
+	Dialog.Add(new CFarButtonItem(60,12,0,0,MUTF8));
 	Dialog.AddButtons(MOk,MCancel);
 
 	do {

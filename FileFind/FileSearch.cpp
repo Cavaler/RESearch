@@ -351,7 +351,7 @@ OperationResult FileFind(PluginPanelItem **PanelItems,int *ItemsNumber,BOOL Show
 }
 
 BOOL CFSPresetCollection::EditPreset(CPreset *pPreset) {
-	CFarDialog Dialog(76,22,"FSPresetDlg");
+	CFarDialog Dialog(76,23,"FSPresetDlg");
 	Dialog.AddFrame(MFSPreset);
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
 	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,"RESearch.PresetName", pPreset->Name()));
@@ -363,17 +363,20 @@ BOOL CFSPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.Add(new CFarTextItem(5,6,0,MSearchFor));
 	Dialog.Add(new CFarEditItem(5,7,70,DIF_HISTORY,"SearchText", pPreset->m_mapStrings["Text"]));
 
-	Dialog.Add(new CFarCheckBoxItem(5,9,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
+	Dialog.Add(new CFarTextItem(5,8,DIF_BOXCOLOR|DIF_SEPARATOR,(char *)NULL));
+
 	int *pSearchAs = &pPreset->m_mapInts["SearchAs"];
-	Dialog.Add(new CFarRadioButtonItem(5,10,DIF_GROUP,MPlainText,pSearchAs,SA_PLAINTEXT));
-	Dialog.Add(new CFarRadioButtonItem(5,11,0,		MRegExp,	 pSearchAs,SA_REGEXP));
-	Dialog.Add(new CFarRadioButtonItem(5,12,0,		MSeveralLineRegExp,	pSearchAs,SA_SEVERALLINE));
-	Dialog.Add(new CFarRadioButtonItem(5,13,0,		MMultiLineRegExp,	pSearchAs,SA_MULTILINE));
-	Dialog.Add(new CFarRadioButtonItem(5,14,0,		MMultiPlainText,	pSearchAs,SA_MULTITEXT));
-	Dialog.Add(new CFarRadioButtonItem(5,15,0,		MMultiRegExp,		pSearchAs,SA_MULTIREGEXP));
-	Dialog.Add(new CFarCheckBoxItem(5,16,0,MInverseSearch,&pPreset->m_mapInts["Inverse"]));
-	Dialog.Add(new CFarCheckBoxItem(35,9,0,"",&pPreset->m_mapInts["UTF8"]));
-	Dialog.Add(new CFarButtonItem(39,9,0,0,MUTF8));
+	Dialog.Add(new CFarRadioButtonItem(5, 9,DIF_GROUP,MPlainText,pSearchAs,SA_PLAINTEXT));
+	Dialog.Add(new CFarRadioButtonItem(5,10,0,		MRegExp,	 pSearchAs,SA_REGEXP));
+	Dialog.Add(new CFarRadioButtonItem(5,11,0,		MSeveralLineRegExp,	pSearchAs,SA_SEVERALLINE));
+	Dialog.Add(new CFarRadioButtonItem(5,12,0,		MMultiLineRegExp,	pSearchAs,SA_MULTILINE));
+	Dialog.Add(new CFarRadioButtonItem(5,13,0,		MMultiPlainText,	pSearchAs,SA_MULTITEXT));
+	Dialog.Add(new CFarRadioButtonItem(5,14,0,		MMultiRegExp,		pSearchAs,SA_MULTIREGEXP));
+
+	Dialog.Add(new CFarCheckBoxItem(5,16,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
+	Dialog.Add(new CFarCheckBoxItem(5,17,0,MInverseSearch,&pPreset->m_mapInts["Inverse"]));
+	Dialog.Add(new CFarCheckBoxItem(56,11,0,"",&pPreset->m_mapInts["UTF8"]));
+	Dialog.Add(new CFarButtonItem(60,11,0,0,MUTF8));
 	Dialog.AddButtons(MOk,MCancel);
 
 	do {
