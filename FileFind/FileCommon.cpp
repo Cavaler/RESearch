@@ -2,7 +2,7 @@
 #include "..\RESearch.h"
 
 CParameterBatch g_FSBatch(2, 5,
-	 "Mask", &MaskText, "Text", &SearchText,
+	"Mask", &MaskText, "Text", &SearchText,
 	"MaskAsRegExp", &FMaskAsRegExp, "CaseSensitive", &FCaseSensitive,
 	"UTF8", &FUTF8, "SearchAs", &FSearchAs, "IsInverse", &FSInverse
 	);
@@ -10,6 +10,13 @@ CParameterBatch g_FRBatch(3, 4,
 	"Mask", &MaskText, "Text", &SearchText, "Replace", &ReplaceText,
 	"MaskAsRegExp", &FMaskAsRegExp, "CaseSensitive", &FCaseSensitive,
 	"UTF8", &FUTF8, "SearchAs", &FSearchAs
+	);
+CParameterBatch g_FGBatch(2, 9,
+	"Mask", &MaskText, "Text", &SearchText,
+	"MaskAsRegExp", &FMaskAsRegExp, "CaseSensitive", &FCaseSensitive,
+	"UTF8", &FUTF8, "SearchAs", &FSearchAs, "IsInverse", &FSInverse,
+	"GrepWhat", &FGrepWhat, "AddLineNumbers", &FGAddLineNumbers,
+	"AddContext", &FGAddContext, "ContextLines", &FGContextLines
 	);
 
 DWORD g_dwDateAfterThis, g_dwDateBeforeThis;
@@ -30,6 +37,7 @@ void FReadRegistry(HKEY Key) {
 
 	FSPresets=new CFSPresetCollection();
 	FRPresets=new CFRPresetCollection();
+	FGPresets=new CFGPresetCollection();
 	FAPresets=new CFAPresetCollection();
 	FRBatch=new CPresetBatchCollection(FRPresets);
 
@@ -88,6 +96,7 @@ void FCleanup(BOOL PatternOnly) {
 		delete FRBatch;
 		delete FSPresets;
 		delete FRPresets;
+		delete FGPresets;
 		delete FAPresets;
 	}
 }

@@ -23,6 +23,13 @@ public:
 	virtual const char *GetName() {return "FileReplace";}
 };
 
+class CFGPresetCollection:public CPresetCollection {
+public:
+	CFGPresetCollection() {Load();}
+	virtual BOOL EditPreset(CPreset *pPreset);
+	virtual const char *GetName() {return "FileGrep";}
+};
+
 class CFAPresetCollection:public CPresetCollection {
 public:
 	CFAPresetCollection() {Load();}
@@ -32,9 +39,11 @@ public:
 
 extern CParameterBatch g_FSBatch;
 extern CParameterBatch g_FRBatch;
+extern CParameterBatch g_FGBatch;
 extern CParameterBatch g_FABatch;
 EXTERN CFSPresetCollection *FSPresets;
 EXTERN CFRPresetCollection *FRPresets;
+EXTERN CFGPresetCollection *FGPresets;
 EXTERN CFAPresetCollection *FAPresets;
 EXTERN CPresetBatchCollection *FRBatch;
 

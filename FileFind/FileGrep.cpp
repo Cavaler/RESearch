@@ -187,8 +187,7 @@ bool GrepPrompt(BOOL bPlugin) {
 			if (AsRegExp) QuoteRegExpString(SearchText);
 			break;
 		case 2:
-//			FSPresets->ShowMenu(g_FSBatch);
-//			if (Plugin&&(FSearchIn<SI_FROMCURRENT)) FSearchIn=SI_FROMCURRENT;
+			FGPresets->ShowMenu(g_FGBatch);
 			break;
 		case 3:
 			if (AdvancedSettings()) FAdvanced=TRUE;
@@ -238,8 +237,59 @@ OperationResult FileGrep(BOOL ShowDialog) {
 		g_hOutput.Close();
 		if (FGOpenInEditor) {
 			StartupInfo.Editor(strFileName.c_str(), NULL, 0, 0, -1, -1,
-				EF_NONMODAL|EF_IMMEDIATERETURN|EF_ENABLE_F6|EF_DELETEONLYFILEONCLOSE, 0, 1);
+				EF_NONMODAL|EF_IMMEDIATERETURN|EF_ENABLE_F6| (FGOutputToFile ? 0 : EF_DELETEONLYFILEONCLOSE), 0, 1);
 		}
 		return OR_OK;
 	} else return OR_FAILED;
+}
+
+BOOL CFGPresetCollection::EditPreset(CPreset *pPreset) {
+	SearchAs FSA = (SearchAs)pPreset->m_mapInts["SearchAs"];
+	BOOL AsRegExp = (FSA == SA_REGEXP) || (FSA == SA_SEVERALLINE) || (FSA == SA_MULTILINE) || (FSA == SA_MULTIREGEXP);
+
+	CFarDialog Dialog(76,23,"FGPresetDlg");
+	Dialog.AddFrame(MREGrep);
+
+	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
+	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,"RESearch.PresetName", pPreset->Name()));
+	Dialog.Add(new CFarCheckBoxItem(35,4,0,MAsRegExp,&pPreset->m_mapInts["MaskAsRegExp"]));
+	Dialog.Add(new CFarTextItem(5,4,0,MMask));
+	Dialog.Add(new CFarEditItem(5,5,70,DIF_HISTORY,"Masks", pPreset->m_mapStrings["Mask"]));
+
+	Dialog.Add(new CFarTextItem(5,6,0,MSearchFor));
+	Dialog.Add(new CFarEditItem(5,7,70,DIF_HISTORY,"SearchText", pPreset->m_mapStrings["Text"]));
+
+	Dialog.Add(new CFarTextItem(5,8,DIF_BOXCOLOR|DIF_SEPARATOR,(char *)NULL));
+	Dialog.Add(new CFarCheckBoxItem(5,9,0,MRegExp,&AsRegExp));
+	Dialog.Add(new CFarCheckBoxItem(35,9,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
+	Dialog.Add(new CFarCheckBoxItem(5,10,0,MInverseSearch,&pPreset->m_mapInts["Inverse"]));
+	Dialog.Add(new CFarCheckBoxItem(35,10,0,"",&pPreset->m_mapInts["UTF8"]));
+	Dialog.Add(new CFarButtonItem(39,10,0,0,MUTF8));
+
+	Dialog.Add(new CFarTextItem(5,11,DIF_BOXCOLOR|DIF_SEPARATOR,""));
+
+	Dialog.Add(new CFarRadioButtonItem(5,12,DIF_GROUP,MGrepNames,	&pPreset->m_mapInts["GrepWhat"],GREP_NAMES));
+	Dialog.Add(new CFarRadioButtonItem(5,13,0,MGrepNamesCount,		&pPreset->m_mapInts["GrepWhat"],GREP_NAMES_COUNT));
+	Dialog.Add(new CFarRadioButtonItem(5,14,0,MGrepLines,			&pPreset->m_mapInts["GrepWhat"],GREP_LINES));
+	Dialog.Add(new CFarRadioButtonItem(5,15,0,MGrepNamesLines,		&pPreset->m_mapInts["GrepWhat"],GREP_NAMES_LINES));
+
+	Dialog.Add(new CFarCheckBoxItem(5,16,0,MGrepAdd,&pPreset->m_mapInts["AddContext"]));
+	Dialog.Add(new CFarEditItem(15,16,20,0,NULL,&pPreset->m_mapInts["ContextLines"],new CFarIntegerRangeValidator(0,1024)));
+	Dialog.Add(new CFarTextItem(22,16,0,MGrepContext));
+	Dialog.Add(new CFarCheckBoxItem(5,17,0,MGrepAddLineNumbers,&pPreset->m_mapInts["AddLineNumbers"]));
+
+	Dialog.AddButtons(MOk,MCancel);
+
+	do {
+		switch (Dialog.Display(2, -2, 13)) {
+		case 0:
+			pPreset->m_mapInts["SearchAs"] = AsRegExp ? SA_REGEXP : SA_PLAINTEXT;
+			return TRUE;
+		case 1:
+			UTF8Converter(pPreset->m_mapStrings["Text"]);
+			break;
+		default:
+			return FALSE;
+		}
+	} while (true);
 }
