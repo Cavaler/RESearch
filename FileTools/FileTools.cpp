@@ -68,7 +68,7 @@ void ChangeSelection(int How) {
 		MaskText=FMask;
 		if (Dialog.Display(-1)==-1) return;
 		FMask=MaskText;
-	} while (!FPreparePattern());
+	} while (!FPrepareMaskPattern());
 
 	PanelInfo PInfo;
 	int I;
@@ -244,7 +244,7 @@ BOOL RenameFilesExecutor(CParameterBatch &Batch) {
 	FMask=MaskText;
 	FText=SearchText;
 	FRReplace=ReplaceText;
-	if (!FPreparePattern()) return FALSE;
+	if (!FPreparePattern(false)) return FALSE;
 	FTAskOverwrite = FTAskCreatePath = true;
 	FileNumber=-1;g_bInterrupted=FALSE;
 
@@ -310,7 +310,7 @@ BOOL RenameFilesPrompt() {
 		case -1:
 			return FALSE;
 		}
-	} while ((ExitCode>=1)||!FPreparePattern());
+	} while ((ExitCode>=1)||!FPreparePattern(false));
 	return TRUE;
 }
 
@@ -323,7 +323,7 @@ OperationResult RenameFiles(PluginPanelItem **PanelItems,int *ItemsNumber,BOOL S
 	if (ShowDialog) {
 		if (!RenameFilesPrompt()) return OR_CANCEL;
 	} else {
-		if (!FPreparePattern()) return OR_CANCEL;
+		if (!FPreparePattern(false)) return OR_CANCEL;
 	}
 
 	FRConfirmFileThisRun=FRConfirmFile;
@@ -360,7 +360,7 @@ BOOL PerformRenameSelectedFiles(PanelInfo &PInfo,PluginPanelItem **PanelItems,in
 BOOL RenameSelectedFilesExecutor(CParameterBatch &Batch) {
 	FText=SearchText;
 	FRReplace=ReplaceText;
-	if (!FPreparePattern()) return FALSE;
+	if (!FPreparePattern(false)) return FALSE;
 	FTAskOverwrite = FTAskCreatePath = true;
 
 	FRConfirmFileThisRun = FALSE;//FRConfirmFile;
@@ -417,7 +417,7 @@ BOOL RenameSelectedFilesPrompt() {
 		case -1:
 			return FALSE;
 		}
-	} while ((ExitCode>=1)||!FPreparePattern());
+	} while ((ExitCode>=1)||!FPreparePattern(false));
 	return TRUE;
 }
 
@@ -430,7 +430,7 @@ OperationResult RenameSelectedFiles(PluginPanelItem **PanelItems,int *ItemsNumbe
 	if (ShowDialog) {
 		if (!RenameSelectedFilesPrompt()) return OR_CANCEL;
 	} else {
-		if (!FPreparePattern()) return OR_CANCEL;
+		if (!FPreparePattern(false)) return OR_CANCEL;
 	}
 
 	*ItemsNumber=0;*PanelItems=NULL;
