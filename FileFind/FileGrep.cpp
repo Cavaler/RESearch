@@ -17,12 +17,22 @@ void AddGrepLine(const char *szLine, bool bEOL = true) {
 	if (bEOL) WriteFile(g_hOutput, "\r\n", 2, &dwWritten, NULL);
 }
 
-bool GrepLineFound(const sBufferedLine &strBuf) {
-	if (FSearchAs == SA_REGEXP) {
-		return FindPattern(FPattern, FPatternExtra, strBuf.szBuffer, strBuf.Length()) != 0;
-	} else {
-		return FindTextInBuffer(strBuf.szBuffer, strBuf.Length(), FText) != 0;
+void AddGrepResultLine(const sBufferedLine &Line, int nLineNumber) {
+	if (FGAddLineNumbers) {
+		AddGrepLine(FormatStr("%d:", nLineNumber).c_str(), false);
 	}
+	AddGrepLine(string(Line.szBuffer, Line.szBufEnd).c_str());
+}
+
+bool GrepLineFound(const sBufferedLine &strBuf) {
+	BOOL bResult;
+	if (FSearchAs == SA_REGEXP) {
+		bResult = FindPattern(FPattern, FPatternExtra, strBuf.szBuffer, strBuf.Length());
+	} else {
+		bResult = FindTextInBuffer(strBuf.szBuffer, strBuf.Length(), FText);
+	}
+
+	return (bResult != 0) != (FSInverse != 0);
 }
 
 void GrepFile(WIN32_FIND_DATA *FindData,PluginPanelItem **PanelItems,int *ItemsNumber) {
@@ -42,11 +52,11 @@ void GrepFile(WIN32_FIND_DATA *FindData,PluginPanelItem **PanelItems,int *ItemsN
 	if (FAdvanced && FASearchHead && (FileSize > (int)FASearchHeadLimit)) FileSize=FASearchHeadLimit;
 
 	deque<sBufferedLine> arrStringBuffer;
-	const char *szBuffer = mapFile;
-	const char *szBufEnd = szBuffer;
-	g_nFoundLine = 0;
+	const char *szBuffer, *szBufEnd = mapFile;
 
 	int nFoundCount = 0;
+
+	int nFirstBufferLine = 0;
 	int nLastMatched = -1;
 
 	int nContextLines = FGAddContext ? FGContextLines : 0;
@@ -55,38 +65,62 @@ void GrepFile(WIN32_FIND_DATA *FindData,PluginPanelItem **PanelItems,int *ItemsN
 		SkipNoCRLF(szBufEnd, &FileSize);
 
 		arrStringBuffer.push_back(sBufferedLine(szBuffer, szBufEnd));
-		if (arrStringBuffer.size() > nContextLines*2+1) arrStringBuffer.pop_front();
 
-		if (arrStringBuffer.size() == nContextLines*2+1) {
-			const sBufferedLine &strTest = arrStringBuffer[nContextLines];
+		if (GrepLineFound(arrStringBuffer.back())) {
+			nFoundCount++;
+			nLastMatched = arrStringBuffer.size()-1;
 
-			if (GrepLineFound(strTest)) {
-				nFoundCount++;
-
-				switch (FGrepWhat) {
-				case GREP_NAMES:
-					AddGrepLine(FindData->cFileName);
-					return;
-				case GREP_NAMES_LINES:
-					if (nFoundCount == 1) AddGrepLine(FindData->cFileName);
-					// break;
-				case GREP_LINES:
-					if (FGAddLineNumbers) {
-						AddGrepLine(FormatStr("%d:", g_nFoundLine-nContextLines).c_str(), false);
+			switch (FGrepWhat) {
+			case GREP_NAMES:
+				AddGrepLine(FindData->cFileName);
+				return;
+			case GREP_NAMES_LINES:
+				if (nFoundCount == 1) AddGrepLine(FindData->cFileName);
+				break;
+			}
+		} else {
+			if (nLastMatched >= 0) {
+				if (nLastMatched < (int)arrStringBuffer.size()-nContextLines*2-1) {
+					switch (FGrepWhat) {
+					case GREP_NAMES_LINES:
+					case GREP_LINES:
+						if (nContextLines > 0) AddGrepLine(">>>");
+						for (int nLine = 0; nLine <= nLastMatched+nContextLines; nLine++) {
+							AddGrepResultLine(arrStringBuffer[nLine], nLine + nFirstBufferLine + 1);
+						}
+						if (nContextLines > 0) AddGrepLine("<<<");
+						break;
 					}
-					AddGrepLine(string(strTest.szBuffer, strTest.szBufEnd).c_str());
-					break;
+					while ((int)arrStringBuffer.size() > nContextLines) {
+						arrStringBuffer.pop_front();
+						nFirstBufferLine++;
+					}
+					nLastMatched = -1;
+				} // else not yet time for output
+			} else {
+				while ((int)arrStringBuffer.size() > nContextLines) {
+					arrStringBuffer.pop_front();
+					nFirstBufferLine++;
 				}
 			}
 		}
 
 		SkipCRLF(szBufEnd, &FileSize);
-		g_nFoundLine++;
 	}
 
 	switch (FGrepWhat) {
 	case GREP_NAMES_COUNT:
 		if (nFoundCount > 0) AddGrepLine(FormatStr("%s:%d", FindData->cFileName, nFoundCount).c_str());
+		break;
+	case GREP_NAMES_LINES:
+	case GREP_LINES:
+		if (nLastMatched >= 0) {
+			if (nContextLines > 0) AddGrepLine(">>>");
+			for (int nLine = 0; (nLine < (int)arrStringBuffer.size()) && (nLine <= nLastMatched+nContextLines); nLine++) {
+				AddGrepResultLine(arrStringBuffer[nLine], nLine + nFirstBufferLine + 1);
+			}
+			if (nContextLines > 0) AddGrepLine("<<<");
+		}
 		break;
 	}
 }
@@ -113,9 +147,9 @@ bool GrepPrompt(BOOL bPlugin) {
 	Dialog.Add(new CFarTextItem(5,9,DIF_BOXCOLOR|DIF_SEPARATOR,""));
 
 	Dialog.Add(new CFarRadioButtonItem(5,10,DIF_GROUP,MGrepNames,		(int *)&FGrepWhat,GREP_NAMES));
-	Dialog.Add(new CFarRadioButtonItem(5,11,DIF_GROUP,MGrepNamesCount,	(int *)&FGrepWhat,GREP_NAMES_COUNT));
-	Dialog.Add(new CFarRadioButtonItem(5,12,DIF_GROUP,MGrepLines,		(int *)&FGrepWhat,GREP_LINES));
-	Dialog.Add(new CFarRadioButtonItem(5,13,DIF_GROUP,MGrepNamesLines,	(int *)&FGrepWhat,GREP_NAMES_LINES));
+	Dialog.Add(new CFarRadioButtonItem(5,11,0,MGrepNamesCount,	(int *)&FGrepWhat,GREP_NAMES_COUNT));
+	Dialog.Add(new CFarRadioButtonItem(5,12,0,MGrepLines,		(int *)&FGrepWhat,GREP_LINES));
+	Dialog.Add(new CFarRadioButtonItem(5,13,0,MGrepNamesLines,	(int *)&FGrepWhat,GREP_NAMES_LINES));
 
 	Dialog.Add(new CFarCheckBoxItem(5,14,0,MGrepAdd,&FGAddContext));
 	Dialog.Add(new CFarEditItem(15,14,20,0,NULL,(int &)FGContextLines,new CFarIntegerRangeValidator(0,1024)));
