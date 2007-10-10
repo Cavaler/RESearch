@@ -2,7 +2,7 @@
 .PluginContents=Regular Expression Search
 
 @Contents
-$ #Regular Expression Search and Replace, version 5.50#
+$ #Regular Expression Search and Replace, version 6.00#
     This plugin allows you to:
 
     - Perform text search and replace in editor
@@ -17,7 +17,7 @@ in file masks, searched text, and using various macros in replacement text.
     Due to this, you can perform complicated searches and context-dependent replacing.
 	Furthermore, it supports ~scripting replacement~@RegularReplaceScripting@.
 
-    This plugin uses ~PCRE 5.0 library~@PCRE@, compiled with ~UTF-8~@UTF8@ support
+    This plugin uses ~PCRE 7.4 library~@PCRE@, compiled with ~UTF-8~@UTF8@ support
 
    ~Regular Expression Basics~@RegularExpressions@
    ~Replacement Text~@RegularReplace@
@@ -47,13 +47,12 @@ which is open source software, written by ~Philip Hazel~@mailto:ph10@@cam.ac.uk@
 and copyright by the University of Cambridge, England.
 
     Library sources can be found at:
-    ~ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/~@ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/@
-
-    These sources were patched to using DOS-866 codepage by default.
+    ~http://www.pcre.org/~@http://www.pcre.org/@
 @RegularExpressions
 $ #Regular Expression Basics#
     Regular expression is a specially formatted string, designed to match not one
-string, but a set of them. For full information, see ~PCRE 4.1 library~@PCRE@ documentation.
+string, but a set of them. For full information, see included pcrepattern.html file or
+~PCRE 7.4 library~@PCRE@ documentation.
     Most commonly used patterns are:
 
     #.# (dot) matches any single character, #except# newline

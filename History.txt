@@ -6,9 +6,31 @@ Regular Expression Search and Replace
  * Minor change
 
 Planned:
-	+ Support for C-like escapes ("\n" mostly) for plain text searches
+	+ Support for C-like escapes (mostly because of "\n") for plain text searches
+	! Performing all regular expression matches in UTF-8
 
-Version 5.53
+Version 5.60
+	+ Compiled with VS.2005
+	+ Using PCRE 7.40
+	+ Compiled with Unicode property support (works only for UTF-8 searches)
+	* Added regular expression reference in "pcrepattern.html"
+	
+	! New feature: "Grep" in panels
+		Searches for text in files and outputs found lines to file or editor window
+
+	+ Search in editor with a lot of "Several lines" is way faster now
+	* Can limit number of "Several lines" by total size, up to 1024Kb
+	* Maximal limit for "Several lines" increased up to 65536
+	+ Search in selection
+
+	* F4 on file in search results positions editor to line with first match
+		- Works only for RE, Several-line RE searches, for other types it will slow down processing a lot
+		  or simply doesn't make sense (Multiple plain/RE)
+	* F3 positions 'somewhere near' that point
+
+	* "Search in" selection is now combobox instead of radiobuttons
+
+	- Searching while doing "plain text replace" from panels greatly sped up
 	- Doesn't crash trying to rename files without extension
 
 Version 5.52 (06.02.2007)

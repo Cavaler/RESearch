@@ -88,6 +88,7 @@ enum eStringTable {
 	MMultiLineRegExp,
 	MMultiPlainText,
 	MMultiRegExp,
+	MSearchIn,
 	MAllDrives,
 	MAllLocalDrives,
 	MFromRoot,

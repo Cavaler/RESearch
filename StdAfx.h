@@ -15,6 +15,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <deque>
 using namespace std;
 
 #include <EasyReg.h>

@@ -339,7 +339,6 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="0"
 						BrowseInformation="1"
 					/>
 				</FileConfiguration>
@@ -362,7 +361,6 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="0"
 						BrowseInformation="1"
 					/>
 				</FileConfiguration>
@@ -389,7 +387,6 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="0"
 						BrowseInformation="1"
 					/>
 				</FileConfiguration>
@@ -412,7 +409,6 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="0"
 						BrowseInformation="1"
 					/>
 				</FileConfiguration>
@@ -435,7 +431,6 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="0"
 						BrowseInformation="1"
 					/>
 				</FileConfiguration>
@@ -458,7 +453,6 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="0"
 						BrowseInformation="1"
 					/>
 				</FileConfiguration>
@@ -518,7 +512,6 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="0"
 						BrowseInformation="1"
 					/>
 				</FileConfiguration>
@@ -549,7 +542,6 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="0"
 						BrowseInformation="1"
 					/>
 				</FileConfiguration>
@@ -572,7 +564,6 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="0"
 						BrowseInformation="1"
 					/>
 				</FileConfiguration>
@@ -599,7 +590,6 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="0"
 						BrowseInformation="1"
 					/>
 				</FileConfiguration>
@@ -626,7 +616,6 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="0"
 						BrowseInformation="1"
 					/>
 				</FileConfiguration>
@@ -657,7 +646,6 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="0"
 						BrowseInformation="1"
 					/>
 				</FileConfiguration>
@@ -684,7 +672,6 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="0"
 						BrowseInformation="1"
 					/>
 				</FileConfiguration>
@@ -731,7 +718,6 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="0"
 						BrowseInformation="1"
 					/>
 				</FileConfiguration>
@@ -754,7 +740,6 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="0"
 						BrowseInformation="1"
 					/>
 				</FileConfiguration>
@@ -777,7 +762,6 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="0"
 						UsePrecompiledHeader="2"
 						BrowseInformation="1"
 					/>
@@ -847,7 +831,6 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="0"
 						BrowseInformation="1"
 					/>
 				</FileConfiguration>

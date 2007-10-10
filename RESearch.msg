@@ -68,7 +68,7 @@ MGrepAddLineNumbers	"Add line n&umbers"
 MGrepAdd			"&Add"
 MGrepContext		"context lines around matches"
 MGrepOutput			"Output to:"
-MGrepEditor			"Open in editor"
+MGrepEditor			"Open output in editor"
 
 MAdvancedOptions	"Advanced search options"				"Дополнительные параметры поиска"
 MFullFileNameMatch	"Full &file name matches:"				"Полное имя файла совпадает с:"
