@@ -103,6 +103,9 @@ int  ScanDirectories(PluginPanelItem **PanelItems,int *ItemsNumber,ProcessFilePr
 int  FPrepareMaskPattern();
 int  FPreparePattern(bool bAcceptEmpty);
 
+BOOL FindTextInBuffer(const char *Buffer,int Size,string &Text);
+BOOL FindPattern(pcre *Pattern,pcre_extra *PatternExtra,const char *Buffer,int Size);
+
 BOOL ConfirmFile(int Title,const char *FileName);
 void SkipNoCRLF(const char *&Buffer,int *Size);
 void SkipCRLF(const char *&Buffer,int *Size);
