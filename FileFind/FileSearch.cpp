@@ -289,9 +289,9 @@ int SearchPrompt(BOOL Plugin) {
 	Dialog.Add(new CFarTextItem(5,18,0,MSearchIn));
 	if (Plugin) {
 		if (FSearchIn<SI_FROMCURRENT) FSearchIn=SI_FROMCURRENT;
-		Dialog.Add(new CFarComboBoxItem(15,18,45,0,new CFarListData(g_WhereToSearchPlugin, false),(int *)&FSearchIn,NULL,3));
+		Dialog.Add(new CFarComboBoxItem(15,18,60,0,new CFarListData(g_WhereToSearchPlugin, false),(int *)&FSearchIn,NULL,3));
 	} else {
-		Dialog.Add(new CFarComboBoxItem(15,18,45,0,new CFarListData(g_WhereToSearch, false),(int *)&FSearchIn));
+		Dialog.Add(new CFarComboBoxItem(15,18,60,0,new CFarListData(g_WhereToSearch, false),(int *)&FSearchIn));
 	}
 
 	Dialog.AddButtons(MOk,MCancel);

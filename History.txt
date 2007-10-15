@@ -7,9 +7,13 @@ Regular Expression Search and Replace
 
 Planned:
 	+ Support for C-like escapes (mostly because of "\n") for plain text searches
+	* dialogprocs for disabling unneeded elements
 	! Performing all regular expression matches in UTF-8
 
-Version 5.60
+Version 6.01 (15.10.2007)
+	- Bugfixes in russian localization (thanks to Tim Sobolev)
+
+Version 6.00 (10.10.2007)
 	+ Compiled with VS.2005
 	+ Using PCRE 7.40
 	+ Compiled with Unicode property support (works only for UTF-8 searches)

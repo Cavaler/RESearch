@@ -161,7 +161,7 @@ bool GrepPrompt(BOOL bPlugin) {
 	Dialog.Add(new CFarCheckBoxItem(5,17,0,MGrepEditor,&FGOpenInEditor));
 
 	Dialog.Add(new CFarTextItem(5,19,0,MSearchIn));
-	Dialog.Add(new CFarComboBoxItem(15,19,45,0,new CFarListData(g_WhereToSearch, false),(int *)&FSearchIn));
+	Dialog.Add(new CFarComboBoxItem(15,19,60,0,new CFarListData(g_WhereToSearch, false),(int *)&FSearchIn));
 
 	Dialog.AddButtons(MOk,MCancel);
 	Dialog.Add(new CFarButtonItem(60,10,0,0,MPresets));
