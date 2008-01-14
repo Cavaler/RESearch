@@ -6,9 +6,11 @@ Regular Expression Search and Replace
  * Minor change
 
 Planned:
+	! Performing all regular expression matches in UTF-8
 	+ Support for C-like escapes (mostly because of "\n") for plain text searches
 	* dialogprocs for disabling unneeded elements
-	! Performing all regular expression matches in UTF-8
+	- Correct "Files found" in Grep
+    * Find next after 
 
 Version 6.01 (15.10.2007)
 	- Bugfixes in russian localization (thanks to Tim Sobolev)
