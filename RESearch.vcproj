@@ -5,9 +5,6 @@
 	Name="RESearch"
 	ProjectGUID="{075A24B6-6A7D-4292-B300-88E3946C877D}"
 	RootNamespace="RESearch"
-	SccProjectName="&quot;$/WINDOWS/FAR/RESearch&quot;, YBAAAAAA"
-	SccLocalPath="."
-	SccProvider="MSSCCI:Microsoft Visual SourceSafe"
 	>
 	<Platforms>
 		<Platform
