@@ -12,6 +12,9 @@ Planned:
 	- Correct "Files found" in Grep
     * Find next after 
 
+Version 6.02 (22.01.2008)
+	- Plain text replace from panels crash fixed
+
 Version 6.01 (15.10.2007)
 	- Bugfixes in russian localization (thanks to Tim Sobolev)
 
