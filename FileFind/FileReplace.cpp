@@ -92,7 +92,7 @@ BOOL ProcessPlainTextBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindD
 	char *Table=(FCaseSensitive) ? NULL : UpCaseTable;
 
 	while (Current+FText.size()<=Buffer+BufLen) {
-		int nPosition = BMHSearch(Current, Current-Buffer+BufLen, FTextUpcase.data(), FTextUpcase.size(), Table);
+		int nPosition = BMHSearch(Current, Buffer+BufLen-Current, FTextUpcase.data(), FTextUpcase.size(), Table);
 		if (nPosition < 0) break;
 		Current += nPosition;
 
