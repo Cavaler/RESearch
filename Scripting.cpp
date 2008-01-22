@@ -230,7 +230,7 @@ private:
 	IDispatch *m_pDispatch;
 };
 
-char *EvaluateReplaceString(const char *Matched,int *Match,int Count,const char *Replace,const char *EOL,int *Numbers,int Engine,int &ResultLength) {
+string EvaluateReplaceString(const char *Matched,int *Match,int Count,const char *Replace,const char *EOL,int *Numbers,int Engine) {
 	EXCEPINFO ExcepInfo;
 	HRESULT hResult;
 
@@ -268,8 +268,5 @@ char *EvaluateReplaceString(const char *Matched,int *Match,int Count,const char 
 	pSite->Release();
 	pParams->Release();
 
-	ResultLength = strResult.length();
-	return _strdup(strResult.c_str());
-
-//	return CreateReplaceString(Matched, Match, Count, Replace, EOL, Numbers, -1, ResultLength);
+	return strResult;
 }

@@ -151,13 +151,12 @@ void RenameFile(WIN32_FIND_DATA *FindData,PluginPanelItem **PanelItems,int *Item
 	FileNumber++;
 	while (FindRename(FileName,Match,MatchCount,MatchStart,MatchLength)) {
 		int Numbers[3]={FileNumber,FileNumber,ReplaceNumber};
-		int ReplaceLength;
-		char *NewSubName=CreateReplaceString(FileName,Match,MatchCount,FRReplace.c_str(),"",Numbers,-1,ReplaceLength);
+		string NewSubName=CreateReplaceString(FileName,Match,MatchCount,FRReplace.c_str(),"",Numbers,-1);
+
 		strncpy(NewName,FileName,MatchStart);
-		strcpy(NewName+MatchStart,NewSubName);
+		strcpy(NewName+MatchStart,NewSubName.c_str());
 		strcat(NewName,FileName+MatchStart+MatchLength);
-		MatchStart+=strlen(NewSubName);
-		free(NewSubName);
+		MatchStart += NewSubName.length();
 		if (Match) delete[] Match;
 
 		if (ConfirmRename(FileName,NewName)) {

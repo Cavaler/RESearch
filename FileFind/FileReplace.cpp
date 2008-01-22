@@ -96,10 +96,8 @@ BOOL ProcessPlainTextBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindD
 		if (nPosition < 0) break;
 		Current += nPosition;
 
-		int ReplaceLength;
-		char *Replace=CreateReplaceString(Buffer,NULL,0,FRReplace.c_str(),"\n",NULL,-1,ReplaceLength);
-		if (!DoReplace(hFile,Current,FText.size(),Replace,ReplaceLength,Skip,Current-Skip,FindData)) {free(Replace);break;}
-		free(Replace);
+		string Replace=CreateReplaceString(Buffer,NULL,0,FRReplace.c_str(),"\n",NULL,-1);
+		if (!DoReplace(hFile,Current,FText.size(),Replace.c_str(),Replace.length(),Skip,Current-Skip,FindData)) break;
 	}
 
 	return FinishReplace(hFile,Skip,Buffer+BufLen-Skip,FindData);
@@ -118,14 +116,12 @@ BOOL ProcessRegExpBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindData
 		Buffer=BufEnd;
 		SkipNoCRLF(BufEnd,&BufLen);
 		while ((BufEnd!=Buffer)&&do_pcre_exec(FPattern,FPatternExtra,Buffer,BufEnd-Buffer,Start,0,Match,MatchCount*3)>=0) {
-			int ReplaceLength;
-			char *Replace=CreateReplaceString(Buffer,Match,MatchCount,FRReplace.c_str(),"\n",NULL,-1,ReplaceLength);
+			string Replace=CreateReplaceString(Buffer,Match,MatchCount,FRReplace.c_str(),"\n",NULL,-1);
 			const char *NewBuffer=Buffer+Match[0];
-			if (!DoReplace(hFile,NewBuffer,Match[1]-Match[0],Replace,ReplaceLength,Skip,NewBuffer-Skip,FindData)) {
-				free(Replace);Error=TRUE;break;
+			if (!DoReplace(hFile,NewBuffer,Match[1]-Match[0],Replace.c_str(),Replace.length(),Skip,NewBuffer-Skip,FindData)) {
+				Error=TRUE;break;
 			}
 			Start=NewBuffer-Buffer;
-			free(Replace);
 		}
 		SkipCRLF(BufEnd,&BufLen);
 
@@ -153,15 +149,13 @@ BOOL ReplaceSeveralLineBuffer(HANDLE &hFile,const char *&Buffer,const char *BufE
 	SkipWholeLine(LineEnd,&LineLen);
 
 	while (Len&&do_pcre_exec(FPattern,FPatternExtra,Buffer,Len,Start,0,Match,MatchCount*3)>=0) {
-		int ReplaceLength;
 		const char *NewBuffer=Buffer+Match[0];
 		if (NewBuffer>=LineEnd) break;
-		char *Replace=CreateReplaceString(Buffer,Match,MatchCount,FRReplace.c_str(),"\n",NULL,-1,ReplaceLength);
-		if (!DoReplace(hFile,NewBuffer,Match[1]-Match[0],Replace,ReplaceLength,Skip,NewBuffer-Skip,FindData)) {
-			free(Replace);return FALSE;
+		string Replace=CreateReplaceString(Buffer,Match,MatchCount,FRReplace.c_str(),"\n",NULL,-1);
+		if (!DoReplace(hFile,NewBuffer,Match[1]-Match[0],Replace.c_str(),Replace.length(),Skip,NewBuffer-Skip,FindData)) {
+			return FALSE;
 		}
 		Start=NewBuffer-Buffer;
-		free(Replace);
 	}
 	Buffer=LineEnd;Len=LineLen;
 	if (hFile == INVALID_HANDLE_VALUE) g_nFoundLine++;	// Yet looking for first match

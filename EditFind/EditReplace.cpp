@@ -7,7 +7,7 @@ enum eReplaceResult {RR_OK,RR_SKIP,RR_CANCEL};
 
 int LastReplaceLine,LastReplacePos;
 
-void DoReplace(int FirstLine,int StartPos,int &LastLine,int &EndPos,char *Replace,int ReplaceLength) {
+void DoReplace(int FirstLine,int StartPos,int &LastLine,int &EndPos,const char *Replace,int ReplaceLength) {
 	EditorSetPosition Position={-1,-1,-1,-1,-1,-1};
 	EditorGetString GetString={-1};
 	int I;
@@ -107,8 +107,8 @@ void DoReplace(int FirstLine,int StartPos,int &LastLine,int &EndPos,char *Replac
 	ReplaceNumber++;
 }
 
-void QuoteString(char *Source,char **&Dest,int &Count,int MaxWidth) {
-	int Length=strlen(Source);
+void QuoteString(const char *Source,int Length,char **&Dest,int &Count,int MaxWidth) {
+//	int Length=strlen(Source);
 	Dest=(char **)realloc(Dest,(Count+1)*sizeof(char *));
 	if (Length>MaxWidth) {
 		Dest[Count]=(char *)malloc(MaxWidth+3);
@@ -119,24 +119,24 @@ void QuoteString(char *Source,char **&Dest,int &Count,int MaxWidth) {
 		strcat(Dest[Count],"\"");
 	} else {
 		Dest[Count]=(char *)malloc(Length+3);
-		strcpy(Dest[Count]+1,Source);
+		strncpy(Dest[Count]+1,Source,Length);
 		Dest[Count][0]=Dest[Count][Length+1]='"';Dest[Count][Length+2]=0;
 	}
 	Count++;
 }
 
-void QuoteStrings(char *Source,char **&Dest,int &Count,int MaxWidth) {
+void QuoteStrings(const char *Source,char **&Dest,int &Count,int MaxWidth) {
 	do {
-		char *Pos=strchr(Source,'\n');
+		const char *Pos=strchr(Source,'\n');
 		if (Pos) {
-			*Pos=0;QuoteString(Source,Dest,Count,MaxWidth);
-			*Pos='\n';Source=Pos+1;
+			QuoteString(Source,Pos-Source,Dest,Count,MaxWidth);
+			Source=Pos+1;
 		} else break;
 	} while (TRUE);
-	QuoteString(Source,Dest,Count,MaxWidth);
+	QuoteString(Source,strlen(Source),Dest,Count,MaxWidth);
 }
 
-eReplaceResult EditorReplaceOK(int FirstLine,int StartPos,int &LastLine,int &EndPos,char *Original,char *Replace,char *Replace_O2E,int ReplaceLength) {
+eReplaceResult EditorReplaceOK(int FirstLine,int StartPos,int &LastLine,int &EndPos,char *Original,const char *Replace,const char *Replace_O2E,int ReplaceLength) {
 	EditorInfo EdInfo;
 	StartupInfo.EditorControl(ECTL_GETINFO,&EdInfo);
 
@@ -241,20 +241,18 @@ BOOL ReplaceInText(int FirstLine,int StartPos,int LastLine,int EndPos) {
 		StartupInfo.EditorControl(ECTL_GETINFO,&EdInfo);
 
 		int Numbers[3]={MatchFirstLine,MatchFirstLine-ReplaceStartLine,ReplaceNumber};
-		int ReplaceLength,FoundLastLine=MatchLastLine;
+		int FoundLastLine=MatchLastLine;
 		BOOL ZeroMatch=(MatchFirstLine==MatchLastLine)&&(MatchStartPos==MatchEndPos);
-		char *Replace_O2E=CreateReplaceString(MatchedLine,Match,MatchCount,ERReplace_O2E.c_str(),"\n",Numbers,(EREvaluate ? EREvaluateScript : -1),ReplaceLength);
+		string Replace_O2E=CreateReplaceString(MatchedLine,Match,MatchCount,ERReplace_O2E.c_str(),"\n",Numbers,(EREvaluate ? EREvaluateScript : -1));
 		if (g_bInterrupted) {	// Script failed
-			if (Replace_O2E) free(Replace_O2E);
 			break;
 		}
 
-		char *Replace=_strdup(Replace_O2E);
-		EditorToOEM(Replace, ReplaceLength);
-		EditorToOEM(MatchedLine,MatchedLineLength);
+		string Replace = Replace_O2E;
+		EditorToOEM(Replace);
+		EditorToOEM(MatchedLine, MatchedLineLength);
 
-		eReplaceResult Result=EditorReplaceOK(MatchFirstLine,MatchStartPos,MatchLastLine,MatchEndPos,MatchedLine,Replace,Replace_O2E,ReplaceLength);
-		free(Replace);free(Replace_O2E);
+		eReplaceResult Result=EditorReplaceOK(MatchFirstLine,MatchStartPos,MatchLastLine,MatchEndPos,MatchedLine,Replace.c_str(),Replace_O2E.c_str(),Replace.length());
 		DeleteMatchInfo();
 
 		if (Result==RR_CANCEL) return TRUE;
@@ -291,22 +289,19 @@ BOOL ReplaceInTextByLine(int FirstLine,int StartPos,int LastLine,int EndPos,BOOL
 			StartupInfo.EditorControl(ECTL_GETINFO,&EdInfo);
 
 			int Numbers[3]={MatchFirstLine,MatchFirstLine-ReplaceStartLine,ReplaceNumber};
-			int ReplaceLength;
-			char *Replace_O2E=CreateReplaceString(MatchedLine,Match,MatchCount,ERReplace_O2E.c_str(),"\n",Numbers,(EREvaluate ? EREvaluateScript : -1),ReplaceLength);
+			string Replace_O2E=CreateReplaceString(MatchedLine,Match,MatchCount,ERReplace_O2E.c_str(),"\n",Numbers,(EREvaluate ? EREvaluateScript : -1));
 			if (g_bInterrupted) {	// Script failed
-				if (Replace_O2E) free(Replace_O2E);
 				break;
 			}
 
-			char *Replace=_strdup(Replace_O2E);
-			EditorToOEM(Replace, ReplaceLength);
+			string Replace = Replace_O2E;
+			EditorToOEM(Replace);
 			EditorToOEM(MatchedLine,MatchedLineLength);
 
 			int TailLength=MatchEndPos-FoundEndPos;
 			int FoundLastLine=MatchLastLine;
 			BOOL ZeroMatch=(FoundStartPos==FoundEndPos);
-			eReplaceResult Result=EditorReplaceOK(MatchFirstLine,FoundStartPos,MatchLastLine,FoundEndPos,MatchedLine,Replace,Replace_O2E,ReplaceLength);
-			free(Replace);free(Replace_O2E);
+			eReplaceResult Result=EditorReplaceOK(MatchFirstLine,FoundStartPos,MatchLastLine,FoundEndPos,MatchedLine,Replace.c_str(),Replace_O2E.c_str(),Replace.length());
 			DeleteMatchInfo();
 
 			if (Result==RR_CANCEL) return TRUE;

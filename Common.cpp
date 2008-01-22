@@ -133,17 +133,12 @@ char ConvertCase(char C) {
 	return C;
 }
 
-void AddChar(char *&String,int &Length,char C) {
-	String=(char *)realloc(String,Length+2);
-	String[Length]=ConvertCase(C);String[++Length]=0;
+void AddChar(string &String, char C) {
+	String += ConvertCase(C);
 }
 
-void AddString(char *&String,int &Length,const char *Add,int Len) {
-	int I;
-	String=(char *)realloc(String,Length+Len+1);
-	strncpy(String+Length,Add,Len);String[Length+Len]=0;
-	for (I=0;I<Len;I++) String[Length+I]=ConvertCase(String[Length+I]);
-	Length+=Len;
+void AddString(string &String, const char *Add, int Len) {
+	for (int I=0;I<Len;I++) String += ConvertCase(Add[I]);
 }
 
 int GetDelta(char *&String) {
@@ -169,7 +164,7 @@ bool GetNumber(const string &str, int &nValue) {
 	} else return false;
 }
 
-BOOL ExpandParameter(const char *Matched,char *&String,int &Length,string Param,int *Match,int Count,int *Numbers) {
+BOOL ExpandParameter(const char *Matched,string &String,string Param,int *Match,int Count,int *Numbers) {
 	int Number=0;
 	if (Param.size()==0) return TRUE;
 	if (isdigit((unsigned char)Param[0])) {
@@ -196,8 +191,8 @@ BOOL ExpandParameter(const char *Matched,char *&String,int &Length,string Param,
 					strMatch += Param.substr(nPos);
 				}
 			}
-			AddString(String, Length, strMatch.data(), strMatch.length());
-		} else AddChar(String,Length,'$');
+			AddString(String, strMatch.data(), strMatch.length());
+		} else AddChar(String, '$');
 		return TRUE;
 	}
 
@@ -215,32 +210,31 @@ BOOL ExpandParameter(const char *Matched,char *&String,int &Length,string Param,
 	}
 	char S[16];
 	sprintf(S,"%0*d",MinLen, Number);
-	AddString(String, Length, S, strlen(S));
+	AddString(String, S, strlen(S));
 	return TRUE;
 }
 
-char *CreateReplaceString(const char *Matched,int *Match,int Count,const char *Replace,const char *EOL,int *Numbers,int Engine,int &ResultLength) {
+string CreateReplaceString(const char *Matched,int *Match,int Count,const char *Replace,const char *EOL,int *Numbers,int Engine) {
 	if ((Engine >= 0) && (Engine < (int)m_arrEngines.size()))
-		return EvaluateReplaceString(Matched, Match, Count, Replace, EOL, Numbers, Engine, ResultLength);
+		return EvaluateReplaceString(Matched, Match, Count, Replace, EOL, Numbers, Engine);
 
-	char *String=_strdup("");
+	string String;
 	OneCaseConvert=CaseConvert=CCV_NONE;
-	ResultLength=0;
 	while (*Replace) {
 		if (OneCaseConvert==CCV_NONE) OneCaseConvert=CaseConvert;
 		switch (*Replace) {
 		case '\\':
 			Replace++;
 			switch (*Replace) {
-			case 0:AddChar(String,ResultLength,'\\');Replace--;break;
-			case 'a':AddChar(String,ResultLength,'\a');break;
-			case 'b':AddChar(String,ResultLength,'\b');break;
-			case 'e':AddChar(String,ResultLength,'\x1B');break;
-			case 'f':AddChar(String,ResultLength,'\f');break;
-			case 'n':AddString(String,ResultLength,EOL,strlen(EOL));break;
-			case 'r':AddChar(String,ResultLength,'\r');break;
-			case 't':AddChar(String,ResultLength,'\t');break;
-			case 'v':AddChar(String,ResultLength,'\v');break;
+			case 0  :AddChar(String,'\\');Replace--;break;
+			case 'a':AddChar(String,'\a');break;
+			case 'b':AddChar(String,'\b');break;
+			case 'e':AddChar(String,'\x1B');break;
+			case 'f':AddChar(String,'\f');break;
+			case 'n':AddString(String,EOL,strlen(EOL));break;
+			case 'r':AddChar(String,'\r');break;
+			case 't':AddChar(String,'\t');break;
+			case 'v':AddChar(String,'\v');break;
 
 			case '0':case '1':case '2':case '3':case '4':
 			case '5':case '6':case '7':case '8':case '9':{
@@ -250,7 +244,7 @@ char *CreateReplaceString(const char *Matched,int *Match,int Count,const char *R
 						Char=Char*8+(*Replace-'0');Replace++;
 					} else break;
 				}
-				Replace--;AddChar(String,ResultLength,Char);
+				Replace--;AddChar(String, Char);
 					 }
 			case 'x':{
 				int Char=0;Replace++;
@@ -262,7 +256,7 @@ char *CreateReplaceString(const char *Matched,int *Match,int Count,const char *R
 						Replace++;
 					} else break;
 				}
-				Replace--;AddChar(String,ResultLength,Char);break;
+				Replace--;AddChar(String, Char);break;
 					 }
 
 			case 'l':OneCaseConvert=CCV_LOWER;break;
@@ -273,7 +267,7 @@ char *CreateReplaceString(const char *Matched,int *Match,int Count,const char *R
 			case 'C':CaseConvert=OneCaseConvert=CCV_FLIP;break;
 			case 'E':CaseConvert=OneCaseConvert=CCV_NONE;break;
 
-			default:AddChar(String,ResultLength,*Replace);
+			default:AddChar(String, *Replace);
 			}
 			break;
 		case '$':{
@@ -281,17 +275,17 @@ char *CreateReplaceString(const char *Matched,int *Match,int Count,const char *R
 			if (Replace[1]=='{') {
 				while (Replace[I]&&(Replace[I]!='}')) I++;
 				char Save=Replace[I];
-				ExpandParameter(Matched,String,ResultLength,string(Replace+2,I-2),Match,Count,Numbers);
+				ExpandParameter(Matched,String,string(Replace+2,I-2),Match,Count,Numbers);
 				Replace+=I;
 				break;
 			}
 			while (isdigit((unsigned char)Replace[I])) I++;
 			char Save=Replace[I];
-			ExpandParameter(Matched,String,ResultLength,string(Replace+1,I-1),Match,Count,Numbers);
+			ExpandParameter(Matched,String,string(Replace+1,I-1),Match,Count,Numbers);
 			Replace+=I-1;
 			break;
 				 }
-		default:AddChar(String,ResultLength,*Replace);
+		default:AddChar(String, *Replace);
 		}
 		if (*Replace) Replace++; else break;
 	}
