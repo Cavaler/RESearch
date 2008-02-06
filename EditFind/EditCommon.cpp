@@ -202,6 +202,9 @@ void FillLineBuffer(size_t FirstLine, size_t LastLine) {
 			if (g_LineBuffer.size() >= SeveralLinesKB*1024u) break;
 		}
 	}
+
+	if ((FirstLine == LastLine) && !g_LineBuffer.empty() && (g_LineBuffer.back() == '\n'))
+		g_LineBuffer.erase(g_LineBuffer.end()-1);
 }
 
 BOOL SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,BOOL NeedMatch) {
@@ -218,7 +221,7 @@ BOOL SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,BOOL Ne
 			if (Interrupted()) return FALSE;
 
 			FillLineBuffer(max(0, FirstLine), Line);
-			Lines = &g_LineBuffer[0];
+			Lines = (!g_LineBuffer.empty()) ? &g_LineBuffer[0] : NULL;
 			LinesLength = g_LineBuffer.size();
 
 			if (Line == LastLine) {
@@ -250,7 +253,7 @@ WTF?					LinesLength-=(CR-Lines)+1;
 			if (Interrupted()) return FALSE;
 
 			FillLineBuffer(Line, min(LastLine, Line+SeveralLines-1));
-			Lines = &g_LineBuffer[0];
+			Lines = (!g_LineBuffer.empty()) ? &g_LineBuffer[0] : NULL;
 			LinesLength = g_LineBuffer.size();
 			FirstLineLength = (g_LineOffsets.size() <= 1) ? LinesLength : g_LineOffsets[1]-1;
 
