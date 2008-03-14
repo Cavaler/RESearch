@@ -140,24 +140,29 @@ int CountLinesIn(const char *Buffer,int Len) {
 	return LinesIn;
 }
 
-BOOL ReplaceSeveralLineBuffer(HANDLE &hFile,const char *&Buffer,const char *BufEnd,int *Match,int MatchCount,const char *&Skip,
-							  int &LinesIn,WIN32_FIND_DATA *FindData) {
-	int Len=BufEnd-Buffer;
+BOOL ReplaceSeveralLineBuffer(HANDLE &hFile,const char *&Buffer,const char *BufEnd,int *Match,int MatchCount,
+							  const char *&Skip, int &LinesIn,WIN32_FIND_DATA *FindData) {
 	int Start=0;
 	const char *LineEnd=Buffer;
-	int LineLen=Len;
+	int LineLen=BufEnd-Buffer;
 	SkipWholeLine(LineEnd,&LineLen);
 
-	while (Len&&do_pcre_exec(FPattern,FPatternExtra,Buffer,Len,Start,0,Match,MatchCount*3)>=0) {
+	while ((Buffer < BufEnd) && do_pcre_exec(FPattern,FPatternExtra,Buffer,BufEnd-Buffer,Start,0,Match,MatchCount*3)>=0) {
 		const char *NewBuffer=Buffer+Match[0];
 		if (NewBuffer>=LineEnd) break;
 		string Replace=CreateReplaceString(Buffer,Match,MatchCount,FRReplace.c_str(),"\n",NULL,-1);
 		if (!DoReplace(hFile,NewBuffer,Match[1]-Match[0],Replace.c_str(),Replace.length(),Skip,NewBuffer-Skip,FindData)) {
 			return FALSE;
 		}
-		Start=NewBuffer-Buffer;
+//		Start=NewBuffer-Buffer;
+		Buffer = Skip;
+		LineEnd=Buffer;
+		int LineLen=BufEnd-Buffer;
+		SkipWholeLine(LineEnd,&LineLen);
+
+		Start = 0;
 	}
-	Buffer=LineEnd;Len=LineLen;
+	Buffer=LineEnd;
 	if (hFile == INVALID_HANDLE_VALUE) g_nFoundLine++;	// Yet looking for first match
 	LinesIn=CountLinesIn(Buffer,BufEnd-Buffer);
 	return TRUE;
@@ -175,7 +180,7 @@ BOOL ProcessSeveralLineBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *Fin
 	do {
 		SkipWholeLine(BufEnd,&BufLen);
 		LinesIn++;
-		if ((LinesIn==SeveralLines) || (BufLen >= SeveralLinesKB*1024)) {
+		if ((LinesIn==SeveralLines) || ((BufEnd-Buffer) >= SeveralLinesKB*1024)) {
 			if (!ReplaceSeveralLineBuffer(hFile,Buffer,BufEnd,Match,MatchCount,Skip,LinesIn,FindData)) {Error=TRUE;break;};
 		}
 	} while (BufLen);
