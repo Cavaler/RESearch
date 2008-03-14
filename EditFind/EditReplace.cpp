@@ -108,33 +108,26 @@ void DoReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, const st
 	ReplaceNumber++;
 }
 
-void QuoteString(const char *Source, int Length, char **&Dest, int &Count, int MaxWidth) {
-//	int Length = strlen(Source);
-	Dest = (char **)realloc(Dest,(Count + 1)*sizeof(char *));
+void QuoteString(const char *Source, int Length, vector<string> &arrQuoted, int MaxWidth) {
+	string str;
+
 	if (Length>MaxWidth) {
-		Dest[Count] = (char *)malloc(MaxWidth + 3);
-		Dest[Count][0] = '"';
-		strncpy(Dest[Count] + 1, Source,(MaxWidth-5)/2);
-		strcpy(Dest[Count] + (MaxWidth-5)/2 + 1," ... ");
-		strcat(Dest[Count] + (MaxWidth-5)/2 + 6, Source + Length-(MaxWidth-5)/2);
-		strcat(Dest[Count],"\"");
+		str = "\"" + string(Source, (MaxWidth-5)/2) + "..." + string(Source + Length-(MaxWidth-5)/2) + "\"";
 	} else {
-		Dest[Count] = (char *)malloc(Length + 3);
-		strncpy(Dest[Count] + 1, Source, Length);
-		Dest[Count][0] = Dest[Count][Length + 1] = '"';Dest[Count][Length + 2] = 0;
+		str = "\"" + string(Source, Length) + "\"";
 	}
-	Count++;
+	arrQuoted.push_back(str);
 }
 
-void QuoteStrings(const char *Source, char **&Dest, int &Count, int MaxWidth) {
+void QuoteStrings(const char *Source, vector<string> &arrQuoted, int MaxWidth) {
 	do {
 		const char *Pos = strchr(Source,'\n');
 		if (Pos) {
-			QuoteString(Source, Pos-Source, Dest, Count, MaxWidth);
+			QuoteString(Source, Pos-Source, arrQuoted, MaxWidth);
 			Source = Pos + 1;
 		} else break;
 	} while (TRUE);
-	QuoteString(Source, strlen(Source), Dest, Count, MaxWidth);
+	QuoteString(Source, strlen(Source), arrQuoted, MaxWidth);
 }
 
 eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &EndPos, char *Original, const string &Replace, const string &Replace_O2E) {
@@ -175,21 +168,24 @@ eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &
 			Width += EndPos;
 		} else Width = EndPos-StartPos;
 
-		char **Found = NULL;
-		int  FoundCount = 0;
+		vector<string> arrFound;
 		char Save = Original[StartPos + Width];
 		Original[StartPos + Width] = 0;
-		QuoteStrings(Original + StartPos, Found, FoundCount, EdInfo.WindowSizeX-12);
+		QuoteStrings(Original + StartPos, arrFound, EdInfo.WindowSizeX-12);
 		Original[StartPos + Width] = Save;
-		
-		char **Replaced = NULL;
-		int  ReplacedCount = 0;
-		QuoteStrings(Replace.c_str(), Replaced, ReplacedCount, EdInfo.WindowSizeX-12);
 
-		int Len = 30, L, H, I, TotalCount = FoundCount + ReplacedCount;					// Calclulate dialog width
-		for (I = 0;I<FoundCount;I++) {L = strlen(Found[I]);if (L>Len) Len = L;}
-		for (I = 0;I<ReplacedCount;I++) {L = strlen(Replaced[I]);if (L>Len) Len = L;}
-		if (Len>EdInfo.WindowSizeX-2) Len = EdInfo.WindowSizeX-2;
+		vector<string> arrReplaced;
+		QuoteStrings(Replace.c_str(), arrReplaced, EdInfo.WindowSizeX-12);
+
+		int L, H, TotalCount = arrFound.size() + arrReplaced.size();					// Calculate dialog width
+		size_t Len = 30;
+		for (size_t I = 0; I<arrFound.size();I++)
+			if (arrFound[I].length()>Len) Len = arrFound[I].length();
+
+		for (size_t I = 0; I<arrReplaced.size();I++)
+			if (arrReplaced[I].length()>Len) Len = arrReplaced[I].length();
+
+		if ((int)Len > EdInfo.WindowSizeX-2) Len = EdInfo.WindowSizeX-2;
 
 		L = Position.CurLine-Position.TopScreenLine;		// Calclulate dialog position
 		if (L<1 + EdInfo.WindowSizeY/2) {
@@ -201,18 +197,14 @@ eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &
 		CFarDialog Dialog(-1, H + 1, Len + 8, H + 8+TotalCount,"ERAskReplace");
 		Dialog.AddFrame(MREReplace);
 		Dialog.Add(new CFarTextItem(-1, 2, 0, MAskReplace));
-		for (I = 0;I<FoundCount;I++) Dialog.Add(new CFarTextItem(-1, 3 + I, 0, Found[I]));
-		Dialog.Add(new CFarTextItem(-1, 3 + FoundCount, 0, MAskWith));
-		for (I = 0;I<ReplacedCount;I++) Dialog.Add(new CFarTextItem(-1, 4 + FoundCount + I, 0, Replaced[I]));
+		for (size_t I = 0; I<arrFound.size();I++) Dialog.Add(new CFarTextItem(-1, 3 + I, 0, arrFound[I]));
+		Dialog.Add(new CFarTextItem(-1, 3 + arrFound.size(), 0, MAskWith));
+		for (size_t I = 0; I<arrReplaced.size();I++) Dialog.Add(new CFarTextItem(-1, 4 + arrFound.size() + I, 0, arrReplaced[I]));
 		Dialog.Add(new CFarButtonItem(0, 5 + TotalCount, DIF_CENTERGROUP|DIF_NOBRACKETS, TRUE, MReplace));
 		Dialog.Add(new CFarButtonItem(0, 5 + TotalCount, DIF_CENTERGROUP|DIF_NOBRACKETS, FALSE, MAll));
 		Dialog.Add(new CFarButtonItem(0, 5 + TotalCount, DIF_CENTERGROUP|DIF_NOBRACKETS, FALSE, MSkip));
 		Dialog.Add(new CFarButtonItem(0, 5 + TotalCount, DIF_CENTERGROUP|DIF_NOBRACKETS, FALSE, MCancel));
 		Result = Dialog.Display(4,-4,-3,-2,-1);
-
-		for (I = 0;I<FoundCount;I++) free(Found[I]);
-		for (I = 0;I<ReplacedCount;I++) free(Replaced[I]);
-		free(Found);free(Replaced);
 	}
 
 	switch (Result) {
