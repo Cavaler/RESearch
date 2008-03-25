@@ -4,13 +4,14 @@
 BOOL EditorFilterAgain() {
 	EditorInfo EdInfo;
 	StartupInfo.EditorControl(ECTL_GETINFO,&EdInfo);
+	EctlForceSetPosition(NULL);
 	EditorSetPosition Position={0,-1,-1,-1,-1,-1};
 	EditorGetString String={-1};
 
 	if (EReverse) {
 		for (Position.CurLine=EdInfo.CurLine; Position.CurLine>=0; Position.CurLine--) {
-			StartupInfo.EditorControl(ECTL_SETPOSITION,&Position);
-			StartupInfo.EditorControl(ECTL_GETSTRING,&String);
+			EctlSetPosition(&Position);
+			EctlGetString(&String);
 
 			if (SearchInLine(String.StringText, String.StringLength, 0, -1, NULL, NULL, FALSE) != EFLeaveFilter) {
 				StartupInfo.EditorControl(ECTL_DELETESTRING, NULL);
@@ -20,8 +21,8 @@ BOOL EditorFilterAgain() {
 		}
 	} else {
 		for (Position.CurLine=EdInfo.CurLine; Position.CurLine<EdInfo.TotalLines; Position.CurLine++) {
-			StartupInfo.EditorControl(ECTL_SETPOSITION,&Position);
-			StartupInfo.EditorControl(ECTL_GETSTRING,&String);
+			EctlSetPosition(&Position);
+			EctlGetString(&String);
 
 			if (SearchInLine(String.StringText, String.StringLength, 0, -1, NULL, NULL, FALSE) != EFLeaveFilter) {
 				StartupInfo.EditorControl(ECTL_DELETESTRING, NULL);

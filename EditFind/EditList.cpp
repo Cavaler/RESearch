@@ -16,6 +16,7 @@ string CanonicalLCName(const char *szName) {
 BOOL EditorListAllAgain() {
 	EditorInfo EdInfo;
 	StartupInfo.EditorControl(ECTL_GETINFO, &EdInfo);
+	EctlForceSetPosition(NULL);
 
 	sFindAllInfo &Info = FindAllInfos[CanonicalLCName(EdInfo.FileName)];
 	Info.arrString.clear();
@@ -28,9 +29,9 @@ BOOL EditorListAllAgain() {
 
 		if (SearchInText(FirstLine, StartPos, LastLine, EndPos, FALSE)) {
 			EditorSetPosition Position={FirstLine,-1,-1,-1,-1,-1};
-			StartupInfo.EditorControl(ECTL_SETPOSITION,&Position);
+			EctlSetPosition(&Position);
 			EditorGetString String = {-1};
-			StartupInfo.EditorControl(ECTL_GETSTRING, &String);
+			EctlGetString(&String);
 
 			char szNumber[8];
 			sprintf(szNumber, "%3d|", FirstLine+1);
@@ -64,11 +65,11 @@ BOOL EditorListAllShowResults() {
 		EditorSetPosition Position = {Info.arrLines[nResult].first, Info.arrLines[nResult].second, -1,
 			TopLine(Info.arrLines[nResult].first, EdInfo.WindowSizeY, EdInfo.TotalLines),
 			LeftColumn(Info.arrLines[nResult].second, EdInfo.WindowSizeY), -1};
-		StartupInfo.EditorControl(ECTL_SETPOSITION,&Position);
+		EctlForceSetPosition(&Position);
 	} else {
 		EditorSetPosition Position = {EdInfo.CurLine, EdInfo.CurPos, EdInfo.CurTabPos, 
 			EdInfo.TopScreenLine, EdInfo.LeftPos, -1};
-		StartupInfo.EditorControl(ECTL_SETPOSITION,&Position);
+		EctlForceSetPosition(&Position);
 	}
 
 	return TRUE;

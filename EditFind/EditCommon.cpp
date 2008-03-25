@@ -174,8 +174,8 @@ void FillLineBuffer(size_t FirstLine, size_t LastLine) {
 		vector<char> NewBuffer;
 
 		for (Position.CurLine = g_FirstLine-1; Position.CurLine >= (int)FirstLine; Position.CurLine--) {
-			StartupInfo.EditorControl(ECTL_SETPOSITION,&Position);
-			StartupInfo.EditorControl(ECTL_GETSTRING,&String);
+			EctlSetPosition(&Position);
+			EctlGetString(&String);
 
 			g_LineOffsets.insert(g_LineOffsets.begin(), 0);
 			for (size_t nOff = 1; nOff < g_LineOffsets.size(); nOff++) g_LineOffsets[nOff] += String.StringLength+1;
@@ -192,8 +192,8 @@ void FillLineBuffer(size_t FirstLine, size_t LastLine) {
 
 	if (LastLine >= g_FirstLine+g_LineOffsets.size()) {
 		for (Position.CurLine = (int)(g_FirstLine+g_LineOffsets.size()); Position.CurLine <= (int)LastLine; Position.CurLine++) {
-			StartupInfo.EditorControl(ECTL_SETPOSITION,&Position);
-			StartupInfo.EditorControl(ECTL_GETSTRING,&String);
+			EctlSetPosition(&Position);
+			EctlGetString(&String);
 
 			g_LineOffsets.push_back(g_LineBuffer.size());
 			g_LineBuffer.insert(g_LineBuffer.end(), String.StringText, String.StringText+String.StringLength);
@@ -313,7 +313,7 @@ void SaveSelection() {
 		for (I=SelStartLine=EdInfo.BlockStartLine;I<EdInfo.TotalLines;I++) {
 			EditorGetString String;
 			String.StringNumber=I;
-			StartupInfo.EditorControl(ECTL_GETSTRING,&String);
+			EctlGetString(&String);
 			if (String.SelStart==-1) break;
 			if (I==SelStartLine) SelStartPos=String.SelStart;
 			SelEndPos=String.SelEnd;
@@ -433,11 +433,11 @@ string PickupSelection() {
 	StartupInfo.EditorControl(ECTL_GETINFO,&EdInfo);
 	if (EdInfo.BlockType==BTYPE_NONE) return "";
 	String.StringNumber=EdInfo.BlockStartLine+1;
-	StartupInfo.EditorControl(ECTL_GETSTRING,&String);
+	EctlGetString(&String);
 	if (String.SelStart>=0) return "";
 
 	String.StringNumber=EdInfo.BlockStartLine;
-	StartupInfo.EditorControl(ECTL_GETSTRING,&String);
+	EctlGetString(&String);
 	if (String.SelEnd==-1) String.SelEnd=String.StringLength;
 	char *Word=(char *)malloc(String.SelEnd-String.SelStart+1);
 	strncpy(Word,String.StringText+String.SelStart,String.SelEnd-String.SelStart);
@@ -462,7 +462,7 @@ string PickupWord() {
 
 	StartupInfo.EditorControl(ECTL_GETINFO,&EdInfo);
 	String.StringNumber=-1;
-	StartupInfo.EditorControl(ECTL_GETSTRING,&String);
+	EctlGetString(&String);
 
 	if (EdInfo.CurPos>=String.StringLength) return "";
 
@@ -525,4 +525,30 @@ void OEMToEditor(string &String) {
 	OEMToEditor(szString, String.length());
 	String = szString;
 	free(szString);
+}
+
+void EctlGetString(EditorGetString *String) {
+	StartupInfo.EditorControl(ECTL_GETSTRING, String);
+}
+
+void EctlSetString(EditorSetString *String) {
+	StartupInfo.EditorControl(ECTL_SETSTRING, String);
+}
+
+int _nOldLine = -2;
+
+void EctlSetPosition(EditorSetPosition *Position) {
+	if (Position->CurLine == _nOldLine) return;
+	StartupInfo.EditorControl(ECTL_SETPOSITION, Position);
+//	OutputDebugString(FormatStr("ESP %d\r\n", Position->CurLine).c_str());
+	_nOldLine = Position->CurLine;
+}
+
+void EctlForceSetPosition(EditorSetPosition *Position) {
+	if (Position) {
+		StartupInfo.EditorControl(ECTL_SETPOSITION, Position);
+		_nOldLine = Position->CurLine;
+	} else {
+		_nOldLine = -2;
+	}
 }

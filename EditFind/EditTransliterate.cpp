@@ -11,9 +11,8 @@ BOOL EditorTransliterateAgain() {
 
 	for (int nLine = 0; nLine < EdInfo.TotalLines; nLine++) {
 		Position.CurLine = nLine;
-		StartupInfo.EditorControl(ECTL_SETPOSITION, &Position);
-
-		StartupInfo.EditorControl(ECTL_GETSTRING,&String);
+		EctlSetPosition(&Position);
+		EctlGetString(&String);
 		string strData(String.StringText, String.StringLength);
 
 		for (size_t nChar = 0; nChar < strData.length(); nChar++) {
@@ -32,7 +31,7 @@ BOOL EditorTransliterateAgain() {
 		SetString.StringText = strData.data();
 		SetString.StringLength = strData.length();
 		SetString.StringEOL = String.StringEOL;
-		StartupInfo.EditorControl(ECTL_SETSTRING, &SetString);
+		EctlSetString(&SetString);
 	}
 
 	return TRUE;

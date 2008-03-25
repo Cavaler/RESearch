@@ -11,18 +11,18 @@ void EditorSearchOK(int FirstLine,int StartPos,int LastLine,int EndPos) {
 	EditorSetPosition Position={(EReverse)?FirstLine:LastLine,(EReverse)?StartPos:EndPos,-1,
 		TopLine(FirstLine,EdInfo.WindowSizeY,EdInfo.TotalLines),
 		LeftColumn((EReverse)?StartPos:EndPos,EdInfo.WindowSizeX),-1};
-	StartupInfo.EditorControl(ECTL_SETPOSITION,&Position);
+	EctlForceSetPosition(&Position);
 }
 
 void PatchEditorInfo(EditorInfo &EdInfo) {
 	// Skipping over selection - for "Search Again inverse"
 	if (ESearchAgainCalled && (EdInfo.BlockType == BTYPE_STREAM)) {
 		EditorGetString String = {EdInfo.BlockStartLine};
-		StartupInfo.EditorControl(ECTL_GETSTRING, &String);
+		EctlGetString(&String);
 		int BlockStartPos = String.SelStart;
 		while (String.SelEnd == -1) {
 			String.StringNumber++;
-			StartupInfo.EditorControl(ECTL_GETSTRING, &String);
+			EctlGetString(&String);
 		}
 		int BlockEndLine = String.StringNumber;
 		int BlockEndPos = String.SelEnd;
@@ -45,6 +45,7 @@ BOOL EditorSearchAgain() {
 	EditorInfo EdInfo;
 	StartupInfo.EditorControl(ECTL_GETINFO,&EdInfo);
 	PatchEditorInfo(EdInfo);
+	EctlForceSetPosition(NULL);
 
 	int FirstLine,StartPos,LastLine,EndPos;
 
@@ -56,7 +57,7 @@ BOOL EditorSearchAgain() {
 
 				EditorGetString String;
 				String.StringNumber = LastLine = EdInfo.BlockStartLine;
-				StartupInfo.EditorControl(ECTL_GETSTRING,&String);
+				EctlGetString(&String);
 
 				EndPos = String.SelEnd-1;
 			} else {
@@ -118,7 +119,7 @@ BOOL EditorSearchAgain() {
 	Position.TopScreenLine=EdInfo.TopScreenLine;
 	Position.LeftPos=EdInfo.LeftPos;
 	Position.Overtype=EdInfo.Overtype;
-	StartupInfo.EditorControl(ECTL_SETPOSITION,&Position);
+	EctlSetPosition(&Position);
 
 	if (!g_bInterrupted) {
 		const char *Lines[]={GetMsg(MRESearch),GetMsg(MCannotFind),EText.c_str(),GetMsg(MOk)};

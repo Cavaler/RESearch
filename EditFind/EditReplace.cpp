@@ -15,15 +15,15 @@ void DoReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, const st
 	if (FirstLine < LastLine) {
 		// Delete lines to be fully replaced
 		Position.CurLine = FirstLine + 1;
-		StartupInfo.EditorControl(ECTL_SETPOSITION, &Position);
+		EctlSetPosition(&Position);
 		for (I = LastLine-1; I>FirstLine; I--)
 			StartupInfo.EditorControl(ECTL_DELETESTRING, NULL);
 		if (LastLine>FirstLine + 1) LastLine = FirstLine + 1;
 	}
 
 	Position.CurLine = FirstLine;
-	StartupInfo.EditorControl(ECTL_SETPOSITION, &Position);
-	StartupInfo.EditorControl(ECTL_GETSTRING, &GetString);
+	EctlSetPosition(&Position);
+	EctlGetString(&GetString);
 	string DefEOL = GetString.StringEOL;
 
 	// Creating full replace line
@@ -38,8 +38,8 @@ void DoReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, const st
 	} else {
 		EditorGetString GetString2 = {-1};
 		Position.CurLine = LastLine;
-		StartupInfo.EditorControl(ECTL_SETPOSITION, &Position);
-		StartupInfo.EditorControl(ECTL_GETSTRING, &GetString2);
+		EctlSetPosition(&Position);
+		EctlGetString(&GetString2);
 
 		OriginalEndLength = GetString2.StringLength-EndPos;
 
@@ -48,7 +48,7 @@ void DoReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, const st
 
 		StartupInfo.EditorControl(ECTL_DELETESTRING, NULL);
 		Position.CurLine = FirstLine;
-		StartupInfo.EditorControl(ECTL_SETPOSITION, &Position);
+		EctlSetPosition(&Position);
 	}
 
 	EditorInfo EdInfo;
@@ -71,9 +71,9 @@ void DoReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, const st
 
 		SetString.StringLength = CR-SetString.StringText;
 		SetString.StringEOL = EOL;
-		StartupInfo.EditorControl(ECTL_SETSTRING, &SetString);
+		EctlSetString(&SetString);
 		Position.CurPos = SetString.StringLength;
-		StartupInfo.EditorControl(ECTL_SETPOSITION, &Position);
+		EctlSetPosition(&Position);
 		Position.CurLine++;
 		StartupInfo.EditorControl(ECTL_INSERTSTRING, NULL);
 
@@ -86,7 +86,7 @@ void DoReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, const st
 
 	SetString.StringLength = NewString.length();
 	SetString.StringEOL = DefEOL.c_str();
-	StartupInfo.EditorControl(ECTL_SETSTRING, &SetString);
+	EctlSetString(&SetString);
 
 	if (EInSelection) {
 		SelEndLine += Position.CurLine-LastLine;
@@ -99,8 +99,10 @@ void DoReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, const st
 
 	Position.CurPos = (EReverse)?StartPos:EndPos;
 	Position.LeftPos = (EReverse)?-1:LeftColumn(Position.CurPos, EdInfo.WindowSizeX);
-	StartupInfo.EditorControl(ECTL_SETPOSITION, &Position);
-	if (!NoAsking) {
+	if (NoAsking) {
+		EctlSetPosition(&Position);
+	} else {
+		EctlForceSetPosition(&Position);
 		EditorSelect Select = {BTYPE_NONE};
 		StartupInfo.EditorControl(ECTL_REDRAW, NULL);
 		StartupInfo.EditorControl(ECTL_SELECT, &Select);
@@ -140,7 +142,7 @@ eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &
 		LeftColumn((EReverse)?StartPos:EndPos, EdInfo.WindowSizeX),-1};
 	EditorSelect Select = {BTYPE_STREAM, FirstLine, StartPos, EndPos-StartPos, LastLine-FirstLine + 1};
 
-	StartupInfo.EditorControl(ECTL_SETPOSITION, &Position);
+	EctlSetPosition(&Position);
 	if (!NoAsking) {
 		if ((Select.BlockWidth == 0)&&(Select.BlockHeight == 1)) {
 			Select.BlockHeight++;
@@ -270,13 +272,14 @@ BOOL ReplaceInTextByLine(int FirstLine, int StartPos, int LastLine, int EndPos, 
 
 	Line = (EReverse)?LastLine:FirstLine;
 	do {
+		if (Interrupted()) return FALSE;
+
 		BOOL Matched = FALSE;
 		int MatchFirstLine = Line, MatchStartPos = (Line == FirstLine)||EachLineLimited?StartPos:0;
 		int MatchLastLine = Line, MatchEndPos = (Line == LastLine)||EachLineLimited?EndPos:-1;
 		int FoundStartPos = MatchStartPos, FoundEndPos = MatchEndPos;
 
 		while (SearchInText(MatchFirstLine, FoundStartPos, MatchLastLine, FoundEndPos, TRUE)) {
-			if (Interrupted()) return FALSE;
 			Matched = TRUE;
 			// Assuming that MatchedLine starts from the needed line
 			StartupInfo.EditorControl(ECTL_GETINFO, &EdInfo);
@@ -302,9 +305,9 @@ BOOL ReplaceInTextByLine(int FirstLine, int StartPos, int LastLine, int EndPos, 
 
 			if (ERRemoveEmpty&&(Result == RR_OK)&&(MatchFirstLine == MatchLastLine)) {
 				EditorSetPosition Position = {MatchFirstLine,-1,-1,-1,-1,-1};
-				StartupInfo.EditorControl(ECTL_SETPOSITION, &Position);
+				EctlSetPosition(&Position);
 				EditorSetString String = {-1};
-				StartupInfo.EditorControl(ECTL_GETSTRING, &String);
+				EctlSetString(&String);
 				if (String.StringLength == 0) {
 					StartupInfo.EditorControl(ECTL_DELETESTRING, NULL);
 					if (!EReverse) {Line--;LastLine--;}
@@ -325,7 +328,7 @@ BOOL ReplaceInTextByLine(int FirstLine, int StartPos, int LastLine, int EndPos, 
 
 		if (ERRemoveNoMatch&&!Matched) {
 			EditorSetPosition Position = {Line,-1,-1,-1,-1,-1};
-			StartupInfo.EditorControl(ECTL_SETPOSITION, &Position);
+			EctlSetPosition(&Position);
 			StartupInfo.EditorControl(ECTL_DELETESTRING, NULL);
 			if (EReverse) Line--; else LastLine--;
 		} else (EReverse)?Line--:Line++;
@@ -342,6 +345,7 @@ BOOL EditorReplaceAgain() {
 	EditorInfo EdInfo;
 	StartupInfo.EditorControl(ECTL_GETINFO, &EdInfo);
 	PatchEditorInfo(EdInfo);
+	EctlForceSetPosition(NULL);
 	m_pReplaceTable = (EdInfo.AnsiMode) ? &XLatTables[XLatTables.size()-1] :
 		(EdInfo.TableNum >= 0) ? &XLatTables[EdInfo.TableNum] : NULL;
 
@@ -379,7 +383,7 @@ BOOL EditorReplaceAgain() {
 	EditorSetPosition Position = {LastReplaceLine, LastReplacePos,-1,
 		TopLine(LastReplaceLine, EdInfo.WindowSizeY, EdInfo.TotalLines),
 		LeftColumn(LastReplacePos, EdInfo.WindowSizeX),-1};
-	StartupInfo.EditorControl(ECTL_SETPOSITION, &Position);
+	EctlForceSetPosition(&Position);
 
 	if (NoAsking||g_bInterrupted) return TRUE;
 	ShowErrorMsg(GetMsg(MCannotFind), EText.c_str(), "ECannotFind");
@@ -400,16 +404,16 @@ BOOL EditorReplaceExecutor(CParameterBatch &Batch) {
 		StartupInfo.EditorControl(ECTL_GETINFO, &EdInfo);
 
 		EditorSetPosition Position = {EdInfo.TotalLines, 0, -1, -1, -1, -1};
-		StartupInfo.EditorControl(ECTL_SETPOSITION, &Position);
+		EctlSetPosition(&Position);
 
 		EditorSetString String = {-1};
-		StartupInfo.EditorControl(ECTL_GETSTRING, &String);
+		EctlSetString(&String);
 
 		Position.CurPos = String.StringLength;
-		StartupInfo.EditorControl(ECTL_SETPOSITION, &Position);
+		EctlSetPosition(&Position);
 	} else {
 		EditorSetPosition Position = {0, 0, 0, -1, -1, -1};
-		StartupInfo.EditorControl(ECTL_SETPOSITION, &Position);
+		EctlSetPosition(&Position);
 	}
 
 	EditorReplaceAgain();
