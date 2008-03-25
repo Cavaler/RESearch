@@ -12,9 +12,14 @@ Planned:
 	- Correct "Files found" in Grep
     * Find next after 
 
+Version 6.10 (25.03.2008)
+	- Replace in Editor speed greatly increased
+	* Runtime components install link in readme.1st provided
+	+ Using PCRE 7.6
+
 Version 6.03 (14.03.2008)
 	- Random crash in several-line replace in editor fixed
-    - Weird several-line replace in panels fixed
+	- Weird several-line replace in panels fixed
 
 Version 6.02 (22.01.2008)
 	- Plain text replace from panels crash fixed
