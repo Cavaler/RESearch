@@ -2,8 +2,7 @@
 #include "..\RESearch.h"
 
 void EditorSearchOK(int FirstLine,int StartPos,int LastLine,int EndPos) {
-	EditorInfo EdInfo;
-	StartupInfo.EditorControl(ECTL_GETINFO,&EdInfo);
+	RefreshEditorInfo();
 
 	EditorSelect Select={BTYPE_STREAM,FirstLine,StartPos,EndPos-StartPos,LastLine-FirstLine+1};
 	if ((Select.BlockWidth!=0)||(Select.BlockHeight>1)) StartupInfo.EditorControl(ECTL_SELECT,&Select);
@@ -42,8 +41,7 @@ void PatchEditorInfo(EditorInfo &EdInfo) {
 }
 
 BOOL EditorSearchAgain() {
-	EditorInfo EdInfo;
-	StartupInfo.EditorControl(ECTL_GETINFO,&EdInfo);
+	RefreshEditorInfo();
 	PatchEditorInfo(EdInfo);
 	EctlForceSetPosition(NULL);
 
@@ -131,8 +129,7 @@ BOOL EditorSearchAgain() {
 }
 
 BOOL EditorSearch() {
-	EditorInfo EdInfo;
-	StartupInfo.EditorControl(ECTL_GETINFO,&EdInfo);
+	RefreshEditorInfo();
 	EInSelection=(EdInfo.BlockType!=BTYPE_NONE);
 
 	CFarDialog Dialog(76,13,"SearchDlg");

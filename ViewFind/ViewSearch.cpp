@@ -81,11 +81,12 @@ BOOL ViewerSearchAgain() {
 	if (ESeveralLine) {
 	} else {
 		string strLine;
+		int nCurrentLine = 0;
 		int nEOLLen;
 
 		int nLineOffset = Info.LeftPos;
 		do {
-			if (Interrupted()) break;
+			if (Interrupted256(nCurrentLine)) break;
 			strLine = GetNextLine(VInfo, szData, (long)(VInfo.FileSize.i64-nOffset), &nEOLLen);
 			if (strLine.empty() && !nEOLLen) break;
 			if (!ECaseSensitive)
@@ -110,6 +111,7 @@ BOOL ViewerSearchAgain() {
 			szData += strLine.length()+nEOLLen;
 			nOffset += strLine.length()+nEOLLen;
 			nLineOffset = 0;
+			nCurrentLine++;
 		} while (true);
 	}
 

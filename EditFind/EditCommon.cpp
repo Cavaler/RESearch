@@ -91,12 +91,16 @@ BOOL SearchInLine(const char *Line,int Length,int Start,int End,int *MatchStart,
 	if (ERegExp) {
 		return SearchIn(Line,Start,Len,MatchStart,MatchLength,NeedMatch);
 	} else {
-		char *OEMLine=(char *)malloc(Length);
-		memmove(OEMLine,Line,Length);
-		EditorToOEM(OEMLine,Length);
-		int Result=SearchIn(OEMLine,Start,Len,MatchStart,MatchLength,NeedMatch);
-		free(OEMLine);
-		return Result;
+		if (EdInfo.AnsiMode || (EdInfo.TableNum >= 0)) {
+			char *OEMLine=(char *)malloc(Length);
+			memmove(OEMLine,Line,Length);
+			EditorToOEM(OEMLine,Length);
+			int Result=SearchIn(OEMLine,Start,Len,MatchStart,MatchLength,NeedMatch);
+			free(OEMLine);
+			return Result;
+		} else {
+			return SearchIn(Line, Start, Len, MatchStart, MatchLength, NeedMatch);
+		}
 	}
 }
 
@@ -210,15 +214,14 @@ void FillLineBuffer(size_t FirstLine, size_t LastLine) {
 BOOL SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,BOOL NeedMatch) {
 	int Line,MatchStart,MatchLength;
 	char *Lines;int LinesLength;
-	EditorInfo EdInfo;
 
 	ClearLineBuffer();
-	StartupInfo.EditorControl(ECTL_GETINFO,&EdInfo);
+	RefreshEditorInfo();
 
 	if (EReverse) {
 		for (Line=LastLine;Line>=FirstLine;Line--) {
 			ShowCurrentLine(Line,EdInfo.TotalLines,EdInfo.WindowSizeX);
-			if (Interrupted()) return FALSE;
+			if (Interrupted256(Line)) return FALSE;
 
 			FillLineBuffer(max(0, FirstLine), Line);
 			Lines = (!g_LineBuffer.empty()) ? &g_LineBuffer[0] : NULL;
@@ -235,11 +238,6 @@ BOOL SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,BOOL Ne
 			if (SearchInLine(Lines,LinesLength,(CurFirstLine==FirstLine)?StartPos:0,-1,&MatchStart,&MatchLength,NeedMatch)) {
 				Relative2Absolute(CurFirstLine,Lines,MatchStart,MatchLength,FirstLine,StartPos,LastLine,EndPos);
 				if (NeedMatch) {
-/*					for (I=0;I<FirstLine-Line;I++) {
-						char *CR=strchr(Lines,'\n');
-WTF?					LinesLength-=(CR-Lines)+1;
-						memmove(Lines,CR+1,LinesLength);
-					}*/
 					MatchedLine=Lines;
 					MatchedLineLength=LinesLength;
 				}
@@ -250,7 +248,7 @@ WTF?					LinesLength-=(CR-Lines)+1;
 		int FirstLineLength;
 		for (Line=FirstLine;Line<=LastLine;Line++) {
 			ShowCurrentLine(Line,EdInfo.TotalLines,EdInfo.WindowSizeX);
-			if (Interrupted()) return FALSE;
+			if (Interrupted256(Line)) return FALSE;
 
 			FillLineBuffer(Line, min(LastLine, Line+SeveralLines-1));
 			Lines = (!g_LineBuffer.empty()) ? &g_LineBuffer[0] : NULL;
@@ -305,10 +303,9 @@ int LeftColumn(int RightPosition,int ScreenWidth) {
 }
 
 void SaveSelection() {
-	EditorInfo EdInfo;
 	int I;
 
-	StartupInfo.EditorControl(ECTL_GETINFO,&EdInfo);
+	RefreshEditorInfo();
 	if ((SelType=EdInfo.BlockType)!=BTYPE_NONE) {
 		for (I=SelStartLine=EdInfo.BlockStartLine;I<EdInfo.TotalLines;I++) {
 			EditorGetString String;
@@ -337,8 +334,7 @@ BOOL EPreparePattern(string &SearchText) {
 		OEMToEditor(OEMLine, SearchText.size());
 
 		if (ECharacterTables) pcre_free((void *)ECharacterTables);
-		EditorInfo EdInfo;
-		StartupInfo.EditorControl(ECTL_GETINFO, &EdInfo);
+		RefreshEditorInfo();
 
 		if (EdInfo.TableNum >= 0) {
 			CharTableSet TableSet;
@@ -402,6 +398,7 @@ void SynchronizeWithFile(BOOL Replace) {
 }
 
 int LastLine=0;
+DWORD LastTickCount=0;
 BOOL ClockPresent=FALSE;
 
 void FindIfClockPresent() {
@@ -413,7 +410,7 @@ void FindIfClockPresent() {
 }
 
 void ShowCurrentLine(int CurLine,int TotalLines,int TotalColumns) {
-	if ((CurLine<LastLine)||(CurLine>LastLine+25)) {
+	if ((CurLine<LastLine) || (CurLine>=LastLine+1000) || (GetTickCount() > LastTickCount+1000)) {
 		int Position=(ClockPresent)?19:25;
 		if (TotalColumns>80) Position+=(TotalColumns-81);
 		Position+=23;
@@ -423,14 +420,14 @@ void ShowCurrentLine(int CurLine,int TotalLines,int TotalColumns) {
 		StartupInfo.Text(Position+12-strlen(LineStr),0,0x30,LineStr);
 		StartupInfo.Text(0,0,0x30,NULL);
 		LastLine=CurLine;
+		LastTickCount=GetTickCount();
 	}
 }
 
 string PickupSelection() {
-	EditorInfo EdInfo;
 	EditorGetString String;
 
-	StartupInfo.EditorControl(ECTL_GETINFO,&EdInfo);
+	RefreshEditorInfo();
 	if (EdInfo.BlockType==BTYPE_NONE) return "";
 	String.StringNumber=EdInfo.BlockStartLine+1;
 	EctlGetString(&String);
@@ -455,12 +452,10 @@ BOOL IsWordChar(char C) {
 }
 
 string PickupWord() {
-	EditorInfo EdInfo;
-	EditorGetString String;
-
 	if (EFindTextAtCursor==FT_NONE) return "";
+	RefreshEditorInfo();
 
-	StartupInfo.EditorControl(ECTL_GETINFO,&EdInfo);
+	EditorGetString String;
 	String.StringNumber=-1;
 	EctlGetString(&String);
 
@@ -551,4 +546,8 @@ void EctlForceSetPosition(EditorSetPosition *Position) {
 	} else {
 		_nOldLine = -2;
 	}
+}
+
+void RefreshEditorInfo() {
+	StartupInfo.EditorControl(ECTL_GETINFO, &EdInfo);
 }

@@ -501,15 +501,17 @@ public:
 	CFarDateTimeStorage(FILETIME *DT):ftDateTime(DT),   ttDateTime(NULL) {};
 	CFarDateTimeStorage(time_t   *DT):ftDateTime(NULL), ttDateTime(DT) {};
 	virtual void Get(char *pszBuffer, int nSize) const {
-		SYSTEMTIME Time;
+		SYSTEMTIME utcTime, locTime;
 		if (ftDateTime) {
-			FileTimeToSystemTime(ftDateTime,&Time);
+			FileTimeToSystemTime(ftDateTime,&utcTime);
 		} else {
 			FILETIME ft;
 			Time_tToFT(*ttDateTime, ft);
-			FileTimeToSystemTime(&ft,&Time);
+			FileTimeToSystemTime(&ft,&utcTime);
 		}
-		_snprintf(pszBuffer,nSize,"%02d.%02d.%04d %02d:%02d:%02d",Time.wDay,Time.wMonth,Time.wYear,Time.wHour,Time.wMinute,Time.wSecond);
+		SystemTimeToTzSpecificLocalTime(NULL, &utcTime, &locTime);
+		_snprintf(pszBuffer, nSize, "%02d.%02d.%04d %02d:%02d:%02d",
+			locTime.wDay, locTime.wMonth, locTime.wYear, locTime.wHour, locTime.wMinute, locTime.wSecond);
 	}
 	virtual void Put(const char *pszBuffer);
 	virtual bool Verify(const char *pszBuffer);
@@ -720,15 +722,17 @@ bool CFarDateTimeStorage::Verify(const char *pszBuffer) {
 	if (!Pattern) return false;
 	int Match[10*3];
 	if (do_pcre_exec(Pattern,NULL,pszBuffer,strlen(pszBuffer),0,0,Match,sizeof(Match)/sizeof(int))>=0) {
-		SYSTEMTIME Time;
-		Time.wDay=   atoin(pszBuffer,Match[1*2],Match[1*2+1]);
-		Time.wMonth= atoin(pszBuffer,Match[2*2],Match[2*2+1]);
-		Time.wYear=  atoin(pszBuffer,Match[3*2],Match[3*2+1]);
-		Time.wHour=  atoin(pszBuffer,Match[5*2],Match[5*2+1]);
-		Time.wMinute=atoin(pszBuffer,Match[7*2],Match[7*2+1]);
-		Time.wSecond=atoin(pszBuffer,Match[9*2],Match[9*2+1]);
-		Time.wMilliseconds=0;
-		SystemTimeToFileTime(&Time,&m_ftTemp);
+		SYSTEMTIME utcTime, locTime;
+		locTime.wDay =    atoin(pszBuffer,Match[1*2],Match[1*2+1]);
+		locTime.wMonth =  atoin(pszBuffer,Match[2*2],Match[2*2+1]);
+		locTime.wYear =   atoin(pszBuffer,Match[3*2],Match[3*2+1]);
+		locTime.wHour =   atoin(pszBuffer,Match[5*2],Match[5*2+1]);
+		locTime.wMinute = atoin(pszBuffer,Match[7*2],Match[7*2+1]);
+		locTime.wSecond = atoin(pszBuffer,Match[9*2],Match[9*2+1]);
+		locTime.wMilliseconds = 0;
+
+		TzSpecificLocalTimeToSystemTime(NULL, &locTime, &utcTime);
+		SystemTimeToFileTime(&utcTime, &m_ftTemp);
 		pcre_free(Pattern);return true;
 	} else {
 		pcre_free(Pattern);return false;

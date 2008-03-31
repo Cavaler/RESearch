@@ -73,6 +73,9 @@ EXTERN char *MatchedLine VALUE(NULL);
 EXTERN int MatchedLineLength VALUE(0);
 EXTERN int SelStartLine,SelStartPos,SelEndLine,SelEndPos,SelType;
 
+EXTERN EditorInfo EdInfo;
+void RefreshEditorInfo();
+
 BOOL EditorSearch();
 BOOL EditorSearchAgain();
 BOOL EditorReplace();

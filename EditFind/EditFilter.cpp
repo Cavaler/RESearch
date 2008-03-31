@@ -2,8 +2,7 @@
 #include "..\RESearch.h"
 
 BOOL EditorFilterAgain() {
-	EditorInfo EdInfo;
-	StartupInfo.EditorControl(ECTL_GETINFO,&EdInfo);
+	RefreshEditorInfo();
 	EctlForceSetPosition(NULL);
 	EditorSetPosition Position={0,-1,-1,-1,-1,-1};
 	EditorGetString String={-1};

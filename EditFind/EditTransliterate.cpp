@@ -2,8 +2,7 @@
 #include "..\RESearch.h"
 
 BOOL EditorTransliterateAgain() {
-	EditorInfo EdInfo;
-	StartupInfo.EditorControl(ECTL_GETINFO,&EdInfo);
+	RefreshEditorInfo();
 
 	EditorSetPosition Position = {0, 0, 0, -1, -1, -1};
 	EditorGetString String = {-1};

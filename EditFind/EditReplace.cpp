@@ -51,8 +51,7 @@ void DoReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, const st
 		EctlSetPosition(&Position);
 	}
 
-	EditorInfo EdInfo;
-	StartupInfo.EditorControl(ECTL_GETINFO, &EdInfo);
+	RefreshEditorInfo();
 	EditorSetString SetString = {-1, NewString.c_str(), NULL, NULL};
 //	Position.CurLine = EdInfo.CurLine;
 	while (TRUE) {
@@ -76,9 +75,6 @@ void DoReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, const st
 		EctlSetPosition(&Position);
 		Position.CurLine++;
 		StartupInfo.EditorControl(ECTL_INSERTSTRING, NULL);
-
-//		NewLength -= NextLine-SetString.StringText;
-//		SetString.StringText = NextLine;
 
 		NewString.erase(0, NextLine-SetString.StringText);
 		SetString.StringText = NewString.c_str();
@@ -133,8 +129,7 @@ void QuoteStrings(const char *Source, vector<string> &arrQuoted, int MaxWidth) {
 }
 
 eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &EndPos, char *Original, const string &Replace, const string &Replace_O2E) {
-	EditorInfo EdInfo;
-	StartupInfo.EditorControl(ECTL_GETINFO, &EdInfo);
+	RefreshEditorInfo();
 
 	LastReplaceLine = LastLine;LastReplacePos = EndPos;
 	EditorSetPosition Position = {(EReverse)?FirstLine:LastLine,(EReverse)?StartPos:EndPos,-1,
@@ -225,15 +220,13 @@ eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &
 }
 
 BOOL ReplaceInText(int FirstLine, int StartPos, int LastLine, int EndPos) {
-	EditorInfo EdInfo;
 	do {
-		if (Interrupted()) return FALSE;
 		int MatchFirstLine = FirstLine, MatchStartPos = StartPos;
 		int MatchLastLine = LastLine, MatchEndPos = EndPos;
 		if (!SearchInText(MatchFirstLine, MatchStartPos, MatchLastLine, MatchEndPos, TRUE)) return FALSE;
 
 		// Assuming that MatchedLine starts from the needed line
-		StartupInfo.EditorControl(ECTL_GETINFO, &EdInfo);
+		RefreshEditorInfo();
 
 		int Numbers[3] = {MatchFirstLine, MatchFirstLine-ReplaceStartLine, ReplaceNumber};
 		int FoundLastLine = MatchLastLine;
@@ -258,22 +251,14 @@ BOOL ReplaceInText(int FirstLine, int StartPos, int LastLine, int EndPos) {
 		} else {
 			FirstLine = MatchLastLine;StartPos = MatchEndPos + ((ZeroMatch)?1:0);
 		}
-
-		int PrevLineCount = EdInfo.TotalLines;
-		StartupInfo.EditorControl(ECTL_GETINFO, &EdInfo);
-//		LastLine += EdInfo.TotalLines-PrevLineCount;
 	} while (TRUE);
 	return FALSE;
 }
 
 BOOL ReplaceInTextByLine(int FirstLine, int StartPos, int LastLine, int EndPos, BOOL EachLineLimited) {
-	int Line;
-	EditorInfo EdInfo;
+	int Line = (EReverse)?LastLine:FirstLine;
 
-	Line = (EReverse)?LastLine:FirstLine;
 	do {
-		if (Interrupted()) return FALSE;
-
 		BOOL Matched = FALSE;
 		int MatchFirstLine = Line, MatchStartPos = (Line == FirstLine)||EachLineLimited?StartPos:0;
 		int MatchLastLine = Line, MatchEndPos = (Line == LastLine)||EachLineLimited?EndPos:-1;
@@ -282,7 +267,7 @@ BOOL ReplaceInTextByLine(int FirstLine, int StartPos, int LastLine, int EndPos, 
 		while (SearchInText(MatchFirstLine, FoundStartPos, MatchLastLine, FoundEndPos, TRUE)) {
 			Matched = TRUE;
 			// Assuming that MatchedLine starts from the needed line
-			StartupInfo.EditorControl(ECTL_GETINFO, &EdInfo);
+			RefreshEditorInfo();
 
 			int Numbers[3] = {MatchFirstLine, MatchFirstLine-ReplaceStartLine, ReplaceNumber};
 			string Replace_O2E = CreateReplaceString(MatchedLine, Match, MatchCount, ERReplace_O2E.c_str(),"\n", Numbers,(EREvaluate ? EREvaluateScript : -1));
@@ -342,8 +327,7 @@ BOOL _EditorReplaceAgain() {
 }
 
 BOOL EditorReplaceAgain() {
-	EditorInfo EdInfo;
-	StartupInfo.EditorControl(ECTL_GETINFO, &EdInfo);
+	RefreshEditorInfo();
 	PatchEditorInfo(EdInfo);
 	EctlForceSetPosition(NULL);
 	m_pReplaceTable = (EdInfo.AnsiMode) ? &XLatTables[XLatTables.size()-1] :
@@ -379,7 +363,7 @@ BOOL EditorReplaceAgain() {
 		}
 	}
 
-	StartupInfo.EditorControl(ECTL_GETINFO, &EdInfo);
+	RefreshEditorInfo();
 	EditorSetPosition Position = {LastReplaceLine, LastReplacePos,-1,
 		TopLine(LastReplaceLine, EdInfo.WindowSizeY, EdInfo.TotalLines),
 		LeftColumn(LastReplacePos, EdInfo.WindowSizeX),-1};
@@ -400,8 +384,7 @@ BOOL EditorReplaceExecutor(CParameterBatch &Batch) {
 	ReplaceNumber = 0;
 
 	if (EReverse) {
-		EditorInfo EdInfo;
-		StartupInfo.EditorControl(ECTL_GETINFO, &EdInfo);
+		RefreshEditorInfo();
 
 		EditorSetPosition Position = {EdInfo.TotalLines, 0, -1, -1, -1, -1};
 		EctlSetPosition(&Position);
@@ -421,8 +404,7 @@ BOOL EditorReplaceExecutor(CParameterBatch &Batch) {
 }
 
 BOOL EditorReplace() {
-	EditorInfo EdInfo;
-	StartupInfo.EditorControl(ECTL_GETINFO, &EdInfo);
+	RefreshEditorInfo();
 	EInSelection = (EdInfo.BlockType != BTYPE_NONE);
 
 	CFarDialog Dialog(76, 17,"ReplaceDlg");

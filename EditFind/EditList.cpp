@@ -14,8 +14,7 @@ string CanonicalLCName(const char *szName) {
 }
 
 BOOL EditorListAllAgain() {
-	EditorInfo EdInfo;
-	StartupInfo.EditorControl(ECTL_GETINFO, &EdInfo);
+	RefreshEditorInfo();
 	EctlForceSetPosition(NULL);
 
 	sFindAllInfo &Info = FindAllInfos[CanonicalLCName(EdInfo.FileName)];
@@ -23,7 +22,7 @@ BOOL EditorListAllAgain() {
 	Info.arrLines.clear();
 
 	for (int CurrentLine = 0; CurrentLine < EdInfo.TotalLines; CurrentLine++) {
-		if (Interrupted()) break;
+		if (Interrupted256(CurrentLine)) break;
 		int FirstLine = CurrentLine, StartPos = 0, EndPos = -1;
 		int LastLine = (ESeveralLine) ? EdInfo.TotalLines-1 : CurrentLine;
 
@@ -54,8 +53,7 @@ BOOL EditorListAllAgain() {
 }
 
 BOOL EditorListAllShowResults() {
-	EditorInfo EdInfo;
-	StartupInfo.EditorControl(ECTL_GETINFO,&EdInfo);
+	RefreshEditorInfo();
 
 	sFindAllInfo &Info = FindAllInfos[CanonicalLCName(EdInfo.FileName)];
 	if (Info.arrLines.size() == 0) return TRUE;
