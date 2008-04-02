@@ -12,9 +12,12 @@ Planned:
 	- Correct "Files found" in Grep
     * Find next after 
 
-Version 6.11 (25.03.2008)
-	- Search in Editor speed increased
-	
+Version 6.12 (02.04.2008)
+	- Editor returns to initial pos if text not found
+
+Version 6.11 (31.03.2008)
+	- Search in Editor speed greatly increased
+
 Version 6.10 (25.03.2008)
 	- Replace in Editor speed greatly increased
 	* Runtime components install link in readme.1st provided

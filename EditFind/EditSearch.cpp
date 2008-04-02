@@ -45,6 +45,8 @@ BOOL EditorSearchAgain() {
 	PatchEditorInfo(EdInfo);
 	EctlForceSetPosition(NULL);
 
+	EditorInfo StartEdInfo = EdInfo;
+
 	int FirstLine,StartPos,LastLine,EndPos;
 
 	if (EInSelection) {		// ***************** SEARCH IN SELECTION
@@ -111,13 +113,13 @@ BOOL EditorSearchAgain() {
 	}
 
 	EditorSetPosition Position;
-	Position.CurLine=EdInfo.CurLine;
-	Position.CurPos=EdInfo.CurPos;
-	Position.CurTabPos=EdInfo.CurTabPos;
-	Position.TopScreenLine=EdInfo.TopScreenLine;
-	Position.LeftPos=EdInfo.LeftPos;
-	Position.Overtype=EdInfo.Overtype;
-	EctlSetPosition(&Position);
+	Position.CurLine = StartEdInfo.CurLine;
+	Position.CurPos = StartEdInfo.CurPos;
+	Position.CurTabPos = StartEdInfo.CurTabPos;
+	Position.TopScreenLine = StartEdInfo.TopScreenLine;
+	Position.LeftPos = StartEdInfo.LeftPos;
+	Position.Overtype = StartEdInfo.Overtype;
+	EctlForceSetPosition(&Position);
 
 	if (!g_bInterrupted) {
 		const char *Lines[]={GetMsg(MRESearch),GetMsg(MCannotFind),EText.c_str(),GetMsg(MOk)};
