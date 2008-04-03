@@ -223,20 +223,20 @@ BOOL SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,BOOL Ne
 			ShowCurrentLine(Line,EdInfo.TotalLines,EdInfo.WindowSizeX);
 			if (Interrupted256(Line)) return FALSE;
 
-			FillLineBuffer(max(0, FirstLine), Line);
+			int CurLastLine = min(LastLine+SeveralLines-1, LastLine);
+			FillLineBuffer(Line, CurLastLine);
 			Lines = (!g_LineBuffer.empty()) ? &g_LineBuffer[0] : NULL;
 			LinesLength = g_LineBuffer.size();
 
-			if (Line == LastLine) {
+			if (CurLastLine == LastLine) {
 				int nLastLength = g_LineBuffer.size()-g_LineOffsets[g_LineOffsets.size()-1];
 				if ((EndPos >= 0) && (nLastLength >= EndPos)) {
 					LinesLength -= nLastLength-EndPos;
 				}
 			}
 
-			int CurFirstLine = Line - g_LineOffsets.size() + 1;
-			if (SearchInLine(Lines,LinesLength,(CurFirstLine==FirstLine)?StartPos:0,-1,&MatchStart,&MatchLength,NeedMatch)) {
-				Relative2Absolute(CurFirstLine,Lines,MatchStart,MatchLength,FirstLine,StartPos,LastLine,EndPos);
+			if (SearchInLine(Lines, LinesLength, (Line==FirstLine) ? StartPos : 0, -1, &MatchStart, &MatchLength, NeedMatch)) {
+				Relative2Absolute(Line, Lines, MatchStart, MatchLength, FirstLine, StartPos, LastLine, EndPos);
 				if (NeedMatch) {
 					MatchedLine=Lines;
 					MatchedLineLength=LinesLength;
