@@ -12,6 +12,9 @@ Planned:
 	- Correct "Files found" in Grep
     * Find next after 
 
+Version 6.13 (03.04.2008)
+	- Reverse search in Editor works correctly
+
 Version 6.12 (02.04.2008)
 	- Editor returns to initial pos if text not found
 
