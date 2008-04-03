@@ -187,11 +187,11 @@ void FillLineBuffer(size_t FirstLine, size_t LastLine) {
 			NewBuffer.insert(NewBuffer.begin(), String.StringText, String.StringText+String.StringLength);
 			NewBuffer.insert(NewBuffer.begin()+String.StringLength, '\n');
 
+			g_FirstLine = Position.CurLine;
 			if (g_LineBuffer.size()+NewBuffer.size() >= SeveralLinesKB*1024u) break;
 		}
 
 		g_LineBuffer.insert(g_LineBuffer.begin(), NewBuffer.begin(), NewBuffer.end());
-		g_FirstLine = Position.CurLine;
 	}
 
 	if (LastLine >= g_FirstLine+g_LineOffsets.size()) {
@@ -229,7 +229,7 @@ BOOL SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,BOOL Ne
 
 			if (Line == LastLine) {
 				int nLastLength = g_LineBuffer.size()-g_LineOffsets[g_LineOffsets.size()-1];
-				if (nLastLength >= EndPos) {
+				if ((EndPos >= 0) && (nLastLength >= EndPos)) {
 					LinesLength -= nLastLength-EndPos;
 				}
 			}
