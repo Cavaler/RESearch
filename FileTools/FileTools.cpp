@@ -22,11 +22,8 @@ int g_nStartWithNow;
 bool g_bFRStripCommon;
 
 void FTReadRegistry(HKEY Key) {
-	QueryRegStringValue(Key, "FTRStrip",   g_strStrip,   "^\\d+\\s*([-.]\\s*)?");
-	QueryRegStringValue(Key, "FTRPrefix",  g_strPrefix,  "");
-	QueryRegStringValue(Key, "FTRPostfix", g_strPostfix,  " - ");
-	QueryRegIntValue   (Key, "FTRStart",  &g_nStartWith, 1, 0);
-	QueryRegIntValue   (Key, "FTRWidth",  &g_nWidth,     2, 0);
+	#define DECLARE_PERSIST_LOAD Key
+	#include "PersistVars.h"
 
 	RPresets  = new CRPresetCollection();
 	QRPresets = new CQRPresetCollection();
@@ -35,11 +32,8 @@ void FTReadRegistry(HKEY Key) {
 }
 
 void FTWriteRegistry(HKEY Key) {
-	SetRegStringValue(Key, "FTRStrip",   g_strStrip);
-	SetRegStringValue(Key, "FTRPrefix",  g_strPrefix);
-	SetRegStringValue(Key, "FTRPostfix", g_strPostfix);
-	SetRegIntValue   (Key, "FTRStart",   g_nStartWith);
-	SetRegIntValue   (Key, "FTRWidth",   g_nWidth);
+	#define DECLARE_PERSIST_SAVE Key
+	#include "PersistVars.h"
 }
 
 void FTCleanup(BOOL PatternOnly) {

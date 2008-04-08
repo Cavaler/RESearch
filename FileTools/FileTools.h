@@ -19,18 +19,15 @@ public:
 	virtual const char *GetName() {return "FileQuickRename";}
 };
 
+#define DECLARE_PERSIST_VARS
+#include "PersistVars.h"
+
 extern CParameterBatch g_RBatch;
 extern CParameterBatch g_QRBatch;
 EXTERN CRPresetCollection *RPresets;
 EXTERN CQRPresetCollection *QRPresets;
 EXTERN CPresetBatchCollection *RBatch;
 EXTERN CPresetBatchCollection *QRBatch;
-
-EXTERN string g_strStrip;
-EXTERN string g_strPrefix;
-EXTERN int    g_nWidth;
-EXTERN int    g_nStartWith;
-EXTERN string g_strPostfix;
 
 void FTReadRegistry(HKEY Key);
 void FTWriteRegistry(HKEY Key);

@@ -1,31 +1,4 @@
-//#ifndef __PERSISTVARS_H
-//#define __PERSISTVARS_H
-
-#ifdef DECLARE_PERSIST_VARS
-	#define PERSIST_BOOL_VARIABLE(Name, Default) EXTERN BOOL Name VALUE(Default);
-	#define PERSIST_STRING_VARIABLE(Name, Default) EXTERN string Name;
-	#define PERSIST_TYPED_VARIABLE(Type, Name, Default, Min, Max) EXTERN Type Name VALUE(Default);
-	#define PERSIST_FILETIME_VARIABLE(Name) EXTERN FILETIME Name;
-	#undef DECLARE_PERSIST_VARS
-#else
-#ifdef DECLARE_PERSIST_LOAD
-	#define PERSIST_BOOL_VARIABLE(Name, Default) QueryRegIntValue(Key, #Name, &Name, Default, 0, 1);
-	#define PERSIST_STRING_VARIABLE(Name, Default) QueryRegStringValue(Key, #Name, Name, Default);
-	#define PERSIST_TYPED_VARIABLE(Type, Name, Default, Min, Max) QueryRegIntValue(Key, #Name, (int *)&Name, Default, Min, Max);
-	#define PERSIST_FILETIME_VARIABLE(Name) QueryRegIntValue(Key, #Name "Lo", &Name.dwLowDateTime, 0xE1D58000); QueryRegIntValue(Key, #Name "Hi", &Name.dwHighDateTime, 0x01A8E79F);
-	#undef DECLARE_PERSIST_LOAD
-#else
-#ifdef DECLARE_PERSIST_SAVE
-	#define PERSIST_BOOL_VARIABLE(Name, Default) SetRegIntValue(Key, #Name, Name);
-	#define PERSIST_STRING_VARIABLE(Name, Default) SetRegStringValue(Key, #Name, Name);
-	#define PERSIST_TYPED_VARIABLE(Type, Name, Default, Min, Max) SetRegIntValue(Key, #Name, Name);
-	#define PERSIST_FILETIME_VARIABLE(Name) SetRegIntValue(Key, #Name "Lo", Name.dwLowDateTime); SetRegIntValue(Key, #Name "Hi", Name.dwHighDateTime);
-	#undef DECLARE_PERSIST_SAVE
-#else
-	#error Don't know what to do
-#endif
-#endif
-#endif
+#include <PersistVariables.h>
 
 PERSIST_BOOL_VARIABLE(FCaseSensitive, FALSE)
 PERSIST_BOOL_VARIABLE(FMaskAsRegExp, FALSE)
@@ -85,10 +58,4 @@ PERSIST_TYPED_VARIABLE(DWORD, FAAttributesCleared, 0, 0, 0x7FFFFFFF)
 PERSIST_BOOL_VARIABLE(FASearchHead, FALSE)
 PERSIST_TYPED_VARIABLE(DWORD, FASearchHeadLimit, 0, 0, 0x7FFFFFFF)
 
-
-#undef PERSIST_BOOL_VARIABLE
-#undef PERSIST_STRING_VARIABLE
-#undef PERSIST_TYPED_VARIABLE
-#undef PERSIST_FILETIME_VARIABLE
-
-//#endif
+#include <PersistVariablesUndef.h>

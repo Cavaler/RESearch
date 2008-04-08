@@ -20,15 +20,9 @@ CParameterBatch g_ELBatch(1, 3,
 					 );
 
 void EReadRegistry(HKEY Key) {
-	QueryRegStringValue(Key,"EText",EText,"");
-	QueryRegIntValue(Key,"ERegExp",&ERegExp,0,0,1);
-	QueryRegIntValue(Key,"ESeveralLine",&ESeveralLine,1,0,1);
-	QueryRegIntValue(Key,"ECaseSensitive",&ECaseSensitive,0,0,1);
-	QueryRegStringValue(Key,"ERReplace",ERReplace,"");
-	QueryRegBoolValue(Key,"EFLeaveFilter",&EFLeaveFilter,TRUE);
-	QueryRegIntValue(Key,"EREvaluateScript",&EREvaluateScript,0,0);
-	QueryRegStringValue(Key,"ETSource",ETSource,"");
-	QueryRegStringValue(Key,"ETTarget",ETTarget,"");
+	#define DECLARE_PERSIST_LOAD Key
+	#include "PersistVars.h"
+
 	SelType=BTYPE_NONE;
 
 	ESPresets=new CESPresetCollection();
@@ -41,15 +35,8 @@ void EReadRegistry(HKEY Key) {
 }
 
 void EWriteRegistry(HKEY Key) {
-	SetRegStringValue(Key,"EText",EText);
-	SetRegIntValue(Key,"ERegExp",ERegExp);
-	SetRegIntValue(Key,"ESeveralLine",ESeveralLine);
-	SetRegIntValue(Key,"ECaseSensitive",ECaseSensitive);
-	SetRegStringValue(Key,"ERReplace",ERReplace);
-	SetRegBoolValue(Key,"EFLeaveFilter",EFLeaveFilter);
-	SetRegIntValue(Key,"EREvaluateScript",EREvaluateScript);
-	SetRegStringValue(Key,"ETSource",ETSource);
-	SetRegStringValue(Key,"ETTarget",ETTarget);
+	#define DECLARE_PERSIST_SAVE Key
+	#include "PersistVars.h"
 }
 
 BOOL SearchIn(const char *Line,int Start,int Length,int *MatchStart,int *MatchLength,BOOL NeedMatch) {

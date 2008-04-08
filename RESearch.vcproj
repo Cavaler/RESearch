@@ -498,6 +498,10 @@
 					/>
 				</FileConfiguration>
 			</File>
+			<File
+				RelativePath=".\EditFind\PersistVars.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="FileFind Sources"
@@ -630,6 +634,10 @@
 			</File>
 			<File
 				RelativePath="FileTools\FileTools.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FileTools\PersistVars.h"
 				>
 			</File>
 		</Filter>

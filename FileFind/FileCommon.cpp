@@ -36,7 +36,7 @@ CParameterBatch g_FABatch(2, 20,
 	);
 
 void FReadRegistry(HKEY Key) {
-	#define DECLARE_PERSIST_LOAD
+	#define DECLARE_PERSIST_LOAD Key
 	#include "PersistVars.h"
 
 	FSPresets=new CFSPresetCollection();
@@ -81,7 +81,7 @@ void FReadRegistry(HKEY Key) {
 }
 
 void FWriteRegistry(HKEY Key) {
-	#define DECLARE_PERSIST_SAVE
+	#define DECLARE_PERSIST_SAVE Key
 	#include "PersistVars.h"
 }
 

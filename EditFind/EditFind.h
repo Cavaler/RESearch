@@ -33,6 +33,9 @@ public:
 	virtual const char *GetName() {return "EditList";}
 };
 
+#define DECLARE_PERSIST_VARS
+#include "PersistVars.h"
+
 extern CParameterBatch g_ESBatch;
 extern CParameterBatch g_ERBatch;
 extern CParameterBatch g_EFBatch;
@@ -45,23 +48,15 @@ EXTERN CPresetBatchCollection *ERBatch;
 EXTERN CPresetBatchCollection *EFBatch;
 
 EXTERN int LastAction VALUE(-1);
-EXTERN string EText;
-EXTERN BOOL ERegExp;
-EXTERN BOOL ESeveralLine;
-EXTERN BOOL ECaseSensitive;
-EXTERN string ERReplace;
+
 EXTERN string ERReplace_O2E;
 EXTERN BOOL ERRemoveEmpty;
 EXTERN BOOL ERRemoveNoMatch;
 EXTERN bool EREvaluate VALUE(false);
-EXTERN int EREvaluateScript;
-EXTERN BOOL EFLeaveFilter;
 EXTERN BOOL EReverse VALUE(FALSE);
 EXTERN BOOL ESearchAgainCalled VALUE(FALSE);
 EXTERN BOOL EInSelection;
 EXTERN BOOL EUTF8 VALUE(FALSE);
-EXTERN string ETSource;
-EXTERN string ETTarget;
 
 EXTERN string ETextUpcase;
 EXTERN pcre *EPattern VALUE(NULL);
