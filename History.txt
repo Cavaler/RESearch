@@ -12,7 +12,10 @@ Planned:
 	- Correct "Files found" in Grep
     * Find next after 
 
-Version 6.14 (04.04.2008)
+Version 6.15 (08.04.2008)
+	- Rare crash with enumerating script engines fixed (thx to Andrey Budko)
+
+Version 6.14 (08.04.2008)
 	+ Linked statically by default now
 	- Comparing file times is correct regarding local/UTC time on FS
 

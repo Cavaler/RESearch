@@ -221,8 +221,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory=".\Release_Static"
-			IntermediateDirectory=".\Release_Static"
+			OutputDirectory=".\Release"
+			IntermediateDirectory=".\Release"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
@@ -246,7 +246,7 @@
 				MkTypLibCompatible="true"
 				SuppressStartupBanner="true"
 				TargetEnvironment="1"
-				TypeLibraryName=".\Release_NET/RESearch.tlb"
+				TypeLibraryName=".\Release/RESearch.tlb"
 				HeaderFileName=""
 			/>
 			<Tool
@@ -291,10 +291,10 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\RESearch.def"
-				ProgramDatabaseFile=".\Release_NET/RESearch7.pdb"
+				ProgramDatabaseFile=".\Release/RESearch.pdb"
 				SubSystem="2"
 				OptimizeForWindows98="1"
-				ImportLibrary=".\Release_NET/RESearch7.lib"
+				ImportLibrary=".\Release/RESearch.lib"
 				TargetMachine="1"
 			/>
 			<Tool
