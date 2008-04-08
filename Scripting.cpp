@@ -21,8 +21,13 @@ void EnumActiveScripts() {
 		if (!nFetched) break;
 
 		BSTR bstrName;
-		ProgIDFromCLSID(Script.m_clsid, &bstrName);
-		Script.m_strName = (const char *)_bstr_t(bstrName);
+		if (SUCCEEDED(ProgIDFromCLSID(Script.m_clsid, &bstrName))) {
+			Script.m_strName = (const char *)_bstr_t(bstrName);
+		} else {
+			OLECHAR szGuid[42];
+			if (FAILED(StringFromGUID2(Script.m_clsid, szGuid, 42))) continue;
+			Script.m_strName = (const char *)_bstr_t(szGuid);
+		}
 		m_arrEngines.push_back(Script);
 		m_lstEngines.Append(Script.m_strName.c_str());
 	} while (true);
