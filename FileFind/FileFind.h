@@ -102,6 +102,7 @@ OperationResult FileGrep(BOOL ShowDialog);
 BOOL AdvancedSettings();
 BOOL CompileAdvancedSettings();
 BOOL MaskCaseHere();
+bool LocalFileTime(char cDrive);
 
 OperationResult NoFilesFound();
 void InitFoundPosition();

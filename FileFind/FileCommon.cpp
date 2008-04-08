@@ -21,6 +21,10 @@ CParameterBatch g_FGBatch(2, 9,
 
 DWORD g_dwDateAfterThis, g_dwDateBeforeThis;
 
+bool g_bScanningLocalTime;
+FILETIME FADateBeforeThisLocal;
+FILETIME FADateAfterThisLocal;
+
 CParameterBatch g_FABatch(2, 20,
 	"FullFileName", &FAFullFileName, "DirectoryName", &FADirectoryName,
 
@@ -266,12 +270,16 @@ void ShowProgress(char *Directory, PluginPanelItem *PanelItems, int ItemsNumber)
 }
 
 BOOL AdvancedApplies(WIN32_FIND_DATA *FindData) {
+	SYSTEMTIME st1, st2;
+	FileTimeToSystemTime(&FindData->ftLastWriteTime, &st1);
+	FileTimeToSystemTime(&FADateAfterThis, &st2);
+
 	if (FADateBefore&&(CompareFileTime(
-		(FAModificationDate)?&FindData->ftLastWriteTime:&FindData->ftCreationTime,
-		&FADateBeforeThis)>0)) return FALSE;
+		(FAModificationDate) ? &FindData->ftLastWriteTime : &FindData->ftCreationTime,
+		g_bScanningLocalTime ? &FADateBeforeThisLocal : &FADateBeforeThis) > 0)) return FALSE;
 	if (FADateAfter&&(CompareFileTime(
-		(FAModificationDate)?&FindData->ftLastWriteTime:&FindData->ftCreationTime,
-		&FADateAfterThis)<0)) return FALSE;
+		(FAModificationDate) ? &FindData->ftLastWriteTime : &FindData->ftCreationTime,
+		g_bScanningLocalTime ? &FADateAfterThisLocal : &FADateAfterThis) < 0)) return FALSE;
 
 	if (FASizeLess && (FindData->nFileSizeLow >= FASizeLessLimit)) return FALSE;
 	if (FASizeGreater && (FindData->nFileSizeLow <= FASizeGreaterLimit)) return FALSE;
@@ -368,6 +376,7 @@ int DoScanDirectory(char *Directory,PluginPanelItem **PanelItems,int *ItemsNumbe
 int ScanPluginDirectories(PanelInfo &Info,PluginPanelItem **PanelItems,int *ItemsNumber,ProcessFileProc ProcessFile) {
 	PluginPanelItem *Items=(FSearchIn==SI_SELECTED)?Info.SelectedItems:Info.PanelItems;
 	int Number=(FSearchIn==SI_SELECTED)?Info.SelectedItemsNumber:Info.ItemsNumber;
+	g_bScanningLocalTime = true;
 
 	for (int I=0;I<Number;I++) {
 		if (Items[I].FindData.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) {
@@ -388,11 +397,24 @@ int ScanPluginDirectories(PanelInfo &Info,PluginPanelItem **PanelItems,int *Item
 	return TRUE;
 }
 
+FILETIME LocalFT(const FILETIME &ftu) {
+	SYSTEMTIME stu, stl;
+	FILETIME ftl;
+	FileTimeToSystemTime(&ftu, &stu);
+	SystemTimeToTzSpecificLocalTime(NULL, &stu, &stl);
+	SystemTimeToFileTime(&stl, &ftl);
+	return ftl;
+}
+
 int ScanDirectories(PluginPanelItem **PanelItems,int *ItemsNumber,ProcessFileProc ProcessFile) {
 	PanelInfo PInfo;
 	StartupInfo.Control(INVALID_HANDLE_VALUE,FCTL_GETPANELINFO,&PInfo);
 	*ItemsNumber=0;*PanelItems=NULL;g_bInterrupted=FALSE;FilesScanned=0;
 	CurrentRecursionLevel=0;
+
+	FADateBeforeThisLocal = LocalFT(FADateBeforeThis);
+	FADateAfterThisLocal = LocalFT(FADateAfterThis);
+	g_bScanningLocalTime = LocalFileTime(PInfo.CurDir[0]);
 
 	if (PInfo.Plugin) return ScanPluginDirectories(PInfo,PanelItems,ItemsNumber,ProcessFile);
 
@@ -406,6 +428,7 @@ int ScanDirectories(PluginPanelItem **PanelItems,int *ItemsNumber,ProcessFilePro
 			UINT DriveType=GetDriveType(RootDir);
 			if ((FSearchIn==SI_ALLLOCAL)&&(DriveType==DRIVE_REMOTE)) continue;
 			if ((DriveType!=0)&&(DriveType!=1)&&(DriveType!=DRIVE_REMOVABLE)&&(DriveType!=DRIVE_CDROM))
+				g_bScanningLocalTime = LocalFileTime(RootDir[0]);
 				DoScanDirectory(RootDir,PanelItems,ItemsNumber,ProcessFile);
 				RootDir[3]=0;
 		}
@@ -582,7 +605,7 @@ BOOL AdvancedSettings() {
 		case 1:
 		case 2:{
 			SYSTEMTIME CurTime;
-			GetLocalTime(&CurTime);
+			GetSystemTime(&CurTime);
 			SystemTimeToFileTime(&CurTime,(Result==2) ? &FADateBeforeThis : &FADateAfterThis);
 			continue;
 			  }
@@ -697,12 +720,25 @@ BOOL MaskCaseHere() {
 	case MC_INSENSITIVE:return FALSE;
 	case MC_VOLUME:{
 		DWORD Flags;
-		char szFSName[32];
+		char szFSName[64];
 		if (!GetVolumeInformation(NULL,NULL,0,NULL,NULL,&Flags,szFSName,sizeof(szFSName))) return FALSE;
 		return _stricmp(szFSName, "NTFS") && (Flags&FS_CASE_SENSITIVE);
 				   }
 	}
 	return FALSE;
+}
+
+bool LocalFileTime(char cDrive) {
+	char szRoot[] = {cDrive, ':', '\\', 0};
+	DWORD Flags;
+	char szFSName[64];
+	if (!GetVolumeInformation(szRoot, NULL, 0, NULL, NULL, &Flags, szFSName, sizeof(szFSName))) return false;
+
+	if (_stricmp(szFSName, "NTFS") == 0) return false;
+	if (_strnicmp(szFSName, "FAT", 3) == 0) return true;
+	if (_stricmp(szFSName, "CDFS") == 0) return true;
+	if (_stricmp(szFSName, "UDF") == 0) return true;
+	return true;
 }
 
 int atoin(const char *Line,int First,int Last) {
