@@ -15,7 +15,7 @@
 	</ToolFiles>
 	<Configurations>
 		<Configuration
-			Name="Release|Win32"
+			Name="Release Dynamic|Win32"
 			OutputDirectory=".\Release_NET"
 			IntermediateDirectory=".\Release_NET"
 			ConfigurationType="2"
@@ -82,7 +82,7 @@
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
 				AdditionalDependencies="PavelMD8.lib pcreMD8.lib"
-				OutputFile="RESearch.dll"
+				OutputFile="RESearchD.dll"
 				Version="6.0"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -393,7 +393,7 @@
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
 				AdditionalDependencies="PavelMT8.lib pcreMT8.lib"
-				OutputFile="RESearchS.dll"
+				OutputFile="RESearch.dll"
 				Version="6.0"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -576,7 +576,7 @@
 				RelativePath="EditFind\maketables.c"
 				>
 				<FileConfiguration
-					Name="Release|Win32"
+					Name="Release Dynamic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -894,7 +894,7 @@
 				RelativePath="RESearch.idl"
 				>
 				<FileConfiguration
-					Name="Release|Win32"
+					Name="Release Dynamic|Win32"
 					>
 					<Tool
 						Name="VCMIDLTool"
@@ -976,7 +976,7 @@
 				RelativePath=".\StdAfx.cpp"
 				>
 				<FileConfiguration
-					Name="Release|Win32"
+					Name="Release Dynamic|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1031,7 +1031,7 @@
 			RelativePath="RESearch.rc"
 			>
 			<FileConfiguration
-				Name="Release|Win32"
+				Name="Release Dynamic|Win32"
 				>
 				<Tool
 					Name="VCResourceCompilerTool"
