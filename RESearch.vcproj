@@ -81,7 +81,6 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="PavelMD8.lib pcreMD8.lib"
 				OutputFile="RESearchD.dll"
 				Version="6.0"
 				LinkIncremental="1"
@@ -181,7 +180,6 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="PavelMDd8.lib pcreMDd8.lib"
 				OutputFile="C:\Program Files\Far\Plugins\_Debug\RESearch\RESearch.dll"
 				Version="4.0"
 				LinkIncremental="2"
@@ -288,7 +286,7 @@
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
 				AdditionalOptions="/D_USE_INTEL_COMPILER "
-				AdditionalDependencies="LibCTinyMDI.lib PavelMDI.lib pcreMDI.lib"
+				AdditionalDependencies="LibCTinyMDI.lib"
 				OutputFile="RESearchI.dll"
 				Version="4.0"
 				LinkIncremental="1"
@@ -392,7 +390,6 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="PavelMT8.lib pcreMT8.lib"
 				OutputFile="RESearch.dll"
 				Version="6.0"
 				LinkIncremental="1"

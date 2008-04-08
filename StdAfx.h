@@ -33,16 +33,10 @@ public:
 #include <deque>
 using namespace std;
 
-#include <EasyReg.h>
-#include <StringEx.h>
-
 #undef _FAR_NO_NAMELESS_UNIONS
 #include <FAR.h>
 #include <FarDlg.h>
 #include <FarKeys.hpp>
-#include <pcre\pcre.h>
+
+#include <Pavel.h>
 #include <CRegExp.h>
-#include <CMapping.h>
-#include <Directory.h>
-#include <UTF8.h>
-#include <Handles.h>
