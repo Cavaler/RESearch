@@ -39,6 +39,9 @@ struct sActiveScript {
 EXTERN vector<sActiveScript> m_arrEngines;
 EXTERN CFarListData m_lstEngines CONSTRUCT((NULL, 0));
 
+BOOL SystemToLocalTime(FILETIME &ft);
+BOOL LocalToSystemTime(FILETIME &ft);
+
 enum OperationResult {OR_CANCEL,OR_FAILED,OR_OK,OR_PANEL};
 
 enum eStringTable {

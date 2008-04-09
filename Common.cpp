@@ -535,3 +535,33 @@ int do_pcre_exec(const pcre *external_re, const pcre_extra *extra_data,
 	}
 	return pcre_exec(external_re, extra_data, subject, length, start_offset, options, offsets, offsetcount);
 }
+
+BOOL SystemToLocalTime(FILETIME &ft) {
+	TIME_ZONE_INFORMATION tzi;
+	DWORD dwRes = GetTimeZoneInformation(&tzi);
+	if (dwRes != TIME_ZONE_ID_INVALID) {
+		ULARGE_INTEGER ul;
+		ul.HighPart = ft.dwHighDateTime;
+		ul.LowPart = ft.dwLowDateTime;
+		LONG Bias = tzi.Bias + ((dwRes == TIME_ZONE_ID_DAYLIGHT) ? tzi.DaylightBias : tzi.StandardBias);
+		ul.QuadPart -= 600000000i64 * Bias;
+		ft.dwHighDateTime = ul.HighPart;
+		ft.dwLowDateTime = ul.LowPart;
+	}
+	return TRUE;
+}
+
+BOOL LocalToSystemTime(FILETIME &ft) {
+	TIME_ZONE_INFORMATION tzi;
+	DWORD dwRes = GetTimeZoneInformation(&tzi);
+	if (dwRes != TIME_ZONE_ID_INVALID) {
+		ULARGE_INTEGER ul;
+		ul.HighPart = ft.dwHighDateTime;
+		ul.LowPart = ft.dwLowDateTime;
+		LONG Bias = tzi.Bias + ((dwRes == TIME_ZONE_ID_DAYLIGHT) ? tzi.DaylightBias : tzi.StandardBias);
+		ul.QuadPart += 600000000i64 * Bias;
+		ft.dwHighDateTime = ul.HighPart;
+		ft.dwLowDateTime = ul.LowPart;
+	}
+	return TRUE;
+}

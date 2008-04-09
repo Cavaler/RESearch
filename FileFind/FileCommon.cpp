@@ -397,23 +397,17 @@ int ScanPluginDirectories(PanelInfo &Info,PluginPanelItem **PanelItems,int *Item
 	return TRUE;
 }
 
-FILETIME LocalFT(const FILETIME &ftu) {
-	SYSTEMTIME stu, stl;
-	FILETIME ftl;
-	FileTimeToSystemTime(&ftu, &stu);
-	SystemTimeToTzSpecificLocalTime(NULL, &stu, &stl);
-	SystemTimeToFileTime(&stl, &ftl);
-	return ftl;
-}
-
 int ScanDirectories(PluginPanelItem **PanelItems,int *ItemsNumber,ProcessFileProc ProcessFile) {
 	PanelInfo PInfo;
 	StartupInfo.Control(INVALID_HANDLE_VALUE,FCTL_GETPANELINFO,&PInfo);
 	*ItemsNumber=0;*PanelItems=NULL;g_bInterrupted=FALSE;FilesScanned=0;
 	CurrentRecursionLevel=0;
 
-	FADateBeforeThisLocal = LocalFT(FADateBeforeThis);
-	FADateAfterThisLocal = LocalFT(FADateAfterThis);
+	FADateBeforeThisLocal = FADateBeforeThis;
+	SystemToLocalTime(FADateBeforeThisLocal);
+	FADateAfterThisLocal = FADateAfterThis;
+	SystemToLocalTime(FADateAfterThisLocal);
+
 	g_bScanningLocalTime = LocalFileTime(PInfo.CurDir[0]);
 
 	if (PInfo.Plugin) return ScanPluginDirectories(PInfo,PanelItems,ItemsNumber,ProcessFile);
@@ -523,19 +517,7 @@ class CFarDateTimeStorage:public CFarStorage {
 public:
 	CFarDateTimeStorage(FILETIME *DT):ftDateTime(DT),   ttDateTime(NULL) {};
 	CFarDateTimeStorage(time_t   *DT):ftDateTime(NULL), ttDateTime(DT) {};
-	virtual void Get(char *pszBuffer, int nSize) const {
-		SYSTEMTIME utcTime, locTime;
-		if (ftDateTime) {
-			FileTimeToSystemTime(ftDateTime,&utcTime);
-		} else {
-			FILETIME ft;
-			Time_tToFT(*ttDateTime, ft);
-			FileTimeToSystemTime(&ft,&utcTime);
-		}
-		SystemTimeToTzSpecificLocalTime(NULL, &utcTime, &locTime);
-		_snprintf(pszBuffer, nSize, "%02d.%02d.%04d %02d:%02d:%02d",
-			locTime.wDay, locTime.wMonth, locTime.wYear, locTime.wHour, locTime.wMinute, locTime.wSecond);
-	}
+	virtual void Get(char *pszBuffer, int nSize) const;
 	virtual void Put(const char *pszBuffer);
 	virtual bool Verify(const char *pszBuffer);
 	virtual operator string() const {
@@ -546,6 +528,65 @@ protected:
 	time_t   *ttDateTime;
 	FILETIME m_ftTemp;
 };
+
+void CFarDateTimeStorage::Get(char *pszBuffer, int nSize) const {
+	SYSTEMTIME locTime;
+	FILETIME ft;
+	if (ftDateTime) {
+		ft = *ftDateTime;
+	} else {
+		Time_tToFT(*ttDateTime, ft);
+	}
+
+	SystemToLocalTime(ft);
+	FileTimeToSystemTime(&ft, &locTime);
+
+	_snprintf(pszBuffer, nSize, "%02d.%02d.%04d %02d:%02d:%02d",
+		locTime.wDay, locTime.wMonth, locTime.wYear, locTime.wHour, locTime.wMinute, locTime.wSecond);
+}
+
+int atoin(const char *Line,int First,int Last) {
+	static char s_szBuffer[128];;
+	if (First==-1) return 0;
+	Line+=First;
+	strncpy(s_szBuffer, Line, Last-First);
+	s_szBuffer[Last-First] = 0;
+	return atoi(s_szBuffer);
+}
+
+bool CFarDateTimeStorage::Verify(const char *pszBuffer) {
+	const char *ErrPtr;
+	int ErrOffset;
+	pcre *Pattern=pcre_compile("^\\s*(\\d+)[./](\\d+)[./](\\d+)(\\s+(\\d+)(:(\\d+)(:(\\d+))?)?)?\\s*$",
+		PCRE_CASELESS,&ErrPtr,&ErrOffset,NULL);
+	if (!Pattern) return false;
+	int Match[10*3];
+	if (do_pcre_exec(Pattern,NULL,pszBuffer,strlen(pszBuffer),0,0,Match,sizeof(Match)/sizeof(int))>=0) {
+		SYSTEMTIME locTime;
+		locTime.wDay =    atoin(pszBuffer,Match[1*2],Match[1*2+1]);
+		locTime.wMonth =  atoin(pszBuffer,Match[2*2],Match[2*2+1]);
+		locTime.wYear =   atoin(pszBuffer,Match[3*2],Match[3*2+1]);
+		locTime.wHour =   atoin(pszBuffer,Match[5*2],Match[5*2+1]);
+		locTime.wMinute = atoin(pszBuffer,Match[7*2],Match[7*2+1]);
+		locTime.wSecond = atoin(pszBuffer,Match[9*2],Match[9*2+1]);
+		locTime.wMilliseconds = 0;
+
+		SystemTimeToFileTime(&locTime, &m_ftTemp);
+		LocalToSystemTime(m_ftTemp);
+
+		pcre_free(Pattern);return true;
+	} else {
+		pcre_free(Pattern);return false;
+	}
+}
+
+void CFarDateTimeStorage::Put(const char *pszBuffer) {
+	if (ftDateTime) {
+		*ftDateTime=m_ftTemp;
+	} else {
+		*ttDateTime = FTtoTime_t(m_ftTemp);
+	}
+}
 
 BOOL AdvancedSettings() {
 	CFarDialog Dialog(78,24,"AdvancedFileSearchDlg");
@@ -739,46 +780,4 @@ bool LocalFileTime(char cDrive) {
 	if (_stricmp(szFSName, "CDFS") == 0) return true;
 	if (_stricmp(szFSName, "UDF") == 0) return true;
 	return true;
-}
-
-int atoin(const char *Line,int First,int Last) {
-	static char s_szBuffer[128];;
-	if (First==-1) return 0;
-	Line+=First;
-	strncpy(s_szBuffer, Line, Last-First);
-	s_szBuffer[Last-First] = 0;
-	return atoi(s_szBuffer);
-}
-
-bool CFarDateTimeStorage::Verify(const char *pszBuffer) {
-	const char *ErrPtr;
-	int ErrOffset;
-	pcre *Pattern=pcre_compile("^\\s*(\\d+)[./](\\d+)[./](\\d+)(\\s+(\\d+)(:(\\d+)(:(\\d+))?)?)?\\s*$",
-		PCRE_CASELESS,&ErrPtr,&ErrOffset,NULL);
-	if (!Pattern) return false;
-	int Match[10*3];
-	if (do_pcre_exec(Pattern,NULL,pszBuffer,strlen(pszBuffer),0,0,Match,sizeof(Match)/sizeof(int))>=0) {
-		SYSTEMTIME utcTime, locTime;
-		locTime.wDay =    atoin(pszBuffer,Match[1*2],Match[1*2+1]);
-		locTime.wMonth =  atoin(pszBuffer,Match[2*2],Match[2*2+1]);
-		locTime.wYear =   atoin(pszBuffer,Match[3*2],Match[3*2+1]);
-		locTime.wHour =   atoin(pszBuffer,Match[5*2],Match[5*2+1]);
-		locTime.wMinute = atoin(pszBuffer,Match[7*2],Match[7*2+1]);
-		locTime.wSecond = atoin(pszBuffer,Match[9*2],Match[9*2+1]);
-		locTime.wMilliseconds = 0;
-
-		TzSpecificLocalTimeToSystemTime(NULL, &locTime, &utcTime);
-		SystemTimeToFileTime(&utcTime, &m_ftTemp);
-		pcre_free(Pattern);return true;
-	} else {
-		pcre_free(Pattern);return false;
-	}
-}
-
-void CFarDateTimeStorage::Put(const char *pszBuffer) {
-	if (ftDateTime) {
-		*ftDateTime=m_ftTemp;
-	} else {
-		*ttDateTime = FTtoTime_t(m_ftTemp);
-	}
 }
