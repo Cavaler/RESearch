@@ -72,7 +72,7 @@ void DoReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, const st
 		SetString.StringEOL = EOL;
 		EctlSetString(&SetString);
 		Position.CurPos = SetString.StringLength;
-		EctlSetPosition(&Position);
+		EctlForceSetPosition(&Position);
 		Position.CurLine++;
 		StartupInfo.EditorControl(ECTL_INSERTSTRING, NULL);
 
