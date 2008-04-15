@@ -378,7 +378,8 @@ BOOL EditorReplaceExecutor(CParameterBatch &Batch) {
 	if (!EPreparePattern(SearchText)) return FALSE;
 
 	EText = SearchText;
-	ERReplace = ReplaceText;
+	ERReplace = ERReplace_O2E = ReplaceText;
+	OEMToEditor(ERReplace_O2E);
 
 	NoAsking = TRUE;
 	ReplaceNumber = 0;
