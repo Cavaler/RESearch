@@ -291,8 +291,8 @@ BOOL ReplaceInTextByLine(int FirstLine, int StartPos, int LastLine, int EndPos, 
 			if (ERRemoveEmpty&&(Result == RR_OK)&&(MatchFirstLine == MatchLastLine)) {
 				EditorSetPosition Position = {MatchFirstLine,-1,-1,-1,-1,-1};
 				EctlSetPosition(&Position);
-				EditorSetString String = {-1};
-				EctlSetString(&String);
+				EditorGetString String = {-1};
+				EctlGetString(&String);
 				if (String.StringLength == 0) {
 					StartupInfo.EditorControl(ECTL_DELETESTRING, NULL);
 					if (!EReverse) {Line--;LastLine--;}
