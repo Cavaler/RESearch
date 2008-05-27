@@ -269,9 +269,10 @@ enum eStringTable {
 	MExecuteBatchQuery,
 };
 
+HKEY OpenRegistry(const char *szSubKey=NULL, bool bCreate=true);
 void ReadRegistry();
 void WriteRegistry();
-void EnumActiveScripts();
+void ReadActiveScripts();
 int  ConfigureSeveralLines();
 
 void PrepareBMHSearch(const char *String,int StringLength,size_t nPattern = 0);

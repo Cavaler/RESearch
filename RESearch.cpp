@@ -29,7 +29,7 @@ void WINAPI SetStartupInfo(const PluginStartupInfo *Info) {
 	CFarIntegerRangeValidator::s_szHelpTopic = "REInvalidNumber";
 
 	CoInitialize(NULL);
-	EnumActiveScripts();
+	ReadActiveScripts();
 }
 
 void BadCmdLine() {

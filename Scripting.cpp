@@ -7,6 +7,32 @@ _COM_SMARTPTR_TYPEDEF(IActiveScriptParse, __uuidof(IActiveScriptParse));
 _COM_SMARTPTR_TYPEDEF(ICatInformation, __uuidof(ICatInformation));
 _COM_SMARTPTR_TYPEDEF(IEnumCLSID, __uuidof(IEnumCLSID));
 
+void EnumActiveScripts();
+
+void ReadActiveScripts() {
+	CHKey hKey = OpenRegistry("ScriptEngines");
+
+	char szKey[256];
+	DWORD dwIndex = 0, dwSize;
+	while ((dwSize = sizeof(szKey)), (RegEnumValue(hKey, dwIndex++, szKey, &dwSize, NULL, NULL, NULL, NULL) == ERROR_SUCCESS)) {
+		sActiveScript Script;
+		if (FAILED(CLSIDFromString(_bstr_t(szKey), &Script.m_clsid))) continue;
+		QueryRegStringValue(hKey, szKey, Script.m_strName, szKey);
+
+		m_arrEngines.push_back(Script);
+		m_lstEngines.Append(Script.m_strName.c_str());
+	}
+
+	if (m_arrEngines.size() == 0) {
+		EnumActiveScripts();
+		for (size_t nKey = 0; nKey < m_arrEngines.size(); nKey++) {
+			OLECHAR szGuid[42];
+			if (FAILED(StringFromGUID2(m_arrEngines[nKey].m_clsid, szGuid, 42))) continue;
+			SetRegStringValue(hKey, (const char *)_bstr_t(szGuid), m_arrEngines[nKey].m_strName);
+		}
+	}
+}
+
 void EnumActiveScripts() {
 	ICatInformationPtr spCatInfo;
 	spCatInfo.CreateInstance(CLSID_StdComponentCategoriesMgr);

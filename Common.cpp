@@ -2,12 +2,17 @@
 #define DEFINE_VARS
 #include "RESearch.h"
 
-HKEY OpenRegistry() {
-	HKEY Key;
-	char CurrentKey[256];
-	strcat(strcpy(CurrentKey,StartupInfo.RootKey),"\\RESearch");
-	RegCreateKeyEx(HKEY_CURRENT_USER,CurrentKey,0,NULL,0,KEY_ALL_ACCESS,NULL,&Key,NULL);
-	return Key;
+HKEY OpenRegistry(const char *szSubKey, bool bCreate) {
+	HKEY hKey;
+	char szCurrentKey[512];
+	strcat(strcpy(szCurrentKey, StartupInfo.RootKey), "\\RESearch");
+	if (szSubKey) strcat(strcat(szCurrentKey, "\\"), szSubKey);
+	if (bCreate) {
+		if (RegCreateKeyEx(HKEY_CURRENT_USER, szCurrentKey, 0, NULL, 0, KEY_ALL_ACCESS, NULL, &hKey, NULL) != ERROR_SUCCESS) return (HKEY)NULL;
+	} else {
+		if (RegOpenKeyEx(HKEY_CURRENT_USER, szCurrentKey, 0, KEY_ALL_ACCESS, &hKey) != ERROR_SUCCESS) return (HKEY)NULL;
+	}
+	return hKey;
 }
 
 void ReadRegistry() {
