@@ -485,7 +485,7 @@ BOOL EditorReplace() {
 }
 
 BOOL CERPresetCollection::EditPreset(CPreset *pPreset) {
-	CFarDialog Dialog(76, 17,"ERPresetDlg");
+	CFarDialog Dialog(76, 19, "ERPresetDlg");
 	Dialog.AddFrame(MERPreset);
 	Dialog.Add(new CFarTextItem(5, 2, 0, MPresetName));
 	Dialog.Add(new CFarEditItem(5, 3, 70, DIF_HISTORY,"RESearch.PresetName", pPreset->Name()));
@@ -503,10 +503,12 @@ BOOL CERPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.Add(new CFarButtonItem(34, 10, 0, 0, MUTF8));
 	Dialog.Add(new CFarCheckBoxItem(5, 11, 0, MRemoveEmpty, &pPreset->m_mapInts["RemoveEmpty"]));
 	Dialog.Add(new CFarCheckBoxItem(30, 11, 0, MRemoveNoMatch, &pPreset->m_mapInts["RemoveNoMatch"]));
+	Dialog.Add(new CFarCheckBoxItem(5, 12, 0, MEvaluateAsScript, &pPreset->m_mapInts["AsScript"]));
+	Dialog.Add(new CFarComboBoxItem(30, 12, 60, 0, new CFarListData(m_lstEngines, false), &pPreset->m_mapInts["Script"]));
 	Dialog.AddButtons(MOk, MCancel);
 
 	do {
-		switch (Dialog.Display(2, -2, -5)) {
+		switch (Dialog.Display(2, -2, -7)) {
 		case 0:
 			return TRUE;
 		case 1:{		// avoid Internal Error for icl
