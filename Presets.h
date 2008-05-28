@@ -3,22 +3,23 @@
 
 #pragma warning(disable:327)
 
-class CParameterBatch {
+class CParameterSet {
 public:
-	CParameterBatch(int nStringCount, int nIntCount, ...);
+	CParameterSet(int nStringCount, int nIntCount, ...);
 	map<string, string *> m_mapStrings;
 	map<string, int *> m_mapInts;
 };
 
 class CPreset {
 public:
-	CPreset(CParameterBatch &Batch);
+	CPreset(CParameterSet &Batch);
 	CPreset(string strName, HKEY hKey);	// hKey is root key
-	void Apply(CParameterBatch &Batch);
+	void Apply(CParameterSet &Batch);
 	void Save(HKEY hKey);
 
 	string &Name() {return m_mapStrings[""];}
 	int m_nID;
+	bool m_bAddToMenu;
 	map<string, string> m_mapStrings;
 	map<string, int> m_mapInts;
 };
@@ -29,7 +30,7 @@ public:
 	virtual ~CPresetCollection();
 	void Load();
 	void Save();
-	int ShowMenu(CParameterBatch &Batch = *((CParameterBatch *)NULL));
+	int ShowMenu(CParameterSet &Batch = *((CParameterSet *)NULL));
 	virtual BOOL EditPreset(CPreset *pPreset) = 0;
 	CPreset *operator()(int nID);
 	virtual const char *GetName()=0;
@@ -59,8 +60,8 @@ public:
 	void Save();
 	~CPresetBatchCollection();
 
-	typedef BOOL (*BatchExecutor)(CParameterBatch &Batch);
-	int ShowMenu(BatchExecutor Executor = NULL, CParameterBatch &Batch = *((CParameterBatch *)NULL));
+	typedef BOOL (*BatchExecutor)(CParameterSet &Batch);
+	int ShowMenu(BatchExecutor Executor = NULL, CParameterSet &Batch = *((CParameterSet *)NULL));
 protected:
 	CPresetCollection *m_pCollection;
 };

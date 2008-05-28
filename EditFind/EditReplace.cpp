@@ -374,7 +374,7 @@ BOOL EditorReplaceAgain() {
 	return FALSE;
 }
 
-BOOL EditorReplaceExecutor(CParameterBatch &Batch) {
+BOOL EditorReplaceExecutor(CParameterSet &Batch) {
 	if (!EPreparePattern(SearchText)) return FALSE;
 
 	EText = SearchText;

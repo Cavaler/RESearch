@@ -34,7 +34,7 @@ BOOL EditorFilterAgain() {
 	return FALSE;
 }
 
-BOOL EditorFilterExecutor(CParameterBatch &Batch) {
+BOOL EditorFilterExecutor(CParameterSet &Batch) {
 	if (!EPreparePattern(SearchText)) return FALSE;
 
 	EText = SearchText;

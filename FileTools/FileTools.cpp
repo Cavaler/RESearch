@@ -6,11 +6,11 @@ char *FRInts[]={"MaskAsRegExp","TextAsRegExp","Repeating"};
 char *FQRStrings[]={"Text","Replace"};
 char *FQRInts[]={"TextAsRegExp","Repeating"};
 
-CParameterBatch g_RBatch(3, 3,
+CParameterSet g_RBatch(3, 3,
 	"Mask", &MaskText, "Text", &SearchText, "Replace", &ReplaceText,
 	"MaskAsRegExp", &FMaskAsRegExp, "TextAsRegExp", &FSearchAs, "Repeating", &FRepeating
 	);
-CParameterBatch g_QRBatch(2, 2,
+CParameterSet g_QRBatch(2, 2,
 	"Text", &SearchText, "Replace", &ReplaceText,
 	"TextAsRegExp", &FSearchAs, "Repeating", &FRepeating
 	);
@@ -233,7 +233,7 @@ void RenameFile(WIN32_FIND_DATA *FindData,PluginPanelItem **PanelItems,int *Item
 	if (Modified) AddFile(FindData,PanelItems,ItemsNumber);
 }
 
-BOOL RenameFilesExecutor(CParameterBatch &Batch) {
+BOOL RenameFilesExecutor(CParameterSet &Batch) {
 	FMask=MaskText;
 	FText=SearchText;
 	FRReplace=ReplaceText;
@@ -350,7 +350,7 @@ BOOL PerformRenameSelectedFiles(PanelInfo &PInfo,PluginPanelItem **PanelItems,in
 	return TRUE;
 }
 
-BOOL RenameSelectedFilesExecutor(CParameterBatch &Batch) {
+BOOL RenameSelectedFilesExecutor(CParameterSet &Batch) {
 	FText=SearchText;
 	FRReplace=ReplaceText;
 	if (!FPreparePattern(false)) return FALSE;

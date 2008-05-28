@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "RESearch.h"
 
-CParameterBatch::CParameterBatch(int nStringCount, int nIntCount, ...) {
+CParameterSet::CParameterSet(int nStringCount, int nIntCount, ...) {
 	va_list List;
 	va_start(List, nIntCount);
 	while (nStringCount--) {
@@ -15,7 +15,7 @@ CParameterBatch::CParameterBatch(int nStringCount, int nIntCount, ...) {
 	va_end(List);
 }
 
-CPreset::CPreset(CParameterBatch &Batch) : m_nID(0) {
+CPreset::CPreset(CParameterSet &Batch) : m_nID(0) {
 	if (!&Batch) return;
 
 	m_mapStrings[""] = "New Preset";
@@ -40,6 +40,8 @@ CPreset::CPreset(string strName, HKEY hKey) {
 	}
 	m_nID = atoi(strName.c_str());
 
+	QueryRegBoolValue(hOwnKey, "AddToMenu", &m_bAddToMenu, false);
+
 	DWORD dwIndex = 0;
 	char szName[256];
 	DWORD dwcbName = sizeof(szName), dwType;
@@ -60,7 +62,7 @@ CPreset::CPreset(string strName, HKEY hKey) {
 	RegCloseKey(hOwnKey);
 }
 
-void CPreset::Apply(CParameterBatch &Batch) {
+void CPreset::Apply(CParameterSet &Batch) {
 	map<string, string *>::iterator it1 = Batch.m_mapStrings.begin();
 	while (it1 != Batch.m_mapStrings.end()) {
 		map<string, string>::iterator it = m_mapStrings.find(it1->first);
@@ -85,6 +87,8 @@ void CPreset::Save(HKEY hKey) {
 
 	if (RegCreateKeyEx(hKey, szName, 0, NULL, 0, KEY_ALL_ACCESS, NULL, &hOwnKey, NULL) != ERROR_SUCCESS)
 		return;
+
+	SetRegBoolValue(hOwnKey, "AddToMenu", m_bAddToMenu);
 
 	map<string, string>::iterator it1 = m_mapStrings.begin();
 	while (it1 != m_mapStrings.end()) {
@@ -151,7 +155,7 @@ void CPresetCollection::Save() {
 	RegCloseKey(hKey);
 }
 
-int CPresetCollection::ShowMenu(CParameterBatch &Batch) {
+int CPresetCollection::ShowMenu(CParameterSet &Batch) {
 	int piBreakKeys[]={VK_INSERT, VK_DELETE, VK_F4, 0};
 	vector<string> arrItems;
 	do {
@@ -378,7 +382,7 @@ void CPresetBatchCollection::Save() {
 	RegCloseKey(hKey);
 }
 
-int CPresetBatchCollection::ShowMenu(BatchExecutor Executor, CParameterBatch &Batch) {
+int CPresetBatchCollection::ShowMenu(BatchExecutor Executor, CParameterSet &Batch) {
 	int piBreakKeys[]={VK_INSERT, VK_DELETE, VK_F4, 0};
 	vector<string> arrItems;
 

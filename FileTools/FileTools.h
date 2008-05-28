@@ -22,8 +22,8 @@ public:
 #define DECLARE_PERSIST_VARS
 #include "PersistVars.h"
 
-extern CParameterBatch g_RBatch;
-extern CParameterBatch g_QRBatch;
+extern CParameterSet g_RBatch;
+extern CParameterSet g_QRBatch;
 EXTERN CRPresetCollection *RPresets;
 EXTERN CQRPresetCollection *QRPresets;
 EXTERN CPresetBatchCollection *RBatch;

@@ -265,7 +265,7 @@ void ReplaceFile(WIN32_FIND_DATA *FindData, PluginPanelItem **PanelItems, int *I
 	}
 }
 
-BOOL FileReplaceExecutor(CParameterBatch &Batch) {
+BOOL FileReplaceExecutor(CParameterSet &Batch) {
 	FMask=MaskText;
 	FText=SearchText;
 	FRReplace=ReplaceText;
