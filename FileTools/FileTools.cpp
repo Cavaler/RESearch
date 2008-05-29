@@ -233,21 +233,6 @@ void RenameFile(WIN32_FIND_DATA *FindData,PluginPanelItem **PanelItems,int *Item
 	if (Modified) AddFile(FindData,PanelItems,ItemsNumber);
 }
 
-BOOL RenameFilesExecutor(CParameterSet &Batch) {
-	FMask=MaskText;
-	FText=SearchText;
-	FRReplace=ReplaceText;
-	if (!FPreparePattern(false)) return FALSE;
-	FTAskOverwrite = FTAskCreatePath = true;
-	FileNumber=-1;g_bInterrupted=FALSE;
-
-	FRConfirmFileThisRun = FALSE;//FRConfirmFile;
-	FRConfirmLineThisRun = FALSE;//FRConfirmLine;
-	ScanDirectories(&PanelItems,&ItemsNumber,RenameFile);
-
-	return TRUE;
-}
-
 BOOL RenameFilesPrompt() {
 	CFarDialog Dialog(76,19,"FileRenameDlg");
 	Dialog.AddFrame(MMenuRename);
@@ -294,7 +279,7 @@ BOOL RenameFilesPrompt() {
 			FRReplace=ReplaceText;
 			break;
 		case 1:
-			if (RBatch->ShowMenu(RenameFilesExecutor, g_RBatch) >= 0)
+			if (RBatch->ShowMenu(g_RBatch) >= 0)
 				return FALSE;
 			break;
 		case 2:
@@ -330,6 +315,23 @@ OperationResult RenameFiles(PluginPanelItem **PanelItems,int *ItemsNumber,BOOL S
 	} else return OR_FAILED;
 }
 
+OperationResult RenameFilesExecutor() {
+	FMask=MaskText;
+	FText=SearchText;
+	FRReplace=ReplaceText;
+	if (!FPreparePattern(false)) return OR_FAILED;
+	FTAskOverwrite = FTAskCreatePath = true;
+	FileNumber=-1;g_bInterrupted=FALSE;
+
+	FRConfirmFileThisRun = FALSE;//FRConfirmFile;
+	FRConfirmLineThisRun = FALSE;//FRConfirmLine;
+
+	if (ScanDirectories(&PanelItems, &ItemsNumber, RenameFile)) {
+		if (!FROpenModified) return OR_OK; else
+			return (ItemsNumber == 0) ? OR_OK : OR_PANEL;
+	} else return OR_FAILED;
+}
+
 BOOL PerformRenameSelectedFiles(PanelInfo &PInfo,PluginPanelItem **PanelItems,int *ItemsNumber) {
 	FileNumber=-1;g_bInterrupted=FALSE;
 
@@ -347,24 +349,6 @@ BOOL PerformRenameSelectedFiles(PanelInfo &PInfo,PluginPanelItem **PanelItems,in
 	}
 
 	StartupInfo.Control(INVALID_HANDLE_VALUE, FCTL_UPDATEPANEL, NULL);
-	return TRUE;
-}
-
-BOOL RenameSelectedFilesExecutor(CParameterSet &Batch) {
-	FText=SearchText;
-	FRReplace=ReplaceText;
-	if (!FPreparePattern(false)) return FALSE;
-	FTAskOverwrite = FTAskCreatePath = true;
-
-	FRConfirmFileThisRun = FALSE;//FRConfirmFile;
-	FRConfirmLineThisRun = FALSE;//FRConfirmLine;
-
-	PanelInfo PInfo;
-	StartupInfo.Control(INVALID_HANDLE_VALUE,FCTL_GETPANELINFO,&PInfo);
-	if (PInfo.Plugin||(PInfo.PanelType!=PTYPE_FILEPANEL)) return FALSE;
-
-	PerformRenameSelectedFiles(PInfo,&PanelItems,&ItemsNumber);
-
 	return TRUE;
 }
 
@@ -401,7 +385,7 @@ BOOL RenameSelectedFilesPrompt() {
 			FRReplace=ReplaceText;
 			break;
 		case 1:
-			if (QRBatch->ShowMenu(RenameSelectedFilesExecutor, g_QRBatch) >= 0)
+			if (QRBatch->ShowMenu(g_QRBatch) >= 0)
 				return FALSE;
 			break;
 		case 2:
@@ -432,7 +416,23 @@ OperationResult RenameSelectedFiles(PluginPanelItem **PanelItems,int *ItemsNumbe
 	FTAskOverwrite = FTAskCreatePath = true;
 
 	PerformRenameSelectedFiles(PInfo,PanelItems,ItemsNumber);
-	return (*ItemsNumber==0)?NoFilesFound():OR_OK;
+	return (*ItemsNumber==0) ? NoFilesFound() : OR_OK;
+}
+
+OperationResult QuickRenameFilesExecutor() {
+	FText=SearchText;
+	FRReplace=ReplaceText;
+	if (!FPreparePattern(false)) return OR_FAILED;
+	FTAskOverwrite = FTAskCreatePath = true;
+
+	FRConfirmFileThisRun = FALSE;//FRConfirmFile;
+	FRConfirmLineThisRun = FALSE;//FRConfirmLine;
+
+	PanelInfo PInfo;
+	StartupInfo.Control(INVALID_HANDLE_VALUE,FCTL_GETPANELINFO,&PInfo);
+	if (PInfo.Plugin || (PInfo.PanelType!=PTYPE_FILEPANEL)) return OR_FAILED;
+
+	return PerformRenameSelectedFiles(PInfo,&PanelItems,&ItemsNumber) ? OR_OK : OR_CANCEL;
 }
 
 void StripCommonPart(vector<string> &arrFileNames) {
@@ -669,12 +669,4 @@ BOOL CQRPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.AddButtons(MOk,MCancel);
 
 	return Dialog.Display(-1)==0;
-}
-
-OperationResult RenameFilesExecutor() {
-	return OR_CANCEL;
-}
-
-OperationResult QuickRenameFilesExecutor() {
-	return OR_CANCEL;
 }

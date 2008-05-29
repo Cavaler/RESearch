@@ -384,7 +384,7 @@ void CPresetBatchCollection::Save() {
 	RegCloseKey(hKey);
 }
 
-int CPresetBatchCollection::ShowMenu(BatchExecutor Executor, CParameterSet &Batch) {
+int CPresetBatchCollection::ShowMenu(CParameterSet &Batch) {
 	int piBreakKeys[]={VK_INSERT, VK_DELETE, VK_F4, 0};
 	vector<string> arrItems;
 
@@ -401,7 +401,7 @@ int CPresetBatchCollection::ShowMenu(BatchExecutor Executor, CParameterSet &Batc
 
 		switch (nBreakKey) {
 		case -1:
-			if (Executor && (nResult >= 0) && (nResult < (int)size())) {
+			if (&Batch && Batch.m_Executor && (nResult >= 0) && (nResult < (int)size())) {
 				CPresetBatch *pBatch = at(nResult);
 				const char *Lines[]={"Execute", GetMsg(MExecuteBatchQuery),
 					pBatch->m_strName.c_str(), GetMsg(MOk), GetMsg(MCancel)};
@@ -411,7 +411,7 @@ int CPresetBatchCollection::ShowMenu(BatchExecutor Executor, CParameterSet &Batc
 					CPreset *pPreset = (*pBatch)(nPreset);
 					if (pPreset) {
 						pPreset->Apply(Batch);
-						if (!Executor(Batch)) break;
+						if (!Batch.m_Executor()) break;
 					}
 				}
 			}

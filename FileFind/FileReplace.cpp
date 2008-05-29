@@ -265,21 +265,6 @@ void ReplaceFile(WIN32_FIND_DATA *FindData, PluginPanelItem **PanelItems, int *I
 	}
 }
 
-BOOL FileReplaceExecutor(CParameterSet &Batch) {
-	FMask=MaskText;
-	FText=SearchText;
-	FRReplace=ReplaceText;
-	if (!FPreparePattern(false)) return FALSE;
-	if (FUTF8) FAllCharTables=FALSE;
-
-	FRConfirmFileThisRun = FALSE;		// FRConfirmFile;
-	FRConfirmReadonlyThisRun = FALSE;	// (FRReplaceReadonly == RR_ALWAYS);
-	FRConfirmLineThisRun = FALSE;		// FRConfirmLine;
-	ScanDirectories(&PanelItems,&ItemsNumber,ReplaceFile);
-
-	return TRUE;
-}
-
 int ReplacePrompt(BOOL Plugin) {
 	CFarDialog Dialog(76,24,"FileReplaceDlg");
 	Dialog.AddFrame(MREReplace);
@@ -346,7 +331,7 @@ int ReplacePrompt(BOOL Plugin) {
 			QuoteReplaceString(ReplaceText);
 			break;
 		case 3:
-			if (FRBatch->ShowMenu(FileReplaceExecutor, g_FRBatch) >= 0)
+			if (FRBatch->ShowMenu(g_FRBatch) >= 0)
 				return FALSE;
 			break;
 		case 4:
@@ -386,6 +371,23 @@ OperationResult FileReplace(PluginPanelItem **PanelItems,int *ItemsNumber,BOOL S
 	if (ScanDirectories(PanelItems,ItemsNumber,ReplaceFile)) {
 		if (!FROpenModified) return OR_OK; else
 		return (*ItemsNumber==0)?NoFilesFound():OR_PANEL;
+	} else return OR_FAILED;
+}
+
+OperationResult FileReplaceExecutor() {
+	FMask=MaskText;
+	FText=SearchText;
+	FRReplace=ReplaceText;
+	if (!FPreparePattern(false)) return OR_FAILED;
+	if (FUTF8) FAllCharTables=FALSE;
+
+	FRConfirmFileThisRun = FALSE;		// FRConfirmFile;
+	FRConfirmReadonlyThisRun = FALSE;	// (FRReplaceReadonly == RR_ALWAYS);
+	FRConfirmLineThisRun = FALSE;		// FRConfirmLine;
+
+	if (ScanDirectories(&PanelItems, &ItemsNumber, ReplaceFile)) {
+		if (!FROpenModified) return OR_OK; else
+			return (ItemsNumber == 0) ? OR_OK : OR_PANEL;
 	} else return OR_FAILED;
 }
 
@@ -430,8 +432,4 @@ BOOL CFRPresetCollection::EditPreset(CPreset *pPreset) {
 			return FALSE;
 		}
 	} while (true);
-}
-
-OperationResult FileReplaceExecutor() {
-	return OR_CANCEL;
 }

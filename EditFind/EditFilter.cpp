@@ -34,14 +34,6 @@ BOOL EditorFilterAgain() {
 	return FALSE;
 }
 
-BOOL EditorFilterExecutor(CParameterSet &Batch) {
-	if (!EPreparePattern(SearchText)) return FALSE;
-
-	EText = SearchText;
-	EditorFilterAgain();
-	return TRUE;
-}
-
 BOOL EditorFilter() {
 	CFarDialog Dialog(76,13,"FilterDlg");
 	Dialog.AddFrame(MFilterLines);
@@ -72,7 +64,7 @@ BOOL EditorFilter() {
 			if (ERegExp) QuoteRegExpString(SearchText);
 			break;
 		case 2:
-			if (EFBatch->ShowMenu(EditorFilterExecutor, g_EFBatch) >= 0)
+			if (EFBatch->ShowMenu(g_EFBatch) >= 0)
 				return TRUE;
 			break;
 		case 3:
@@ -89,6 +81,13 @@ BOOL EditorFilter() {
 	EText=SearchText;
 	if (!EText.empty()) EditorFilterAgain();
 	return TRUE;
+}
+
+OperationResult EditorFilterExecutor() {
+	if (!EPreparePattern(SearchText)) return OR_FAILED;
+
+	EText = SearchText;
+	return EditorFilterAgain() ? OR_OK : OR_CANCEL;
 }
 
 BOOL CEFPresetCollection::EditPreset(CPreset *pPreset) {
@@ -121,8 +120,4 @@ BOOL CEFPresetCollection::EditPreset(CPreset *pPreset) {
 			return FALSE;
 		}
 	} while (true);
-}
-
-OperationResult EditorFilterExecutor() {
-	return OR_CANCEL;
 }

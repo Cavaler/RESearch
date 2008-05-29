@@ -374,36 +374,6 @@ BOOL EditorReplaceAgain() {
 	return FALSE;
 }
 
-BOOL EditorReplaceExecutor(CParameterSet &Batch) {
-	if (!EPreparePattern(SearchText)) return FALSE;
-
-	EText = SearchText;
-	ERReplace = ERReplace_O2E = ReplaceText;
-	OEMToEditor(ERReplace_O2E);
-
-	NoAsking = TRUE;
-	ReplaceNumber = 0;
-
-	if (EReverse) {
-		RefreshEditorInfo();
-
-		EditorSetPosition Position = {EdInfo.TotalLines, 0, -1, -1, -1, -1};
-		EctlSetPosition(&Position);
-
-		EditorSetString String = {-1};
-		EctlSetString(&String);
-
-		Position.CurPos = String.StringLength;
-		EctlSetPosition(&Position);
-	} else {
-		EditorSetPosition Position = {0, 0, 0, -1, -1, -1};
-		EctlSetPosition(&Position);
-	}
-
-	EditorReplaceAgain();
-	return TRUE;
-}
-
 BOOL EditorReplace() {
 	RefreshEditorInfo();
 	EInSelection = (EdInfo.BlockType != BTYPE_NONE);
@@ -461,7 +431,7 @@ BOOL EditorReplace() {
 			ConfigureSeveralLines();
 			break;
 		case 5:
-			if (ERBatch->ShowMenu(EditorReplaceExecutor, g_ERBatch) >= 0)
+			if (ERBatch->ShowMenu(g_ERBatch) >= 0)
 				return TRUE;
 			break;
 		case 6:
@@ -482,6 +452,35 @@ BOOL EditorReplace() {
 	g_bInterrupted = FALSE;
 	if (!EText.empty()) EditorReplaceAgain();
 	return TRUE;
+}
+
+OperationResult EditorReplaceExecutor() {
+	if (!EPreparePattern(SearchText)) return OR_FAILED;
+
+	EText = SearchText;
+	ERReplace = ERReplace_O2E = ReplaceText;
+	OEMToEditor(ERReplace_O2E);
+
+	NoAsking = TRUE;
+	ReplaceNumber = 0;
+
+	if (EReverse) {
+		RefreshEditorInfo();
+
+		EditorSetPosition Position = {EdInfo.TotalLines, 0, -1, -1, -1, -1};
+		EctlSetPosition(&Position);
+
+		EditorSetString String = {-1};
+		EctlSetString(&String);
+
+		Position.CurPos = String.StringLength;
+		EctlSetPosition(&Position);
+	} else {
+		EditorSetPosition Position = {0, 0, 0, -1, -1, -1};
+		EctlSetPosition(&Position);
+	}
+
+	return EditorReplaceAgain() ? OR_OK : OR_CANCEL;
 }
 
 BOOL CERPresetCollection::EditPreset(CPreset *pPreset) {
@@ -520,8 +519,4 @@ BOOL CERPresetCollection::EditPreset(CPreset *pPreset) {
 			return FALSE;
 		}
 	} while (true);
-}
-
-OperationResult EditorReplaceExecutor() {
-	return OR_CANCEL;
 }

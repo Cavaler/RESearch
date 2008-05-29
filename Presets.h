@@ -65,8 +65,7 @@ public:
 	void Save();
 	~CPresetBatchCollection();
 
-	typedef BOOL (*BatchExecutor)(CParameterSet &Batch);
-	int ShowMenu(BatchExecutor Executor = NULL, CParameterSet &Batch = *((CParameterSet *)NULL));
+	int ShowMenu(CParameterSet &Batch = *((CParameterSet *)NULL));
 protected:
 	CPresetCollection *m_pCollection;
 };
