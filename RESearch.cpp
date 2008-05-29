@@ -269,8 +269,8 @@ BOOL ProcessCommandLine(char *Line,BOOL *ShowDialog,int *Item) {
 }
 
 int ShowFileMenu() {
-	FarMenuItem MenuItems[14];
-	memset(MenuItems,0,sizeof(MenuItems));
+	vector<FarMenuItem> MenuItems(15);
+
 	strcpy(MenuItems[0].Text,GetMsg(MMenuSearch));
 	strcpy(MenuItems[1].Text,GetMsg(MMenuReplace));
 	strcpy(MenuItems[2].Text,GetMsg(MMenuGrep));
@@ -286,13 +286,20 @@ int ShowFileMenu() {
 	strcpy(MenuItems[12].Text,GetMsg(MMenuUTF8Converter));
 	strcpy(MenuItems[13].Text,GetMsg(MMenuShowLastResults));
 
+	MenuItems[14].Separator=TRUE;
+	FSPresets->FillMenuItems(MenuItems);
+	FRPresets->FillMenuItems(MenuItems);
+	FGPresets->FillMenuItems(MenuItems);
+	RPresets->FillMenuItems(MenuItems);
+	QRPresets->FillMenuItems(MenuItems);
+
 	return StartupInfo.Menu(StartupInfo.ModuleNumber,-1,-1,0,FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT,GetMsg(MMenuHeader),
-		NULL,"FileMenu",NULL,NULL,MenuItems,sizeof(MenuItems)/sizeof(MenuItems[0]));
+		NULL,"FileMenu",NULL,NULL,&MenuItems[0],MenuItems.size());
 }
 
 int ShowEditorMenu() {
-	FarMenuItem MenuItems[10];
-	memset(MenuItems,0,sizeof(MenuItems));
+	vector<FarMenuItem> MenuItems(11);
+
 	strcpy(MenuItems[0].Text,GetMsg(MMenuSearch));
 	strcpy(MenuItems[1].Text,GetMsg(MMenuReplace));
 	strcpy(MenuItems[2].Text,GetMsg(MMenuFilterText));
@@ -304,42 +311,74 @@ int ShowEditorMenu() {
 	strcpy(MenuItems[8].Text,GetMsg(MMenuUTF8Converter));
 	strcpy(MenuItems[9].Text,GetMsg(MMenuShowLastResults));
 
+	MenuItems[10].Separator=TRUE;
+	ESPresets->FillMenuItems(MenuItems);
+	ERPresets->FillMenuItems(MenuItems);
+	EFPresets->FillMenuItems(MenuItems);
+	ELPresets->FillMenuItems(MenuItems);
+
 	return StartupInfo.Menu(StartupInfo.ModuleNumber,-1,-1,0,FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT,GetMsg(MMenuHeader),
-		NULL,"EditorMenu",NULL,NULL,MenuItems,sizeof(MenuItems)/sizeof(MenuItems[0]));
+		NULL,"EditorMenu",NULL,NULL,&MenuItems[0],MenuItems.size());
 }
 
 int ShowViewerMenu() {
-	FarMenuItem MenuItems[4];
-	memset(MenuItems,0,sizeof(MenuItems));
+	vector<FarMenuItem> MenuItems(5);
+
 	strcpy(MenuItems[0].Text,GetMsg(MMenuSearch));
 	strcpy(MenuItems[1].Text,GetMsg(MMenuSearchAgain));
 //	strcpy(MenuItems[2].Text,GetMsg(MMenuSearchAgainRev));
 	MenuItems[2].Separator=TRUE;
 	strcpy(MenuItems[3].Text,GetMsg(MMenuUTF8Converter));
 
+	MenuItems[4].Separator=TRUE;
+	VSPresets->FillMenuItems(MenuItems);
+
 	return StartupInfo.Menu(StartupInfo.ModuleNumber,-1,-1,0,FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT,GetMsg(MMenuHeader),
-		NULL,"EditorMenu",NULL,NULL,MenuItems,sizeof(MenuItems)/sizeof(MenuItems[0]));
+		NULL,"EditorMenu",NULL,NULL,&MenuItems[0],MenuItems.size());
 }
 
-HANDLE WINAPI OpenPlugin(int OpenFrom,int Item) {
-	BOOL ShowDialog=TRUE;
-	g_bFromCmdLine = false;
-	g_bInterrupted = FALSE;
+OperationResult OpenPluginFromFilePreset(int Item) {
+	CPreset *pPreset;
+	if (pPreset = FSPresets->FindMenuPreset(Item)) {
+		CParameterBackup Backup(g_FSBatch);
+		pPreset->Apply(g_FSBatch);
+		return g_FSBatch.m_Executor();
+	}
 
-	int nMenu;
-	ESearchAgainCalled = FALSE;
+	if (pPreset = FRPresets->FindMenuPreset(Item)) {
+		CParameterBackup Backup(g_FRBatch);
+		pPreset->Apply(g_FRBatch);
+		return g_FRBatch.m_Executor();
+	}
 
-	switch (OpenFrom) {
-	case OPEN_COMMANDLINE:
-		g_bFromCmdLine = true;
-		if (!ProcessCommandLine((char *)Item,&ShowDialog,&Item)) return INVALID_HANDLE_VALUE;
-	case OPEN_PLUGINSMENU:{
-		OperationResult Result=OR_CANCEL;
-		if (!g_bFromCmdLine) {
-			Item=ShowFileMenu();
-			if (Item==-1) return INVALID_HANDLE_VALUE;
-		}
-		switch (Item) {
+	if (pPreset = FGPresets->FindMenuPreset(Item)) {
+		CParameterBackup Backup(g_FGBatch);
+		pPreset->Apply(g_FGBatch);
+		return g_FGBatch.m_Executor();
+	}
+
+	if (pPreset = RPresets->FindMenuPreset(Item)) {
+		CParameterBackup Backup(g_RBatch);
+		pPreset->Apply(g_RBatch);
+		return g_RBatch.m_Executor();
+	}
+
+	if (pPreset = QRPresets->FindMenuPreset(Item)) {
+		CParameterBackup Backup(g_QRBatch);
+		pPreset->Apply(g_QRBatch);
+		return g_QRBatch.m_Executor();
+	}
+
+	return OR_CANCEL;
+}
+
+HANDLE OpenPluginFromFileMenu(int Item, BOOL ShowDialog) {
+	OperationResult Result=OR_CANCEL;
+	if (!g_bFromCmdLine) {
+		Item=ShowFileMenu();
+		if (Item==-1) return INVALID_HANDLE_VALUE;
+	}
+	switch (Item) {
 		case 0:
 			Result=FileFind(&PanelItems,&ItemsNumber,ShowDialog);
 			break;
@@ -374,23 +413,54 @@ HANDLE WINAPI OpenPlugin(int OpenFrom,int Item) {
 				Result=OR_CANCEL;
 				break;
 			}
-		}
-		if (Result!=OR_CANCEL) SynchronizeWithFile(Item);
-		if (Result==OR_PANEL) {
-			PanelInfo PInfo;
-			StartupInfo.Control(INVALID_HANDLE_VALUE,FCTL_GETPANELINFO,&PInfo);
-			CTemporaryPanel *Panel=new CTemporaryPanel(PanelItems,ItemsNumber,PInfo.CurDir);
-			PanelItems=NULL;ItemsNumber=0;
-			return (HANDLE)Panel;
-		} else {
-			StartupInfo.Control(INVALID_HANDLE_VALUE,FCTL_UPDATEPANEL,(void *)~NULL);
-			StartupInfo.Control(INVALID_HANDLE_VALUE,FCTL_REDRAWPANEL,NULL);
-			return INVALID_HANDLE_VALUE;
-		}
-						  }
-	case OPEN_EDITOR:
-		FindIfClockPresent();
-		switch (nMenu = ShowEditorMenu()) {
+	}
+	if (Item >= 15) {
+		Item -= 15;
+		Result = OpenPluginFromFilePreset(Item);
+	}
+
+	if (Result!=OR_CANCEL) SynchronizeWithFile(Item);
+	if (Result==OR_PANEL) {
+		PanelInfo PInfo;
+		StartupInfo.Control(INVALID_HANDLE_VALUE,FCTL_GETPANELINFO,&PInfo);
+		CTemporaryPanel *Panel=new CTemporaryPanel(PanelItems,ItemsNumber,PInfo.CurDir);
+		PanelItems=NULL;ItemsNumber=0;
+		return (HANDLE)Panel;
+	} else {
+		StartupInfo.Control(INVALID_HANDLE_VALUE,FCTL_UPDATEPANEL,(void *)~NULL);
+		StartupInfo.Control(INVALID_HANDLE_VALUE,FCTL_REDRAWPANEL,NULL);
+		return INVALID_HANDLE_VALUE;
+	}
+}
+
+OperationResult OpenPluginFromEditorPreset(int Item) {
+	CPreset *pPreset;
+	if (pPreset = ESPresets->FindMenuPreset(Item)) {
+		CParameterBackup Backup(g_ESBatch);
+		pPreset->Apply(g_ESBatch);
+		return g_ESBatch.m_Executor();
+	}
+	if (pPreset = ERPresets->FindMenuPreset(Item)) {
+		CParameterBackup Backup(g_ERBatch);
+		pPreset->Apply(g_ERBatch);
+		return g_ERBatch.m_Executor();
+	}
+	if (pPreset = EFPresets->FindMenuPreset(Item)) {
+		CParameterBackup Backup(g_EFBatch);
+		pPreset->Apply(g_EFBatch);
+		return g_EFBatch.m_Executor();
+	}
+	if (pPreset = ELPresets->FindMenuPreset(Item)) {
+		CParameterBackup Backup(g_ELBatch);
+		pPreset->Apply(g_ELBatch);
+		return g_ELBatch.m_Executor();
+	}
+	return OR_CANCEL;
+}
+
+HANDLE OpenPluginFromEditorMenu(int Item) {
+	FindIfClockPresent();
+	switch (int nMenu = ShowEditorMenu()) {
 		case 0:
 			if (EditorSearch()) LastAction=0;
 			break;
@@ -438,11 +508,28 @@ HANDLE WINAPI OpenPlugin(int OpenFrom,int Item) {
 		case 8:
 			UTF8Converter();
 			break;
-		}
-		return INVALID_HANDLE_VALUE;
+	}
 
-	case OPEN_VIEWER:
-		switch (nMenu = ShowViewerMenu()) {
+	if (Item >= 10) {
+		Item -= 10;
+		OpenPluginFromEditorPreset(Item);
+	}
+
+	return INVALID_HANDLE_VALUE;
+}
+
+OperationResult OpenPluginFromViewerPreset(int Item) {
+	CPreset *pPreset;
+	if (pPreset = VSPresets->FindMenuPreset(Item)) {
+		CParameterBackup Backup(g_VSBatch);
+		pPreset->Apply(g_VSBatch);
+		return g_VSBatch.m_Executor();
+	}
+	return OR_CANCEL;
+}
+
+HANDLE OpenPluginFromViewerMenu(int Item) {
+	switch (ShowViewerMenu()) {
 		case 0:
 			if (ViewerSearch()) LastAction = 0;
 			break;
@@ -451,21 +538,50 @@ HANDLE WINAPI OpenPlugin(int OpenFrom,int Item) {
 		case 1:
 			ESearchAgainCalled = TRUE;
 			switch (LastAction) {
-			case -1:
-				ESearchAgainCalled = FALSE;
-				if (ViewerSearch()) LastAction = 0;
-				break;
-			default:
-				if (ViewerSearchAgain()) LastAction = 0;
-				break;
+		case -1:
+			ESearchAgainCalled = FALSE;
+			if (ViewerSearch()) LastAction = 0;
+			break;
+		default:
+			if (ViewerSearchAgain()) LastAction = 0;
+			break;
 			}
 //			if (nMenu == 2) EReverse = !EReverse;
 			break;
 		case 3:
 			UTF8Converter();
 			break;
-		}
-		return INVALID_HANDLE_VALUE;
+	}
+
+	if (Item >= 5) {
+		Item -= 5;
+		OpenPluginFromViewerPreset(Item);
+	}
+
+	return INVALID_HANDLE_VALUE;
+}
+
+HANDLE WINAPI OpenPlugin(int OpenFrom,int Item) {
+	BOOL ShowDialog = TRUE;
+	g_bFromCmdLine = false;
+	g_bInterrupted = FALSE;
+
+	ESearchAgainCalled = FALSE;
+
+	switch (OpenFrom) {
+	case OPEN_COMMANDLINE:
+		g_bFromCmdLine = true;
+		if (!ProcessCommandLine((char *)Item,&ShowDialog,&Item)) return INVALID_HANDLE_VALUE;
+		else // fall-through
+
+	case OPEN_PLUGINSMENU:
+		return OpenPluginFromFileMenu(Item, ShowDialog);
+
+	case OPEN_EDITOR:
+		return OpenPluginFromEditorMenu(Item);
+
+	case OPEN_VIEWER:
+		return OpenPluginFromViewerMenu(Item);
 
 	case OPEN_SHORTCUT:
 		StartupInfo.Control(INVALID_HANDLE_VALUE,FCTL_SETPANELDIR,(void *)Item);

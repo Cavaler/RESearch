@@ -350,8 +350,20 @@ OperationResult FileFind(PluginPanelItem **PanelItems,int *ItemsNumber,BOOL Show
 	} else return OR_FAILED;
 }
 
+OperationResult FileSearchExecutor() {
+	FMask=MaskText;
+	FText=SearchText;
+	if (!FPreparePattern(false)) return OR_FAILED;
+	if (FUTF8) FAllCharTables=FALSE;
+
+	if (ScanDirectories(&PanelItems, &ItemsNumber, SearchFile)) {
+		if (!FROpenModified) return OR_OK; else
+			return (ItemsNumber == 0) ? OR_OK : OR_PANEL;
+	} else return OR_FAILED;
+}
+
 BOOL CFSPresetCollection::EditPreset(CPreset *pPreset) {
-	CFarDialog Dialog(76,23,"FSPresetDlg");
+	CFarDialog Dialog(76,25,"FSPresetDlg");
 	Dialog.AddFrame(MFSPreset);
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
 	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,"RESearch.PresetName", pPreset->Name()));
@@ -377,10 +389,11 @@ BOOL CFSPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.Add(new CFarCheckBoxItem(5,17,0,MInverseSearch,&pPreset->m_mapInts["Inverse"]));
 	Dialog.Add(new CFarCheckBoxItem(56,11,0,"",&pPreset->m_mapInts["UTF8"]));
 	Dialog.Add(new CFarButtonItem(60,11,0,0,MUTF8));
+	Dialog.Add(new CFarCheckBoxItem(5,19,0,MAddToMenu,&pPreset->m_bAddToMenu));
 	Dialog.AddButtons(MOk,MCancel);
 
 	do {
-		switch (Dialog.Display(2, -2, -3)) {
+		switch (Dialog.Display(2, -2, -4)) {
 		case 0:
 			return TRUE;
 		case 1:
@@ -390,8 +403,4 @@ BOOL CFSPresetCollection::EditPreset(CPreset *pPreset) {
 			return FALSE;
 		}
 	} while (true);
-}
-
-OperationResult FileSearchExecutor() {
-	return OR_CANCEL;
 }

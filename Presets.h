@@ -33,6 +33,7 @@ public:
 	CPreset(CParameterSet &Batch);
 	CPreset(string strName, HKEY hKey);	// hKey is root key
 	void Apply(CParameterSet &Batch);
+	void FillMenuItem(FarMenuItem &Item);
 	void Save(HKEY hKey);
 
 	string &Name() {return m_mapStrings[""];}
@@ -52,6 +53,9 @@ public:
 	virtual BOOL EditPreset(CPreset *pPreset) = 0;
 	CPreset *operator()(int nID);
 	virtual const char *GetName()=0;
+
+	void FillMenuItems(vector<FarMenuItem> &MenuItems);
+	CPreset *FindMenuPreset(int &nIndex);
 
 protected:
 	int FindUnusedID();

@@ -78,6 +78,8 @@ enum eStringTable {
 	MMenuTransliterate,
 	MMenuUTF8Converter,
 	MMenuShowLastResults,
+	MMenuPreset,
+	MMenuBatch,
 
 	MRESearch,
 	MREReplace,

@@ -91,7 +91,7 @@ OperationResult EditorFilterExecutor() {
 }
 
 BOOL CEFPresetCollection::EditPreset(CPreset *pPreset) {
-	CFarDialog Dialog(76,15,"EFPresetDlg");
+	CFarDialog Dialog(76,17,"EFPresetDlg");
 	Dialog.AddFrame(MEFPreset);
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
 	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,"RESearch.PresetName",pPreset->Name()));
@@ -105,10 +105,11 @@ BOOL CEFPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.Add(new CFarRadioButtonItem(30,8,0,MRemoveMatching,&pPreset->m_mapInts["LeaveFilter"],FALSE));
 	Dialog.Add(new CFarCheckBoxItem(30,9,0,"",&pPreset->m_mapInts["UTF8"]));
 	Dialog.Add(new CFarButtonItem(34,9,0,0,MUTF8));
+	Dialog.Add(new CFarCheckBoxItem(5,11,0,MAddToMenu,&pPreset->m_bAddToMenu));
 	Dialog.AddButtons(MOk,MCancel);
 
 	do {
-		switch (Dialog.Display(2, -2, -3)) {
+		switch (Dialog.Display(2, -2, -4)) {
 		case 0:
 			return TRUE;
 		case 1:{		// avoid Internal Error for icl

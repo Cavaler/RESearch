@@ -630,7 +630,7 @@ OperationResult RenumberFiles() {
 }
 
 BOOL CRPresetCollection::EditPreset(CPreset *pPreset) {
-	CFarDialog Dialog(76,16,"RPresetDlg");
+	CFarDialog Dialog(76,17,"RPresetDlg");
 	Dialog.AddFrame(MFRPreset);
 
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
@@ -648,13 +648,14 @@ BOOL CRPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.Add(new CFarCheckBoxItem(35,8,0,MRepeating,&pPreset->m_mapInts["Repeating"]));
 	Dialog.Add(new CFarEditItem(5,9,70,DIF_HISTORY,"ReplaceText", pPreset->m_mapStrings["Replace"]));
 
+	Dialog.Add(new CFarCheckBoxItem(5,11,0,MAddToMenu,&pPreset->m_bAddToMenu));
 	Dialog.AddButtons(MOk,MCancel);
 
 	return Dialog.Display(-1)==0;
 }
 
 BOOL CQRPresetCollection::EditPreset(CPreset *pPreset) {
-	CFarDialog Dialog(76,14,"QRPresetDlg");
+	CFarDialog Dialog(76,15,"QRPresetDlg");
 	Dialog.AddFrame(MFRPreset);
 
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
@@ -668,6 +669,7 @@ BOOL CQRPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.Add(new CFarCheckBoxItem(35,6,0,MRepeating,&pPreset->m_mapInts["Repeating"]));
 	Dialog.Add(new CFarEditItem(5,7,70,DIF_HISTORY,"ReplaceText", pPreset->m_mapStrings["Replace"]));
 
+	Dialog.Add(new CFarCheckBoxItem(5,9,0,MAddToMenu,&pPreset->m_bAddToMenu));
 	Dialog.AddButtons(MOk,MCancel);
 
 	return Dialog.Display(-1)==0;

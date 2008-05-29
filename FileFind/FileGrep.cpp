@@ -247,7 +247,7 @@ BOOL CFGPresetCollection::EditPreset(CPreset *pPreset) {
 	SearchAs FSA = (SearchAs)pPreset->m_mapInts["SearchAs"];
 	BOOL AsRegExp = (FSA == SA_REGEXP) || (FSA == SA_SEVERALLINE) || (FSA == SA_MULTILINE) || (FSA == SA_MULTIREGEXP);
 
-	CFarDialog Dialog(76,23,"FGPresetDlg");
+	CFarDialog Dialog(76,25,"FGPresetDlg");
 	Dialog.AddFrame(MREGrep);
 
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
@@ -278,6 +278,7 @@ BOOL CFGPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.Add(new CFarTextItem(22,16,0,MGrepContext));
 	Dialog.Add(new CFarCheckBoxItem(5,17,0,MGrepAddLineNumbers,&pPreset->m_mapInts["AddLineNumbers"]));
 
+	Dialog.Add(new CFarCheckBoxItem(5,19,0,MAddToMenu,&pPreset->m_bAddToMenu));
 	Dialog.AddButtons(MOk,MCancel);
 
 	do {

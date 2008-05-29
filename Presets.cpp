@@ -49,6 +49,8 @@ CPreset::CPreset(CParameterSet &Batch) : m_nID(0) {
 	if (!&Batch) return;
 
 	m_mapStrings[""] = "New Preset";
+	m_bAddToMenu = false;
+
 	map<string, string *>::iterator it1 = Batch.m_mapStrings.begin();
 	while (it1 != Batch.m_mapStrings.end()) {
 		m_mapStrings[it1->first] = *(it1->second);
@@ -110,6 +112,11 @@ void CPreset::Apply(CParameterSet &Batch) {
 		}
 		it2++;
 	}
+}
+
+void CPreset::FillMenuItem(FarMenuItem &Item) {
+	strcat(strcpy(Item.Text, GetMsg(MMenuPreset)), Name().c_str());
+	Item.Selected = Item.Checked = Item.Separator = FALSE;
 }
 
 void CPreset::Save(HKEY hKey) {
@@ -239,6 +246,27 @@ int CPresetCollection::ShowMenu(CParameterSet &Batch) {
 CPreset *CPresetCollection::operator()(int nID) {
 	for (size_t nPreset = 0; nPreset < size(); nPreset++) {
 		if (at(nPreset)->m_nID == nID) return at(nPreset);
+	}
+	return NULL;
+}
+
+void CPresetCollection::FillMenuItems(vector<FarMenuItem> &MenuItems) {
+	for (size_t nPreset = 0; nPreset < size(); nPreset++) {
+		CPreset *pPreset = at(nPreset);
+		if (pPreset->m_bAddToMenu) {
+			FarMenuItem Item;
+			pPreset->FillMenuItem(Item);
+			MenuItems.push_back(Item);
+		}
+	}
+}
+
+CPreset *CPresetCollection::FindMenuPreset(int &nIndex) {
+	for (size_t nPreset = 0; nPreset < size(); nPreset++) {
+		CPreset *pPreset = at(nPreset);
+		if (pPreset->m_bAddToMenu) {
+			if (nIndex == 0) return pPreset; else nIndex--;
+		}
 	}
 	return NULL;
 }

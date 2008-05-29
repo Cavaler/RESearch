@@ -392,7 +392,7 @@ OperationResult FileReplaceExecutor() {
 }
 
 BOOL CFRPresetCollection::EditPreset(CPreset *pPreset) {
-	CFarDialog Dialog(76,20,"FRPresetDlg");
+	CFarDialog Dialog(76, 22, "FRPresetDlg");
 	Dialog.AddFrame(MFRPreset);
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
 	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,"RESearch.PresetName", pPreset->Name()));
@@ -417,10 +417,11 @@ BOOL CFRPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.Add(new CFarCheckBoxItem(5,14,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
 	Dialog.Add(new CFarCheckBoxItem(56,12,0,"",&pPreset->m_mapInts["UTF8"]));
 	Dialog.Add(new CFarButtonItem(60,12,0,0,MUTF8));
+	Dialog.Add(new CFarCheckBoxItem(5,16,0,MAddToMenu,&pPreset->m_bAddToMenu));
 	Dialog.AddButtons(MOk,MCancel);
 
 	do {
-		switch (Dialog.Display(2, -2, -3)) {
+		switch (Dialog.Display(2, -2, -4)) {
 		case 0:
 			return TRUE;
 		case 1:{		// avoid Internal Error for icl
