@@ -38,4 +38,7 @@ OperationResult RenameFiles(PluginPanelItem **PanelItems,int *ItemsNumber,BOOL S
 OperationResult RenameSelectedFiles(PluginPanelItem **PanelItems,int *ItemsNumber,BOOL ShowDialog);
 OperationResult RenumberFiles();
 
+OperationResult RenameFilesExecutor();
+OperationResult QuickRenameFilesExecutor();
+
 #endif __FILETOOLS_H

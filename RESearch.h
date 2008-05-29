@@ -1,6 +1,8 @@
 #ifndef __RESEARCH_H
 #define __RESEARCH_H
 
+enum OperationResult {OR_CANCEL,OR_FAILED,OR_OK,OR_PANEL};
+
 #include "Presets.h"
 
 #ifdef DEFINE_VARS
@@ -41,8 +43,6 @@ EXTERN CFarListData m_lstEngines CONSTRUCT((NULL, 0));
 
 BOOL SystemToLocalTime(FILETIME &ft);
 BOOL LocalToSystemTime(FILETIME &ft);
-
-enum OperationResult {OR_CANCEL,OR_FAILED,OR_OK,OR_PANEL};
 
 enum eStringTable {
 

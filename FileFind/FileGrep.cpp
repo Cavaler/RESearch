@@ -293,3 +293,7 @@ BOOL CFGPresetCollection::EditPreset(CPreset *pPreset) {
 		}
 	} while (true);
 }
+
+OperationResult FileGrepExecutor() {
+	return OR_CANCEL;
+}

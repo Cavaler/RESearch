@@ -391,3 +391,7 @@ BOOL CFSPresetCollection::EditPreset(CPreset *pPreset) {
 		}
 	} while (true);
 }
+
+OperationResult FileSearchExecutor() {
+	return OR_CANCEL;
+}

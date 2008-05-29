@@ -104,6 +104,10 @@ BOOL CompileAdvancedSettings();
 BOOL MaskCaseHere();
 bool LocalFileTime(char cDrive);
 
+OperationResult FileSearchExecutor();
+OperationResult FileReplaceExecutor();
+OperationResult FileGrepExecutor();
+
 OperationResult NoFilesFound();
 void InitFoundPosition();
 

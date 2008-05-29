@@ -84,6 +84,11 @@ BOOL EditorListAll();
 BOOL EditorListAllAgain();
 BOOL EditorListAllShowResults();
 
+OperationResult EditorSearchExecutor();
+OperationResult EditorReplaceExecutor();
+OperationResult EditorFilterExecutor();
+OperationResult EditorListAllExecutor();
+
 void PatchEditorInfo(EditorInfo &EdInfo);
 
 BOOL SearchInLine(const char *Line,int Length,int Start,int End,int *MatchStart,int *MatchLength,BOOL NeedMatch);

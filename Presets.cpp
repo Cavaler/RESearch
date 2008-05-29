@@ -1,7 +1,9 @@
 #include "StdAfx.h"
 #include "RESearch.h"
 
-CParameterSet::CParameterSet(int nStringCount, int nIntCount, ...) {
+CParameterSet::CParameterSet(PresetExecutor Executor, int nStringCount, int nIntCount, ...)
+: m_Executor(Executor)
+{
 	va_list List;
 	va_start(List, nIntCount);
 	while (nStringCount--) {

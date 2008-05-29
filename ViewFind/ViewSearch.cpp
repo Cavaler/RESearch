@@ -200,3 +200,7 @@ BOOL CVSPresetCollection::EditPreset(CPreset *pPreset) {
 		}
 	} while (true);
 }
+
+OperationResult ViewSearchExecutor() {
+	return OR_CANCEL;
+}

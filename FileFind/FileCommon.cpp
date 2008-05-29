@@ -1,17 +1,17 @@
 #include "StdAfx.h"
 #include "..\RESearch.h"
 
-CParameterSet g_FSBatch(2, 5,
+CParameterSet g_FSBatch(FileSearchExecutor, 2, 5,
 	"Mask", &MaskText, "Text", &SearchText,
 	"MaskAsRegExp", &FMaskAsRegExp, "CaseSensitive", &FCaseSensitive,
 	"UTF8", &FUTF8, "SearchAs", &FSearchAs, "IsInverse", &FSInverse
 	);
-CParameterSet g_FRBatch(3, 4,
+CParameterSet g_FRBatch(FileReplaceExecutor, 3, 4,
 	"Mask", &MaskText, "Text", &SearchText, "Replace", &ReplaceText,
 	"MaskAsRegExp", &FMaskAsRegExp, "CaseSensitive", &FCaseSensitive,
 	"UTF8", &FUTF8, "SearchAs", &FSearchAs
 	);
-CParameterSet g_FGBatch(2, 9,
+CParameterSet g_FGBatch(FileGrepExecutor, 2, 9,
 	"Mask", &MaskText, "Text", &SearchText,
 	"MaskAsRegExp", &FMaskAsRegExp, "CaseSensitive", &FCaseSensitive,
 	"UTF8", &FUTF8, "SearchAs", &FSearchAs, "IsInverse", &FSInverse,
@@ -25,7 +25,7 @@ bool g_bScanningLocalTime;
 FILETIME FADateBeforeThisLocal;
 FILETIME FADateAfterThisLocal;
 
-CParameterSet g_FABatch(2, 20,
+CParameterSet g_FABatch(NULL, 2, 20,
 	"FullFileName", &FAFullFileName, "DirectoryName", &FADirectoryName,
 
 	"FullFileNameMatch", &FAFullFileNameMatch, "CaseSensitive", &FACaseSensitive, "FullFileNameInverse", &FAFullFileNameInverse,

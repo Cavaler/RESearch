@@ -122,3 +122,7 @@ BOOL CEFPresetCollection::EditPreset(CPreset *pPreset) {
 		}
 	} while (true);
 }
+
+OperationResult EditorFilterExecutor() {
+	return OR_CANCEL;
+}

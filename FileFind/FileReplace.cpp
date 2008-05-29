@@ -431,3 +431,7 @@ BOOL CFRPresetCollection::EditPreset(CPreset *pPreset) {
 		}
 	} while (true);
 }
+
+OperationResult FileReplaceExecutor() {
+	return OR_CANCEL;
+}

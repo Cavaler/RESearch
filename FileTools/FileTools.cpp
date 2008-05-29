@@ -6,11 +6,11 @@ char *FRInts[]={"MaskAsRegExp","TextAsRegExp","Repeating"};
 char *FQRStrings[]={"Text","Replace"};
 char *FQRInts[]={"TextAsRegExp","Repeating"};
 
-CParameterSet g_RBatch(3, 3,
+CParameterSet g_RBatch(RenameFilesExecutor, 3, 3,
 	"Mask", &MaskText, "Text", &SearchText, "Replace", &ReplaceText,
 	"MaskAsRegExp", &FMaskAsRegExp, "TextAsRegExp", &FSearchAs, "Repeating", &FRepeating
 	);
-CParameterSet g_QRBatch(2, 2,
+CParameterSet g_QRBatch(QuickRenameFilesExecutor, 2, 2,
 	"Text", &SearchText, "Replace", &ReplaceText,
 	"TextAsRegExp", &FSearchAs, "Repeating", &FRepeating
 	);
@@ -669,4 +669,12 @@ BOOL CQRPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.AddButtons(MOk,MCancel);
 
 	return Dialog.Display(-1)==0;
+}
+
+OperationResult RenameFilesExecutor() {
+	return OR_CANCEL;
+}
+
+OperationResult QuickRenameFilesExecutor() {
+	return OR_CANCEL;
 }

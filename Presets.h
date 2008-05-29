@@ -3,13 +3,18 @@
 
 #pragma warning(disable:327)
 
+typedef OperationResult (*PresetExecutor)();
+
+//	Mapping of parameter names to existing variables
 class CParameterSet {
 public:
-	CParameterSet(int nStringCount, int nIntCount, ...);
+	CParameterSet(PresetExecutor Executor, int nStringCount, int nIntCount, ...);
 	map<string, string *> m_mapStrings;
 	map<string, int *> m_mapInts;
+	PresetExecutor m_Executor;
 };
 
+//	Saveable mapping of parameter names to values
 class CPreset {
 public:
 	CPreset(CParameterSet &Batch);

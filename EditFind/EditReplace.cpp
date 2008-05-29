@@ -521,3 +521,7 @@ BOOL CERPresetCollection::EditPreset(CPreset *pPreset) {
 		}
 	} while (true);
 }
+
+OperationResult EditorReplaceExecutor() {
+	return OR_CANCEL;
+}

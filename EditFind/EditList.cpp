@@ -145,3 +145,7 @@ BOOL CELPresetCollection::EditPreset(CPreset *pPreset) {
 		}
 	} while (true);
 }
+
+OperationResult EditorListAllExecutor() {
+	return OR_CANCEL;
+}

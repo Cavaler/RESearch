@@ -19,4 +19,6 @@ void VWriteRegistry(HKEY Key);
 BOOL ViewerSearch();
 BOOL ViewerSearchAgain();
 
+OperationResult ViewSearchExecutor();
+
 #endif

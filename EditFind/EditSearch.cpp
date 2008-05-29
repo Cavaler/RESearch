@@ -216,3 +216,7 @@ BOOL CESPresetCollection::EditPreset(CPreset *pPreset) {
 		}
 	} while (true);
 }
+
+OperationResult EditorSearchExecutor() {
+	return OR_CANCEL;
+}
