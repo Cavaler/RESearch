@@ -17,6 +17,34 @@ CParameterSet::CParameterSet(PresetExecutor Executor, int nStringCount, int nInt
 	va_end(List);
 }
 
+CParameterBackup::CParameterBackup(CParameterSet &Set, bool bAutoRestore)
+: m_Set(Set), m_bAutoRestore(bAutoRestore)
+{
+	for (map<string, string *>::iterator its = m_Set.m_mapStrings.begin(); its != m_Set.m_mapStrings.end(); its++) {
+		m_mapStrings[its->first] = *(its->second);
+	}
+
+	for (map<string, int *>::iterator iti = m_Set.m_mapInts.begin(); iti != m_Set.m_mapInts.end(); iti++) {
+		m_mapInts[iti->first] = *(iti->second);
+	}
+}
+
+void CParameterBackup::Restore() {
+	for (map<string, string *>::iterator its = m_Set.m_mapStrings.begin(); its != m_Set.m_mapStrings.end(); its++) {
+		*(its->second) = m_mapStrings[its->first];
+	}
+
+	for (map<string, int *>::iterator iti = m_Set.m_mapInts.begin(); iti != m_Set.m_mapInts.end(); iti++) {
+		*(iti->second) = m_mapInts[iti->first];
+	}
+
+	m_bAutoRestore = false;
+}
+
+CParameterBackup::~CParameterBackup() {
+	if (m_bAutoRestore) Restore();
+}
+
 CPreset::CPreset(CParameterSet &Batch) : m_nID(0) {
 	if (!&Batch) return;
 
@@ -67,17 +95,19 @@ CPreset::CPreset(string strName, HKEY hKey) {
 void CPreset::Apply(CParameterSet &Batch) {
 	map<string, string *>::iterator it1 = Batch.m_mapStrings.begin();
 	while (it1 != Batch.m_mapStrings.end()) {
-		map<string, string>::iterator it = m_mapStrings.find(it1->first);
-		if (it != m_mapStrings.end()) 
-			*(it1->second) = it->second;
+		if (it1->first[0] != '@') {
+			map<string, string>::iterator it = m_mapStrings.find(it1->first);
+			if (it != m_mapStrings.end()) *(it1->second) = it->second;
+		}
 		it1++;
 	}
 
 	map<string, int *>::iterator it2 = Batch.m_mapInts.begin();
 	while (it2 != Batch.m_mapInts.end()) {
-		map<string, int>::iterator it = m_mapInts.find(it2->first);
-		if (it != m_mapInts.end()) 
-			*(it2->second) = it->second;
+		if (it2->first[0] != '@') {
+			map<string, int>::iterator it = m_mapInts.find(it2->first);
+			if (it != m_mapInts.end()) *(it2->second) = it->second;
+		}
 		it2++;
 	}
 }
@@ -94,13 +124,13 @@ void CPreset::Save(HKEY hKey) {
 
 	map<string, string>::iterator it1 = m_mapStrings.begin();
 	while (it1 != m_mapStrings.end()) {
-		SetRegStringValue(hOwnKey, it1->first.c_str(), it1->second);
+		if (it1->first[0] != '@') SetRegStringValue(hOwnKey, it1->first.c_str(), it1->second);
 		it1++;
 	}
 
 	map<string, int>::iterator it2 = m_mapInts.begin();
 	while (it2 != m_mapInts.end()) {
-		SetRegIntValue(hOwnKey, it2->first.c_str(), it2->second);
+		if (it2->first[0] != '@') SetRegIntValue(hOwnKey, it2->first.c_str(), it2->second);
 		it2++;
 	}
 
@@ -240,6 +270,7 @@ CPresetBatch::CPresetBatch(CPresetCollection *pCollection, string strName, HKEY 
 		return;
 
 	QueryRegStringValue(hOwnKey, NULL, m_strName, "Batch");
+	QueryRegBoolValue(hOwnKey, "AddToMenu", &m_bAddToMenu, false);
 
 	int nCount;
 	QueryRegIntValue(hOwnKey, "Count", &nCount, 0);
@@ -262,6 +293,7 @@ void CPresetBatch::Save(int nID, HKEY hKey) {
 		return;
 
 	SetRegStringValue(hOwnKey, NULL, m_strName);
+	SetRegBoolValue(hOwnKey, "AddToMenu", m_bAddToMenu);
 	SetRegIntValue(hOwnKey, "Count", size());
 
 	char szKeyName[16];
@@ -326,9 +358,11 @@ int CPresetBatch::ShowMenu() {
 			}
 			break;
 		case 4:{
-			CFarDialog Dialog(60, 9, "PresetName");
-			Dialog.AddFrame(MBatchName);
-			Dialog.Add(new CFarEditItem(5, 3, 53, DIF_HISTORY,"SearchText", m_strName));
+			CFarDialog Dialog(60, 12, "BatchName");
+			Dialog.AddFrame(MBatchProp);
+			Dialog.Add(new CFarTextItem(5, 3, 0, MBatchName));
+			Dialog.Add(new CFarEditItem(5, 4, 53, DIF_HISTORY, "SearchText", m_strName));
+			Dialog.Add(new CFarCheckBoxItem(5, 6, 0, MAddToMenu, &m_bAddToMenu));
 			Dialog.AddButtons(MOk, MCancel);
 			Dialog.Display(-1);
 			break;
@@ -406,6 +440,8 @@ int CPresetBatchCollection::ShowMenu(CParameterSet &Batch) {
 				const char *Lines[]={"Execute", GetMsg(MExecuteBatchQuery),
 					pBatch->m_strName.c_str(), GetMsg(MOk), GetMsg(MCancel)};
 				if (StartupInfo.Message(StartupInfo.ModuleNumber, FMSG_WARNING, "ExecuteBatch", Lines, 5, 2) != 0) break;
+
+				CParameterBackup Backup(Batch);
 
 				for (size_t nPreset = 0; nPreset < pBatch->size(); nPreset++) {
 					CPreset *pPreset = (*pBatch)(nPreset);

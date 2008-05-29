@@ -6,12 +6,14 @@ char *FRInts[]={"MaskAsRegExp","TextAsRegExp","Repeating"};
 char *FQRStrings[]={"Text","Replace"};
 char *FQRInts[]={"TextAsRegExp","Repeating"};
 
-CParameterSet g_RBatch(RenameFilesExecutor, 3, 3,
+CParameterSet g_RBatch(RenameFilesExecutor, 6, 3,
 	"Mask", &MaskText, "Text", &SearchText, "Replace", &ReplaceText,
+	"@Mask", &FMask, "@Text", &FText, "@Replace", &FRReplace,
 	"MaskAsRegExp", &FMaskAsRegExp, "TextAsRegExp", &FSearchAs, "Repeating", &FRepeating
 	);
-CParameterSet g_QRBatch(QuickRenameFilesExecutor, 2, 2,
+CParameterSet g_QRBatch(QuickRenameFilesExecutor, 4, 2,
 	"Text", &SearchText, "Replace", &ReplaceText,
+	"@Text", &FText, "@Replace", &FRReplace,
 	"TextAsRegExp", &FSearchAs, "Repeating", &FRepeating
 	);
 

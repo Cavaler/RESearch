@@ -1,18 +1,19 @@
 #include "StdAfx.h"
 #include "..\RESearch.h"
 
-CParameterSet g_FSBatch(FileSearchExecutor, 2, 5,
-	"Mask", &MaskText, "Text", &SearchText,
+CParameterSet g_FSBatch(FileSearchExecutor, 4, 5,
+	"Mask", &MaskText, "Text", &SearchText, "@Mask", &FMask, "@Text", &FText,
 	"MaskAsRegExp", &FMaskAsRegExp, "CaseSensitive", &FCaseSensitive,
 	"UTF8", &FUTF8, "SearchAs", &FSearchAs, "IsInverse", &FSInverse
 	);
-CParameterSet g_FRBatch(FileReplaceExecutor, 3, 4,
+CParameterSet g_FRBatch(FileReplaceExecutor, 6, 4,
 	"Mask", &MaskText, "Text", &SearchText, "Replace", &ReplaceText,
+	"@Mask", &FMask, "@Text", &FText, "@Replace", &FRReplace,
 	"MaskAsRegExp", &FMaskAsRegExp, "CaseSensitive", &FCaseSensitive,
 	"UTF8", &FUTF8, "SearchAs", &FSearchAs
 	);
-CParameterSet g_FGBatch(FileGrepExecutor, 2, 9,
-	"Mask", &MaskText, "Text", &SearchText,
+CParameterSet g_FGBatch(FileGrepExecutor, 4, 9,
+	"Mask", &MaskText, "Text", &SearchText, "@Mask", &FMask, "@Text", &FText,
 	"MaskAsRegExp", &FMaskAsRegExp, "CaseSensitive", &FCaseSensitive,
 	"UTF8", &FUTF8, "SearchAs", &FSearchAs, "IsInverse", &FSInverse,
 	"GrepWhat", &FGrepWhat, "AddLineNumbers", &FGAddLineNumbers,

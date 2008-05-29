@@ -14,6 +14,19 @@ public:
 	PresetExecutor m_Executor;
 };
 
+class CParameterBackup {
+public:
+	CParameterBackup(CParameterSet &Set, bool bAutoRestore = true);
+	void Restore();
+	~CParameterBackup();
+
+	map<string, string> m_mapStrings;
+	map<string, int> m_mapInts;
+
+	CParameterSet &m_Set;
+	bool m_bAutoRestore;
+};
+
 //	Saveable mapping of parameter names to values
 class CPreset {
 public:
@@ -52,6 +65,7 @@ public:
 	void Save(int nID, HKEY hKey);
 	~CPresetBatch();
 
+	bool m_bAddToMenu;
 	string m_strName;
 	CPreset *operator()(size_type nIndex);
 	int ShowMenu();

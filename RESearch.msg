@@ -104,7 +104,7 @@ MModifyReadonlyRequest	"is read-only. Should it be modified anyway?"	"помечен 'т
 
 MFilterLines		"Filter text"				"Фильтрация текста"
 MLeaveMatching		"&Leave matching lines"		"&Оставить совпадающие строки"
-MRemoveMatching		"&Remove matching lines"	"&Убрать совпадающие строки"
+MRemoveMatching		"R&emove matching lines"	"&Убрать совпадающие строки"
 
 MListAllLines		"List all lines"			"Вывести все строки"
 
@@ -217,7 +217,9 @@ MFRPreset			"File replace preset"				"Пресет замены в файлах"
 MFAPreset			"Advanced search options preset"	"Пресет дополнительных опций поиска"
 MVSPreset			"Viewer search preset"				"Пресет поиска в просмотрщике"
 MPresetName			"Preset name:"						"Имя пресета:"
+MAddToMenu			"Add to RESearch men&u"				"Добавить в меню плагина"
 MDeletePresetQuery	"Are you sure to delete preset"		"Вы хотите удалить пресет"
-MBatchName			"Batch name:"						"Имя пакета:"
+MBatchProp			"Batch"								"Пакет"
+MBatchName			"Batch &name:"						"Имя пакета:"
 MDeleteBatchQuery	"Are you sure to delete batch"		"Вы хотите удалить пакет"
 MExecuteBatchQuery	"Are you sure to execute batch"		"Вы хотите выполнить пакет"

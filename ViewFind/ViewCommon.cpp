@@ -1,8 +1,8 @@
 #include "StdAfx.h"
 #include "..\RESearch.h"
 
-CParameterSet g_VSBatch(ViewSearchExecutor, 1, 4,
-	"Text", &SearchText,
+CParameterSet g_VSBatch(ViewSearchExecutor, 2, 4,
+	"Text", &SearchText, "@Text", &EText,
 	"IsRegExp", &ERegExp, "CaseSensitive", &ECaseSensitive, "SeveralLine", &ESeveralLine, "UTF8", &EUTF8
 					 );
 
