@@ -99,6 +99,7 @@ int  TopLine(int Line,int ScreenHeight,int TotalLines);
 int	LeftColumn(int RightPosition,int ScreenWidth);
 void SaveSelection();
 void RestoreSelection();
+void RestorePosition(const EditorInfo &StartEdInfo);
 BOOL EPreparePattern(string &SearchText);
 
 void FindIfClockPresent();

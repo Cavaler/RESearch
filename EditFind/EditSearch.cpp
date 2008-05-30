@@ -112,14 +112,7 @@ BOOL EditorSearchAgain() {
 		}
 	}
 
-	EditorSetPosition Position;
-	Position.CurLine = StartEdInfo.CurLine;
-	Position.CurPos = StartEdInfo.CurPos;
-	Position.CurTabPos = StartEdInfo.CurTabPos;
-	Position.TopScreenLine = StartEdInfo.TopScreenLine;
-	Position.LeftPos = StartEdInfo.LeftPos;
-	Position.Overtype = StartEdInfo.Overtype;
-	EctlForceSetPosition(&Position);
+	RestorePosition(StartEdInfo);
 
 	if (!g_bInterrupted) {
 		const char *Lines[]={GetMsg(MRESearch),GetMsg(MCannotFind),EText.c_str(),GetMsg(MOk)};

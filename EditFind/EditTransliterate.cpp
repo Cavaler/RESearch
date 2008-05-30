@@ -3,6 +3,7 @@
 
 BOOL EditorTransliterateAgain() {
 	RefreshEditorInfo();
+	EditorInfo StartEdInfo = EdInfo;
 
 	EditorSetPosition Position = {0, 0, 0, -1, -1, -1};
 	EditorGetString String = {-1};
@@ -27,11 +28,15 @@ BOOL EditorTransliterateAgain() {
 			}
 		}
 
-		SetString.StringText = strData.data();
-		SetString.StringLength = strData.length();
-		SetString.StringEOL = String.StringEOL;
-		EctlSetString(&SetString);
+		if (strData != string(String.StringText, String.StringLength)) {
+			SetString.StringText = strData.data();
+			SetString.StringLength = strData.length();
+			SetString.StringEOL = String.StringEOL;
+			EctlSetString(&SetString);
+		}
 	}
+
+	RestorePosition(StartEdInfo);
 
 	return TRUE;
 }

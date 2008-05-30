@@ -317,6 +317,17 @@ void RestoreSelection() {
 	}
 }
 
+void RestorePosition(const EditorInfo &StartEdInfo) {
+	EditorSetPosition Position;
+	Position.CurLine = StartEdInfo.CurLine;
+	Position.CurPos = StartEdInfo.CurPos;
+	Position.CurTabPos = StartEdInfo.CurTabPos;
+	Position.TopScreenLine = StartEdInfo.TopScreenLine;
+	Position.LeftPos = StartEdInfo.LeftPos;
+	Position.Overtype = StartEdInfo.Overtype;
+	EctlForceSetPosition(&Position);
+}
+
 BOOL EPreparePattern(string &SearchText) {
 	ECleanup(TRUE);
 	if (ERegExp) {
