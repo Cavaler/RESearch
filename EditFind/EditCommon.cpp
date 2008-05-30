@@ -1,9 +1,10 @@
 #include "StdAfx.h"
 #include "..\RESearch.h"
 
-CParameterSet g_ESParamSet(EditorSearchExecutor, 2, 4,
+CParameterSet g_ESParamSet(EditorSearchExecutor, 2, 5,
 	"Text", &SearchText, "@Text", &EText,
-	"IsRegExp", &ERegExp, "CaseSensitive", &ECaseSensitive, "SeveralLine", &ESeveralLine, "UTF8", &EUTF8
+	"IsRegExp", &ERegExp, "CaseSensitive", &ECaseSensitive, "SeveralLine", &ESeveralLine, "UTF8", &EUTF8,
+	"ListAll", &EListAllFromPreset
 					 );
 CParameterSet g_ERParamSet(EditorReplaceExecutor, 4, 8,
 	"Text", &SearchText, "Replace", &ReplaceText,
@@ -533,4 +534,22 @@ void EctlForceSetPosition(EditorSetPosition *Position) {
 
 void RefreshEditorInfo() {
 	StartupInfo.EditorControl(ECTL_GETINFO, &EdInfo);
+}
+
+void EditorSeekToBeginEnd() {
+	if (EReverse) {
+		RefreshEditorInfo();
+
+		EditorSetPosition Position = {EdInfo.TotalLines, 0, -1, -1, -1, -1};
+		EctlSetPosition(&Position);
+
+		EditorSetString String = {-1};
+		EctlSetString(&String);
+
+		Position.CurPos = String.StringLength;
+		EctlSetPosition(&Position);
+	} else {
+		EditorSetPosition Position = {0, 0, 0, -1, -1, -1};
+		EctlSetPosition(&Position);
+	}
 }

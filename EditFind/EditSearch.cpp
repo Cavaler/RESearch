@@ -186,6 +186,16 @@ BOOL EditorSearch() {
 	return TRUE;
 }
 
+OperationResult EditorSearchExecutor() {
+	if (!EPreparePattern(SearchText)) return OR_FAILED;
+	EText = SearchText;
+	EditorSeekToBeginEnd();
+
+	return (EListAllFromPreset) ?
+		EditorListAllAgain() ? OR_OK : OR_CANCEL :
+		EditorSearchAgain() ? OR_OK : OR_CANCEL;
+}
+
 BOOL CESPresetCollection::EditPreset(CPreset *pPreset) {
 	CFarDialog Dialog(76,16,"ESPresetDlg");
 	Dialog.AddFrame(MESPreset);
@@ -197,10 +207,11 @@ BOOL CESPresetCollection::EditPreset(CPreset *pPreset) {
 
 	Dialog.Add(new CFarCheckBoxItem(5,7,0,MRegExp,&pPreset->m_mapInts["IsRegExp"]));
 	Dialog.Add(new CFarCheckBoxItem(5,8,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
-	Dialog.Add(new CFarCheckBoxItem(30,7,0,MSeveralLine,&pPreset->m_mapInts["SeveralLine"]));
-	Dialog.Add(new CFarCheckBoxItem(30,8,0,"",&pPreset->m_mapInts["UTF8"]));
-	Dialog.Add(new CFarButtonItem(34,8,0,0,MUTF8));
+	Dialog.Add(new CFarCheckBoxItem(35,7,0,MSeveralLine,&pPreset->m_mapInts["SeveralLine"]));
+	Dialog.Add(new CFarCheckBoxItem(35,8,0,"",&pPreset->m_mapInts["UTF8"]));
+	Dialog.Add(new CFarButtonItem(39,8,0,0,MUTF8));
 	Dialog.Add(new CFarCheckBoxItem(5,10,0,MAddToMenu,&pPreset->m_bAddToMenu));
+	Dialog.Add(new CFarCheckBoxItem(35,10,0,MListAllFromPreset,&pPreset->m_mapInts["ListAll"]));
 	Dialog.AddButtons(MOk,MCancel);
 
 	do {
@@ -216,8 +227,4 @@ BOOL CESPresetCollection::EditPreset(CPreset *pPreset) {
 			return FALSE;
 		}
 	} while (true);
-}
-
-OperationResult EditorSearchExecutor() {
-	return OR_CANCEL;
 }

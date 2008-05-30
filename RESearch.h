@@ -234,6 +234,7 @@ enum eStringTable {
 	MErrorParsingText,
 	MErrorLoadingTypeLib,
 	MErrorExecutingScript,
+	MListAllFromPreset,
 
 	MTransliterate,
 	MTransSource,

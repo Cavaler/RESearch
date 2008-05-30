@@ -76,10 +76,12 @@ BOOL EditorListAll();
 BOOL EditorListAllAgain();
 BOOL EditorListAllShowResults();
 
+EXTERN BOOL EListAllFromPreset;
 OperationResult EditorSearchExecutor();
 OperationResult EditorReplaceExecutor();
 OperationResult EditorFilterExecutor();
 OperationResult EditorListAllExecutor();
+void EditorSeekToBeginEnd();
 
 void PatchEditorInfo(EditorInfo &EdInfo);
 

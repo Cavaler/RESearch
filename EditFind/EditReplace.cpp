@@ -464,21 +464,7 @@ OperationResult EditorReplaceExecutor() {
 	NoAsking = TRUE;
 	ReplaceNumber = 0;
 
-	if (EReverse) {
-		RefreshEditorInfo();
-
-		EditorSetPosition Position = {EdInfo.TotalLines, 0, -1, -1, -1, -1};
-		EctlSetPosition(&Position);
-
-		EditorSetString String = {-1};
-		EctlSetString(&String);
-
-		Position.CurPos = String.StringLength;
-		EctlSetPosition(&Position);
-	} else {
-		EditorSetPosition Position = {0, 0, 0, -1, -1, -1};
-		EctlSetPosition(&Position);
-	}
+	EditorSeekToBeginEnd();
 
 	return EditorReplaceAgain() ? OR_OK : OR_CANCEL;
 }
