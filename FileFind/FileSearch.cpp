@@ -354,7 +354,7 @@ OperationResult FileFind(PluginPanelItem **PanelItems,int *ItemsNumber,BOOL Show
 OperationResult FileSearchExecutor() {
 	FMask = MaskText;
 	FText = SearchText;
-	return FileSearch(&PanelItems, &ItemsNumber, FALSE, TRUE);
+	return FileFind(&PanelItems, &ItemsNumber, FALSE, TRUE);
 }
 
 BOOL CFSPresetCollection::EditPreset(CPreset *pPreset) {

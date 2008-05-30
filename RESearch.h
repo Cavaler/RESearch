@@ -261,6 +261,7 @@ enum eStringTable {
 	MESPreset,
 	MERPreset,
 	MEFPreset,
+	METPreset,
 	MFSPreset,
 	MFRPreset,
 	MFAPreset,

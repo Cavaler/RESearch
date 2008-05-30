@@ -17,6 +17,10 @@ CParameterSet g_EFParamSet(EditorFilterExecutor, 2, 4,
 	"Text", &SearchText, "@Text", &EText,
 	"LeaveFilter", &EFLeaveFilter, "IsRegExp", &ERegExp, "CaseSensitive", &ECaseSensitive, "UTF8", &EUTF8
 					 );
+CParameterSet g_ETParamSet(EditorTransliterateExecutor, 2, 0,
+	"Text", &SearchText, "Replace", &ReplaceText,
+	 "@Text", &EText,  "@Replace", &ERReplace
+					 );
 
 void EReadRegistry(HKEY Key) {
 	#define DECLARE_PERSIST_LOAD Key
@@ -27,6 +31,7 @@ void EReadRegistry(HKEY Key) {
 	ESPresets=new CESPresetCollection();
 	ERPresets=new CERPresetCollection();
 	EFPresets=new CEFPresetCollection();
+	ETPresets=new CETPresetCollection();
 
 	ERBatch=new CPresetBatchCollection(ERPresets);
 	EFBatch=new CPresetBatchCollection(EFPresets);
@@ -362,9 +367,11 @@ void ECleanup(BOOL PatternOnly) {
 		DeleteMatchInfo();
 		delete ERBatch;
 		delete EFBatch;
+
 		delete ESPresets;
 		delete ERPresets;
 		delete EFPresets;
+		delete ETPresets;
 	}
 }
 

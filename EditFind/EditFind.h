@@ -26,16 +26,24 @@ public:
 	virtual const char *GetName() {return "EditFilter";}
 };
 
+class CETPresetCollection:public CPresetCollection {
+public:
+	CETPresetCollection() {Load();}
+	virtual BOOL EditPreset(CPreset *pPreset);
+	virtual const char *GetName() {return "EditTransliterate";}
+};
+
 #define DECLARE_PERSIST_VARS
 #include "PersistVars.h"
 
 extern CParameterSet g_ESParamSet;
 extern CParameterSet g_ERParamSet;
 extern CParameterSet g_EFParamSet;
-extern CParameterSet g_ELParamSet;
+extern CParameterSet g_ETParamSet;
 EXTERN CESPresetCollection *ESPresets;
 EXTERN CERPresetCollection *ERPresets;
 EXTERN CEFPresetCollection *EFPresets;
+EXTERN CETPresetCollection *ETPresets;
 EXTERN CPresetBatchCollection *ERBatch;
 EXTERN CPresetBatchCollection *EFBatch;
 
@@ -80,7 +88,7 @@ EXTERN BOOL EListAllFromPreset;
 OperationResult EditorSearchExecutor();
 OperationResult EditorReplaceExecutor();
 OperationResult EditorFilterExecutor();
-OperationResult EditorListAllExecutor();
+OperationResult EditorTransliterateExecutor();
 void EditorSeekToBeginEnd();
 
 void PatchEditorInfo(EditorInfo &EdInfo);

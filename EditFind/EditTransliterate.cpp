@@ -55,6 +55,9 @@ BOOL EditorTransliterate() {
 		switch (ExitCode=Dialog.Display(2, -3, -1)) {
 		case 0:
 			break;
+		case 1:
+			ETPresets->ShowMenu(g_ETParamSet);
+			break;
 		case -1:
 			return FALSE;
 		}
@@ -66,4 +69,28 @@ BOOL EditorTransliterate() {
 	g_bInterrupted=FALSE;
 	if (!ETSource.empty()) EditorTransliterateAgain();
 	return TRUE;
+}
+
+OperationResult EditorTransliterateExecutor() {
+	ETSource = SearchText;
+	ETTarget = ReplaceText;
+
+	return EditorTransliterateAgain() ? OR_OK : OR_CANCEL;
+}
+
+BOOL CETPresetCollection::EditPreset(CPreset *pPreset) {
+	CFarDialog Dialog(76,15,"ETPresetDlg");
+	Dialog.AddFrame(METPreset);
+	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
+	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,"RESearch.PresetName",pPreset->Name()));
+
+	Dialog.Add(new CFarTextItem(5,4,0,MTransSource));
+	Dialog.Add(new CFarEditItem(5,5,70,DIF_HISTORY,"SourceChars",SearchText));
+	Dialog.Add(new CFarTextItem(5,6,0,MTransTarget));
+	Dialog.Add(new CFarEditItem(5,7,70,DIF_HISTORY,"TargetChars",ReplaceText));
+
+	Dialog.Add(new CFarCheckBoxItem(5,9,0,MAddToMenu,&pPreset->m_bAddToMenu));
+	Dialog.AddButtons(MOk,MCancel);
+
+	return Dialog.Display(-1) == 0;
 }
