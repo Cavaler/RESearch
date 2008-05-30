@@ -303,10 +303,10 @@ int ReplacePrompt(BOOL Plugin) {
 	Dialog.Add(new CFarCheckBoxItem(42,17,0,MOverwriteBackup,&FROverwriteBackup));
 
 	Dialog.AddButtons(MOk,MCancel);
-	Dialog.Add(new CFarButtonItem(60,20,0,0,MBatch));
-	Dialog.Add(new CFarButtonItem(60,9,0,0,MPresets));
+	Dialog.Add(new CFarButtonItem(60,20,0,0,MBtnBatch));
+	Dialog.Add(new CFarButtonItem(60,9,0,0,MBtnPresets));
 	Dialog.Add(new CFarCheckBoxItem(56,10,0,"",&FAdvanced));
-	Dialog.Add(new CFarButtonItem(60,10,0,0,MAdvanced));
+	Dialog.Add(new CFarButtonItem(60,10,0,0,MBtnAdvanced));
 	Dialog.Add(new CFarCheckBoxItem(56,11,0,"",&FUTF8));
 	Dialog.Add(new CFarButtonItem(60,11,0,0,MUTF8));
 	Dialog.SetFocus(3);

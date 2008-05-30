@@ -48,10 +48,10 @@ enum eStringTable {
 
 	MOk,
 	MCancel,
-	MPresets,
-	MAdvanced,
+	MBtnPresets,
+	MBtnAdvanced,
+	MBtnBatch,
 	MError,
-	MBatch,
 
 	MSearchResults,
 
@@ -267,8 +267,12 @@ enum eStringTable {
 	MPresetName,
 	MAddToMenu,
 	MDeletePresetQuery,
-	MBatchProp,
+
+	MBatch,
 	MBatchName,
+	MBtnCommands,
+	MBatchCommands,
+
 	MDeleteBatchQuery,
 	MExecuteBatchQuery,
 };

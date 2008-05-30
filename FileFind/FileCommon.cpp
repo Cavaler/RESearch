@@ -635,7 +635,7 @@ BOOL AdvancedSettings() {
 	Dialog.Add(new CFarCheckBox3Item(47,16,DIF_3STATE,MCompressed,&FAAttributesCleared,&FAAttributesSet,FILE_ATTRIBUTE_COMPRESSED));
 	Dialog.Add(new CFarCheckBox3Item(47,17,DIF_3STATE,MEncrypted,&FAAttributesCleared,&FAAttributesSet,FILE_ATTRIBUTE_ENCRYPTED));
 	Dialog.AddButtons(MOk,MCancel);
-	Dialog.AddButton(MPresets);
+	Dialog.AddButton(MBtnPresets);
 	Dialog.SetFocus(2);
 
 	int Result;

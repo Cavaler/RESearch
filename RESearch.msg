@@ -2,10 +2,10 @@
 
 MOk					"Ok"				"&OK"
 MCancel				"Cancel"			"&Отмена"
-MPresets			"Prese&ts"			"Пресеты"
-MAdvanced			"Advanc&ed"			"Дополнит"
+MBtnPresets			"Prese&ts"			"Пресеты"
+MBtnAdvanced		"Advanc&ed"			"Дополнит"
+MBtnBatch			"&Batch"			"&Пакет"
 MError				"Error"				"Ошибка"
-MBatch				"&Batch"			"&Пакет"
 
 MSearchResults		"Search results"	"Результаты поиска"
 
@@ -221,7 +221,11 @@ MVSPreset			"Viewer search preset"				"Пресет поиска в просмотрщике"
 MPresetName			"Preset name:"						"Имя пресета:"
 MAddToMenu			"Add to RESearch men&u"				"Добавить в меню плагина"
 MDeletePresetQuery	"Are you sure to delete preset"		"Вы хотите удалить пресет"
-MBatchProp			"Batch"								"Пакет"
+
+MBatch				"Batch"								"Пакет"
 MBatchName			"Batch &name:"						"Имя пакета:"
+MBtnCommands		"Commands..."						"Команды..."
+MBatchCommands		"Batch commands"					"Команды пакета"
+
 MDeleteBatchQuery	"Are you sure to delete batch"		"Вы хотите удалить пакет"
 MExecuteBatchQuery	"Are you sure to execute batch"		"Вы хотите выполнить пакет"

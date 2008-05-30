@@ -931,6 +931,10 @@
 			</FileConfiguration>
 		</File>
 		<File
+			RelativePath=".\RESearch.tlb"
+			>
+		</File>
+		<File
 			RelativePath="RESearchEng.hlf"
 			>
 		</File>

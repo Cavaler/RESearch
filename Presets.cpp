@@ -360,8 +360,29 @@ CPreset *CPresetBatch::operator()(size_type nIndex) {
 	return (nIndex < size()) ? (*m_pCollection)(at(nIndex)) : NULL;
 }
 
+bool CPresetBatch::Edit() {
+	CFarDialog Dialog(60, 12, "BatchProperties");
+	Dialog.AddFrame(MBatch);
+	Dialog.Add(new CFarTextItem(5, 3, 0, MBatchName));
+	Dialog.Add(new CFarEditItem(5, 4, 53, DIF_HISTORY, "SearchText", m_strName));
+	Dialog.Add(new CFarCheckBoxItem(5, 6, 0, MAddToMenu, &m_bAddToMenu));
+	Dialog.Add(new CFarButtonItem(34, 6, 0, 0, MBtnCommands));
+	Dialog.AddButtons(MOk, MCancel);
+	do {
+		switch (Dialog.Display(2, -2, -3)) {
+		case 0:
+			return true;
+		case 1:
+			ShowMenu();
+			break;
+		default:
+			return false;
+		}
+	} while (true);
+}
+
 int CPresetBatch::ShowMenu() {
-	int piBreakKeys[]={VK_INSERT, (PKF_CONTROL<<16)|VK_UP, (PKF_CONTROL<<16)|VK_DOWN, VK_DELETE, VK_F6, 0};
+	int piBreakKeys[]={VK_INSERT, (PKF_CONTROL<<16)|VK_UP, (PKF_CONTROL<<16)|VK_DOWN, VK_DELETE, 0};
 	vector<string> arrItems;
 	int nResult = 0;
 
@@ -371,7 +392,7 @@ int CPresetBatch::ShowMenu() {
 			arrItems[nPreset] = (*this)(nPreset)->Name();
 
 		int nBreakKey;
-		nResult = ChooseMenu(arrItems, m_strName.c_str(), "Ins,Ctrl-\x18\x19,Del,F6", "Batch", nResult,
+		nResult = ChooseMenu(arrItems, GetMsg(MBatchCommands), "Ins,Ctrl-\x18\x19,Del", "Batch", nResult,
 			FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT, piBreakKeys, &nBreakKey);
 
 		switch (nBreakKey) {
@@ -406,16 +427,6 @@ int CPresetBatch::ShowMenu() {
 				erase(begin() + nResult);
 			}
 			break;
-		case 4:{
-			CFarDialog Dialog(60, 12, "BatchName");
-			Dialog.AddFrame(MBatchProp);
-			Dialog.Add(new CFarTextItem(5, 3, 0, MBatchName));
-			Dialog.Add(new CFarEditItem(5, 4, 53, DIF_HISTORY, "SearchText", m_strName));
-			Dialog.Add(new CFarCheckBoxItem(5, 6, 0, MAddToMenu, &m_bAddToMenu));
-			Dialog.AddButtons(MOk, MCancel);
-			Dialog.Display(-1);
-			break;
-			  }
 		}
 	} while (true);
 }
@@ -496,8 +507,7 @@ int CPresetBatchCollection::ShowMenu(CParameterSet &ParamSet) {
 			return nResult;
 		case 0:{
 			CPresetBatch *pBatch = new CPresetBatch(m_pCollection);
-			pBatch->ShowMenu();
-			if (!pBatch->empty()) {
+			if (pBatch->Edit()) {
 				push_back(pBatch);
 				Save();
 			} else {
@@ -518,7 +528,7 @@ int CPresetBatchCollection::ShowMenu(CParameterSet &ParamSet) {
 			break;
 		case 2:
 			if (nResult < (int)size()) {
-				at(nResult)->ShowMenu();
+				at(nResult)->Edit();
 				Save();
 			}
 			break;

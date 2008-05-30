@@ -261,8 +261,8 @@ BOOL RenameFilesPrompt() {
 	Dialog.Add(new CFarCheckBoxItem(5,12,0,MConfirmFile,&FRConfirmFile));
 	Dialog.Add(new CFarCheckBoxItem(5,13,0,MConfirmLine,&FRConfirmLine));
 	Dialog.AddButtons(MOk,MCancel);
-	Dialog.Add(new CFarButtonItem(60,11,0,0,MBatch));
-	Dialog.Add(new CFarButtonItem(60,9,0,0,MPresets));
+	Dialog.Add(new CFarButtonItem(60,11,0,0,MBtnBatch));
+	Dialog.Add(new CFarButtonItem(60,9,0,0,MBtnPresets));
 	Dialog.SetFocus(4);
 
 	if (FSearchAs>=SA_SEVERALLINE) FSearchAs=SA_PLAINTEXT;
@@ -370,8 +370,8 @@ BOOL RenameSelectedFilesPrompt() {
 	Dialog.Add(new CFarCheckBoxItem(5,7,0,MConfirmFile,&FRConfirmFile));
 	Dialog.Add(new CFarCheckBoxItem(5,8,0,MConfirmLine,&FRConfirmLine));
 	Dialog.AddButtons(MOk,MCancel);
-	Dialog.Add(new CFarButtonItem(60,10,0,0,MBatch));
-	Dialog.Add(new CFarButtonItem(60,7,0,0,MPresets));
+	Dialog.Add(new CFarButtonItem(60,10,0,0,MBtnBatch));
+	Dialog.Add(new CFarButtonItem(60,7,0,0,MBtnPresets));
 	Dialog.SetFocus(4);
 
 	if (FSearchAs>=SA_SEVERALLINE) FSearchAs=SA_PLAINTEXT;

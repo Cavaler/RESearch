@@ -151,7 +151,7 @@ BOOL EditorSearch() {
 	Dialog.Add(new CFarCheckBoxItem(5,7,0,MReverseSearch,&EReverse));
 	if (EInSelection) Dialog.Add(new CFarCheckBoxItem(30,7,0,MInSelection,&EInSelection));
 	Dialog.AddButtons(MOk, MShowAll); Dialog.AddButton(MCancel);
-	Dialog.Add(new CFarButtonItem(60,5,0,0,MPresets));
+	Dialog.Add(new CFarButtonItem(60,5,0,0,MBtnPresets));
 
 	SearchText=PickupText();
 	if (SearchText.empty()) SearchText=EText;

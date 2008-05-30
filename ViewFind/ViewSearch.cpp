@@ -143,7 +143,7 @@ BOOL ViewerSearch() {
 	Dialog.Add(new CFarButtonItem(34,6,0,0,MUTF8));
 	Dialog.Add(new CFarCheckBoxItem(5,7,DIF_DISABLE,MReverseSearch,&EReverse));
 	Dialog.AddButtons(MOk,MCancel);
-	Dialog.Add(new CFarButtonItem(60,5,0,0,MPresets));
+	Dialog.Add(new CFarButtonItem(60,5,0,0,MBtnPresets));
 
 	SearchText = EText;
 	int ExitCode;

@@ -69,14 +69,15 @@ public:
 	void Save(int nID, HKEY hKey);
 	void FillMenuItem(FarMenuItem &Item);
 	void Execute(CParameterSet &ParamSet);
+	bool Edit();
 	~CPresetBatch();
 
 	bool m_bAddToMenu;
 	string m_strName;
 	CPreset *operator()(size_type nIndex);
-	int ShowMenu();
 protected:
 	CPresetCollection *m_pCollection;
+	int ShowMenu();
 };
 
 class CPresetBatchCollection : public vector<CPresetBatch *> {

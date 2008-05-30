@@ -50,8 +50,8 @@ BOOL EditorFilter() {
 	Dialog.Add(new CFarCheckBoxItem(30,7,0,"",&EUTF8));
 	Dialog.Add(new CFarButtonItem(34,7,0,0,MUTF8));
 	Dialog.AddButtons(MOk,MCancel);
-	Dialog.Add(new CFarButtonItem(60,9,0,0,MBatch));
-	Dialog.Add(new CFarButtonItem(60,5,0,0,MPresets));
+	Dialog.Add(new CFarButtonItem(60,9,0,0,MBtnBatch));
+	Dialog.Add(new CFarButtonItem(60,5,0,0,MBtnPresets));
 
 	SearchText=PickupText();
 	if (SearchText.empty()) SearchText=EText;

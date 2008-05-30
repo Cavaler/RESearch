@@ -45,7 +45,7 @@ BOOL EditorTransliterate() {
 	Dialog.Add(new CFarEditItem(5,5,70,DIF_HISTORY,"TargetChars",ReplaceText));
 
 	Dialog.AddButtons(MOk,MCancel);
-	Dialog.Add(new CFarButtonItem(60,7,0,0,MPresets));
+	Dialog.Add(new CFarButtonItem(60,7,0,0,MBtnPresets));
 
 	SearchText = ETSource;
 	ReplaceText = ETTarget;

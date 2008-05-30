@@ -295,9 +295,9 @@ int SearchPrompt(BOOL Plugin) {
 	}
 
 	Dialog.AddButtons(MOk,MCancel);
-	Dialog.Add(new CFarButtonItem(60,7,0,0,MPresets));
+	Dialog.Add(new CFarButtonItem(60,7,0,0,MBtnPresets));
 	Dialog.Add(new CFarCheckBoxItem(56,9,0,"",&FAdvanced));
-	Dialog.Add(new CFarButtonItem(60,9,0,0,MAdvanced));
+	Dialog.Add(new CFarButtonItem(60,9,0,0,MBtnAdvanced));
 	Dialog.Add(new CFarCheckBoxItem(56,11,0,"",&FUTF8));
 	Dialog.Add(new CFarButtonItem(60,11,0,0,MUTF8));
 	Dialog.SetFocus(3);
