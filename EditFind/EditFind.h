@@ -29,10 +29,10 @@ public:
 #define DECLARE_PERSIST_VARS
 #include "PersistVars.h"
 
-extern CParameterSet g_ESBatch;
-extern CParameterSet g_ERBatch;
-extern CParameterSet g_EFBatch;
-extern CParameterSet g_ELBatch;
+extern CParameterSet g_ESParamSet;
+extern CParameterSet g_ERParamSet;
+extern CParameterSet g_EFParamSet;
+extern CParameterSet g_ELParamSet;
 EXTERN CESPresetCollection *ESPresets;
 EXTERN CERPresetCollection *ERPresets;
 EXTERN CEFPresetCollection *EFPresets;

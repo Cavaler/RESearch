@@ -331,11 +331,11 @@ int ReplacePrompt(BOOL Plugin) {
 			QuoteReplaceString(ReplaceText);
 			break;
 		case 3:
-			if (FRBatch->ShowMenu(g_FRBatch) >= 0)
+			if (FRBatch->ShowMenu(g_FRParamSet) >= 0)
 				return FALSE;
 			break;
 		case 4:
-			FRPresets->ShowMenu(g_FRBatch);
+			FRPresets->ShowMenu(g_FRParamSet);
 			if (Plugin&&(FSearchIn<SI_FROMCURRENT)) FSearchIn=SI_FROMCURRENT;
 			break;
 		case 5:

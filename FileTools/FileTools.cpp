@@ -6,12 +6,12 @@ char *FRInts[]={"MaskAsRegExp","TextAsRegExp","Repeating"};
 char *FQRStrings[]={"Text","Replace"};
 char *FQRInts[]={"TextAsRegExp","Repeating"};
 
-CParameterSet g_RBatch(RenameFilesExecutor, 6, 3,
+CParameterSet g_RnParamSet(RenameFilesExecutor, 6, 3,
 	"Mask", &MaskText, "Text", &SearchText, "Replace", &ReplaceText,
 	"@Mask", &FMask, "@Text", &FText, "@Replace", &FRReplace,
 	"MaskAsRegExp", &FMaskAsRegExp, "TextAsRegExp", &FSearchAs, "Repeating", &FRepeating
 	);
-CParameterSet g_QRBatch(QuickRenameFilesExecutor, 4, 2,
+CParameterSet g_QRParamSet(QuickRenameFilesExecutor, 4, 2,
 	"Text", &SearchText, "Replace", &ReplaceText,
 	"@Text", &FText, "@Replace", &FRReplace,
 	"TextAsRegExp", &FSearchAs, "Repeating", &FRepeating
@@ -27,9 +27,9 @@ void FTReadRegistry(HKEY Key) {
 	#define DECLARE_PERSIST_LOAD Key
 	#include "PersistVars.h"
 
-	RPresets  = new CRPresetCollection();
+	RnPresets = new CRnPresetCollection();
 	QRPresets = new CQRPresetCollection();
-	RBatch    = new CPresetBatchCollection(RPresets);
+	RnBatch   = new CPresetBatchCollection(RnPresets);
 	QRBatch   = new CPresetBatchCollection(QRPresets);
 }
 
@@ -40,9 +40,9 @@ void FTWriteRegistry(HKEY Key) {
 
 void FTCleanup(BOOL PatternOnly) {
 	if (!PatternOnly) {
-		delete RBatch;
+		delete RnBatch;
 		delete QRBatch;
-		delete RPresets;
+		delete RnPresets;
 		delete QRPresets;
 	}
 }
@@ -281,11 +281,11 @@ BOOL RenameFilesPrompt() {
 			FRReplace=ReplaceText;
 			break;
 		case 1:
-			if (RBatch->ShowMenu(g_RBatch) >= 0)
+			if (RnBatch->ShowMenu(g_RnParamSet) >= 0)
 				return FALSE;
 			break;
 		case 2:
-			RPresets->ShowMenu(g_RBatch);
+			RnPresets->ShowMenu(g_RnParamSet);
 			break;
 		case -1:
 			return FALSE;
@@ -387,11 +387,11 @@ BOOL RenameSelectedFilesPrompt() {
 			FRReplace=ReplaceText;
 			break;
 		case 1:
-			if (QRBatch->ShowMenu(g_QRBatch) >= 0)
+			if (QRBatch->ShowMenu(g_QRParamSet) >= 0)
 				return FALSE;
 			break;
 		case 2:
-			QRPresets->ShowMenu(g_QRBatch);
+			QRPresets->ShowMenu(g_QRParamSet);
 			break;
 		case -1:
 			return FALSE;
@@ -629,7 +629,7 @@ OperationResult RenumberFiles() {
 	return OR_CANCEL;
 }
 
-BOOL CRPresetCollection::EditPreset(CPreset *pPreset) {
+BOOL CRnPresetCollection::EditPreset(CPreset *pPreset) {
 	CFarDialog Dialog(76,17,"RPresetDlg");
 	Dialog.AddFrame(MFRPreset);
 

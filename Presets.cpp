@@ -45,20 +45,20 @@ CParameterBackup::~CParameterBackup() {
 	if (m_bAutoRestore) Restore();
 }
 
-CPreset::CPreset(CParameterSet &Batch) : m_nID(0) {
-	if (!&Batch) return;
+CPreset::CPreset(CParameterSet &ParamSet) : m_nID(0) {
+	if (!&ParamSet) return;
 
 	m_mapStrings[""] = "New Preset";
 	m_bAddToMenu = false;
 
-	map<string, string *>::iterator it1 = Batch.m_mapStrings.begin();
-	while (it1 != Batch.m_mapStrings.end()) {
+	map<string, string *>::iterator it1 = ParamSet.m_mapStrings.begin();
+	while (it1 != ParamSet.m_mapStrings.end()) {
 		m_mapStrings[it1->first] = *(it1->second);
 		it1++;
 	}
 
-	map<string, int *>::iterator it2 = Batch.m_mapInts.begin();
-	while (it2 != Batch.m_mapInts.end()) {
+	map<string, int *>::iterator it2 = ParamSet.m_mapInts.begin();
+	while (it2 != ParamSet.m_mapInts.end()) {
 		m_mapInts[it2->first] = *(it2->second);
 		it2++;
 	}
@@ -94,9 +94,9 @@ CPreset::CPreset(string strName, HKEY hKey) {
 	RegCloseKey(hOwnKey);
 }
 
-void CPreset::Apply(CParameterSet &Batch) {
-	map<string, string *>::iterator it1 = Batch.m_mapStrings.begin();
-	while (it1 != Batch.m_mapStrings.end()) {
+void CPreset::Apply(CParameterSet &ParamSet) {
+	map<string, string *>::iterator it1 = ParamSet.m_mapStrings.begin();
+	while (it1 != ParamSet.m_mapStrings.end()) {
 		if (it1->first[0] != '@') {
 			map<string, string>::iterator it = m_mapStrings.find(it1->first);
 			if (it != m_mapStrings.end()) *(it1->second) = it->second;
@@ -104,8 +104,8 @@ void CPreset::Apply(CParameterSet &Batch) {
 		it1++;
 	}
 
-	map<string, int *>::iterator it2 = Batch.m_mapInts.begin();
-	while (it2 != Batch.m_mapInts.end()) {
+	map<string, int *>::iterator it2 = ParamSet.m_mapInts.begin();
+	while (it2 != ParamSet.m_mapInts.end()) {
 		if (it2->first[0] != '@') {
 			map<string, int>::iterator it = m_mapInts.find(it2->first);
 			if (it != m_mapInts.end()) *(it2->second) = it->second;
@@ -194,7 +194,7 @@ void CPresetCollection::Save() {
 	RegCloseKey(hKey);
 }
 
-int CPresetCollection::ShowMenu(CParameterSet &Batch) {
+int CPresetCollection::ShowMenu(CParameterSet &ParamSet) {
 	int piBreakKeys[]={VK_INSERT, VK_DELETE, VK_F4, 0};
 	vector<string> arrItems;
 	do {
@@ -210,10 +210,10 @@ int CPresetCollection::ShowMenu(CParameterSet &Batch) {
 
 		switch (nBreakKey) {
 		case -1:
-			if (&Batch && (nResult >= 0) && (nResult < (int)size())) at(nResult)->Apply(Batch);
+			if (&ParamSet && (nResult >= 0) && (nResult < (int)size())) at(nResult)->Apply(ParamSet);
 			return nResult;
 		case 0:{
-			CPreset *pPreset = new CPreset(Batch);
+			CPreset *pPreset = new CPreset(ParamSet);
 			if (EditPreset(pPreset)) {
 				pPreset->m_nID = FindUnusedID();
 				push_back(pPreset);
@@ -341,14 +341,14 @@ void CPresetBatch::FillMenuItem(FarMenuItem &Item) {
 	Item.Selected = Item.Checked = Item.Separator = FALSE;
 }
 
-void CPresetBatch::Execute(CParameterSet &Batch) {
-	CParameterBackup Backup(Batch);
+void CPresetBatch::Execute(CParameterSet &ParamSet) {
+	CParameterBackup Backup(ParamSet);
 
 	for (size_t nPreset = 0; nPreset < size(); nPreset++) {
 		CPreset *pPreset = (*this)(nPreset);
 		if (pPreset) {
-			pPreset->Apply(Batch);
-			if (!Batch.m_Executor()) break;
+			pPreset->Apply(ParamSet);
+			if (!ParamSet.m_Executor()) break;
 		}
 	}
 }
@@ -467,7 +467,7 @@ void CPresetBatchCollection::Save() {
 	RegCloseKey(hKey);
 }
 
-int CPresetBatchCollection::ShowMenu(CParameterSet &Batch) {
+int CPresetBatchCollection::ShowMenu(CParameterSet &ParamSet) {
 	int piBreakKeys[]={VK_INSERT, VK_DELETE, VK_F4, 0};
 	vector<string> arrItems;
 
@@ -484,13 +484,13 @@ int CPresetBatchCollection::ShowMenu(CParameterSet &Batch) {
 
 		switch (nBreakKey) {
 		case -1:
-			if (&Batch && Batch.m_Executor && (nResult >= 0) && (nResult < (int)size())) {
+			if (&ParamSet && ParamSet.m_Executor && (nResult >= 0) && (nResult < (int)size())) {
 				CPresetBatch *pBatch = at(nResult);
 				const char *Lines[]={"Execute", GetMsg(MExecuteBatchQuery),
 					pBatch->m_strName.c_str(), GetMsg(MOk), GetMsg(MCancel)};
 				if (StartupInfo.Message(StartupInfo.ModuleNumber, FMSG_WARNING, "ExecuteBatch", Lines, 5, 2) != 0) break;
 
-				pBatch->Execute(Batch);
+				pBatch->Execute(ParamSet);
 			}
 
 			return nResult;

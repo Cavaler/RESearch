@@ -170,7 +170,7 @@ BOOL EditorSearch() {
 			ConfigureSeveralLines();
 			break;
 		case 4:
-			ESPresets->ShowMenu(g_ESBatch);
+			ESPresets->ShowMenu(g_ESParamSet);
 			break;
 		case 5:
 			UTF8Converter(SearchText);

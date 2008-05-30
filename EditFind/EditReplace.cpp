@@ -431,11 +431,11 @@ BOOL EditorReplace() {
 			ConfigureSeveralLines();
 			break;
 		case 5:
-			if (ERBatch->ShowMenu(g_ERBatch) >= 0)
+			if (ERBatch->ShowMenu(g_ERParamSet) >= 0)
 				return TRUE;
 			break;
 		case 6:
-			ERPresets->ShowMenu(g_ERBatch);
+			ERPresets->ShowMenu(g_ERParamSet);
 			break;
 		case 7:
 			UTF8Converter(SearchText);

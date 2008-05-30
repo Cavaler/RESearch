@@ -11,7 +11,7 @@ public:
 	virtual const char *GetName() {return "ViewFind";}
 };
 
-extern CParameterSet g_VSBatch;
+extern CParameterSet g_VSParamSet;
 EXTERN CVSPresetCollection *VSPresets;
 
 void VReadRegistry(HKEY Key);

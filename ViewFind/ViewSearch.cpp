@@ -155,7 +155,7 @@ BOOL ViewerSearch() {
 			if (ERegExp) QuoteRegExpString(SearchText);
 			break;
 		case 2:
-			VSPresets->ShowMenu(g_VSBatch);
+			VSPresets->ShowMenu(g_VSParamSet);
 			break;
 		case 3:
 			UTF8Converter(SearchText);

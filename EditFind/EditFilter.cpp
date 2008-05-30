@@ -64,11 +64,11 @@ BOOL EditorFilter() {
 			if (ERegExp) QuoteRegExpString(SearchText);
 			break;
 		case 2:
-			if (EFBatch->ShowMenu(g_EFBatch) >= 0)
+			if (EFBatch->ShowMenu(g_EFParamSet) >= 0)
 				return TRUE;
 			break;
 		case 3:
-			EFPresets->ShowMenu(g_EFBatch);
+			EFPresets->ShowMenu(g_EFParamSet);
 			break;
 		case 4:
 			UTF8Converter(SearchText);

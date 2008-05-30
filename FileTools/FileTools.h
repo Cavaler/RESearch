@@ -5,9 +5,9 @@
 #include "..\Presets.h"
 #include "..\FileFind\FileFind.h"
 
-class CRPresetCollection:public CPresetCollection {
+class CRnPresetCollection:public CPresetCollection {
 public:
-	CRPresetCollection() {Load();}
+	CRnPresetCollection() {Load();}
 	virtual BOOL EditPreset(CPreset *pPreset);
 	virtual const char *GetName() {return "FileRename";}
 };
@@ -22,11 +22,11 @@ public:
 #define DECLARE_PERSIST_VARS
 #include "PersistVars.h"
 
-extern CParameterSet g_RBatch;
-extern CParameterSet g_QRBatch;
-EXTERN CRPresetCollection *RPresets;
+extern CParameterSet g_RnParamSet;
+extern CParameterSet g_QRParamSet;
+EXTERN CRnPresetCollection *RnPresets;
 EXTERN CQRPresetCollection *QRPresets;
-EXTERN CPresetBatchCollection *RBatch;
+EXTERN CPresetBatchCollection *RnBatch;
 EXTERN CPresetBatchCollection *QRBatch;
 
 void FTReadRegistry(HKEY Key);

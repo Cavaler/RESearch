@@ -37,10 +37,10 @@ public:
 	virtual const char *GetName() {return "FileAdvanced";}
 };
 
-extern CParameterSet g_FSBatch;
-extern CParameterSet g_FRBatch;
-extern CParameterSet g_FGBatch;
-extern CParameterSet g_FABatch;
+extern CParameterSet g_FSParamSet;
+extern CParameterSet g_FRParamSet;
+extern CParameterSet g_FGParamSet;
+extern CParameterSet g_FAParamSet;
 EXTERN CFSPresetCollection *FSPresets;
 EXTERN CFRPresetCollection *FRPresets;
 EXTERN CFGPresetCollection *FGPresets;

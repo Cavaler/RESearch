@@ -290,7 +290,7 @@ int ShowFileMenu() {
 	FSPresets->FillMenuItems(MenuItems);
 	FRPresets->FillMenuItems(MenuItems);
 	FGPresets->FillMenuItems(MenuItems);
-	RPresets->FillMenuItems(MenuItems);
+	RnPresets->FillMenuItems(MenuItems);
 	QRPresets->FillMenuItems(MenuItems);
 
 	MenuItems.push_back(MenuItems[14]);	// Separator
@@ -346,40 +346,40 @@ int ShowViewerMenu() {
 OperationResult OpenPluginFromFilePreset(int Item) {
 	CPreset *pPreset;
 	if (pPreset = FSPresets->FindMenuPreset(Item)) {
-		CParameterBackup Backup(g_FSBatch);
-		pPreset->Apply(g_FSBatch);
-		return g_FSBatch.m_Executor();
+		CParameterBackup Backup(g_FSParamSet);
+		pPreset->Apply(g_FSParamSet);
+		return g_FSParamSet.m_Executor();
 	}
 
 	if (pPreset = FRPresets->FindMenuPreset(Item)) {
-		CParameterBackup Backup(g_FRBatch);
-		pPreset->Apply(g_FRBatch);
-		return g_FRBatch.m_Executor();
+		CParameterBackup Backup(g_FRParamSet);
+		pPreset->Apply(g_FRParamSet);
+		return g_FRParamSet.m_Executor();
 	}
 
 	if (pPreset = FGPresets->FindMenuPreset(Item)) {
-		CParameterBackup Backup(g_FGBatch);
-		pPreset->Apply(g_FGBatch);
-		return g_FGBatch.m_Executor();
+		CParameterBackup Backup(g_FGParamSet);
+		pPreset->Apply(g_FGParamSet);
+		return g_FGParamSet.m_Executor();
 	}
 
-	if (pPreset = RPresets->FindMenuPreset(Item)) {
-		CParameterBackup Backup(g_RBatch);
-		pPreset->Apply(g_RBatch);
-		return g_RBatch.m_Executor();
+	if (pPreset = RnPresets->FindMenuPreset(Item)) {
+		CParameterBackup Backup(g_RnParamSet);
+		pPreset->Apply(g_RnParamSet);
+		return g_RnParamSet.m_Executor();
 	}
 
 	if (pPreset = QRPresets->FindMenuPreset(Item)) {
-		CParameterBackup Backup(g_QRBatch);
-		pPreset->Apply(g_QRBatch);
-		return g_QRBatch.m_Executor();
+		CParameterBackup Backup(g_QRParamSet);
+		pPreset->Apply(g_QRParamSet);
+		return g_QRParamSet.m_Executor();
 	}
 
 	Item--;
 
 	CPresetBatch *pBatch;
 	if (pBatch = FRBatch->FindMenuBatch(Item)) {
-		pBatch->Execute(g_FRBatch);
+		pBatch->Execute(g_FRParamSet);
 		return OR_OK;
 	}
 
@@ -451,30 +451,30 @@ HANDLE OpenPluginFromFileMenu(int Item, BOOL ShowDialog) {
 OperationResult OpenPluginFromEditorPreset(int Item) {
 	CPreset *pPreset;
 	if (pPreset = ESPresets->FindMenuPreset(Item)) {
-		CParameterBackup Backup(g_ESBatch);
-		pPreset->Apply(g_ESBatch);
-		return g_ESBatch.m_Executor();
+		CParameterBackup Backup(g_ESParamSet);
+		pPreset->Apply(g_ESParamSet);
+		return g_ESParamSet.m_Executor();
 	}
 	if (pPreset = ERPresets->FindMenuPreset(Item)) {
-		CParameterBackup Backup(g_ERBatch);
-		pPreset->Apply(g_ERBatch);
-		return g_ERBatch.m_Executor();
+		CParameterBackup Backup(g_ERParamSet);
+		pPreset->Apply(g_ERParamSet);
+		return g_ERParamSet.m_Executor();
 	}
 	if (pPreset = EFPresets->FindMenuPreset(Item)) {
-		CParameterBackup Backup(g_EFBatch);
-		pPreset->Apply(g_EFBatch);
-		return g_EFBatch.m_Executor();
+		CParameterBackup Backup(g_EFParamSet);
+		pPreset->Apply(g_EFParamSet);
+		return g_EFParamSet.m_Executor();
 	}
 
 	Item--;
 
 	CPresetBatch *pBatch;
 	if (pBatch = ERBatch->FindMenuBatch(Item)) {
-		pBatch->Execute(g_ERBatch);
+		pBatch->Execute(g_ERParamSet);
 		return OR_OK;
 	}
 	if (pBatch = EFBatch->FindMenuBatch(Item)) {
-		pBatch->Execute(g_EFBatch);
+		pBatch->Execute(g_EFParamSet);
 		return OR_OK;
 	}
 
@@ -544,9 +544,9 @@ HANDLE OpenPluginFromEditorMenu(int Item) {
 OperationResult OpenPluginFromViewerPreset(int Item) {
 	CPreset *pPreset;
 	if (pPreset = VSPresets->FindMenuPreset(Item)) {
-		CParameterBackup Backup(g_VSBatch);
-		pPreset->Apply(g_VSBatch);
-		return g_VSBatch.m_Executor();
+		CParameterBackup Backup(g_VSParamSet);
+		pPreset->Apply(g_VSParamSet);
+		return g_VSParamSet.m_Executor();
 	}
 	return OR_CANCEL;
 }

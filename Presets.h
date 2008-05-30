@@ -30,9 +30,9 @@ public:
 //	Saveable mapping of parameter names to values
 class CPreset {
 public:
-	CPreset(CParameterSet &Batch);
+	CPreset(CParameterSet &ParamSet);
 	CPreset(string strName, HKEY hKey);	// hKey is root key
-	void Apply(CParameterSet &Batch);
+	void Apply(CParameterSet &ParamSet);
 	void FillMenuItem(FarMenuItem &Item);
 	void Save(HKEY hKey);
 
@@ -49,7 +49,7 @@ public:
 	virtual ~CPresetCollection();
 	void Load();
 	void Save();
-	int ShowMenu(CParameterSet &Batch = *((CParameterSet *)NULL));
+	int ShowMenu(CParameterSet &ParamSet = *((CParameterSet *)NULL));
 	virtual BOOL EditPreset(CPreset *pPreset) = 0;
 	CPreset *operator()(int nID);
 	virtual const char *GetName()=0;
@@ -68,7 +68,7 @@ public:
 	CPresetBatch(CPresetCollection *pCollection, string strName, HKEY hKey);
 	void Save(int nID, HKEY hKey);
 	void FillMenuItem(FarMenuItem &Item);
-	void Execute(CParameterSet &Batch);
+	void Execute(CParameterSet &ParamSet);
 	~CPresetBatch();
 
 	bool m_bAddToMenu;
@@ -85,7 +85,7 @@ public:
 	void Save();
 	~CPresetBatchCollection();
 
-	int ShowMenu(CParameterSet &Batch = *((CParameterSet *)NULL));
+	int ShowMenu(CParameterSet &ParamSet = *((CParameterSet *)NULL));
 
 	void FillMenuItems(vector<FarMenuItem> &MenuItems);
 	CPresetBatch *FindMenuBatch(int &nIndex);

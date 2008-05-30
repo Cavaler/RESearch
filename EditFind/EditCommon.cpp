@@ -1,18 +1,18 @@
 #include "StdAfx.h"
 #include "..\RESearch.h"
 
-CParameterSet g_ESBatch(EditorSearchExecutor, 2, 4,
+CParameterSet g_ESParamSet(EditorSearchExecutor, 2, 4,
 	"Text", &SearchText, "@Text", &EText,
 	"IsRegExp", &ERegExp, "CaseSensitive", &ECaseSensitive, "SeveralLine", &ESeveralLine, "UTF8", &EUTF8
 					 );
-CParameterSet g_ERBatch(EditorReplaceExecutor, 4, 8,
+CParameterSet g_ERParamSet(EditorReplaceExecutor, 4, 8,
 	"Text", &SearchText, "Replace", &ReplaceText,
 	 "@Text", &EText,  "@Replace", &ERReplace,
 	"IsRegExp", &ERegExp, "CaseSensitive", &ECaseSensitive, "SeveralLine", &ESeveralLine,
 	"UTF8", &EUTF8, "RemoveEmpty", &ERRemoveEmpty, "RemoveNoMatch", &ERRemoveNoMatch,
 	"AsScript", &EREvaluate, "Script", &EREvaluateScript
 					 );
-CParameterSet g_EFBatch(EditorFilterExecutor, 2, 4,
+CParameterSet g_EFParamSet(EditorFilterExecutor, 2, 4,
 	"Text", &SearchText, "@Text", &EText,
 	"LeaveFilter", &EFLeaveFilter, "IsRegExp", &ERegExp, "CaseSensitive", &ECaseSensitive, "UTF8", &EUTF8
 					 );

@@ -1,18 +1,18 @@
 #include "StdAfx.h"
 #include "..\RESearch.h"
 
-CParameterSet g_FSBatch(FileSearchExecutor, 4, 5,
+CParameterSet g_FSParamSet(FileSearchExecutor, 4, 5,
 	"Mask", &MaskText, "Text", &SearchText, "@Mask", &FMask, "@Text", &FText,
 	"MaskAsRegExp", &FMaskAsRegExp, "CaseSensitive", &FCaseSensitive,
 	"UTF8", &FUTF8, "SearchAs", &FSearchAs, "IsInverse", &FSInverse
 	);
-CParameterSet g_FRBatch(FileReplaceExecutor, 6, 4,
+CParameterSet g_FRParamSet(FileReplaceExecutor, 6, 4,
 	"Mask", &MaskText, "Text", &SearchText, "Replace", &ReplaceText,
 	"@Mask", &FMask, "@Text", &FText, "@Replace", &FRReplace,
 	"MaskAsRegExp", &FMaskAsRegExp, "CaseSensitive", &FCaseSensitive,
 	"UTF8", &FUTF8, "SearchAs", &FSearchAs
 	);
-CParameterSet g_FGBatch(FileGrepExecutor, 4, 9,
+CParameterSet g_FGParamSet(FileGrepExecutor, 4, 9,
 	"Mask", &MaskText, "Text", &SearchText, "@Mask", &FMask, "@Text", &FText,
 	"MaskAsRegExp", &FMaskAsRegExp, "CaseSensitive", &FCaseSensitive,
 	"UTF8", &FUTF8, "SearchAs", &FSearchAs, "IsInverse", &FSInverse,
@@ -26,7 +26,7 @@ bool g_bScanningLocalTime;
 FILETIME FADateBeforeThisLocal;
 FILETIME FADateAfterThisLocal;
 
-CParameterSet g_FABatch(NULL, 2, 20,
+CParameterSet g_FAParamSet(NULL, 2, 20,
 	"FullFileName", &FAFullFileName, "DirectoryName", &FADirectoryName,
 
 	"FullFileNameMatch", &FAFullFileNameMatch, "CaseSensitive", &FACaseSensitive, "FullFileNameInverse", &FAFullFileNameInverse,
@@ -654,7 +654,7 @@ BOOL AdvancedSettings() {
 		case 3:
 			g_dwDateAfterThis = (DWORD)FTtoTime_t(FADateAfterThis);
 			g_dwDateBeforeThis = (DWORD)FTtoTime_t(FADateBeforeThis);
-			if (FAPresets->ShowMenu(g_FABatch) >= 0) {
+			if (FAPresets->ShowMenu(g_FAParamSet) >= 0) {
 				Time_tToFT(g_dwDateAfterThis, FADateAfterThis);
 				Time_tToFT(g_dwDateBeforeThis, FADateBeforeThis);
 			}
