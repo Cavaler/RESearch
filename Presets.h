@@ -67,6 +67,8 @@ public:
 	CPresetBatch(CPresetCollection *pCollection);
 	CPresetBatch(CPresetCollection *pCollection, string strName, HKEY hKey);
 	void Save(int nID, HKEY hKey);
+	void FillMenuItem(FarMenuItem &Item);
+	void Execute(CParameterSet &Batch);
 	~CPresetBatch();
 
 	bool m_bAddToMenu;
@@ -84,6 +86,9 @@ public:
 	~CPresetBatchCollection();
 
 	int ShowMenu(CParameterSet &Batch = *((CParameterSet *)NULL));
+
+	void FillMenuItems(vector<FarMenuItem> &MenuItems);
+	CPresetBatch *FindMenuBatch(int &nIndex);
 protected:
 	CPresetCollection *m_pCollection;
 };

@@ -289,7 +289,11 @@ void CPresetCollection::ValidateIDs() {
 
 // ---------------
 
-CPresetBatch::CPresetBatch(CPresetCollection *pCollection) : m_pCollection(pCollection), m_strName("New Batch") {
+CPresetBatch::CPresetBatch(CPresetCollection *pCollection)
+: m_pCollection(pCollection)
+, m_strName("New Batch")
+, m_bAddToMenu(false)
+{
 }
 
 CPresetBatch::CPresetBatch(CPresetCollection *pCollection, string strName, HKEY hKey) : m_pCollection(pCollection) {
@@ -330,6 +334,23 @@ void CPresetBatch::Save(int nID, HKEY hKey) {
 		SetRegIntValue(hOwnKey, szKeyName, at(nIndex));
 	}
 	RegCloseKey(hOwnKey);
+}
+
+void CPresetBatch::FillMenuItem(FarMenuItem &Item) {
+	strcat(strcpy(Item.Text, GetMsg(MMenuBatch)), m_strName.c_str());
+	Item.Selected = Item.Checked = Item.Separator = FALSE;
+}
+
+void CPresetBatch::Execute(CParameterSet &Batch) {
+	CParameterBackup Backup(Batch);
+
+	for (size_t nPreset = 0; nPreset < size(); nPreset++) {
+		CPreset *pPreset = (*this)(nPreset);
+		if (pPreset) {
+			pPreset->Apply(Batch);
+			if (!Batch.m_Executor()) break;
+		}
+	}
 }
 
 CPresetBatch::~CPresetBatch() {
@@ -469,15 +490,7 @@ int CPresetBatchCollection::ShowMenu(CParameterSet &Batch) {
 					pBatch->m_strName.c_str(), GetMsg(MOk), GetMsg(MCancel)};
 				if (StartupInfo.Message(StartupInfo.ModuleNumber, FMSG_WARNING, "ExecuteBatch", Lines, 5, 2) != 0) break;
 
-				CParameterBackup Backup(Batch);
-
-				for (size_t nPreset = 0; nPreset < pBatch->size(); nPreset++) {
-					CPreset *pPreset = (*pBatch)(nPreset);
-					if (pPreset) {
-						pPreset->Apply(Batch);
-						if (!Batch.m_Executor()) break;
-					}
-				}
+				pBatch->Execute(Batch);
 			}
 
 			return nResult;
@@ -511,4 +524,25 @@ int CPresetBatchCollection::ShowMenu(CParameterSet &Batch) {
 			break;
 		}
 	} while (true);
+}
+
+void CPresetBatchCollection::FillMenuItems(vector<FarMenuItem> &MenuItems) {
+	for (size_t nBatch = 0; nBatch < size(); nBatch++) {
+		CPresetBatch *pBatch = at(nBatch);
+		if (pBatch->m_bAddToMenu) {
+			FarMenuItem Item;
+			pBatch->FillMenuItem(Item);
+			MenuItems.push_back(Item);
+		}
+	}
+}
+
+CPresetBatch *CPresetBatchCollection::FindMenuBatch(int &nIndex) {
+	for (size_t nBatch = 0; nBatch < size(); nBatch++) {
+		CPresetBatch *pBatch = at(nBatch);
+		if (pBatch->m_bAddToMenu) {
+			if (nIndex == 0) return pBatch; else nIndex--;
+		}
+	}
+	return NULL;
 }

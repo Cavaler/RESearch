@@ -293,6 +293,9 @@ int ShowFileMenu() {
 	RPresets->FillMenuItems(MenuItems);
 	QRPresets->FillMenuItems(MenuItems);
 
+	MenuItems.push_back(MenuItems[14]);	// Separator
+	FRBatch->FillMenuItems(MenuItems);
+
 	return StartupInfo.Menu(StartupInfo.ModuleNumber,-1,-1,0,FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT,GetMsg(MMenuHeader),
 		NULL,"FileMenu",NULL,NULL,&MenuItems[0],MenuItems.size());
 }
@@ -316,6 +319,10 @@ int ShowEditorMenu() {
 	ERPresets->FillMenuItems(MenuItems);
 	EFPresets->FillMenuItems(MenuItems);
 	ELPresets->FillMenuItems(MenuItems);
+
+	MenuItems.push_back(MenuItems[10]);	// Separator
+	ERBatch->FillMenuItems(MenuItems);
+	EFBatch->FillMenuItems(MenuItems);
 
 	return StartupInfo.Menu(StartupInfo.ModuleNumber,-1,-1,0,FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT,GetMsg(MMenuHeader),
 		NULL,"EditorMenu",NULL,NULL,&MenuItems[0],MenuItems.size());
@@ -369,6 +376,14 @@ OperationResult OpenPluginFromFilePreset(int Item) {
 		return g_QRBatch.m_Executor();
 	}
 
+	Item--;
+
+	CPresetBatch *pBatch;
+	if (pBatch = FRBatch->FindMenuBatch(Item)) {
+		pBatch->Execute(g_FRBatch);
+		return OR_OK;
+	}
+
 	return OR_CANCEL;
 }
 
@@ -378,6 +393,7 @@ HANDLE OpenPluginFromFileMenu(int Item, BOOL ShowDialog) {
 		Item=ShowFileMenu();
 		if (Item==-1) return INVALID_HANDLE_VALUE;
 	}
+
 	switch (Item) {
 		case 0:
 			Result=FileFind(&PanelItems,&ItemsNumber,ShowDialog);
@@ -455,12 +471,25 @@ OperationResult OpenPluginFromEditorPreset(int Item) {
 		pPreset->Apply(g_ELBatch);
 		return g_ELBatch.m_Executor();
 	}
+
+	Item--;
+
+	CPresetBatch *pBatch;
+	if (pBatch = ERBatch->FindMenuBatch(Item)) {
+		pBatch->Execute(g_ERBatch);
+		return OR_OK;
+	}
+	if (pBatch = EFBatch->FindMenuBatch(Item)) {
+		pBatch->Execute(g_EFBatch);
+		return OR_OK;
+	}
+
 	return OR_CANCEL;
 }
 
 HANDLE OpenPluginFromEditorMenu(int Item) {
 	FindIfClockPresent();
-	switch (int nMenu = ShowEditorMenu()) {
+	switch (Item = ShowEditorMenu()) {
 		case 0:
 			if (EditorSearch()) LastAction=0;
 			break;
@@ -503,15 +532,15 @@ HANDLE OpenPluginFromEditorMenu(int Item) {
 				EditorListAllAgain();
 				break;
 			};
-			if (nMenu == 6) EReverse = !EReverse;
+			if (Item == 6) EReverse = !EReverse;
 			break;
 		case 8:
 			UTF8Converter();
 			break;
 	}
 
-	if (Item >= 10) {
-		Item -= 10;
+	if (Item >= 11) {
+		Item -= 11;
 		OpenPluginFromEditorPreset(Item);
 	}
 
