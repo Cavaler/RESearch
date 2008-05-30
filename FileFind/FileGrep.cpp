@@ -243,6 +243,13 @@ OperationResult FileGrep(BOOL ShowDialog) {
 	} else return OR_FAILED;
 }
 
+OperationResult FileGrepExecutor() {
+	FMask = MaskText;
+	FText = SearchText;
+
+	return FileGrep(FALSE);
+}
+
 BOOL CFGPresetCollection::EditPreset(CPreset *pPreset) {
 	SearchAs FSA = (SearchAs)pPreset->m_mapInts["SearchAs"];
 	BOOL AsRegExp = (FSA == SA_REGEXP) || (FSA == SA_SEVERALLINE) || (FSA == SA_MULTILINE) || (FSA == SA_MULTIREGEXP);
@@ -293,8 +300,4 @@ BOOL CFGPresetCollection::EditPreset(CPreset *pPreset) {
 			return FALSE;
 		}
 	} while (true);
-}
-
-OperationResult FileGrepExecutor() {
-	return OR_CANCEL;
 }

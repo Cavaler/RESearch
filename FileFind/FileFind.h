@@ -96,8 +96,8 @@ EXTERN vector<CharTableSet2> XLatTables;
 
 typedef void (*ProcessFileProc)(WIN32_FIND_DATA *FindData,PluginPanelItem **PanelItems,int *ItemsNumber);
 
-OperationResult FileFind(PluginPanelItem **PanelItems,int *ItemsNumber,BOOL ShowDialog);
-OperationResult FileReplace(PluginPanelItem **PanelItems,int *ItemsNumber,BOOL ShowDialog);
+OperationResult FileFind(PluginPanelItem **PanelItems,int *ItemsNumber,BOOL ShowDialog,BOOL bSilent=FALSE);
+OperationResult FileReplace(PluginPanelItem **PanelItems,int *ItemsNumber,BOOL ShowDialog,BOOL bSilent=FALSE);
 OperationResult FileGrep(BOOL ShowDialog);
 BOOL AdvancedSettings();
 BOOL CompileAdvancedSettings();

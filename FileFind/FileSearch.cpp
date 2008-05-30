@@ -333,7 +333,7 @@ int SearchPrompt(BOOL Plugin) {
 	return TRUE;
 }
 
-OperationResult FileFind(PluginPanelItem **PanelItems,int *ItemsNumber,BOOL ShowDialog) {
+OperationResult FileFind(PluginPanelItem **PanelItems,int *ItemsNumber,BOOL ShowDialog,BOOL bSilent) {
 	PanelInfo PInfo;
 	StartupInfo.Control(INVALID_HANDLE_VALUE,FCTL_GETPANELINFO,&PInfo);
 	if (PInfo.PanelType!=PTYPE_FILEPANEL) return OR_FAILED;
@@ -342,24 +342,19 @@ OperationResult FileFind(PluginPanelItem **PanelItems,int *ItemsNumber,BOOL Show
 	if (ShowDialog) {
 		if (!SearchPrompt(PInfo.Plugin)) return OR_CANCEL;
 	} else {
+		if (FUTF8) FAllCharTables=FALSE;
 		if (!FPreparePattern(true)) return OR_CANCEL;
 	}
 
 	if (ScanDirectories(PanelItems,ItemsNumber,SearchFile)) {
-		if (*ItemsNumber==0) return NoFilesFound(); else return OR_PANEL;
+		return (*ItemsNumber==0) ? (bSilent ? OR_OK : NoFilesFound()) : OR_PANEL;
 	} else return OR_FAILED;
 }
 
 OperationResult FileSearchExecutor() {
-	FMask=MaskText;
-	FText=SearchText;
-	if (!FPreparePattern(false)) return OR_FAILED;
-	if (FUTF8) FAllCharTables=FALSE;
-
-	if (ScanDirectories(&PanelItems, &ItemsNumber, SearchFile)) {
-		if (!FROpenModified) return OR_OK; else
-			return (ItemsNumber == 0) ? OR_OK : OR_PANEL;
-	} else return OR_FAILED;
+	FMask = MaskText;
+	FText = SearchText;
+	return FileSearch(&PanelItems, &ItemsNumber, FALSE, TRUE);
 }
 
 BOOL CFSPresetCollection::EditPreset(CPreset *pPreset) {
