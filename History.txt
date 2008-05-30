@@ -14,13 +14,16 @@ Planned:
 
 Version 6.20 (21.04.2008)
 	! Presets and batches can be added to RESearch menu
-    * Batch editing interface changed
+	* Batch editing interface changed
+	* 'As List All' parameter in Editor Search presets
+	* Editor Transliteration presets
 	- Running Batch (or preset from menu) doesn't spoil last manual parameters
 	- "Evaluate as script" stored in presets
 
 	- UTF8 converter doesn't crash on empty strings
 	- Script engine list cached, removing significant delay on first use in session
 	  To re-read, remove HKEY_CURRENT_USER\Software\Far\Plugins\RESearch\ScriptEngines key
+	- Transliterate saves editor position; only really changed lines in Undo
 
 Version 6.18 (21.04.2008)
 	- Remove Empty Lines fixed
