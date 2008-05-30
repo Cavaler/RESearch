@@ -318,7 +318,6 @@ int ShowEditorMenu() {
 	ESPresets->FillMenuItems(MenuItems);
 	ERPresets->FillMenuItems(MenuItems);
 	EFPresets->FillMenuItems(MenuItems);
-	ELPresets->FillMenuItems(MenuItems);
 
 	MenuItems.push_back(MenuItems[10]);	// Separator
 	ERBatch->FillMenuItems(MenuItems);
@@ -465,11 +464,6 @@ OperationResult OpenPluginFromEditorPreset(int Item) {
 		CParameterBackup Backup(g_EFBatch);
 		pPreset->Apply(g_EFBatch);
 		return g_EFBatch.m_Executor();
-	}
-	if (pPreset = ELPresets->FindMenuPreset(Item)) {
-		CParameterBackup Backup(g_ELBatch);
-		pPreset->Apply(g_ELBatch);
-		return g_ELBatch.m_Executor();
 	}
 
 	Item--;

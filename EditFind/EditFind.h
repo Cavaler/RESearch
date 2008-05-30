@@ -26,13 +26,6 @@ public:
 	virtual const char *GetName() {return "EditFilter";}
 };
 
-class CELPresetCollection:public CPresetCollection {
-public:
-	CELPresetCollection() {Load();}
-	virtual BOOL EditPreset(CPreset *pPreset);
-	virtual const char *GetName() {return "EditList";}
-};
-
 #define DECLARE_PERSIST_VARS
 #include "PersistVars.h"
 
@@ -43,7 +36,6 @@ extern CParameterSet g_ELBatch;
 EXTERN CESPresetCollection *ESPresets;
 EXTERN CERPresetCollection *ERPresets;
 EXTERN CEFPresetCollection *EFPresets;
-EXTERN CELPresetCollection *ELPresets;
 EXTERN CPresetBatchCollection *ERBatch;
 EXTERN CPresetBatchCollection *EFBatch;
 
