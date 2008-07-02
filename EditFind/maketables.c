@@ -1,4 +1,5 @@
-#include <pcre\internal.h>
+#include <pcre\config.h>
+#include <pcre\pcre_internal.h>
 #include <Plugin.hpp>
 
 #undef islower

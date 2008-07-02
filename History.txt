@@ -12,6 +12,9 @@ Planned:
 	- Correct "Files found" in Grep
     * Find next after 
 
+Version 6.21 (02.07.2008)
+	- RegExp UTF8 search fixed
+
 Version 6.20 (21.04.2008)
 	! Presets and batches can be added to RESearch menu
 	* Batch editing interface changed
