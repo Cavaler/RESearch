@@ -330,6 +330,9 @@ void RestorePosition(const EditorInfo &StartEdInfo) {
 
 BOOL EPreparePattern(string &SearchText) {
 	ECleanup(TRUE);
+
+	if (!CheckUsage(SearchText, ERegExp!=0, ESeveralLine!=0)) return FALSE;
+
 	if (ERegExp) {
 		char *OEMLine = _strdup(SearchText.c_str());
 		OEMToEditor(OEMLine, SearchText.size());

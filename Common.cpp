@@ -38,6 +38,30 @@ void WriteRegistry() {
 	FTWriteRegistry(hKey);
 }
 
+bool CheckUsage(const string &strText, bool bRegExp, bool bSeveralLine) {
+	if (!g_bShowUsageWarnings) return true;
+
+	if (!bRegExp) {
+		if ((strText.find("\\r") != string::npos) || (strText.find("\\n") != string::npos)) {
+			int nResult = Message(FMSG_WARNING, NULL, 5, 2,
+				GetMsg(MWarning), GetMsg(MWarnMacrosInPlainText), GetMsg(MWarnContinue), GetMsg(MOk), GetMsg(MCancel));
+			
+			if (nResult == 1) return false;
+		}
+	}
+
+	if (bSeveralLine) {
+		if ((strText.find("\\r\\n") != string::npos) || (strText.find("\r\n") != string::npos)) {
+			int nResult = Message(FMSG_WARNING, NULL, 5, 2,
+				GetMsg(MWarning), GetMsg(MWarnRNInSeveralLine), GetMsg(MWarnContinue), GetMsg(MOk), GetMsg(MCancel));
+
+			if (nResult == 1) return false;
+		}
+	}
+
+	return true;
+}
+
 BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,int CaseSensitive,BOOL bUTF8,const unsigned char *pTables) {
 	if (Text.empty()) return FALSE;		// WAS: Not needed if empty NOW: what is search for nothing?
 	const char *ErrPtr;

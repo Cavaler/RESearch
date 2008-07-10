@@ -138,7 +138,10 @@ int FPreparePattern(bool bAcceptEmpty) {
 
 	if (FText.empty() && !bAcceptEmpty) return FALSE;
 
-	if ((FSearchAs==SA_PLAINTEXT)||(FSearchAs==SA_MULTITEXT)) {
+	bool bPlainText = (FSearchAs==SA_PLAINTEXT)||(FSearchAs==SA_MULTITEXT);
+	if (!CheckUsage(FText, !bPlainText, FSearchAs == SA_SEVERALLINE)) return FALSE;
+
+	if (bPlainText) {
 		FTextUpcase=FText;
 		if (!FCaseSensitive) {
 			for (size_t I=0; I<FText.size(); I++)

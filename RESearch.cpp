@@ -645,7 +645,7 @@ int ConfigureSeveralLines() {
 }
 
 int ConfigureCommon() {
-	CFarDialog Dialog(60,16,"CommonConfig");
+	CFarDialog Dialog(60,18,"CommonConfig");
 	Dialog.AddFrame(MCommonSettings);
 
 	Dialog.Add(new CFarTextItem(5,3,0,MSeveralLinesIs));
@@ -662,6 +662,8 @@ int ConfigureCommon() {
 	Dialog.Add(new CFarEditItem(34,9,40,0,NULL,(int &)g_nMaxInThreadLength,new CFarIntegerRangeValidator(0,0x7FFFFFFF)));
 	Dialog.Add(new CFarTextItem(9,10,0,MThreadStackMB));
 	Dialog.Add(new CFarEditItem(34,10,40,0,NULL,(int &)g_nThreadStackMB,new CFarIntegerRangeValidator(0,1024)));
+
+	Dialog.Add(new CFarCheckBoxItem(5,12,0,MShowUsageWarnings,&g_bShowUsageWarnings));
 
 	Dialog.AddButtons(MOk,MCancel);
 	return Dialog.Display(-1);

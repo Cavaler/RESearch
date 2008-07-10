@@ -6,6 +6,7 @@ MBtnPresets			"Prese&ts"			"Пресеты"
 MBtnAdvanced		"Advanc&ed"			"Дополнит"
 MBtnBatch			"&Batch"			"&Пакет"
 MError				"Error"				"Ошибка"
+MWarning			"Warning"			"Предупреждение"
 
 MSearchResults		"Search results"	"Результаты поиска"
 
@@ -125,6 +126,9 @@ MFileCreateError	"Cannot create file"	"Ошибка создания файла"
 MFileBackupError	"Cannot backup file"	"Ошибка сохранения копии файла"
 MFileReadError		"Read error in file"	"Ошибка чтения файла"
 MFileWriteError		"Write error in file"	"Ошибка записи в файл"
+MWarnMacrosInPlainText	"'\\n' and other escapes don't work in plain-text"		"'\\n' и прочие не работают в поиске просто текста"
+MWarnRNInSeveralLine	"Single '\\n' should be used in several-line search"		"Используйте одиночный '\\n' в многострочном поиске"
+MWarnContinue		"Continue?"				"Продолжить?"
 
 MCommonSettings		"Common settings"						"Общие настройки"
 MSeveralLinesIs		"'&Several' lines means"				"'&Несколько' строк - значит"
@@ -134,6 +138,7 @@ MDotMatchesNewline	"&Dot matches newline also"				"&Точка совпадает с символом п
 MUseSeparateThread	"&Use separate thread for regexp match"	"&Использовать отдельный поток для регулярных выражений"
 MMaxInThreadLength	"For &lines longer than:"				"Для строк &длиннее:"
 MThreadStackMB		"&Thread stack, in MB:"					"Стек потока, в MB:"
+MShowUsageWarnings	"Show &warnings on common mistakes"		"&Предупреждения о неправильном использовании"
 
 MFileSearchSettings	"Panel search settings"		"Поиск в файловой панели"
 MReadAtOnceLimit	"&Read at once maximum"		"Читать сразу &максимум"

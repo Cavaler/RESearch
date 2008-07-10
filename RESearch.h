@@ -41,6 +41,7 @@ enum eStringTable {
 	MBtnAdvanced,
 	MBtnBatch,
 	MError,
+	MWarning,
 
 	MSearchResults,
 
@@ -160,6 +161,9 @@ enum eStringTable {
 	MFileBackupError,
 	MFileReadError,
 	MFileWriteError,
+	MWarnMacrosInPlainText,
+	MWarnRNInSeveralLine,
+	MWarnContinue,
 
 	MCommonSettings,
 	MSeveralLinesIs,
@@ -169,6 +173,7 @@ enum eStringTable {
 	MUseSeparateThread,
 	MMaxInThreadLength,
 	MThreadStackMB,
+	MShowUsageWarnings,
 
 	MFileSearchSettings,
 	MReadAtOnceLimit,
@@ -274,6 +279,7 @@ void WriteRegistry();
 void ReadActiveScripts();
 int  ConfigureSeveralLines();
 
+bool CheckUsage(const string &strText, bool bRegExp, bool bSeveralLine);
 void PrepareBMHSearch(const char *String,int StringLength,size_t nPattern = 0);
 BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,int CaseSensitive,BOOL bUTF8=FALSE,const unsigned char *pTables=NULL);
 BOOL PreparePattern(CRegExp &reObject, const string &Text, int CaseSensitive, BOOL bUTF8=FALSE, const unsigned char *pTables=NULL);

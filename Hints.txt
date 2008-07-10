@@ -1,0 +1,19 @@
+Some non-obvious aspects of RESearch usage are explained here.
+
+- Literals like '\n' DO NOT work in plain text search! Either use regexp, or enter needed
+symbol directly using Ctrl-Q.
+
+- '\n' and others do work in replace string even with plain-text search.
+
+- Single-line search in both editor and panels, both regexp and plaintext, is done
+by extracting lines from text sequentially, WITHOUT newline symbols - therefore to search for
+the word 'end' at the end of string, use regexp 'end$', not 'end\n'!
+
+- Several-line search is done by internally concatenating lines with a single '\n',
+so it is to be used instead of '\r\n' always.
+
+- In Multi-Line RegExp search from panels actual newline symbols are to be used,
+so '\r?\n' is good for most cases.
+
+- If '[ ] Dot matches newline also' is not set, you can use '\C' as 'Any symbol including newline'
+
