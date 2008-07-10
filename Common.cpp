@@ -16,51 +16,26 @@ HKEY OpenRegistry(const char *szSubKey, bool bCreate) {
 }
 
 void ReadRegistry() {
-	HKEY Key=OpenRegistry();
-//	Configuration
-	QueryRegIntValue(Key,"SeveralLines",&SeveralLines,32,1,65535);
-	QueryRegIntValue(Key,"SeveralLinesKB",&SeveralLinesKB,16,1,1024);
-	QueryRegBoolValue(Key,"AllowEmptyMatch",&AllowEmptyMatch,FALSE);
-	QueryRegBoolValue(Key,"DotMatchesNewline",&DotMatchesNewline,TRUE);
-	QueryRegBoolValue(Key, "UseSeparateThread", &g_bUseSeparateThread, true);
-	QueryRegIntValue(Key, "MaxInThreadLength", &g_nMaxInThreadLength, 1024, 0);
-	QueryRegIntValue(Key, "ThreadStackMB", &g_nThreadStackMB, 64, 0);
+	CHKey hKey = OpenRegistry();
+#define DECLARE_PERSIST_SAVE hKey
+#include "PersistVars.h"
 
-	QueryRegIntValue(Key,"EShowPosition",(int *)&EShowPosition,1,0,2);
-	QueryRegIntValue(Key,"EShowPositionOffset",&EShowPositionOffset,0,-1024,1024);
-	QueryRegIntValue(Key,"ERightSideOffset",&ERightSideOffset,5,0,1024);
-	QueryRegIntValue(Key,"EFindTextAtCursor",(int *)&EFindTextAtCursor,FT_WORD,FT_NONE,FT_ANY);
-	QueryRegBoolValue(Key,"EFindSelection",&EFindSelection,TRUE);
-
-	EReadRegistry(Key);
-	VReadRegistry(Key);
-	FReadRegistry(Key);
-	FTReadRegistry(Key);
-	RegCloseKey(Key);
+	EReadRegistry(hKey);
+	VReadRegistry(hKey);
+	FReadRegistry(hKey);
+	FTReadRegistry(hKey);
 }
 
 void WriteRegistry() {
-	HKEY Key=OpenRegistry();
-//	Configuration
-	SetRegIntValue(Key,"SeveralLines",SeveralLines);
-	SetRegIntValue(Key,"SeveralLinesKB",SeveralLinesKB);
-	SetRegBoolValue(Key,"AllowEmptyMatch",AllowEmptyMatch);
-	SetRegBoolValue(Key,"DotMatchesNewline",DotMatchesNewline);
-	SetRegBoolValue(Key, "UseSeparateThread", g_bUseSeparateThread);
-	SetRegIntValue(Key, "MaxInThreadLength", g_nMaxInThreadLength);
-	SetRegIntValue(Key, "ThreadStackMB", g_nThreadStackMB);
+	CHKey hKey = OpenRegistry();
 
-	SetRegIntValue(Key,"EShowPosition",EShowPosition);
-	SetRegIntValue(Key,"EShowPositionOffset",EShowPositionOffset);
-	SetRegIntValue(Key,"ERightSideOffset",ERightSideOffset);
-	SetRegIntValue(Key,"EFindTextAtCursor",EFindTextAtCursor);
-	SetRegBoolValue(Key,"EFindSelection",EFindSelection);
+#define DECLARE_PERSIST_LOAD hKey
+#include "PersistVars.h"
 
-	EWriteRegistry(Key);
-	VWriteRegistry(Key);
-	FWriteRegistry(Key);
-	FTWriteRegistry(Key);
-	RegCloseKey(Key);
+	EWriteRegistry(hKey);
+	VWriteRegistry(hKey);
+	FWriteRegistry(hKey);
+	FTWriteRegistry(hKey);
 }
 
 BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,int CaseSensitive,BOOL bUTF8,const unsigned char *pTables) {

@@ -698,6 +698,10 @@
 			Name="Header Files"
 			>
 			<File
+				RelativePath=".\PersistVars.h"
+				>
+			</File>
+			<File
 				RelativePath="Presets.h"
 				>
 			</File>

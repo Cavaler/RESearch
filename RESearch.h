@@ -15,22 +15,11 @@ enum OperationResult {OR_CANCEL,OR_FAILED,OR_OK,OR_PANEL};
 #define CONSTRUCT(n)
 #endif
 
-// Common
-EXTERN int  SeveralLines;
-EXTERN int  SeveralLinesKB;
-EXTERN BOOL AllowEmptyMatch;
-EXTERN BOOL DotMatchesNewline;
-EXTERN bool g_bUseSeparateThread;
-EXTERN int  g_nMaxInThreadLength;
-EXTERN int  g_nThreadStackMB;
-
 enum   ShowPosition {SP_TOP,SP_CENTER,SP_BOTTOM};
-EXTERN ShowPosition EShowPosition;
-EXTERN int  EShowPositionOffset;
-EXTERN int ERightSideOffset;
 enum   FindTextAtCursor {FT_NONE,FT_WORD,FT_ANY};
-EXTERN FindTextAtCursor EFindTextAtCursor;
-EXTERN BOOL EFindSelection;
+
+#define DECLARE_PERSIST_VARS
+#include "PersistVars.h"
 
 EXTERN bool g_bFromCmdLine;
 
