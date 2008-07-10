@@ -12,6 +12,10 @@ Planned:
 	- Correct "Files found" in Grep
     * Find next after 
 
+Version 6.22 (10.07.2008)
+	* Hints.txt added
+    * Warnings on common mistakes added
+
 Version 6.21 (02.07.2008)
 	- RegExp UTF8 search fixed
 
