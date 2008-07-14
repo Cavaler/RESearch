@@ -2,7 +2,6 @@
 
 PERSIST_TYPED_VARIABLE(int, SeveralLines, 32, 1, 65535)
 PERSIST_TYPED_VARIABLE(int, SeveralLinesKB, 16, 1, 1024)
-PERSIST_BOOL_VARIABLE(AllowEmptyMatch, FALSE)
 PERSIST_BOOL_VARIABLE(DotMatchesNewline, TRUE)
 PERSIST_bool_VARIABLE_(g_bUseSeparateThread, "UseSeparateThread", true)
 PERSIST_TYPED_VARIABLE_(int, g_nMaxInThreadLength, "MaxInThreadLength", 1024, 0, MAXINT_PTR)

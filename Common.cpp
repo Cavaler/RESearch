@@ -17,7 +17,7 @@ HKEY OpenRegistry(const char *szSubKey, bool bCreate) {
 
 void ReadRegistry() {
 	CHKey hKey = OpenRegistry();
-#define DECLARE_PERSIST_SAVE hKey
+#define DECLARE_PERSIST_LOAD hKey
 #include "PersistVars.h"
 
 	EReadRegistry(hKey);
@@ -29,7 +29,7 @@ void ReadRegistry() {
 void WriteRegistry() {
 	CHKey hKey = OpenRegistry();
 
-#define DECLARE_PERSIST_LOAD hKey
+#define DECLARE_PERSIST_SAVE hKey
 #include "PersistVars.h"
 
 	EWriteRegistry(hKey);

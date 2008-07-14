@@ -5,7 +5,11 @@ void EditorSearchOK(int FirstLine,int StartPos,int LastLine,int EndPos) {
 	RefreshEditorInfo();
 
 	EditorSelect Select={BTYPE_STREAM,FirstLine,StartPos,EndPos-StartPos,LastLine-FirstLine+1};
-	if ((Select.BlockWidth!=0)||(Select.BlockHeight>1)) StartupInfo.EditorControl(ECTL_SELECT,&Select);
+	if ((Select.BlockWidth == 0) && (Select.BlockHeight == 1)) {
+		Select.BlockWidth++;
+		if (Select.BlockStartPos>0) {Select.BlockStartPos--;Select.BlockWidth++;}
+	}
+	StartupInfo.EditorControl(ECTL_SELECT,&Select);
 
 	EditorSetPosition Position={(EReverse)?FirstLine:LastLine,(EReverse)?StartPos:EndPos,-1,
 		TopLine(FirstLine,EdInfo.WindowSizeY,EdInfo.TotalLines),
@@ -15,6 +19,7 @@ void EditorSearchOK(int FirstLine,int StartPos,int LastLine,int EndPos) {
 
 void PatchEditorInfo(EditorInfo &EdInfo) {
 	// Skipping over selection - for "Search Again inverse"
+
 	if (ESearchAgainCalled && (EdInfo.BlockType == BTYPE_STREAM)) {
 		EditorGetString String = {EdInfo.BlockStartLine};
 		EctlGetString(&String);
@@ -33,6 +38,13 @@ void PatchEditorInfo(EditorInfo &EdInfo) {
 			}
 		} else {
 			if ((EdInfo.CurLine == EdInfo.BlockStartLine) && (EdInfo.CurPos == BlockStartPos)) {
+				EdInfo.CurLine = BlockEndLine;
+				EdInfo.CurPos = BlockEndPos;
+			} else
+
+			// Skipping selection for zero-width search
+			if ((EdInfo.CurLine == EdInfo.BlockStartLine) && (EdInfo.BlockStartLine == BlockEndLine) &&
+				(BlockStartPos == EdInfo.CurPos-1) && (BlockEndPos == EdInfo.CurPos+1)) {
 				EdInfo.CurLine = BlockEndLine;
 				EdInfo.CurPos = BlockEndPos;
 			}

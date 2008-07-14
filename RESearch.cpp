@@ -645,7 +645,7 @@ int ConfigureSeveralLines() {
 }
 
 int ConfigureCommon() {
-	CFarDialog Dialog(60,18,"CommonConfig");
+	CFarDialog Dialog(60,17,"CommonConfig");
 	Dialog.AddFrame(MCommonSettings);
 
 	Dialog.Add(new CFarTextItem(5,3,0,MSeveralLinesIs));
@@ -654,16 +654,15 @@ int ConfigureCommon() {
 	Dialog.Add(new CFarEditItem(48,3,52,0,NULL,(int &)SeveralLinesKB,new CFarIntegerRangeValidator(1, 1024)));
 	Dialog.Add(new CFarTextItem(53,3,0,MKB));
 
-	Dialog.Add(new CFarCheckBoxItem(5,5,0,MAllowEmptyMatch,&AllowEmptyMatch));
-	Dialog.Add(new CFarCheckBoxItem(5,6,0,MDotMatchesNewline,&DotMatchesNewline));
+	Dialog.Add(new CFarCheckBoxItem(5,5,0,MDotMatchesNewline,&DotMatchesNewline));
 
-	Dialog.Add(new CFarCheckBoxItem(5,8,0,MUseSeparateThread,&g_bUseSeparateThread));
-	Dialog.Add(new CFarTextItem(9,9,0,MMaxInThreadLength));
-	Dialog.Add(new CFarEditItem(34,9,40,0,NULL,(int &)g_nMaxInThreadLength,new CFarIntegerRangeValidator(0,0x7FFFFFFF)));
-	Dialog.Add(new CFarTextItem(9,10,0,MThreadStackMB));
-	Dialog.Add(new CFarEditItem(34,10,40,0,NULL,(int &)g_nThreadStackMB,new CFarIntegerRangeValidator(0,1024)));
+	Dialog.Add(new CFarCheckBoxItem(5,7,0,MUseSeparateThread,&g_bUseSeparateThread));
+	Dialog.Add(new CFarTextItem(9,8,0,MMaxInThreadLength));
+	Dialog.Add(new CFarEditItem(34,8,40,0,NULL,(int &)g_nMaxInThreadLength,new CFarIntegerRangeValidator(0,0x7FFFFFFF)));
+	Dialog.Add(new CFarTextItem(9,9,0,MThreadStackMB));
+	Dialog.Add(new CFarEditItem(34,9,40,0,NULL,(int &)g_nThreadStackMB,new CFarIntegerRangeValidator(0,1024)));
 
-	Dialog.Add(new CFarCheckBoxItem(5,12,0,MShowUsageWarnings,&g_bShowUsageWarnings));
+	Dialog.Add(new CFarCheckBoxItem(5,11,0,MShowUsageWarnings,&g_bShowUsageWarnings));
 
 	Dialog.AddButtons(MOk,MCancel);
 	return Dialog.Display(-1);

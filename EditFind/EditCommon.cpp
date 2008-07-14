@@ -48,12 +48,12 @@ BOOL SearchIn(const char *Line,int Start,int Length,int *MatchStart,int *MatchLe
 		MatchCount=pcre_info(EPattern,NULL,NULL)+1;
 		Match=new int[MatchCount*3];
 		if (pcre_exec(EPattern,EPatternExtra,Line,Start+Length,Start,0,Match,MatchCount*3)>=0) {
-			if ((Match[0]!=Match[1])||AllowEmptyMatch) {
+//			if ((Match[0]!=Match[1])/*||AllowEmptyMatch*/) {
 				if (MatchStart) *MatchStart=Match[0];
 				if (MatchLength) *MatchLength=Match[1]-Match[0];
 				if (!NeedMatch) {delete[] Match;Match=NULL;}
 				return TRUE;
-			}
+//			}
 		}
 		if (!NeedMatch) {delete[] Match;Match=NULL;}
 	} else {

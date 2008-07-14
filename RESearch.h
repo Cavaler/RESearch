@@ -168,7 +168,6 @@ enum eStringTable {
 	MCommonSettings,
 	MSeveralLinesIs,
 	MLinesOr,
-	MAllowEmptyMatch,
 	MDotMatchesNewline,
 	MUseSeparateThread,
 	MMaxInThreadLength,

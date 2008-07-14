@@ -12,6 +12,13 @@ void DoReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, const st
 	EditorGetString GetString = {-1};
 	int I;
 
+	// Quite a special case
+	if ((FirstLine == LastLine) && (StartPos == EndPos) && Replace.empty()) {
+		EndPos++;
+		ReplaceNumber++;
+		return;
+	}
+
 	if (FirstLine < LastLine) {
 		// Delete lines to be fully replaced
 		Position.CurLine = FirstLine + 1;
@@ -140,9 +147,10 @@ eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &
 	EctlSetPosition(&Position);
 	if (!NoAsking) {
 		if ((Select.BlockWidth == 0)&&(Select.BlockHeight == 1)) {
-			Select.BlockHeight++;
-			if (Select.BlockStartPos>0) {Select.BlockStartPos--;Select.BlockHeight++;}
+			Select.BlockWidth++;
+			if (Select.BlockStartPos>0) {Select.BlockStartPos--;Select.BlockWidth++;}
 		}
+
 		StartupInfo.EditorControl(ECTL_SELECT, &Select);
 		StartupInfo.EditorControl(ECTL_REDRAW, NULL);
 	}
