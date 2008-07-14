@@ -17,3 +17,4 @@ so '\r?\n' is good for most cases.
 
 - If '[ ] Dot matches newline also' is not set, you can use '\C' as 'Any symbol including newline'
 
+- If zero-width string is found, characters surrounding it are highlighted

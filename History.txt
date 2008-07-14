@@ -7,14 +7,19 @@ Regular Expression Search and Replace
 
 Planned:
 	! Performing all regular expression matches in UTF-8
-	+ Support for C-like escapes (mostly because of "\n") for plain text searches
 	* dialogprocs for disabling unneeded elements
 	- Correct "Files found" in Grep
     * Find next after 
+	! Batches of different operations
+
+
+Version 6.23 (14.07.2008)
+	- General settings saved correctly
+	* "[X] Allow empty matches" option removed, always allowed
 
 Version 6.22 (10.07.2008)
 	* Hints.txt added
-    * Warnings on common mistakes added
+	* Warnings on common mistakes added
 
 Version 6.21 (02.07.2008)
 	- RegExp UTF8 search fixed
