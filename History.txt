@@ -8,10 +8,12 @@ Regular Expression Search and Replace
 Planned:
 	! Performing all regular expression matches in UTF-8
 	* dialogprocs for disabling unneeded elements
-	- Correct "Files found" in Grep
-    * Find next after 
-	! Batches of different operations
 
+Version 6.30 (21.07.2008)
+	! Batches redesigned
+	  Now one can combine different operations into single batch. Accessible from RESearch menu,
+	  not from dialogs.
+	- "Files found" displayed correctly in Grep progress window
 
 Version 6.23 (14.07.2008)
 	- General settings saved correctly
