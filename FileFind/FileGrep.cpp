@@ -37,6 +37,7 @@ bool GrepLineFound(const sBufferedLine &strBuf) {
 
 void GrepFile(WIN32_FIND_DATA *FindData,PluginPanelItem **PanelItems,int *ItemsNumber) {
 	if (FText.empty()) {
+		AddFile(FindData, PanelItems, ItemsNumber);
 		AddGrepLine(FindData->cFileName);
 		return;
 	}
@@ -67,7 +68,9 @@ void GrepFile(WIN32_FIND_DATA *FindData,PluginPanelItem **PanelItems,int *ItemsN
 		arrStringBuffer.push_back(sBufferedLine(szBuffer, szBufEnd));
 
 		if (GrepLineFound(arrStringBuffer.back())) {
-			nFoundCount++;
+			if (++nFoundCount == 1) {
+				AddFile(FindData, PanelItems, ItemsNumber);
+			}
 			nLastMatched = arrStringBuffer.size()-1;
 
 			switch (FGrepWhat) {
