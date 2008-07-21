@@ -416,7 +416,6 @@ BOOL EditorReplace() {
 	Dialog.Add(new CFarButtonItem(0, 13, DIF_CENTERGROUP, TRUE, MReplace));
 	Dialog.Add(new CFarButtonItem(0, 13, DIF_CENTERGROUP, FALSE, MAll));
 	Dialog.Add(new CFarButtonItem(0, 13, DIF_CENTERGROUP, FALSE, MCancel));
-	Dialog.Add(new CFarButtonItem(60, 13, 0, 0, MBtnBatch));
 	Dialog.Add(new CFarButtonItem(60, 7, 0, FALSE, MBtnPresets));
 
 	SearchText = PickupText();
@@ -425,7 +424,7 @@ BOOL EditorReplace() {
 
 	int ExitCode;
 	do {
-		switch (ExitCode = Dialog.Display(8,-5,-4, 5, 6, 10,-2,-1, 13)) {
+		switch (ExitCode = Dialog.Display(8,-4,-3, 5, 6, 10, -1, 13)) {
 		case 0:
 		case 1:
 			break;
@@ -439,13 +438,9 @@ BOOL EditorReplace() {
 			ConfigureSeveralLines();
 			break;
 		case 5:
-			if (ERBatch->ShowMenu(g_ERParamSet) >= 0)
-				return TRUE;
-			break;
-		case 6:
 			ERPresets->ShowMenu(true);
 			break;
-		case 7:
+		case 6:
 			UTF8Converter(SearchText);
 			break;
 		case -1:

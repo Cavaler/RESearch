@@ -7,25 +7,25 @@
 
 class CESPresetCollection:public CPresetCollection {
 public:
-	CESPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "EditFind", MFAPreset) {}
+	CESPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "EditFind", MESPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
 };
 
 class CERPresetCollection:public CPresetCollection {
 public:
-	CERPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "EditReplace", MFAPreset) {}
+	CERPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "EditReplace", MERPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
 };
 
 class CEFPresetCollection:public CPresetCollection {
 public:
-	CEFPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "EditFilter", MFAPreset) {}
+	CEFPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "EditFilter", MEFPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
 };
 
 class CETPresetCollection:public CPresetCollection {
 public:
-	CETPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "EditTransliterate", MFAPreset) {}
+	CETPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "EditTransliterate", METPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
 };
 
@@ -40,8 +40,6 @@ EXTERN CESPresetCollection *ESPresets;
 EXTERN CERPresetCollection *ERPresets;
 EXTERN CEFPresetCollection *EFPresets;
 EXTERN CETPresetCollection *ETPresets;
-EXTERN CPresetBatchCollection *ERBatch;
-EXTERN CPresetBatchCollection *EFBatch;
 
 EXTERN int LastAction VALUE(-1);
 

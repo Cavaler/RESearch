@@ -303,7 +303,6 @@ int ReplacePrompt(BOOL Plugin) {
 	Dialog.Add(new CFarCheckBoxItem(42,17,0,MOverwriteBackup,&FROverwriteBackup));
 
 	Dialog.AddButtons(MOk,MCancel);
-	Dialog.Add(new CFarButtonItem(60,20,0,0,MBtnBatch));
 	Dialog.Add(new CFarButtonItem(60,9,0,0,MBtnPresets));
 	Dialog.Add(new CFarCheckBoxItem(56,10,0,"",&FAdvanced));
 	Dialog.Add(new CFarButtonItem(60,10,0,0,MBtnAdvanced));
@@ -318,7 +317,7 @@ int ReplacePrompt(BOOL Plugin) {
 	ReplaceText=FRReplace;
 	int ExitCode;
 	do {
-		switch (ExitCode=Dialog.Display(7,-8,8,9,-6,-5,-3,-1)) {
+		switch (ExitCode=Dialog.Display(7, -7, 8, 9, -5, -3, -1)) {
 		case 0:
 			FMask=MaskText;
 			FText=SearchText;
@@ -331,17 +330,13 @@ int ReplacePrompt(BOOL Plugin) {
 			QuoteReplaceString(ReplaceText);
 			break;
 		case 3:
-			if (FRBatch->ShowMenu(g_FRParamSet) >= 0)
-				return FALSE;
-			break;
-		case 4:
 			FRPresets->ShowMenu(true);
 			if (Plugin&&(FSearchIn<SI_FROMCURRENT)) FSearchIn=SI_FROMCURRENT;
 			break;
-		case 5:
+		case 4:
 			if (AdvancedSettings()) FAdvanced=TRUE;
 			break;
-		case 6:
+		case 5:
 			UTF8Converter(SearchText);
 			break;
 		case -1:

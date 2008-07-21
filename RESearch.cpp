@@ -9,7 +9,6 @@ void WINAPI GetPluginInfo(PluginInfo *Info) {
 
 	Info->StructSize=sizeof(PluginInfo);
 	Info->Flags=PF_EDITOR|PF_VIEWER|PF_FULLCMDLINE;
-//	Info->Flags=PF_EDITOR|PF_FULLCMDLINE;
 	Info->DiskMenuStringsNumber=0;
 	Info->PluginMenuStrings=MenuStrings;
 	Info->PluginMenuStringsNumber=1;
@@ -297,7 +296,7 @@ int ShowFileMenu() {
 	MenuItems.push_back(MenuItems[0]);
 	strcpy(MenuItems.back().Text, GetMsg(MMenuBatches));
 
-	FRBatch->FillMenuItems(MenuItems);
+	g_pPanelBatches->FillMenuItems(MenuItems);
 
 	return StartupInfo.Menu(StartupInfo.ModuleNumber,-1,-1,0,FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT,GetMsg(MMenuHeader),
 		NULL,"FileMenu",NULL,NULL,&MenuItems[0],MenuItems.size());
@@ -327,8 +326,7 @@ int ShowEditorMenu() {
 	MenuItems.push_back(MenuItems[0]);
 	strcpy(MenuItems.back().Text, GetMsg(MMenuBatches));
 
-	ERBatch->FillMenuItems(MenuItems);
-	EFBatch->FillMenuItems(MenuItems);
+	g_pEditorBatches->FillMenuItems(MenuItems);
 
 	return StartupInfo.Menu(StartupInfo.ModuleNumber,-1,-1,0,FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT,GetMsg(MMenuHeader),
 		NULL,"EditorMenu",NULL,NULL,&MenuItems[0],MenuItems.size());
@@ -378,9 +376,9 @@ OperationResult OpenPluginFromFilePreset(int Item) {
 		return OR_OK;
 	} else Item--;
 
-	CPresetBatch *pBatch;
-	if (pBatch = FRBatch->FindMenuBatch(Item)) {
-		pBatch->Execute(g_FRParamSet);
+	CBatchAction *pAction;
+	if (pAction = g_pPanelBatches->FindMenuAction(Item)) {
+		pAction->Execute();
 		return OR_OK;
 	}
 
@@ -470,13 +468,9 @@ OperationResult OpenPluginFromEditorPreset(int Item) {
 		return OR_OK;
 	} else Item--;
 
-	CPresetBatch *pBatch;
-	if (pBatch = ERBatch->FindMenuBatch(Item)) {
-		pBatch->Execute(g_ERParamSet);
-		return OR_OK;
-	}
-	if (pBatch = EFBatch->FindMenuBatch(Item)) {
-		pBatch->Execute(g_EFParamSet);
+	CBatchAction *pAction;
+	if (pAction = g_pEditorBatches->FindMenuAction(Item)) {
+		pAction->Execute();
 		return OR_OK;
 	}
 

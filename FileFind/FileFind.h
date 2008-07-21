@@ -41,7 +41,6 @@ EXTERN CFSPresetCollection *FSPresets;
 EXTERN CFRPresetCollection *FRPresets;
 EXTERN CFGPresetCollection *FGPresets;
 EXTERN CFAPresetCollection *FAPresets;
-EXTERN CPresetBatchCollection *FRBatch;
 
 #define DECLARE_PERSIST_VARS
 #include "PersistVars.h"

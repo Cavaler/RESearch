@@ -32,9 +32,6 @@ void EReadRegistry(HKEY Key) {
 	ERPresets = new CERPresetCollection(g_ERParamSet);
 	EFPresets = new CEFPresetCollection(g_EFParamSet);
 	ETPresets = new CETPresetCollection(g_ETParamSet);
-
-	ERBatch=new CPresetBatchCollection(ERPresets);
-	EFBatch=new CPresetBatchCollection(EFPresets);
 }
 
 void EWriteRegistry(HKEY Key) {
@@ -377,10 +374,9 @@ void DeleteMatchInfo() {
 void ECleanup(BOOL PatternOnly) {
 	if (EPattern) {pcre_free(EPattern);EPattern=NULL;}
 	if (EPatternExtra) {pcre_free(EPatternExtra);EPatternExtra=NULL;}
+
 	if (!PatternOnly) {
 		DeleteMatchInfo();
-		delete ERBatch;
-		delete EFBatch;
 
 		delete ESPresets;
 		delete ERPresets;

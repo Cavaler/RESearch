@@ -75,40 +75,6 @@ protected:
 
 //////////////////////////////////////////////////////////////////////////
 
-class CPresetBatch : public vector<int> {
-public:
-	CPresetBatch(CPresetCollection *pCollection);
-	CPresetBatch(CPresetCollection *pCollection, string strName, HKEY hKey);
-	void Save(int nID, HKEY hKey);
-	void FillMenuItem(FarMenuItem &Item);
-	void Execute(CParameterSet &ParamSet);
-	bool Edit();
-	~CPresetBatch();
-
-	bool m_bAddToMenu;
-	string m_strName;
-	CPreset *operator()(size_type nIndex);
-protected:
-	CPresetCollection *m_pCollection;
-	int ShowMenu();
-};
-
-class CPresetBatchCollection : public vector<CPresetBatch *> {
-public:
-	CPresetBatchCollection(CPresetCollection *pCollection);
-	void Save();
-	~CPresetBatchCollection();
-
-	int ShowMenu(CParameterSet &ParamSet = *((CParameterSet *)NULL));
-
-	void FillMenuItems(vector<FarMenuItem> &MenuItems);
-	CPresetBatch *FindMenuBatch(int &nIndex);
-protected:
-	CPresetCollection *m_pCollection;
-};
-
-//////////////////////////////////////////////////////////////////////////
-
 typedef pair<size_t, int> BatchActionIndex;
 extern const BatchActionIndex NO_BATCH_INDEX;
 
@@ -130,8 +96,10 @@ public:
 	void Save(HKEY hKey);
 
 	bool Edit();
-		void ShowMenu();
+	void EditItems();
 	void Execute();
+
+	FarMenuItem GetMenuItem();
 
 	bool m_bAddToMenu;
 	string m_strName;
@@ -147,6 +115,8 @@ public:
 
 	void ShowMenu();
 
+	void FillMenuItems(vector<FarMenuItem> &MenuItems);
+	CBatchAction *FindMenuAction(int &nIndex);
 public:
 	CBatchType &m_Type;
 };

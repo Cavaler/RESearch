@@ -29,8 +29,6 @@ void FTReadRegistry(HKEY Key) {
 
 	RnPresets = new CRnPresetCollection(g_RnParamSet);
 	QRPresets = new CQRPresetCollection(g_QRParamSet);
-	RnBatch   = new CPresetBatchCollection(RnPresets);
-	QRBatch   = new CPresetBatchCollection(QRPresets);
 }
 
 void FTWriteRegistry(HKEY Key) {
@@ -40,8 +38,6 @@ void FTWriteRegistry(HKEY Key) {
 
 void FTCleanup(BOOL PatternOnly) {
 	if (!PatternOnly) {
-		delete RnBatch;
-		delete QRBatch;
 		delete RnPresets;
 		delete QRPresets;
 	}
@@ -261,7 +257,6 @@ BOOL RenameFilesPrompt() {
 	Dialog.Add(new CFarCheckBoxItem(5,12,0,MConfirmFile,&FRConfirmFile));
 	Dialog.Add(new CFarCheckBoxItem(5,13,0,MConfirmLine,&FRConfirmLine));
 	Dialog.AddButtons(MOk,MCancel);
-	Dialog.Add(new CFarButtonItem(60,11,0,0,MBtnBatch));
 	Dialog.Add(new CFarButtonItem(60,9,0,0,MBtnPresets));
 	Dialog.SetFocus(4);
 
@@ -274,17 +269,13 @@ BOOL RenameFilesPrompt() {
 	ReplaceText=FRReplace;
 	int ExitCode;
 	do {
-		switch (ExitCode=Dialog.Display(3,-4,-2,-1)) {
+		switch (ExitCode=Dialog.Display(2, -3, -1)) {
 		case 0:
 			FMask=MaskText;
 			FText=SearchText;
 			FRReplace=ReplaceText;
 			break;
 		case 1:
-			if (RnBatch->ShowMenu(g_RnParamSet) >= 0)
-				return FALSE;
-			break;
-		case 2:
 			RnPresets->ShowMenu(true);
 			break;
 		case -1:
@@ -370,7 +361,6 @@ BOOL RenameSelectedFilesPrompt() {
 	Dialog.Add(new CFarCheckBoxItem(5,7,0,MConfirmFile,&FRConfirmFile));
 	Dialog.Add(new CFarCheckBoxItem(5,8,0,MConfirmLine,&FRConfirmLine));
 	Dialog.AddButtons(MOk,MCancel);
-	Dialog.Add(new CFarButtonItem(60,10,0,0,MBtnBatch));
 	Dialog.Add(new CFarButtonItem(60,7,0,0,MBtnPresets));
 	Dialog.SetFocus(4);
 
@@ -381,16 +371,12 @@ BOOL RenameSelectedFilesPrompt() {
 	SearchText=FText;
 	ReplaceText=FRReplace;
 	do {
-		switch (ExitCode=Dialog.Display(3,-4,-2,-1)) {
+		switch (ExitCode=Dialog.Display(2, -3, -1)) {
 		case 0:
 			FText=SearchText;
 			FRReplace=ReplaceText;
 			break;
 		case 1:
-			if (QRBatch->ShowMenu(g_QRParamSet) >= 0)
-				return FALSE;
-			break;
-		case 2:
 			QRPresets->ShowMenu(true);
 			break;
 		case -1:

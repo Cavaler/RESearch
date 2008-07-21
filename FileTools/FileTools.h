@@ -24,8 +24,6 @@ extern CParameterSet g_RnParamSet;
 extern CParameterSet g_QRParamSet;
 EXTERN CRnPresetCollection *RnPresets;
 EXTERN CQRPresetCollection *QRPresets;
-EXTERN CPresetBatchCollection *RnBatch;
-EXTERN CPresetBatchCollection *QRBatch;
 
 void FTReadRegistry(HKEY Key);
 void FTWriteRegistry(HKEY Key);

@@ -44,7 +44,6 @@ void FReadRegistry(HKEY Key) {
 	FRPresets = new CFRPresetCollection(g_FRParamSet);
 	FGPresets = new CFGPresetCollection(g_FGParamSet);
 	FAPresets = new CFAPresetCollection(g_FAParamSet);
-	FRBatch = new CPresetBatchCollection(FRPresets);
 
 	CharTableSet2 Table;
 
@@ -98,7 +97,6 @@ void FCleanup(BOOL PatternOnly) {
 		if (FAFullFileNamePattern) {pcre_free(FAFullFileNamePattern);FAFullFileNamePattern=NULL;}
 		if (FAFullFileNamePatternExtra) {pcre_free(FAFullFileNamePatternExtra);FAFullFileNamePatternExtra=NULL;}
 
-		delete FRBatch;
 		delete FSPresets;
 		delete FRPresets;
 		delete FGPresets;
