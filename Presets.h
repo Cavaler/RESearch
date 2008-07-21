@@ -53,7 +53,6 @@ class CPresetCollection : public vector<CPreset *> {
 public:
 	CPresetCollection(CParameterSet &ParamSet, const char *strKey, int nTitle);
 	virtual ~CPresetCollection();
-	void Load();
 	void Save();
 	int ShowMenu(bool bExecute);
 	virtual BOOL EditPreset(CPreset *pPreset) = 0;
@@ -127,6 +126,8 @@ public:
 class CBatchAction : public vector<BatchActionIndex> {		// Collection index and ID
 public:
 	CBatchAction(CBatchType &Type);
+	CBatchAction(CBatchType &Type, string strName, HKEY hKey);
+	void Save(HKEY hKey);
 
 	bool Edit();
 		void ShowMenu();

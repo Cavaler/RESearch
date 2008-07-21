@@ -6,7 +6,7 @@
 
 class CVSPresetCollection : public CPresetCollection {
 public:
-	CVSPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "ViewFind", MVSPreset) {Load();}
+	CVSPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "ViewFind", MVSPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
 };
 

@@ -7,25 +7,25 @@
 
 class CESPresetCollection:public CPresetCollection {
 public:
-	CESPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "EditFind", MFAPreset) {Load();}
+	CESPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "EditFind", MFAPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
 };
 
 class CERPresetCollection:public CPresetCollection {
 public:
-	CERPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "EditReplace", MFAPreset) {Load();}
+	CERPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "EditReplace", MFAPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
 };
 
 class CEFPresetCollection:public CPresetCollection {
 public:
-	CEFPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "EditFilter", MFAPreset) {Load();}
+	CEFPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "EditFilter", MFAPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
 };
 
 class CETPresetCollection:public CPresetCollection {
 public:
-	CETPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "EditTransliterate", MFAPreset) {Load();}
+	CETPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "EditTransliterate", MFAPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
 };
 

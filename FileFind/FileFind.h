@@ -11,25 +11,25 @@ enum GrepWhat {GREP_NAMES, GREP_NAMES_COUNT, GREP_LINES, GREP_NAMES_LINES};
 
 class CFSPresetCollection:public CPresetCollection {
 public:
-	CFSPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "FileFind", MFSPreset) {Load();}
+	CFSPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "FileFind", MFSPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
 };
 
 class CFRPresetCollection:public CPresetCollection {
 public:
-	CFRPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "FileReplace", MFRPreset) {Load();}
+	CFRPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "FileReplace", MFRPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
 };
 
 class CFGPresetCollection:public CPresetCollection {
 public:
-	CFGPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "FileGrep", MFGPreset) {Load();}
+	CFGPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "FileGrep", MFGPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
 };
 
 class CFAPresetCollection:public CPresetCollection {
 public:
-	CFAPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "FileAdvanced", MFAPreset) {Load();}
+	CFAPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "FileAdvanced", MFAPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
 };
 
