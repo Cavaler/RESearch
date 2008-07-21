@@ -443,7 +443,7 @@ BOOL EditorReplace() {
 				return TRUE;
 			break;
 		case 6:
-			ERPresets->ShowMenu(g_ERParamSet);
+			ERPresets->ShowMenu(true);
 			break;
 		case 7:
 			UTF8Converter(SearchText);

@@ -11,30 +11,26 @@ enum GrepWhat {GREP_NAMES, GREP_NAMES_COUNT, GREP_LINES, GREP_NAMES_LINES};
 
 class CFSPresetCollection:public CPresetCollection {
 public:
-	CFSPresetCollection() {Load();}
+	CFSPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "FileFind", MFSPreset) {Load();}
 	virtual BOOL EditPreset(CPreset *pPreset);
-	virtual const char *GetName() {return "FileFind";}
 };
 
 class CFRPresetCollection:public CPresetCollection {
 public:
-	CFRPresetCollection() {Load();}
+	CFRPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "FileReplace", MFRPreset) {Load();}
 	virtual BOOL EditPreset(CPreset *pPreset);
-	virtual const char *GetName() {return "FileReplace";}
 };
 
 class CFGPresetCollection:public CPresetCollection {
 public:
-	CFGPresetCollection() {Load();}
+	CFGPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "FileGrep", MFGPreset) {Load();}
 	virtual BOOL EditPreset(CPreset *pPreset);
-	virtual const char *GetName() {return "FileGrep";}
 };
 
 class CFAPresetCollection:public CPresetCollection {
 public:
-	CFAPresetCollection() {Load();}
+	CFAPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "FileAdvanced", MFAPreset) {Load();}
 	virtual BOOL EditPreset(CPreset *pPreset);
-	virtual const char *GetName() {return "FileAdvanced";}
 };
 
 extern CParameterSet g_FSParamSet;

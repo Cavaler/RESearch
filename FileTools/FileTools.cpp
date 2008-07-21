@@ -27,8 +27,8 @@ void FTReadRegistry(HKEY Key) {
 	#define DECLARE_PERSIST_LOAD Key
 	#include "PersistVars.h"
 
-	RnPresets = new CRnPresetCollection();
-	QRPresets = new CQRPresetCollection();
+	RnPresets = new CRnPresetCollection(g_RnParamSet);
+	QRPresets = new CQRPresetCollection(g_QRParamSet);
 	RnBatch   = new CPresetBatchCollection(RnPresets);
 	QRBatch   = new CPresetBatchCollection(QRPresets);
 }
@@ -285,7 +285,7 @@ BOOL RenameFilesPrompt() {
 				return FALSE;
 			break;
 		case 2:
-			RnPresets->ShowMenu(g_RnParamSet);
+			RnPresets->ShowMenu(true);
 			break;
 		case -1:
 			return FALSE;
@@ -391,7 +391,7 @@ BOOL RenameSelectedFilesPrompt() {
 				return FALSE;
 			break;
 		case 2:
-			QRPresets->ShowMenu(g_QRParamSet);
+			QRPresets->ShowMenu(true);
 			break;
 		case -1:
 			return FALSE;

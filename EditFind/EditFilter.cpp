@@ -68,7 +68,7 @@ BOOL EditorFilter() {
 				return TRUE;
 			break;
 		case 3:
-			EFPresets->ShowMenu(g_EFParamSet);
+			EFPresets->ShowMenu(true);
 			break;
 		case 4:
 			UTF8Converter(SearchText);

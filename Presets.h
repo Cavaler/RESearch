@@ -31,36 +31,50 @@ public:
 class CPreset {
 public:
 	CPreset(CParameterSet &ParamSet);
-	CPreset(string strName, HKEY hKey);	// hKey is root key
-	void Apply(CParameterSet &ParamSet);
+	CPreset(CParameterSet &ParamSet, string strName, HKEY hKey);	// hKey is root key
+
+	OperationResult ExecutePreset();
+		void Apply();
 	void FillMenuItem(FarMenuItem &Item);
 	void Save(HKEY hKey);
 
 	string &Name() {return m_mapStrings[""];}
+
+public:
 	int m_nID;
 	bool m_bAddToMenu;
 	map<string, string> m_mapStrings;
 	map<string, int> m_mapInts;
+
+	CParameterSet &m_ParamSet;
 };
 
 class CPresetCollection : public vector<CPreset *> {
 public:
-	CPresetCollection();
+	CPresetCollection(CParameterSet &ParamSet, const char *strKey, int nTitle);
 	virtual ~CPresetCollection();
 	void Load();
 	void Save();
-	int ShowMenu(CParameterSet &ParamSet = *((CParameterSet *)NULL));
+	int ShowMenu(bool bExecute);
 	virtual BOOL EditPreset(CPreset *pPreset) = 0;
 	CPreset *operator()(int nID);
-	virtual const char *GetName()=0;
 
 	void FillMenuItems(vector<FarMenuItem> &MenuItems);
 	CPreset *FindMenuPreset(int &nIndex);
+
+	const char *Name()  {return m_strKey.c_str();}
+	const char *Title() {return GetMsg(m_nTitle);}
+
+	CParameterSet &m_ParamSet;
+	string m_strKey;
+	int m_nTitle;
 
 protected:
 	int FindUnusedID();
 	void ValidateIDs();
 };
+
+//////////////////////////////////////////////////////////////////////////
 
 class CPresetBatch : public vector<int> {
 public:
@@ -92,6 +106,48 @@ public:
 	CPresetBatch *FindMenuBatch(int &nIndex);
 protected:
 	CPresetCollection *m_pCollection;
+};
+
+//////////////////////////////////////////////////////////////////////////
+
+typedef pair<size_t, int> BatchActionIndex;
+extern const BatchActionIndex NO_BATCH_INDEX;
+
+class CBatchType : public vector<CPresetCollection *> {
+public:
+	CBatchType(int nTitle, ...);
+	CPreset *operator[](const BatchActionIndex &Pair);
+
+	BatchActionIndex SelectPreset();
+
+public:
+	int m_nTitle;
+};
+
+class CBatchAction : public vector<BatchActionIndex> {		// Collection index and ID
+public:
+	CBatchAction(CBatchType &Type);
+
+	bool Edit();
+		void ShowMenu();
+	void Execute();
+
+	bool m_bAddToMenu;
+	string m_strName;
+
+protected:
+	CBatchType &m_Type;
+};
+
+class CBatchActionCollection : public vector<CBatchAction *> {
+public:
+	CBatchActionCollection(CBatchType &Type, HKEY hKey);	// CPresetCollection *
+	void Save(HKEY hKey);
+
+	void ShowMenu();
+
+public:
+	CBatchType &m_Type;
 };
 
 #endif

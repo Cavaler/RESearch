@@ -4,11 +4,10 @@
 #include "..\RESearch.h"
 #include "..\Presets.h"
 
-class CVSPresetCollection:public CPresetCollection {
+class CVSPresetCollection : public CPresetCollection {
 public:
-	CVSPresetCollection() {Load();}
+	CVSPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "ViewFind", MVSPreset) {Load();}
 	virtual BOOL EditPreset(CPreset *pPreset);
-	virtual const char *GetName() {return "ViewFind";}
 };
 
 extern CParameterSet g_VSParamSet;

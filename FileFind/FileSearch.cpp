@@ -316,7 +316,7 @@ int SearchPrompt(BOOL Plugin) {
 			if ((FSearchAs!=SA_PLAINTEXT) && (FSearchAs!=SA_MULTITEXT)) QuoteRegExpString(SearchText);
 			break;
 		case 2:
-			FSPresets->ShowMenu(g_FSParamSet);
+			FSPresets->ShowMenu(true);
 			if (Plugin&&(FSearchIn<SI_FROMCURRENT)) FSearchIn=SI_FROMCURRENT;
 			break;
 		case 3:

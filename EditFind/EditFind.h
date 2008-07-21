@@ -7,30 +7,26 @@
 
 class CESPresetCollection:public CPresetCollection {
 public:
-	CESPresetCollection() {Load();}
+	CESPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "EditFind", MFAPreset) {Load();}
 	virtual BOOL EditPreset(CPreset *pPreset);
-	virtual const char *GetName() {return "EditFind";}
 };
 
 class CERPresetCollection:public CPresetCollection {
 public:
-	CERPresetCollection() {Load();}
+	CERPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "EditReplace", MFAPreset) {Load();}
 	virtual BOOL EditPreset(CPreset *pPreset);
-	virtual const char *GetName() {return "EditReplace";}
 };
 
 class CEFPresetCollection:public CPresetCollection {
 public:
-	CEFPresetCollection() {Load();}
+	CEFPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "EditFilter", MFAPreset) {Load();}
 	virtual BOOL EditPreset(CPreset *pPreset);
-	virtual const char *GetName() {return "EditFilter";}
 };
 
 class CETPresetCollection:public CPresetCollection {
 public:
-	CETPresetCollection() {Load();}
+	CETPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "EditTransliterate", MFAPreset) {Load();}
 	virtual BOOL EditPreset(CPreset *pPreset);
-	virtual const char *GetName() {return "EditTransliterate";}
 };
 
 #define DECLARE_PERSIST_VARS

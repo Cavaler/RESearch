@@ -61,7 +61,7 @@ BOOL EditorTransliterate() {
 		case 0:
 			break;
 		case 1:
-			ETPresets->ShowMenu(g_ETParamSet);
+			ETPresets->ShowMenu(true);
 			break;
 		case -1:
 			return FALSE;

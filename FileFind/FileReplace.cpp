@@ -335,7 +335,7 @@ int ReplacePrompt(BOOL Plugin) {
 				return FALSE;
 			break;
 		case 4:
-			FRPresets->ShowMenu(g_FRParamSet);
+			FRPresets->ShowMenu(true);
 			if (Plugin&&(FSearchIn<SI_FROMCURRENT)) FSearchIn=SI_FROMCURRENT;
 			break;
 		case 5:

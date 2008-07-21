@@ -45,9 +45,9 @@ CParameterBackup::~CParameterBackup() {
 	if (m_bAutoRestore) Restore();
 }
 
-CPreset::CPreset(CParameterSet &ParamSet) : m_nID(0) {
-	if (!&ParamSet) return;
-
+CPreset::CPreset(CParameterSet &ParamSet)
+: m_ParamSet(ParamSet), m_nID(0)
+{
 	m_mapStrings[""] = "New Preset";
 	m_bAddToMenu = false;
 
@@ -64,7 +64,9 @@ CPreset::CPreset(CParameterSet &ParamSet) : m_nID(0) {
 	}
 }
 
-CPreset::CPreset(string strName, HKEY hKey) {
+CPreset::CPreset(CParameterSet &ParamSet, string strName, HKEY hKey)
+: m_ParamSet(ParamSet)
+{
 	HKEY hOwnKey;
 	if (RegCreateKeyEx(hKey, strName.c_str(), 0, NULL, 0, KEY_ALL_ACCESS, NULL, &hOwnKey, NULL) != ERROR_SUCCESS) {
 		m_nID = 0;
@@ -94,9 +96,15 @@ CPreset::CPreset(string strName, HKEY hKey) {
 	RegCloseKey(hOwnKey);
 }
 
-void CPreset::Apply(CParameterSet &ParamSet) {
-	map<string, string *>::iterator it1 = ParamSet.m_mapStrings.begin();
-	while (it1 != ParamSet.m_mapStrings.end()) {
+OperationResult CPreset::ExecutePreset() {
+	CParameterBackup _Backup(m_ParamSet);
+	Apply();
+	return m_ParamSet.m_Executor();
+}
+
+void CPreset::Apply() {
+	map<string, string *>::iterator it1 = m_ParamSet.m_mapStrings.begin();
+	while (it1 != m_ParamSet.m_mapStrings.end()) {
 		if (it1->first[0] != '@') {
 			map<string, string>::iterator it = m_mapStrings.find(it1->first);
 			if (it != m_mapStrings.end()) *(it1->second) = it->second;
@@ -104,8 +112,8 @@ void CPreset::Apply(CParameterSet &ParamSet) {
 		it1++;
 	}
 
-	map<string, int *>::iterator it2 = ParamSet.m_mapInts.begin();
-	while (it2 != ParamSet.m_mapInts.end()) {
+	map<string, int *>::iterator it2 = m_ParamSet.m_mapInts.begin();
+	while (it2 != m_ParamSet.m_mapInts.end()) {
 		if (it2->first[0] != '@') {
 			map<string, int>::iterator it = m_mapInts.find(it2->first);
 			if (it != m_mapInts.end()) *(it2->second) = it->second;
@@ -146,7 +154,9 @@ void CPreset::Save(HKEY hKey) {
 
 // ---------------
 
-CPresetCollection::CPresetCollection() {
+CPresetCollection::CPresetCollection(CParameterSet &ParamSet, const char *strKey, int nTitle)
+: m_ParamSet(ParamSet), m_strKey(strKey), m_nTitle(nTitle)
+{
 }
 
 CPresetCollection::~CPresetCollection() {
@@ -156,7 +166,7 @@ CPresetCollection::~CPresetCollection() {
 void CPresetCollection::Load() {
 	HKEY hKey;
 	char szCurrentKey[256];
-	sprintf(szCurrentKey, "%s\\RESearch\\%sPresets", StartupInfo.RootKey, GetName());
+	sprintf(szCurrentKey, "%s\\RESearch\\%sPresets", StartupInfo.RootKey, Name());
 
 	if (RegCreateKeyEx(HKEY_CURRENT_USER, szCurrentKey, 0, NULL, 0, KEY_ALL_ACCESS, NULL, &hKey, NULL)!=ERROR_SUCCESS) return;
 
@@ -166,7 +176,7 @@ void CPresetCollection::Load() {
 		DWORD dwcbCurrentKey = sizeof(szCurrentKey);
 
 		if (RegEnumKeyEx(hKey, dwIndex, szCurrentKey, &dwcbCurrentKey, NULL, NULL, NULL, &ftTime) != ERROR_SUCCESS) break;
-		push_back(new CPreset(szCurrentKey, hKey));
+		push_back(new CPreset(m_ParamSet, szCurrentKey, hKey));
 		dwIndex++;
 
 	} while (TRUE);
@@ -178,7 +188,7 @@ void CPresetCollection::Load() {
 void CPresetCollection::Save() {
 	HKEY hKey;
 	char szCurrentKey[256];
-	sprintf(szCurrentKey, "%s\\RESearch\\%sPresets", StartupInfo.RootKey, GetName());
+	sprintf(szCurrentKey, "%s\\RESearch\\%sPresets", StartupInfo.RootKey, Name());
 
 	if (RegCreateKeyEx(HKEY_CURRENT_USER, szCurrentKey, 0, NULL, 0, KEY_ALL_ACCESS, NULL, &hKey, NULL) != ERROR_SUCCESS) return;
 	do {
@@ -194,7 +204,7 @@ void CPresetCollection::Save() {
 	RegCloseKey(hKey);
 }
 
-int CPresetCollection::ShowMenu(CParameterSet &ParamSet) {
+int CPresetCollection::ShowMenu(bool bExecute) {
 	int piBreakKeys[]={VK_INSERT, VK_DELETE, VK_F4, 0};
 	vector<string> arrItems;
 	do {
@@ -204,16 +214,16 @@ int CPresetCollection::ShowMenu(CParameterSet &ParamSet) {
 
 		int nBreakKey;
 		char szTitle[128];
-		sprintf(szTitle, "%s presets", GetName());
+		sprintf(szTitle, "%s presets", Name());
 		int nResult = ChooseMenu(arrItems, szTitle, "Ins,Del,F4", "Presets", 0,
 			FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT, piBreakKeys, &nBreakKey);
 
 		switch (nBreakKey) {
 		case -1:
-			if (&ParamSet && (nResult >= 0) && (nResult < (int)size())) at(nResult)->Apply(ParamSet);
+			if (bExecute && (nResult >= 0) && (nResult < (int)size())) at(nResult)->Apply();
 			return nResult;
 		case 0:{
-			CPreset *pPreset = new CPreset(ParamSet);
+			CPreset *pPreset = new CPreset(m_ParamSet);
 			if (EditPreset(pPreset)) {
 				pPreset->m_nID = FindUnusedID();
 				push_back(pPreset);
@@ -347,8 +357,7 @@ void CPresetBatch::Execute(CParameterSet &ParamSet) {
 	for (size_t nPreset = 0; nPreset < size(); nPreset++) {
 		CPreset *pPreset = (*this)(nPreset);
 		if (pPreset) {
-			pPreset->Apply(ParamSet);
-			if (!ParamSet.m_Executor()) break;
+			if (!pPreset->ExecutePreset()) break;
 		}
 	}
 }
@@ -399,7 +408,7 @@ int CPresetBatch::ShowMenu() {
 		case -1:
 			return nResult;
 		case 0:{
-			int nNewIndex = m_pCollection->ShowMenu();
+			int nNewIndex = m_pCollection->ShowMenu(false);
 			if (nNewIndex >= 0) {
 				push_back(m_pCollection->at(nNewIndex)->m_nID);
 				nResult = size()-1;
@@ -438,7 +447,7 @@ m_pCollection(pCollection)
 {
 	HKEY hKey;
 	char szCurrentKey[256];
-	sprintf(szCurrentKey, "%s\\RESearch\\%sBatch", StartupInfo.RootKey, m_pCollection->GetName());
+	sprintf(szCurrentKey, "%s\\RESearch\\%sBatch", StartupInfo.RootKey, m_pCollection->Name());
 
 	if (RegCreateKeyEx(HKEY_CURRENT_USER, szCurrentKey, 0, NULL, 0, KEY_ALL_ACCESS, NULL, &hKey, NULL)!=ERROR_SUCCESS) return;
 
@@ -462,15 +471,10 @@ CPresetBatchCollection::~CPresetBatchCollection() {
 void CPresetBatchCollection::Save() {
 	HKEY hKey;
 	char szCurrentKey[256];
-	sprintf(szCurrentKey, "%s\\RESearch\\%sBatch", StartupInfo.RootKey, m_pCollection->GetName());
+	sprintf(szCurrentKey, "%s\\RESearch\\%sBatch", StartupInfo.RootKey, m_pCollection->Name());
 
 	if (RegCreateKeyEx(HKEY_CURRENT_USER, szCurrentKey, 0, NULL, 0, KEY_ALL_ACCESS, NULL, &hKey, NULL) != ERROR_SUCCESS) return;
-	do {
-		FILETIME ftTime;
-		DWORD dwcbCurrentKey = sizeof(szCurrentKey);
-		if (RegEnumKeyEx(hKey, 0, szCurrentKey, &dwcbCurrentKey, NULL, NULL, NULL, &ftTime) != ERROR_SUCCESS) break;
-		RegDeleteKey(hKey, szCurrentKey);
-	} while (TRUE);
+	RegDeleteAllSubkeys(hKey);
 
 	for (size_t nBatch=0; nBatch<size(); nBatch++)
 		at(nBatch)->Save(nBatch, hKey);
@@ -489,7 +493,7 @@ int CPresetBatchCollection::ShowMenu(CParameterSet &ParamSet) {
 
 		int nBreakKey;
 		char szTitle[128];
-		sprintf(szTitle, "%s batches", m_pCollection->GetName());
+		sprintf(szTitle, "%s batches", m_pCollection->Name());
 		int nResult = ChooseMenu(arrItems, szTitle, "Ins,Del,F4", "Batches", 0,
 			FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT, piBreakKeys, &nBreakKey);
 
@@ -555,4 +559,203 @@ CPresetBatch *CPresetBatchCollection::FindMenuBatch(int &nIndex) {
 		}
 	}
 	return NULL;
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+CBatchAction::CBatchAction(CBatchType &Type)
+: m_Type(Type), m_bAddToMenu(false)
+{
+}
+
+bool CBatchAction::Edit() {
+	CFarDialog Dialog(60, 12, "BatchProperties");
+	Dialog.AddFrame(MBatch);
+	Dialog.Add(new CFarTextItem(5, 3, 0, MBatchName));
+	Dialog.Add(new CFarEditItem(5, 4, 53, DIF_HISTORY, "SearchText", m_strName));
+	Dialog.Add(new CFarCheckBoxItem(5, 6, 0, MAddToMenu, &m_bAddToMenu));
+	Dialog.Add(new CFarButtonItem(34, 6, 0, 0, MBtnCommands));
+	Dialog.AddButtons(MOk, MCancel);
+	do {
+		switch (Dialog.Display(2, -2, -3)) {
+		case 0:
+			return true;
+		case 1:
+			ShowMenu();
+			break;
+		default:
+			return false;
+		}
+	} while (true);
+}
+
+void CBatchAction::ShowMenu() {
+	int piBreakKeys[]={VK_INSERT, (PKF_CONTROL<<16)|VK_UP, (PKF_CONTROL<<16)|VK_DOWN, VK_DELETE, 0};
+	vector<string> arrItems;
+	int nResult = 0;
+
+	do {
+		arrItems.resize(size());
+		for (size_t nPreset = 0; nPreset < size(); nPreset++) {
+			arrItems[nPreset] = m_Type[at(nPreset)]->Name();
+		}
+
+		int nBreakKey;
+		nResult = ChooseMenu(arrItems, GetMsg(MBatchCommands), "Ins,Ctrl-\x18\x19,Del", "Batch", nResult,
+			FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT, piBreakKeys, &nBreakKey);
+
+		switch (nBreakKey) {
+		case -1:
+			return;
+		case 0:{
+			BatchActionIndex NewIndex = m_Type.SelectPreset();
+			if (NewIndex != NO_BATCH_INDEX) {
+				push_back(NewIndex);
+				nResult = size()-1;
+			}
+			break;
+			   }
+		case 1:
+			if (nResult > 0) {
+				value_type nSave = at(nResult-1);
+				at(nResult-1) = at(nResult);
+				at(nResult) = nSave;
+				nResult--;
+			}
+			break;
+		case 2:
+			if ((nResult >= 0) && (nResult < (int)size()-1)) {
+				value_type nSave = at(nResult+1);
+				at(nResult+1) = at(nResult);
+				at(nResult) = nSave;
+				nResult++;
+			}
+			break;
+		case 3:
+			if (nResult < (int)size()) {
+				erase(begin() + nResult);
+			}
+			break;
+		}
+	} while (true);
+}
+
+void CBatchAction::Execute() {
+	for (size_t nAction = 0; nAction < size(); nAction++) {
+		CPreset *pPreset = m_Type[at(nAction)];
+		if (pPreset->ExecutePreset() != OR_OK) break;
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////
+const BatchActionIndex NO_BATCH_INDEX(0, -1);
+
+CBatchType::CBatchType(int nTitle, ...)
+: m_nTitle(nTitle)
+{
+	va_list List;
+	va_start(List, nTitle);
+
+	CPresetCollection *pColl;
+	while ((pColl = va_arg(List, CPresetCollection *)) != NULL) {
+		push_back(pColl);
+	}
+
+	va_end(List);
+}
+
+CPreset *CBatchType::operator[](const BatchActionIndex &Pair) {
+	if ((Pair.first < 0) || (Pair.first >= size())) return NULL;
+	return (*at(Pair.first))(Pair.second);
+}
+
+BatchActionIndex CBatchType::SelectPreset() {
+	vector<string> arrItems;
+
+	for (size_t nColl = 0; nColl < size(); nColl++) {
+		CPresetCollection *pColl = at(nColl);
+		arrItems.push_back(pColl->Title());
+	}
+
+	int nResult = 0;
+	do {
+		nResult = ChooseMenu(arrItems, GetMsg(m_nTitle), NULL, NULL, nResult,
+			FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT, NULL, NULL);
+
+		if (nResult < 0) return NO_BATCH_INDEX;
+
+		CPresetCollection *pColl = at(nResult);
+		int nPreset = pColl->ShowMenu(false);
+		if (nPreset >= 0) {
+			CPreset *pPreset = pColl->at(nPreset);
+			return BatchActionIndex(nResult, pPreset->m_nID);
+		}
+	} while (true);
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+CBatchActionCollection::CBatchActionCollection(CBatchType &Type, HKEY hKey)
+: m_Type(Type)
+{
+}
+
+void CBatchActionCollection::Save(HKEY hKey) {
+	RegDeleteAllSubkeys(hKey);
+}
+
+void CBatchActionCollection::ShowMenu() {
+	int piBreakKeys[]={VK_INSERT, VK_DELETE, VK_F4, 0};
+	vector<string> arrItems;
+
+	do {
+		arrItems.resize(size());
+		for (size_t nBatch = 0; nBatch < size(); nBatch++)
+			arrItems[nBatch] = at(nBatch)->m_strName;
+
+		int nBreakKey;
+		int nResult = ChooseMenu(arrItems, GetMsg(m_Type.m_nTitle), "Ins,Del,F4", "Batches", 0,
+			FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT, piBreakKeys, &nBreakKey);
+
+		switch (nBreakKey) {
+		case -1:
+			if ((nResult >= 0) && (nResult < (int)size())) {
+				CBatchAction *pBatch = at(nResult);
+				const char *Lines[]={"Execute", GetMsg(MExecuteBatchQuery),
+					pBatch->m_strName.c_str(), GetMsg(MOk), GetMsg(MCancel)};
+				if (StartupInfo.Message(StartupInfo.ModuleNumber, FMSG_WARNING, "ExecuteBatch", Lines, 5, 2) != 0) break;
+
+				pBatch->Execute();
+			}
+
+			return;
+		case 0:{
+			CBatchAction *pBatch = new CBatchAction(m_Type);
+			if (pBatch->Edit()) {
+				push_back(pBatch);
+				WriteRegistry();
+			} else {
+				delete pBatch;
+			}
+			break;
+			   }
+		case 1:
+			if (nResult < (int)size()) {
+				const char *Lines[]={"Delete", GetMsg(MDeleteBatchQuery),
+					at(nResult)->m_strName.c_str(), GetMsg(MOk), GetMsg(MCancel)};
+				if (StartupInfo.Message(StartupInfo.ModuleNumber, FMSG_WARNING, "DeleteBatch", Lines, 5, 2)==0) {
+					delete at(nResult);
+					erase(begin() + nResult);
+					WriteRegistry();
+				}
+			}
+			break;
+		case 2:
+			if (nResult < (int)size()) {
+				at(nResult)->Edit();
+				WriteRegistry();
+			}
+			break;
+		}
+	} while (true);
 }

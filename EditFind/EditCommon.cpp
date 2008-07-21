@@ -28,10 +28,10 @@ void EReadRegistry(HKEY Key) {
 
 	SelType=BTYPE_NONE;
 
-	ESPresets=new CESPresetCollection();
-	ERPresets=new CERPresetCollection();
-	EFPresets=new CEFPresetCollection();
-	ETPresets=new CETPresetCollection();
+	ESPresets = new CESPresetCollection(g_ESParamSet);
+	ERPresets = new CERPresetCollection(g_ERParamSet);
+	EFPresets = new CEFPresetCollection(g_EFParamSet);
+	ETPresets = new CETPresetCollection(g_ETParamSet);
 
 	ERBatch=new CPresetBatchCollection(ERPresets);
 	EFBatch=new CPresetBatchCollection(EFPresets);

@@ -68,6 +68,7 @@ enum eStringTable {
 	MMenuTransliterate,
 	MMenuUTF8Converter,
 	MMenuShowLastResults,
+	MMenuBatches,
 	MMenuPreset,
 	MMenuBatch,
 
@@ -257,12 +258,17 @@ enum eStringTable {
 	METPreset,
 	MFSPreset,
 	MFRPreset,
+	MFGPreset,
 	MFAPreset,
+	MRnPreset,
+	MQRPreset,
 	MVSPreset,
 	MPresetName,
 	MAddToMenu,
 	MDeletePresetQuery,
 
+	MPanelBatches,
+	MEditorBatches,
 	MBatch,
 	MBatchName,
 	MBtnCommands,
@@ -319,5 +325,11 @@ inline bool Interrupted256(int nValue) {
 #include "EditFind\EditFind.h"
 #include "FileFind\FileFind.h"
 #include "FileTools\FileTools.h"
+
+EXTERN CBatchType	*g_pEditorBatchType;
+EXTERN CBatchType	*g_pPanelBatchType;
+
+EXTERN CBatchActionCollection	*g_pEditorBatches;
+EXTERN CBatchActionCollection	*g_pPanelBatches;
 
 #endif

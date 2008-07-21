@@ -7,7 +7,7 @@ CParameterSet g_VSParamSet(ViewSearchExecutor, 2, 4,
 					 );
 
 void VReadRegistry(HKEY Key) {
-	VSPresets=new CVSPresetCollection();
+	VSPresets = new CVSPresetCollection(g_VSParamSet);
 }
 
 void VWriteRegistry(HKEY Key) {

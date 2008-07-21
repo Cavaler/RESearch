@@ -7,16 +7,14 @@
 
 class CRnPresetCollection:public CPresetCollection {
 public:
-	CRnPresetCollection() {Load();}
+	CRnPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "FileRename", MRnPreset) {Load();}
 	virtual BOOL EditPreset(CPreset *pPreset);
-	virtual const char *GetName() {return "FileRename";}
 };
 
 class CQRPresetCollection:public CPresetCollection {
 public:
-	CQRPresetCollection() {Load();}
+	CQRPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "FileQuickRename", MQRPreset) {Load();}
 	virtual BOOL EditPreset(CPreset *pPreset);
-	virtual const char *GetName() {return "FileQuickRename";}
 };
 
 #define DECLARE_PERSIST_VARS

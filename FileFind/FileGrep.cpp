@@ -187,7 +187,7 @@ bool GrepPrompt(BOOL bPlugin) {
 			if (AsRegExp) QuoteRegExpString(SearchText);
 			break;
 		case 2:
-			FGPresets->ShowMenu(g_FGParamSet);
+			FGPresets->ShowMenu(true);
 			break;
 		case 3:
 			if (AdvancedSettings()) FAdvanced=TRUE;

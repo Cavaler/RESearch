@@ -77,8 +77,8 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				OutputFile="C:\Program Files\Far\Plugins\_Debug\RESearch\RESearch.dll"
-				Version="4.0"
+				OutputFile="$(FAR_DEBUG_DLLS)\$(ProjectName)\$(ProjectName).dll"
+				Version="6.23"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\RESearch.def"
@@ -184,7 +184,7 @@
 				IgnoreImportLibrary="true"
 				AdditionalOptions="/D_USE_INTEL_COMPILER "
 				OutputFile="RESearchI.dll"
-				Version="4.0"
+				Version="6.23"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\RESearch.def"
@@ -287,8 +287,8 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				OutputFile="RESearch.dll"
-				Version="6.0"
+				OutputFile="$(ProjectName).dll"
+				Version="6.23"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\RESearch.def"
@@ -898,7 +898,7 @@
 				<Tool
 					Name="VCCustomBuildTool"
 					Description="Compiling language file $(InputPath)..."
-					CommandLine="$(COMSPEC) /c ..\MakeLng.bat&#x0D;&#x0A;echo Copying resulting language files...&#x0D;&#x0A;copy *.lng &quot;C:\Program Files\Far\Plugins\_Debug\$(TargetName)\&quot;&#x0D;&#x0A;"
+					CommandLine="$(COMSPEC) /c ..\MakeLng.bat&#x0D;&#x0A;echo Copying resulting language files...&#x0D;&#x0A;copy *.lng &quot;$(FAR_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;"
 					Outputs="$(TargetName)Eng.lng;$(TargetName)Rus.lng"
 				/>
 			</FileConfiguration>

@@ -40,11 +40,11 @@ void FReadRegistry(HKEY Key) {
 	#define DECLARE_PERSIST_LOAD Key
 	#include "PersistVars.h"
 
-	FSPresets=new CFSPresetCollection();
-	FRPresets=new CFRPresetCollection();
-	FGPresets=new CFGPresetCollection();
-	FAPresets=new CFAPresetCollection();
-	FRBatch=new CPresetBatchCollection(FRPresets);
+	FSPresets = new CFSPresetCollection(g_FSParamSet);
+	FRPresets = new CFRPresetCollection(g_FRParamSet);
+	FGPresets = new CFGPresetCollection(g_FGParamSet);
+	FAPresets = new CFAPresetCollection(g_FAParamSet);
+	FRBatch = new CPresetBatchCollection(FRPresets);
 
 	CharTableSet2 Table;
 
@@ -657,7 +657,7 @@ BOOL AdvancedSettings() {
 		case 3:
 			g_dwDateAfterThis = (DWORD)FTtoTime_t(FADateAfterThis);
 			g_dwDateBeforeThis = (DWORD)FTtoTime_t(FADateBeforeThis);
-			if (FAPresets->ShowMenu(g_FAParamSet) >= 0) {
+			if (FAPresets->ShowMenu(true) >= 0) {
 				Time_tToFT(g_dwDateAfterThis, FADateAfterThis);
 				Time_tToFT(g_dwDateBeforeThis, FADateBeforeThis);
 			}

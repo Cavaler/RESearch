@@ -3,16 +3,15 @@
 #include "RESearch.h"
 
 HKEY OpenRegistry(const char *szSubKey, bool bCreate) {
-	HKEY hKey;
 	char szCurrentKey[512];
 	strcat(strcpy(szCurrentKey, StartupInfo.RootKey), "\\RESearch");
 	if (szSubKey) strcat(strcat(szCurrentKey, "\\"), szSubKey);
+
 	if (bCreate) {
-		if (RegCreateKeyEx(HKEY_CURRENT_USER, szCurrentKey, 0, NULL, 0, KEY_ALL_ACCESS, NULL, &hKey, NULL) != ERROR_SUCCESS) return (HKEY)NULL;
+		return RegCreateSubkey(HKEY_CURRENT_USER, szCurrentKey);
 	} else {
-		if (RegOpenKeyEx(HKEY_CURRENT_USER, szCurrentKey, 0, KEY_ALL_ACCESS, &hKey) != ERROR_SUCCESS) return (HKEY)NULL;
+		return RegOpenSubkey(HKEY_CURRENT_USER, szCurrentKey);
 	}
-	return hKey;
 }
 
 void ReadRegistry() {
@@ -24,6 +23,14 @@ void ReadRegistry() {
 	VReadRegistry(hKey);
 	FReadRegistry(hKey);
 	FTReadRegistry(hKey);
+
+	g_pEditorBatchType = new CBatchType(MEditorBatches, ERPresets, EFPresets, ETPresets, NULL);
+	hKey = OpenRegistry("EditorBatches");
+	g_pEditorBatches = new CBatchActionCollection(*g_pEditorBatchType, hKey);
+
+	g_pPanelBatchType = new CBatchType(MPanelBatches, FRPresets, RnPresets, QRPresets, NULL);
+	hKey = OpenRegistry("PanelBatches");
+	g_pPanelBatches = new CBatchActionCollection(*g_pPanelBatchType, hKey);
 }
 
 void WriteRegistry() {
@@ -36,6 +43,12 @@ void WriteRegistry() {
 	VWriteRegistry(hKey);
 	FWriteRegistry(hKey);
 	FTWriteRegistry(hKey);
+
+	hKey = OpenRegistry("EditorBatches");
+	g_pEditorBatches->Save(hKey);
+
+	hKey = OpenRegistry("PanelBatches");
+	g_pPanelBatches->Save(hKey);
 }
 
 bool CheckUsage(const string &strText, bool bRegExp, bool bSeveralLine) {
