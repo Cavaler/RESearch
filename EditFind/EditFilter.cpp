@@ -31,7 +31,7 @@ BOOL EditorFilterAgain() {
 		}
 	}
 
-	return FALSE;
+	return TRUE;
 }
 
 BOOL EditorFilter() {

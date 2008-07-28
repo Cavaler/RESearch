@@ -316,12 +316,13 @@ OperationResult RenameFilesExecutor() {
 	FTAskOverwrite = FTAskCreatePath = true;
 	FileNumber=-1;g_bInterrupted=FALSE;
 
-	FRConfirmFileThisRun = FALSE;//FRConfirmFile;
-	FRConfirmLineThisRun = FALSE;//FRConfirmLine;
+	FRConfirmFileThisRun = FALSE;	//FRConfirmFile;
+	FRConfirmLineThisRun = FALSE;	//FRConfirmLine;
 
 	if (ScanDirectories(&PanelItems, &ItemsNumber, RenameFile)) {
-		if (!FROpenModified) return OR_OK; else
-			return (ItemsNumber == 0) ? OR_OK : OR_PANEL;
+//		if (!FROpenModified) return OR_OK; else
+//			return (ItemsNumber == 0) ? OR_OK : OR_PANEL;
+		return OR_OK;
 	} else return OR_FAILED;
 }
 
@@ -413,8 +414,8 @@ OperationResult QuickRenameFilesExecutor() {
 	if (!FPreparePattern(false)) return OR_FAILED;
 	FTAskOverwrite = FTAskCreatePath = true;
 
-	FRConfirmFileThisRun = FALSE;//FRConfirmFile;
-	FRConfirmLineThisRun = FALSE;//FRConfirmLine;
+	FRConfirmFileThisRun = FALSE;	//FRConfirmFile;
+	FRConfirmLineThisRun = FALSE;	//FRConfirmLine;
 
 	PanelInfo PInfo;
 	StartupInfo.Control(INVALID_HANDLE_VALUE,FCTL_GETPANELINFO,&PInfo);

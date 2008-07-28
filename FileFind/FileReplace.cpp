@@ -373,6 +373,7 @@ OperationResult FileReplaceExecutor() {
 	FMask = MaskText;
 	FText = SearchText;
 	FRReplace = ReplaceText;
+	FROpenModified = FALSE;
 
 	return FileReplace(&PanelItems, &ItemsNumber, FALSE, TRUE);
 }
