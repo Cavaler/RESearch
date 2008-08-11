@@ -9,6 +9,10 @@ Planned:
 	! Performing all regular expression matches in UTF-8
 	* dialogprocs for disabling unneeded elements
 
+Version 6.32 (11.08.2008)
+	- Crash while using "[X] Use all character tables"
+	- Viewer search fixes
+
 Version 6.31 (21.07.2008)
 	- Editor Filter items in batches don't stop processing
 
