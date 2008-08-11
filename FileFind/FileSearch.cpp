@@ -14,6 +14,8 @@ BOOL FindTextInBufferWithTable(const char *Buffer,int Size,string &Text,char *Ta
 
 bool FromUnicodeLE(const char *Buffer, int Size, vector<char> &arrData) {
 	arrData.resize(Size/2);
+	if (Size == 0) return true;
+
 	int nResult = WideCharToMultiByte(CP_OEMCP, 0, (LPCWSTR)Buffer, Size/2, &arrData[0], arrData.size(), NULL, NULL);
 	if (nResult <= 0) return false;
 	arrData.resize(nResult);
@@ -32,6 +34,8 @@ bool FromUnicodeBE(const char *Buffer, int Size, vector<char> &arrData) {
 }
 
 bool FromUTF8(const char *Buffer, int Size, vector<char> &arrData) {
+	if (Size == 0) {arrData.clear(); return true;}
+
 	vector<wchar_t> arrWData(Size);
 	int nResult = MultiByteToWideChar(CP_UTF8, 0, Buffer, Size, &arrWData[0], arrWData.size());
 	if (nResult <= 0) return false;
@@ -65,15 +69,17 @@ bool FromUnicodeDetect(const char *Buffer, int Size, vector<char> &arrData, int 
 	return false;
 }
 
-BOOL FindTextInBuffer(const char *Buffer,int Size,string &Text) {
-	char *Table=(FCaseSensitive)?NULL:UpCaseTable;
+BOOL FindTextInBuffer(const char *Buffer, int Size, string &Text) {
+	if (Size == 0) return FALSE;
+
+	char *Table=(FCaseSensitive) ? NULL : UpCaseTable;
 
 	vector<char> arrData;
 	int nDetect = 0;
 	if (FAllCharTables) {
 		nDetect = LikeUnicode(Buffer, Size);
 		if ((nDetect > 0) && FromUnicodeDetect(Buffer, Size, arrData, nDetect)) {
-			if (FindTextInBufferWithTable(&arrData[0], arrData.size(), Text, Table)) return TRUE;
+			if ((arrData.size() > 0) && FindTextInBufferWithTable(&arrData[0], arrData.size(), Text, Table)) return TRUE;
 		}
 	}
 
@@ -87,13 +93,13 @@ BOOL FindTextInBuffer(const char *Buffer,int Size,string &Text) {
 
 	if (nDetect == 0) {		// No signature, but anyway Unicode?
 		if (FromUnicodeLE(Buffer, Size, arrData)) {
-			if (FindTextInBufferWithTable(&arrData[0], arrData.size(), Text, Table)) return TRUE;
+			if ((arrData.size() > 0) && FindTextInBufferWithTable(&arrData[0], arrData.size(), Text, Table)) return TRUE;
 		}
 		if (FromUnicodeBE(Buffer, Size, arrData)) {
-			if (FindTextInBufferWithTable(&arrData[0], arrData.size(), Text, Table)) return TRUE;
+			if ((arrData.size() > 0) && FindTextInBufferWithTable(&arrData[0], arrData.size(), Text, Table)) return TRUE;
 		}
 		if (FromUTF8(Buffer, Size, arrData)) {
-			if (FindTextInBufferWithTable(&arrData[0], arrData.size(), Text, Table)) return TRUE;
+			if ((arrData.size() > 0) && FindTextInBufferWithTable(&arrData[0], arrData.size(), Text, Table)) return TRUE;
 		}
 	}
 
@@ -105,12 +111,14 @@ BOOL FindPlainText(const char *Buffer,int Size) {
 }
 
 BOOL FindPattern(pcre *Pattern,pcre_extra *PatternExtra,const char *Buffer,int Size) {
+	if (Size == 0) return FALSE;
+
 	vector<char> arrData;
 	int nDetect = 0;
 	if (FAllCharTables) {
 		nDetect = LikeUnicode(Buffer, Size);
 		if ((nDetect > 0) && FromUnicodeDetect(Buffer, Size, arrData, nDetect)) {
-			if (do_pcre_exec(Pattern, PatternExtra, &arrData[0], arrData.size(),0,0,NULL,0)>=0) return true;
+			if ((arrData.size() > 0) && (do_pcre_exec(Pattern, PatternExtra, &arrData[0], arrData.size(),0,0,NULL,0)>=0)) return true;
 		}
 	}
 
@@ -119,13 +127,13 @@ BOOL FindPattern(pcre *Pattern,pcre_extra *PatternExtra,const char *Buffer,int S
 	
 	if (nDetect == 0) {		// No signature, but anyway Unicode?
 		if (FromUnicodeLE(Buffer, Size, arrData)) {
-			if (do_pcre_exec(Pattern, PatternExtra, &arrData[0], arrData.size(),0,0,NULL,0)>=0) return TRUE;
+			if ((arrData.size() > 0) && (do_pcre_exec(Pattern, PatternExtra, &arrData[0], arrData.size(),0,0,NULL,0)>=0)) return TRUE;
 		}
 		if (FromUnicodeBE(Buffer, Size, arrData)) {
-			if (do_pcre_exec(Pattern, PatternExtra, &arrData[0], arrData.size(),0,0,NULL,0)>=0) return TRUE;
+			if ((arrData.size() > 0) && (do_pcre_exec(Pattern, PatternExtra, &arrData[0], arrData.size(),0,0,NULL,0)>=0)) return TRUE;
 		}
 		if (FromUTF8(Buffer, Size, arrData)) {
-			if (do_pcre_exec(Pattern, PatternExtra, &arrData[0], arrData.size(),0,0,NULL,0)>=0) return TRUE;
+			if ((arrData.size() > 0) && (do_pcre_exec(Pattern, PatternExtra, &arrData[0], arrData.size(),0,0,NULL,0)>=0)) return TRUE;
 		}
 	}
 	
