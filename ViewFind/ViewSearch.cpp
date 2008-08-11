@@ -9,6 +9,8 @@ struct ViewerSearchInfo {
 map<int, ViewerSearchInfo> g_ViewerInfo;
 
 string ToOEM(ViewerInfo &VInfo, const char *szData, int nLength) {
+	if (nLength == 0) return "";
+
 	if (VInfo.CurMode.AnsiMode) {
 		vector<char> arrData(szData, szData+nLength);
 		CharToOemBuff(&arrData[0], &arrData[0], nLength);
@@ -25,22 +27,29 @@ string ToOEM(ViewerInfo &VInfo, const char *szData, int nLength) {
 	return strResult;
 }
 
-string GetNextLine(ViewerInfo &VInfo, const char *szData, int nLength, int *pEOLLen = NULL) {
+string GetNextLine(ViewerInfo &VInfo, const char *szData, int nLength, int &nSkip) {
 	if (VInfo.CurMode.Unicode) {
 		const wchar_t *wszData = (const wchar_t *)szData;
 		const wchar_t *wszCur = wszData;
-		while (nLength && !wcschr(L"\r\n", *wszCur)) {wszCur++; nLength++;}
+		while (nLength && !wcschr(L"\r\n", *wszCur)) {wszCur++; nLength--;}
+
+		nSkip = (nLength == 0) ? 0 :
+			((nLength > 1) && (wszCur[0] == '\r') && (wszCur[1] == '\n')) ? 2 : 1;
+
+		nSkip = (nSkip + (wszCur - wszData)) * 2;
+		if (wszCur == wszData) return "";
 
 		vector<char> arrData(wszCur - wszData);
 		WideCharToMultiByte(CP_OEMCP, 0, wszData, wszCur-wszData, &arrData[0], wszCur-wszData, " ", NULL);
-		if (pEOLLen) *pEOLLen = (nLength == 0) ? 0 :
-			((nLength > 1) && (wszCur[0] == '\r') && (wszCur[1] == '\n')) ? 2 : 1;
 		return string(&arrData[0], arrData.size());
 	} else {
 		const char *szCur = szData;
-		while (nLength && !strchr("\r\n", *szCur)) {szCur++; nLength++;}
-		if (pEOLLen) *pEOLLen = (nLength == 0) ? 0 :
+		while (nLength && !strchr("\r\n", *szCur)) {szCur++; nLength--;}
+
+		nSkip = (nLength == 0) ? 0 :
 			((nLength > 1) && (szCur[0] == '\r') && (szCur[1] == '\n')) ? 2 : 1;
+
+		nSkip = nSkip + (szCur - szData);
 		return ToOEM(VInfo, szData, szCur-szData);
 	}
 }
@@ -82,13 +91,13 @@ BOOL ViewerSearchAgain() {
 	} else {
 		string strLine;
 		int nCurrentLine = 0;
-		int nEOLLen;
+		int nSkip;
 
 		int nLineOffset = Info.LeftPos;
 		do {
 			if (Interrupted256(nCurrentLine)) break;
-			strLine = GetNextLine(VInfo, szData, (long)(VInfo.FileSize.i64-nOffset), &nEOLLen);
-			if (strLine.empty() && !nEOLLen) break;
+			strLine = GetNextLine(VInfo, szData, mapInput.Size()-nOffset, nSkip);
+			if (strLine.empty() && (nSkip == 0)) break;
 			if (!ECaseSensitive)
 				for (size_t n=0; n<strLine.size(); n++) strLine[n] = UpCaseTable[(BYTE)strLine[n]];
 
@@ -108,11 +117,12 @@ BOOL ViewerSearchAgain() {
 					break;
 				}
 			}
-			szData += strLine.length()+nEOLLen;
-			nOffset += strLine.length()+nEOLLen;
+
+			szData += nSkip;
+			nOffset += nSkip;
 			nLineOffset = 0;
 			nCurrentLine++;
-		} while (true);
+		} while (nOffset < (long)mapInput.Size());
 	}
 
 	if (ERegExp) delete[] pMatch;
