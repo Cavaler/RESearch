@@ -75,6 +75,8 @@ bool FromUnicodeSkipDetect(const char *Buffer, int Size, vector<char> &arrData, 
 	return false;
 }
 
+//////////////////////////////////////////////////////////////////////////
+
 BOOL FindTextInBufferWithTable(const char *Buffer, int Size, string &TextUpcase, char *Table) {
 	return BMHSearch(Buffer, Size, TextUpcase.data(), TextUpcase.size(), Table) >= 0;
 }
@@ -92,7 +94,7 @@ BOOL FindTextInBuffer(const char *Buffer, int Size, string &Text) {
 	eLikeUnicode nDetect = UNI_NONE;
 
 	nDetect = LikeUnicode(Buffer, Size);
-	if ((nDetect > 0) && FromUnicodeSkipDetect(Buffer, Size, arrData, nDetect)) {
+	if ((nDetect != UNI_NONE) && FromUnicodeSkipDetect(Buffer, Size, arrData, nDetect)) {
 		if ((arrData.size() > 0) && FindTextInBufferWithTable(&arrData[0], arrData.size(), TextUpcase, Table)) return TRUE;
 		if (!FAllCharTables) return FALSE;
 	}
@@ -104,6 +106,9 @@ BOOL FindTextInBuffer(const char *Buffer, int Size, string &Text) {
 		Table = (char *)((FCaseSensitive) ? XLatTables[I].DecodeTable : XLatTables[I].UpperDecodeTable);
 		if (FindTextInBufferWithTable(Buffer, Size, TextUpcase, Table)) return TRUE;
 	}
+
+	// Restore initial
+	Table = (FCaseSensitive) ? NULL : UpCaseTable;
 
 	if (nDetect == UNI_NONE) {		// No signature, but anyway Unicode?
 		if (FromUnicodeLE(Buffer, Size, arrData)) {
@@ -129,9 +134,8 @@ BOOL FindPlainText(const char *Buffer,int Size) {
 BOOL FindPattern(pcre *Pattern, pcre_extra *PatternExtra, const char *Buffer, int Size, eLikeUnicode nUni) {
 	if (Size == 0) return FALSE;
 
-	if (nUni != UNI_NONE) {
-		vector<char> arrData;
-		FromUnicodeDetect(Buffer, Size, arrData, nUni);
+	vector<char> arrData;
+	if ((nUni != UNI_NONE) && FromUnicodeDetect(Buffer, Size, arrData, nUni)) {
 		if ((arrData.size() > 0) && (do_pcre_exec(Pattern, PatternExtra, &arrData[0], arrData.size(), 0, 0, NULL, 0) >= 0)) return TRUE;
 		return FALSE;
 	}
