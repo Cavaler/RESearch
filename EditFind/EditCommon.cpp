@@ -356,12 +356,7 @@ BOOL EPreparePattern(string &SearchText) {
 		free(OEMLine);
 		return Result;
 	} else {
-		ETextUpcase=SearchText;
-		if (!ECaseSensitive) {
-			for (size_t I=0; I<SearchText.size(); I++)
-				ETextUpcase[I] = UpCaseTable[(unsigned char)SearchText[I]];
-		}
-
+		ETextUpcase = (ECaseSensitive) ? SearchText : UpCaseString(SearchText);
 		PrepareBMHSearch(ETextUpcase.data(), ETextUpcase.length());
 		return TRUE;
 	}

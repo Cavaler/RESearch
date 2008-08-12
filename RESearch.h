@@ -300,6 +300,7 @@ void ShowHResultError(int nError, HRESULT hResult, const char *szHelp = NULL);
 EXTERN char UpCaseTable[256];
 EXTERN CharTableSet *m_pReplaceTable;
 void PrepareLocaleStuff();
+string UpCaseString(const string &strText);
 
 int BMHSearch(const char *Buffer,int BufferLength,const char *String,int StringLength,char *XLatTable,int nPattern = 0);
 int ReverseBMHSearch(const char *Buffer,int BufferLength,const char *String,int StringLength,char *XLatTable,int nPattern = 0);

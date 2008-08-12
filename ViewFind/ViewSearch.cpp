@@ -98,8 +98,7 @@ BOOL ViewerSearchAgain() {
 			if (Interrupted256(nCurrentLine)) break;
 			strLine = GetNextLine(VInfo, szData, mapInput.Size()-nOffset, nSkip);
 			if (strLine.empty() && (nSkip == 0)) break;
-			if (!ECaseSensitive)
-				for (size_t n=0; n<strLine.size(); n++) strLine[n] = UpCaseTable[(BYTE)strLine[n]];
+			if (!ECaseSensitive) strLine = UpCaseString(strLine);
 
 			if (ERegExp) {
 				if (pcre_exec(EPattern, EPatternExtra, strLine.data(), strLine.length()-nLineOffset, nLineOffset, 0, pMatch, nMatchCount*3)>=0) {

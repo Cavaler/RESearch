@@ -140,11 +140,7 @@ int FPreparePattern(bool bAcceptEmpty) {
 	if (!CheckUsage(FText, !bPlainText, FSearchAs == SA_SEVERALLINE)) return FALSE;
 
 	if (bPlainText) {
-		FTextUpcase=FText;
-		if (!FCaseSensitive) {
-			for (size_t I=0; I<FText.size(); I++)
-				FTextUpcase[I] = UpCaseTable[(unsigned char)FText[I]];
-		}
+		FTextUpcase = (FCaseSensitive) ? FText : UpCaseString(FText);
 	}
 
 	switch (FSearchAs) {
@@ -503,6 +499,11 @@ void SkipCRLF(const char *&Buffer,int *Size) {
 	}
 }
 
+void SkipWholeLine(const char *&Buffer,int *Size) {
+	SkipNoCRLF(Buffer,Size);
+	SkipCRLF(Buffer,Size);
+}
+
 wchar_t LE(const char *Buffer) {
 	return (wchar_t)(Buffer[0] + (Buffer[1] << 8));
 }
@@ -561,8 +562,9 @@ void SkipCRLF(const char *&Buffer,int *Size, eLikeUnicode nUni) {
 	}
 }
 
-void SkipWholeLine(const char *&Buffer,int *Size) {
-	SkipNoCRLF(Buffer,Size);SkipCRLF(Buffer,Size);
+void SkipWholeLine(const char *&Buffer, int *Size, eLikeUnicode nUni) {
+	SkipNoCRLF(Buffer, Size, nUni);
+	SkipCRLF(Buffer, Size, nUni);
 }
 
 time_t FTtoTime_t(FILETIME &ft) {

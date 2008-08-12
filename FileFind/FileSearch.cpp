@@ -5,16 +5,9 @@ void XLatBuffer(BYTE *Buffer,int Length,int Table) {
 	for (register int I=0;I<Length;I++) Buffer[I]=XLatTables[Table].DecodeTable[Buffer[I]];
 }
 
-BOOL FindTextInBufferWithTable(const char *Buffer,int Size,string &Text,char *Table) {
-	string TextUpcase=Text;
-
-	int Position=BMHSearch(Buffer,Size,FTextUpcase.data(),FTextUpcase.size(),Table);
-	return Position>=0;
-}
-
 bool FromUnicodeLE(const char *Buffer, int Size, vector<char> &arrData) {
 	arrData.resize(Size/2);
-	if (Size == 0) return true;
+	if (arrData.size() == 0) return true;
 
 	int nResult = WideCharToMultiByte(CP_OEMCP, 0, (LPCWSTR)Buffer, Size/2, &arrData[0], arrData.size(), NULL, NULL);
 	if (nResult <= 0) return false;
@@ -47,26 +40,42 @@ bool FromUTF8(const char *Buffer, int Size, vector<char> &arrData) {
 	return true;
 }
 
-int LikeUnicode(const char *Buffer, int Size) {
-	if (Size < 2) return 0;
+eLikeUnicode LikeUnicode(const char *Buffer, int Size) {
+	if (Size < 2) return UNI_NONE;
 
-	if ((Buffer[0] == '\xFF') && (Buffer[1] == '\xFE')) return 1;
-	if ((Buffer[0] == '\xFE') && (Buffer[1] == '\xFF')) return 2;
-	if ((Size >= 3) && (Buffer[0] == '\xEF') && (Buffer[1] == '\xBB') && (Buffer[2] == '\xBF')) return 3;
+	if ((Buffer[0] == '\xFF') && (Buffer[1] == '\xFE')) return UNI_LE;
+	if ((Buffer[0] == '\xFE') && (Buffer[1] == '\xFF')) return UNI_BE;
+	if ((Size >= 3) && (Buffer[0] == '\xEF') && (Buffer[1] == '\xBB') && (Buffer[2] == '\xBF')) return UNI_UTF8;
 
-	return 0;
+	return UNI_NONE;
 }
 
-bool FromUnicodeDetect(const char *Buffer, int Size, vector<char> &arrData, int nDetect) {
+bool FromUnicodeDetect(const char *Buffer, int Size, vector<char> &arrData, eLikeUnicode nDetect) {
 	switch (nDetect) {
-	case 1:
+	case UNI_LE:
+		return FromUnicodeLE(Buffer, Size, arrData);
+	case UNI_BE:
+		return FromUnicodeBE(Buffer, Size, arrData);
+	case UNI_UTF8:
+		return FromUTF8(Buffer, Size, arrData);
+	}
+	return false;
+}
+
+bool FromUnicodeSkipDetect(const char *Buffer, int Size, vector<char> &arrData, eLikeUnicode nDetect) {
+	switch (nDetect) {
+	case UNI_LE:
 		return FromUnicodeLE(Buffer+2, Size-2, arrData);
-	case 2:
+	case UNI_BE:
 		return FromUnicodeBE(Buffer+2, Size-2, arrData);
-	case 3:
+	case UNI_UTF8:
 		return FromUTF8(Buffer+3, Size-3, arrData);
 	}
 	return false;
+}
+
+BOOL FindTextInBufferWithTable(const char *Buffer, int Size, string &TextUpcase, char *Table) {
+	return BMHSearch(Buffer, Size, TextUpcase.data(), TextUpcase.size(), Table) >= 0;
 }
 
 BOOL FindTextInBuffer(const char *Buffer, int Size, string &Text) {
@@ -74,32 +83,36 @@ BOOL FindTextInBuffer(const char *Buffer, int Size, string &Text) {
 
 	char *Table=(FCaseSensitive) ? NULL : UpCaseTable;
 
+//	Re-preparing BMH for the multi-text search
+	string TextUpcase = (FCaseSensitive) ? Text : UpCaseString(Text);
+	PrepareBMHSearch(TextUpcase.data(), TextUpcase.length());
+
 	vector<char> arrData;
-	int nDetect = 0;
+	eLikeUnicode nDetect = UNI_NONE;
 	if (FAllCharTables) {
 		nDetect = LikeUnicode(Buffer, Size);
-		if ((nDetect > 0) && FromUnicodeDetect(Buffer, Size, arrData, nDetect)) {
-			if ((arrData.size() > 0) && FindTextInBufferWithTable(&arrData[0], arrData.size(), Text, Table)) return TRUE;
+		if ((nDetect > 0) && FromUnicodeSkipDetect(Buffer, Size, arrData, nDetect)) {
+			if ((arrData.size() > 0) && FindTextInBufferWithTable(&arrData[0], arrData.size(), TextUpcase, Table)) return TRUE;
 		}
 	}
 
-	if (FindTextInBufferWithTable(Buffer,Size,Text,Table)) return TRUE;
+	if (FindTextInBufferWithTable(Buffer, Size, TextUpcase, Table)) return TRUE;
 	if (!FAllCharTables) return FALSE;
 
 	for (size_t I=0; I<XLatTables.size(); I++) {
 		Table = (char *)((FCaseSensitive) ? XLatTables[I].DecodeTable : XLatTables[I].UpperDecodeTable);
-		if (FindTextInBufferWithTable(Buffer,Size,Text,Table)) return TRUE;
+		if (FindTextInBufferWithTable(Buffer, Size, TextUpcase, Table)) return TRUE;
 	}
 
-	if (nDetect == 0) {		// No signature, but anyway Unicode?
+	if (nDetect == UNI_NONE) {		// No signature, but anyway Unicode?
 		if (FromUnicodeLE(Buffer, Size, arrData)) {
-			if ((arrData.size() > 0) && FindTextInBufferWithTable(&arrData[0], arrData.size(), Text, Table)) return TRUE;
+			if ((arrData.size() > 0) && FindTextInBufferWithTable(&arrData[0], arrData.size(), TextUpcase, Table)) return TRUE;
 		}
 		if (FromUnicodeBE(Buffer, Size, arrData)) {
-			if ((arrData.size() > 0) && FindTextInBufferWithTable(&arrData[0], arrData.size(), Text, Table)) return TRUE;
+			if ((arrData.size() > 0) && FindTextInBufferWithTable(&arrData[0], arrData.size(), TextUpcase, Table)) return TRUE;
 		}
 		if (FromUTF8(Buffer, Size, arrData)) {
-			if ((arrData.size() > 0) && FindTextInBufferWithTable(&arrData[0], arrData.size(), Text, Table)) return TRUE;
+			if ((arrData.size() > 0) && FindTextInBufferWithTable(&arrData[0], arrData.size(), TextUpcase, Table)) return TRUE;
 		}
 	}
 
@@ -107,96 +120,121 @@ BOOL FindTextInBuffer(const char *Buffer, int Size, string &Text) {
 }
 
 BOOL FindPlainText(const char *Buffer,int Size) {
-	return FindTextInBuffer(Buffer,Size,FText);
+	return FindTextInBuffer(Buffer, Size, FText);
 }
 
-BOOL FindPattern(pcre *Pattern,pcre_extra *PatternExtra,const char *Buffer,int Size) {
+//////////////////////////////////////////////////////////////////////////
+
+BOOL FindPattern(pcre *Pattern, pcre_extra *PatternExtra, const char *Buffer, int Size, eLikeUnicode nUni) {
 	if (Size == 0) return FALSE;
 
-	vector<char> arrData;
-	int nDetect = 0;
-	if (FAllCharTables) {
-		nDetect = LikeUnicode(Buffer, Size);
-		if ((nDetect > 0) && FromUnicodeDetect(Buffer, Size, arrData, nDetect)) {
-			if ((arrData.size() > 0) && (do_pcre_exec(Pattern, PatternExtra, &arrData[0], arrData.size(),0,0,NULL,0)>=0)) return true;
-		}
+	if (nUni != UNI_NONE) {
+		vector<char> arrData;
+		FromUnicodeDetect(Buffer, Size, arrData, nUni);
+		if ((arrData.size() > 0) && (do_pcre_exec(Pattern, PatternExtra, &arrData[0], arrData.size(), 0, 0, NULL, 0) >= 0)) return TRUE;
+		return FALSE;
 	}
 
-	if (do_pcre_exec(Pattern,PatternExtra,Buffer,Size,0,0,NULL,0)>=0) return TRUE;
-	if (!FAllCharTables) return FALSE;
-	
-	if (nDetect == 0) {		// No signature, but anyway Unicode?
-		if (FromUnicodeLE(Buffer, Size, arrData)) {
-			if ((arrData.size() > 0) && (do_pcre_exec(Pattern, PatternExtra, &arrData[0], arrData.size(),0,0,NULL,0)>=0)) return TRUE;
-		}
-		if (FromUnicodeBE(Buffer, Size, arrData)) {
-			if ((arrData.size() > 0) && (do_pcre_exec(Pattern, PatternExtra, &arrData[0], arrData.size(),0,0,NULL,0)>=0)) return TRUE;
-		}
-		if (FromUTF8(Buffer, Size, arrData)) {
-			if ((arrData.size() > 0) && (do_pcre_exec(Pattern, PatternExtra, &arrData[0], arrData.size(),0,0,NULL,0)>=0)) return TRUE;
+	if (do_pcre_exec(Pattern, PatternExtra, Buffer, Size, 0, 0, NULL, 0) >= 0) return TRUE;
+
+	if (FAllCharTables && !XLatTables.empty()) {
+		vector<char> SaveBuf(Size);
+		for (size_t I=0; I < XLatTables.size(); I++) {
+			memmove(&SaveBuf[0], Buffer, Size);
+			XLatBuffer((BYTE *)&SaveBuf[0], Size, I);
+			if (do_pcre_exec(Pattern, PatternExtra, &SaveBuf[0], Size, 0, 0, NULL, 0) >= 0) return TRUE;
 		}
 	}
 	
-	if (XLatTables.empty()) return FALSE;
-
-	vector<char> SaveBuf(Size);
-	for (size_t I=0; I < XLatTables.size(); I++) {
-		memmove(&SaveBuf[0], Buffer, Size);
-		XLatBuffer((BYTE *)&SaveBuf[0], Size, I);
-		if (do_pcre_exec(Pattern, PatternExtra, &SaveBuf[0], Size, 0, 0, NULL, 0)>=0) return TRUE;
-	}
-
 	return FALSE;
 }
 
-BOOL FindRegExp(const char *Buffer,int Size) {
-	const char *BufEnd=Buffer;
+BOOL FindRegExpWithEncoding(const char *Buffer, int Size, eLikeUnicode nUni) {
+	const char *BufEnd = Buffer;
+	int nRest = (nUni == UNI_NONE) || (nUni == UNI_UTF8) ? 0 : 1;
 	do {
 		Buffer=BufEnd;
-		SkipNoCRLF(BufEnd,&Size);
-		if (FindPattern(FPattern,FPatternExtra,Buffer,BufEnd-Buffer)) return TRUE;
-		SkipCRLF(BufEnd,&Size);
+		SkipNoCRLF(BufEnd, &Size, nUni);
+		if (FindPattern(FPattern, FPatternExtra, Buffer, BufEnd-Buffer, nUni)) return TRUE;
+		SkipCRLF(BufEnd, &Size, nUni);
 		g_nFoundLine++;
-	} while (Size);
+	} while (Size > nRest);
 	return FALSE;
 }
 
-BOOL FindSeveralLineRegExp(const char *Buffer,int Size) {
+BOOL FindSeveralLineRegExpWithEncoding(const char *Buffer, int Size, eLikeUnicode nUni) {
 	const char *BufEnd=Buffer;
+	int nRest = (nUni == UNI_NONE) || (nUni == UNI_UTF8) ? 0 : 1;
 	int LinesIn=0,Len;
 	do {
-		SkipNoCRLF(BufEnd,&Size);
-		SkipCRLF(BufEnd,&Size);
+		SkipNoCRLF(BufEnd, &Size, nUni);
+		SkipCRLF(BufEnd, &Size, nUni);
 		LinesIn++;
-		if (LinesIn==SeveralLines) {
+		if (LinesIn == SeveralLines) {
 			Len=BufEnd-Buffer;
-			if (FindPattern(FPattern,FPatternExtra,Buffer,Len)) return TRUE;
-			SkipWholeLine(Buffer,&Len);
+			if (FindPattern(FPattern, FPatternExtra, Buffer, Len, nUni)) return TRUE;
+			SkipWholeLine(Buffer, &Len, nUni);
 			g_nFoundLine++;
 			LinesIn--;
 		}
-	} while (Size);
+	} while (Size > nRest);
 
 	Len=BufEnd-Buffer;
 	while (Len) {
-		if (FindPattern(FPattern,FPatternExtra,Buffer,Len)) return TRUE;
-		SkipWholeLine(Buffer,&Len);
+		if (FindPattern(FPattern, FPatternExtra, Buffer, Len, nUni)) return TRUE;
+		SkipWholeLine(Buffer, &Len, nUni);
 		g_nFoundLine++;
 	}
 	return FALSE;
 }
 
-BOOL FindMultiLineRegExp(const char *Buffer,int Size) {
-//	return (do_pcre_exec(FPattern,FPatternExtra,Buffer,Size,0,0,NULL,0)>=0);
-	return FindPattern(FPattern, FPatternExtra, Buffer, Size);
+BOOL FindMultiLineRegExpWithEncoding(const char *Buffer, int Size, eLikeUnicode nUni) {
+	return FindPattern(FPattern, FPatternExtra, Buffer, Size, nUni);
 }
+
+BOOL FindExamineEncoding(const char *Buffer, int Size, BOOL (*Searcher)(const char *,int,eLikeUnicode)) {
+	eLikeUnicode nDetect = UNI_NONE;
+
+	if (FAllCharTables) {
+		nDetect = LikeUnicode(Buffer, Size);
+		if (nDetect != UNI_NONE) {
+			int nSkip = (nDetect == UNI_UTF8) ? 3 : 2;
+			return Searcher(Buffer+nSkip, Size-nSkip, nDetect);
+		}
+	}
+
+	// Checking existing chartables is per-line
+	if (Searcher(Buffer, Size, UNI_NONE)) return TRUE;
+
+	if (FAllCharTables && (nDetect == UNI_NONE)) {		// No signature, but anyway Unicode?
+		if (Searcher(Buffer, Size, UNI_LE)) return TRUE;
+		if (Searcher(Buffer, Size, UNI_BE)) return TRUE;
+		if (Searcher(Buffer, Size, UNI_UTF8)) return TRUE;
+	}
+
+	return FALSE;
+}
+
+BOOL FindRegExp(const char *Buffer, int Size) {
+	return FindExamineEncoding(Buffer, Size, FindRegExpWithEncoding);
+}
+
+BOOL FindSeveralLineRegExp(const char *Buffer, int Size) {
+	return FindExamineEncoding(Buffer, Size, FindSeveralLineRegExpWithEncoding);
+}
+
+BOOL FindMultiLineRegExp(const char *Buffer,int Size) {
+	return FindExamineEncoding(Buffer, Size, FindMultiLineRegExpWithEncoding);
+}
+
+//////////////////////////////////////////////////////////////////////////
 
 BOOL FindRegExpInBuffer(const char *Buffer,int Size,string &Text) {
 	if (!Text[0]) return TRUE;
 	pcre *Pattern;
 	pcre_extra *PatternExtra;
-	if (PreparePattern(&Pattern,&PatternExtra,Text,FCaseSensitive)) {
-		BOOL Return=FindPattern(Pattern,PatternExtra,Buffer,Size);
+	if (PreparePattern(&Pattern, &PatternExtra, Text, FCaseSensitive, FALSE, OEMCharTables)) {
+		BOOL Return = FindExamineEncoding(Buffer, Size, FindRegExpWithEncoding);
 		pcre_free(Pattern);pcre_free(PatternExtra);
 		return Return;
 	} else {g_bInterrupted=TRUE;return FALSE;}

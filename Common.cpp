@@ -332,6 +332,15 @@ void PrepareLocaleStuff() {
 	}
 }
 
+string UpCaseString(const string &strText) {
+	string strUpCase = strText;
+
+	for (size_t I=0; I<strUpCase.size(); I++)
+		strUpCase[I] = UpCaseTable[(unsigned char)strUpCase[I]];
+
+	return strUpCase;
+}
+
 #define BufCased(I) ((XLatTable)?(unsigned char)XLatTable[Buf[I]]:Buf[I])
 
 typedef int BMHTable[256];
