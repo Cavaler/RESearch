@@ -116,13 +116,19 @@ BOOL FindTextInBuffer(const char *Buffer,int Size,string &Text);
 BOOL FindPattern(pcre *Pattern,pcre_extra *PatternExtra,const char *Buffer,int Size);
 
 BOOL ConfirmFile(int Title,const char *FileName);
-void SkipNoCRLF(const char *&Buffer,int *Size);
-void SkipCRLF(const char *&Buffer,int *Size);
 void SkipWholeLine(const char *&Buffer,int *Size);
 
 void FReadRegistry(HKEY Key);
 void FWriteRegistry(HKEY Key);
 void FCleanup(BOOL PatternOnly);
+
+enum eLikeUnicode {UNI_NONE, UNI_LE, UNI_BE, UNI_UTF8};
+
+void SkipNoCRLF(const char *&Buffer,int *Size);
+void SkipCRLF(const char *&Buffer,int *Size);
+void SkipNoCRLF(const char *&Buffer,int *Size, eLikeUnicode nUni);
+void SkipCRLF(const char *&Buffer,int *Size, eLikeUnicode nUni);
+
 
 struct TempUserData {
 	TempUserData() : FoundLine(0), FoundColumn(1), ToBeDeleted(false) {}

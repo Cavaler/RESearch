@@ -19,7 +19,7 @@ void WINAPI GetPluginInfo(PluginInfo *Info) {
 
 void WINAPI SetStartupInfo(const PluginStartupInfo *Info) {
 	StartupInfo=*Info;
-	SetANSILocale();
+	PrepareLocaleStuff();
 	ReadRegistry();
 
 	g_pszOKButton = GetMsg(MOk);

@@ -334,7 +334,9 @@ BOOL EPreparePattern(string &SearchText) {
 		char *OEMLine = _strdup(SearchText.c_str());
 		OEMToEditor(OEMLine, SearchText.size());
 
-		if (ECharacterTables) pcre_free((void *)ECharacterTables);
+		if (ECharacterTables && (ECharacterTables != ANSICharTables) && (ECharacterTables != OEMCharTables))
+			pcre_free((void *)ECharacterTables);
+
 		RefreshEditorInfo();
 
 		if (EdInfo.TableNum >= 0) {
@@ -344,10 +346,10 @@ BOOL EPreparePattern(string &SearchText) {
 			ECharacterTables = far_maketables(&TableSet);
 		} else if (EdInfo.AnsiMode) {
 			setlocale(LC_CTYPE, ".ACP");
-			ECharacterTables = pcre_maketables();
+			ECharacterTables = ANSICharTables;
 		} else {
 			setlocale(LC_CTYPE, ".OCP");
-			ECharacterTables = NULL;
+			ECharacterTables = OEMCharTables;
 		}
 
 		BOOL Result = PreparePattern(&EPattern,&EPatternExtra,OEMLine,ECaseSensitive,EUTF8,ECharacterTables);

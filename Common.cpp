@@ -309,10 +309,15 @@ string CreateReplaceString(const char *Matched,int *Match,int Count,const char *
 	return String;
 }
 
-void SetANSILocale() {
-	char Locale[10];
-	sprintf(Locale,".%d",GetACP());
-	setlocale(LC_ALL,Locale);
+void PrepareLocaleStuff() {
+//	char Locale[10];
+//	sprintf(Locale,".%d",GetACP());
+//	setlocale(LC_ALL,Locale);
+
+	setlocale(LC_ALL, ".OCP");
+	OEMCharTables = pcre_maketables();
+	setlocale(LC_ALL, ".ACP");
+	ANSICharTables = pcre_maketables();
 
 	for (unsigned short I=0;I<256;I++) {
 		WCHAR W,U,L;

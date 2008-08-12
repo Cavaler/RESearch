@@ -170,7 +170,7 @@ int FPreparePattern(bool bAcceptEmpty) {
 	case SA_SEVERALLINE:
 	case SA_MULTILINE:
 		if (FText.empty()) return TRUE;
-		return PreparePattern(&FPattern,&FPatternExtra,FText,FCaseSensitive,FUTF8);
+		return PreparePattern(&FPattern, &FPatternExtra, FText, FCaseSensitive, FUTF8, OEMCharTables);
 	default:
 		return FALSE;
 	}
@@ -500,6 +500,64 @@ void SkipCRLF(const char *&Buffer,int *Size) {
 	} else {
 		if (*Buffer==0x0D) Buffer++;
 		if (*Buffer==0x0A) Buffer++;
+	}
+}
+
+wchar_t LE(const char *Buffer) {
+	return (wchar_t)(Buffer[0] + (Buffer[1] << 8));
+}
+
+wchar_t BE(const char *Buffer) {
+	return (wchar_t)(Buffer[1] + (Buffer[0] << 8));
+}
+
+void SkipNoCRLF(const char *&Buffer,int *Size, eLikeUnicode nUni) {
+	switch (nUni) {
+	case UNI_NONE:
+	case UNI_UTF8:
+		SkipNoCRLF(Buffer, Size);
+		break;
+	case UNI_LE:
+		if (Size) {
+			while ((*Size >= 2) && (LE(Buffer)!=0x0D) && (LE(Buffer)!=0x0A)) {Buffer+=2;(*Size)-=2;}
+		} else {
+			while ((LE(Buffer)!=0x0D) && (LE(Buffer)!=0x0A)) Buffer+=2;
+		}
+		break;
+	case UNI_BE:
+		if (Size) {
+			while ((*Size >= 2) && (BE(Buffer)!=0x0D) && (BE(Buffer)!=0x0A)) {Buffer+=2;(*Size)-=2;}
+		} else {
+			while ((BE(Buffer)!=0x0D) && (BE(Buffer)!=0x0A)) Buffer+=2;
+		}
+		break;
+	}
+}
+
+void SkipCRLF(const char *&Buffer,int *Size, eLikeUnicode nUni) {
+	switch (nUni) {
+	case UNI_NONE:
+	case UNI_UTF8:
+		SkipCRLF(Buffer, Size);
+		break;
+	case UNI_LE:
+		if (Size) {
+			if ((*Size) && (LE(Buffer)==0x0D)) {Buffer+=2;(*Size)-=2;}
+			if ((*Size) && (LE(Buffer)==0x0A)) {Buffer+=2;(*Size)-=2;}
+		} else {
+			if (LE(Buffer)==0x0D) Buffer+=2;
+			if (LE(Buffer)==0x0A) Buffer+=2;
+		}
+		break;
+	case UNI_BE:
+		if (Size) {
+			if ((*Size) && (BE(Buffer)==0x0D)) {Buffer+=2;(*Size)-=2;}
+			if ((*Size) && (BE(Buffer)==0x0A)) {Buffer+=2;(*Size)-=2;}
+		} else {
+			if (BE(Buffer)==0x0D) Buffer+=2;
+			if (BE(Buffer)==0x0A) Buffer+=2;
+		}
+		break;
 	}
 }
 

@@ -299,7 +299,7 @@ void ShowHResultError(int nError, HRESULT hResult, const char *szHelp = NULL);
 
 EXTERN char UpCaseTable[256];
 EXTERN CharTableSet *m_pReplaceTable;
-void SetANSILocale();
+void PrepareLocaleStuff();
 
 int BMHSearch(const char *Buffer,int BufferLength,const char *String,int StringLength,char *XLatTable,int nPattern = 0);
 int ReverseBMHSearch(const char *Buffer,int BufferLength,const char *String,int StringLength,char *XLatTable,int nPattern = 0);
@@ -331,5 +331,8 @@ EXTERN CBatchType	*g_pPanelBatchType;
 
 EXTERN CBatchActionCollection	*g_pEditorBatches;
 EXTERN CBatchActionCollection	*g_pPanelBatches;
+
+EXTERN const unsigned char *OEMCharTables VALUE(NULL);
+EXTERN const unsigned char *ANSICharTables VALUE(NULL);
 
 #endif
