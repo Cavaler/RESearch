@@ -27,9 +27,10 @@ void AddGrepResultLine(const sBufferedLine &Line, int nLineNumber) {
 bool GrepLineFound(const sBufferedLine &strBuf) {
 	BOOL bResult;
 	if (FSearchAs == SA_REGEXP) {
-		bResult = FindPattern(FPattern, FPatternExtra, strBuf.szBuffer, strBuf.Length());
+		bResult = do_pcre_exec(FPattern, FPatternExtra, strBuf.szBuffer, strBuf.Length(), 0, 0, NULL, 0) >= 0;
 	} else {
-		bResult = FindTextInBuffer(strBuf.szBuffer, strBuf.Length(), FText);
+		char *Table = (FCaseSensitive) ? NULL : UpCaseTable;
+		bResult = BMHSearch(strBuf.szBuffer, strBuf.Length(), FTextUpcase.data(), FTextUpcase.size(), Table) >= 0;
 	}
 
 	return (bResult != 0) != (FSInverse != 0);
