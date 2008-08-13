@@ -9,6 +9,12 @@ Planned:
 	! Performing all regular expression matches in UTF-8
 	* dialogprocs for disabling unneeded elements
 
+Version 6.35 (12.08.2008)
+	+ If file has Unicode signature, it is always scanned (FileSearch only) as Unicode
+	    regardless of "Use All CharTables" option
+	- "[X] Use all character tables" rewritten, should work better for Unicode
+	- Multi-text/regexp searches fixed. But - does anyone need them?
+
 Version 6.32 (11.08.2008)
 	- Crash while using "[X] Use all character tables"
 	- Viewer search fixes
