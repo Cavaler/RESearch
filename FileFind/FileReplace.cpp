@@ -274,10 +274,10 @@ int ReplacePrompt(BOOL Plugin) {
 	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,"Masks", MaskText));
 
 	Dialog.Add(new CFarTextItem(5,4,0,MSearchFor));
-	Dialog.Add(new CFarEditItem(5,5,65,DIF_HISTORY,"SearchText", SearchText));
+	Dialog.Add(new CFarEditItem(5,5,65,DIF_HISTORY|DIF_VAREDIT,"SearchText", SearchText));
 
 	Dialog.Add(new CFarTextItem(5,6,0,MReplaceWith));
-	Dialog.Add(new CFarEditItem(5,7,65,DIF_HISTORY,"ReplaceText", ReplaceText));
+	Dialog.Add(new CFarEditItem(5,7,65,DIF_HISTORY|DIF_VAREDIT,"ReplaceText", ReplaceText));
 
 	Dialog.Add(new CFarButtonItem(67,5,0,0,"&\\"));
 	Dialog.Add(new CFarButtonItem(67,7,0,0,"&/"));
@@ -389,10 +389,10 @@ BOOL CFRPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.Add(new CFarEditItem(5,5,70,DIF_HISTORY,"Masks", pPreset->m_mapStrings["Mask"]));
 
 	Dialog.Add(new CFarTextItem(5,6,0,MSearchFor));
-	Dialog.Add(new CFarEditItem(5,7,70,DIF_HISTORY,"SearchText", pPreset->m_mapStrings["Text"]));
+	Dialog.Add(new CFarEditItem(5,7,70,DIF_HISTORY|DIF_VAREDIT,"SearchText", pPreset->m_mapStrings["Text"]));
 
 	Dialog.Add(new CFarTextItem(5,8,0,MReplaceWith));
-	Dialog.Add(new CFarEditItem(5,9,70,DIF_HISTORY,"ReplaceText", pPreset->m_mapStrings["Replace"]));
+	Dialog.Add(new CFarEditItem(5,9,70,DIF_HISTORY|DIF_VAREDIT,"ReplaceText", pPreset->m_mapStrings["Replace"]));
 
 	Dialog.Add(new CFarTextItem(5,10,DIF_BOXCOLOR|DIF_SEPARATOR,(char *)NULL));
 

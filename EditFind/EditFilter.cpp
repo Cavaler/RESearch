@@ -38,7 +38,7 @@ BOOL EditorFilter() {
 	CFarDialog Dialog(76,13,"FilterDlg");
 	Dialog.AddFrame(MFilterLines);
 	Dialog.Add(new CFarTextItem(5,2,0,MSearchFor));
-	Dialog.Add(new CFarEditItem(5,3,65,DIF_HISTORY,"SearchText",SearchText));
+	Dialog.Add(new CFarEditItem(5,3,65,DIF_HISTORY|DIF_VAREDIT,"SearchText",SearchText));
 	Dialog.Add(new CFarButtonItem(67,3,0,0,"&\\"));
 
 	Dialog.Add(new CFarTextItem(5,4,DIF_BOXCOLOR|DIF_SEPARATOR,""));
@@ -92,7 +92,7 @@ BOOL CEFPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,"RESearch.PresetName",pPreset->Name()));
 
 	Dialog.Add(new CFarTextItem(5,4,0,MSearchFor));
-	Dialog.Add(new CFarEditItem(5,5,70,DIF_HISTORY,"SearchText",pPreset->m_mapStrings["Text"]));
+	Dialog.Add(new CFarEditItem(5,5,70,DIF_HISTORY|DIF_VAREDIT,"SearchText",pPreset->m_mapStrings["Text"]));
 
 	Dialog.Add(new CFarCheckBoxItem(5,7,0,MRegExp,&pPreset->m_mapInts["IsRegExp"]));
 	Dialog.Add(new CFarCheckBoxItem(5,8,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
