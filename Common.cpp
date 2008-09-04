@@ -24,11 +24,11 @@ void ReadRegistry() {
 	FReadRegistry(hKey);
 	FTReadRegistry(hKey);
 
-	g_pEditorBatchType = new CBatchType(MEditorBatches, ERPresets, EFPresets, ETPresets, NULL);
+	g_pEditorBatchType = new CBatchType(MEditorBatches, ESPresets, ERPresets, EFPresets, ETPresets, NULL);
 	hKey = OpenRegistry("EditorBatches");
 	g_pEditorBatches = new CBatchActionCollection(*g_pEditorBatchType, hKey);
 
-	g_pPanelBatchType = new CBatchType(MPanelBatches, FRPresets, RnPresets, QRPresets, NULL);
+	g_pPanelBatchType = new CBatchType(MPanelBatches, FSPresets, FRPresets, RnPresets, QRPresets, FGPresets, NULL);
 	hKey = OpenRegistry("PanelBatches");
 	g_pPanelBatches = new CBatchActionCollection(*g_pPanelBatchType, hKey);
 }

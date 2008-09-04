@@ -13,24 +13,28 @@ class CFSPresetCollection:public CPresetCollection {
 public:
 	CFSPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "FileFind", MFSPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
+	virtual int  ID() { return 3; }
 };
 
 class CFRPresetCollection:public CPresetCollection {
 public:
 	CFRPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "FileReplace", MFRPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
+	virtual int  ID() { return 0; }
 };
 
 class CFGPresetCollection:public CPresetCollection {
 public:
 	CFGPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "FileGrep", MFGPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
+	virtual int  ID() { return 4; }
 };
 
 class CFAPresetCollection:public CPresetCollection {
 public:
 	CFAPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "FileAdvanced", MFAPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
+	virtual int  ID() { return 5; }
 };
 
 extern CParameterSet g_FSParamSet;

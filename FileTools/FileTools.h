@@ -9,12 +9,14 @@ class CRnPresetCollection:public CPresetCollection {
 public:
 	CRnPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "FileRename", MRnPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
+	virtual int  ID() { return 1; }
 };
 
 class CQRPresetCollection:public CPresetCollection {
 public:
 	CQRPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "FileQuickRename", MQRPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
+	virtual int  ID() { return 2; }
 };
 
 #define DECLARE_PERSIST_VARS

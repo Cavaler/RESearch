@@ -9,24 +9,28 @@ class CESPresetCollection:public CPresetCollection {
 public:
 	CESPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "EditFind", MESPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
+	virtual int  ID() { return 3; }
 };
 
 class CERPresetCollection:public CPresetCollection {
 public:
 	CERPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "EditReplace", MERPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
+	virtual int  ID() { return 0; }
 };
 
 class CEFPresetCollection:public CPresetCollection {
 public:
 	CEFPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "EditFilter", MEFPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
+	virtual int  ID() { return 1; }
 };
 
 class CETPresetCollection:public CPresetCollection {
 public:
 	CETPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "EditTransliterate", METPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
+	virtual int  ID() { return 2; }
 };
 
 #define DECLARE_PERSIST_VARS

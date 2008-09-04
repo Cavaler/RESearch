@@ -8,6 +8,7 @@ class CVSPresetCollection : public CPresetCollection {
 public:
 	CVSPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "ViewFind", MVSPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
+	virtual int  ID() { return 0; }
 };
 
 extern CParameterSet g_VSParamSet;

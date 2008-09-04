@@ -56,6 +56,7 @@ public:
 	void Save();
 	int ShowMenu(bool bExecute);
 	virtual BOOL EditPreset(CPreset *pPreset) = 0;
+	virtual int  ID() = 0;	// For batches
 	CPreset *operator()(int nID);
 
 	void FillMenuItems(vector<FarMenuItem> &MenuItems);
@@ -75,7 +76,7 @@ protected:
 
 //////////////////////////////////////////////////////////////////////////
 
-typedef pair<size_t, int> BatchActionIndex;
+typedef pair<int, int> BatchActionIndex;		// Collection and Preset IDs
 extern const BatchActionIndex NO_BATCH_INDEX;
 
 class CBatchType : public vector<CPresetCollection *> {

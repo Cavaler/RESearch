@@ -204,8 +204,10 @@ int CPresetCollection::ShowMenu(bool bExecute) {
 		int nBreakKey;
 		char szTitle[128];
 		sprintf(szTitle, "%s presets", Name());
-		int nResult = ChooseMenu(arrItems, szTitle, "Ins,Del,F4", "Presets", 0,
-			FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT, piBreakKeys, &nBreakKey);
+		int nResult = bExecute	? ChooseMenu(arrItems, szTitle, "Ins,Del,F4", "Presets", 0,
+			FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT, piBreakKeys, &nBreakKey)
+								: ChooseMenu(arrItems, szTitle, NULL, "Presets", 0,
+			FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT, NULL, &nBreakKey);
 
 		switch (nBreakKey) {
 		case -1:
@@ -288,7 +290,7 @@ void CPresetCollection::ValidateIDs() {
 
 //////////////////////////////////////////////////////////////////////////
 
-const BatchActionIndex NO_BATCH_INDEX(0, -1);
+const BatchActionIndex NO_BATCH_INDEX(-1, -1);
 
 CBatchType::CBatchType(int nTitle, ...)
 : m_nTitle(nTitle)
@@ -305,8 +307,12 @@ CBatchType::CBatchType(int nTitle, ...)
 }
 
 CPreset *CBatchType::operator[](const BatchActionIndex &Pair) {
-	if ((Pair.first < 0) || (Pair.first >= size())) return NULL;
-	return (*at(Pair.first))(Pair.second);
+	for (size_t nColl = 0; nColl < size(); nColl++) {
+		if (at(nColl)->ID() == Pair.first) {
+			return (*at(nColl))(Pair.second);
+		}
+	}
+	return NULL;
 }
 
 BatchActionIndex CBatchType::SelectPreset() {
@@ -328,7 +334,7 @@ BatchActionIndex CBatchType::SelectPreset() {
 		int nPreset = pColl->ShowMenu(false);
 		if (nPreset >= 0) {
 			CPreset *pPreset = pColl->at(nPreset);
-			return BatchActionIndex(nResult, pPreset->m_nID);
+			return BatchActionIndex(pColl->ID(), pPreset->m_nID);
 		}
 	} while (true);
 }
