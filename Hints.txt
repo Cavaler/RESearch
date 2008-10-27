@@ -9,10 +9,10 @@ symbol directly using Ctrl-Q.
 by extracting lines from text sequentially, WITHOUT newline symbols - therefore to search for
 the word 'end' at the end of string, use regexp 'end$', not 'end\n'!
 
-- Several-line search is done by internally concatenating lines with a single '\n',
+- Several-line search in editor is done by internally concatenating lines with a single '\n',
 so it is to be used instead of '\r\n' always.
 
-- In Multi-Line RegExp search from panels actual newline symbols are to be used,
+- In Several/Multi-Line RegExp search from panels actual newline symbols are to be used,
 so '\r?\n' is good for most cases.
 
 - If '[ ] Dot matches newline also' is not set, you can use '\C' as 'Any symbol including newline'

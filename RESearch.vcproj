@@ -882,6 +882,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\Hints.txt"
+			>
+		</File>
+		<File
 			RelativePath="History.txt"
 			>
 		</File>

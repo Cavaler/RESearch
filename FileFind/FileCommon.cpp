@@ -137,7 +137,7 @@ int FPreparePattern(bool bAcceptEmpty) {
 	if (FText.empty() && !bAcceptEmpty) return FALSE;
 
 	bool bPlainText = (FSearchAs==SA_PLAINTEXT)||(FSearchAs==SA_MULTITEXT);
-	if (!CheckUsage(FText, !bPlainText, FSearchAs == SA_SEVERALLINE)) return FALSE;
+	if (!CheckUsage(FText, !bPlainText, FALSE/*FSearchAs == SA_SEVERALLINE*/)) return FALSE;
 
 	if (bPlainText) {
 		FTextUpcase = (FCaseSensitive) ? FText : UpCaseString(FText);
