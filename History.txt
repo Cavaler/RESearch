@@ -9,6 +9,11 @@ Planned:
 	! Performing all regular expression matches in UTF-8
 	* dialogprocs for disabling unneeded elements
 
+Version 6.37 (03.12.2008)
+	* Hints.txt fixed concerning several-line search in panels
+	- File Masks are properly case-insensitive
+	- Only File Search/Replace/Grep affect subsequent Editor operations
+
 Version 6.36 (04.09.2008)
 	* Removed 512 symbols limit from 'Search for' and 'Replace with' fields everythere
 	* Search and Grep presets can be added to batches
