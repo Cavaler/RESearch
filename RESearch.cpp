@@ -394,13 +394,16 @@ HANDLE OpenPluginFromFileMenu(int Item, BOOL ShowDialog) {
 
 	switch (Item) {
 		case 0:
-			Result=FileFind(&PanelItems,&ItemsNumber,ShowDialog);
+			Result = FileFind(&PanelItems,&ItemsNumber,ShowDialog);
+			if (Result != OR_CANCEL) SynchronizeWithFile(false);
 			break;
 		case 1:
-			Result=FileReplace(&PanelItems,&ItemsNumber,ShowDialog);
+			Result = FileReplace(&PanelItems,&ItemsNumber,ShowDialog);
+			if (Result != OR_CANCEL) SynchronizeWithFile(true);
 			break;
 		case 2:
-			Result=FileGrep(ShowDialog);
+			Result = FileGrep(ShowDialog);
+			if (Result != OR_CANCEL) SynchronizeWithFile(false);
 			break;
 		case 4:ChangeSelection(MMenuSelect);break;
 		case 5:ChangeSelection(MMenuUnselect);break;
@@ -433,7 +436,6 @@ HANDLE OpenPluginFromFileMenu(int Item, BOOL ShowDialog) {
 		Result = OpenPluginFromFilePreset(Item);
 	}
 
-	if (Result!=OR_CANCEL) SynchronizeWithFile(Item);
 	if (Result==OR_PANEL) {
 		PanelInfo PInfo;
 		StartupInfo.Control(INVALID_HANDLE_VALUE,FCTL_GETPANELINFO,&PInfo);

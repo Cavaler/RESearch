@@ -109,7 +109,7 @@ void EditorToOEM(string &String);
 void OEMToEditor(char *Buffer,int Length);
 void OEMToEditor(string &String);
 
-void SynchronizeWithFile(BOOL Replace);
+void SynchronizeWithFile(bool bReplace);
 void EReadRegistry(HKEY Key);
 void EWriteRegistry(HKEY Key);
 void DeleteMatchInfo();

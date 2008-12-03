@@ -382,14 +382,15 @@ void ECleanup(BOOL PatternOnly) {
 	}
 }
 
-void SynchronizeWithFile(BOOL Replace) {
+void SynchronizeWithFile(bool bReplace) {
 	if (FSearchAs<=SA_REGEXP) {
 		ERegExp=(FSearchAs==SA_REGEXP);
 		EText=FText;EPreparePattern(EText);
-		if (Replace) {
+		if (bReplace) {
 			ERReplace=FRReplace;
 			LastAction=1;
-		} else LastAction=0;
+		} else
+			LastAction=0;
 	}
 	ECaseSensitive=FCaseSensitive;
 	EUTF8=FUTF8;
