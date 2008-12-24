@@ -494,11 +494,9 @@ HANDLE OpenPluginFromEditorMenu(int Item) {
 		case 3:
 			if (EditorTransliterate()) LastAction=3;
 			break;
-		case 9:
-			if (EditorListAllShowResults()) LastAction=4;
-			break;
 		case 6:
 			EReverse = !EReverse;
+			//	fall-through
 		case 5:
 			ESearchAgainCalled = TRUE;
 			if (!ERegExp) EPreparePattern(EText);	// Not needed for RegExp
@@ -528,6 +526,9 @@ HANDLE OpenPluginFromEditorMenu(int Item) {
 			break;
 		case 8:
 			UTF8Converter();
+			break;
+		case 9:
+			if (EditorListAllShowResults(false)) LastAction=4;
 			break;
 	}
 

@@ -16,6 +16,7 @@ string CanonicalLCName(const char *szName) {
 BOOL EditorListAllAgain() {
 	RefreshEditorInfo();
 	EctlForceSetPosition(NULL);
+	EditorInfo _Info = EdInfo;
 
 	sFindAllInfo &Info = FindAllInfos[CanonicalLCName(EdInfo.FileName)];
 	Info.arrString.clear();
@@ -49,11 +50,12 @@ BOOL EditorListAllAgain() {
 		return TRUE;
 	}
 
-	return EditorListAllShowResults();
+	EdInfo = _Info;
+	return EditorListAllShowResults(true);
 }
 
-BOOL EditorListAllShowResults() {
-	RefreshEditorInfo();
+BOOL EditorListAllShowResults(bool bImmediate) {
+	if (!bImmediate) RefreshEditorInfo();
 
 	sFindAllInfo &Info = FindAllInfos[CanonicalLCName(EdInfo.FileName)];
 	if (Info.arrLines.size() == 0) return TRUE;

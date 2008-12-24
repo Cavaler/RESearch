@@ -80,7 +80,7 @@ BOOL EditorTransliterate();
 BOOL EditorTransliterateAgain();
 BOOL EditorListAll();
 BOOL EditorListAllAgain();
-BOOL EditorListAllShowResults();
+BOOL EditorListAllShowResults(bool bImmediate);
 
 EXTERN BOOL EListAllFromPreset;
 OperationResult EditorSearchExecutor();
