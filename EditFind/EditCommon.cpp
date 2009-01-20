@@ -342,13 +342,13 @@ BOOL EPreparePattern(string &SearchText) {
 		if (EdInfo.TableNum >= 0) {
 			CharTableSet TableSet;
 			StartupInfo.CharTable(EdInfo.TableNum, (char *)&TableSet, sizeof(TableSet));
-			setlocale(LC_CTYPE, ".OCP");
+			setlocale(LC_ALL, FormatStr(".%d", GetOEMCP()).c_str());
 			ECharacterTables = far_maketables(&TableSet);
 		} else if (EdInfo.AnsiMode) {
-			setlocale(LC_CTYPE, ".ACP");
+			setlocale(LC_ALL, FormatStr(".%d", GetACP()).c_str());
 			ECharacterTables = ANSICharTables;
 		} else {
-			setlocale(LC_CTYPE, ".OCP");
+			setlocale(LC_ALL, FormatStr(".%d", GetOEMCP()).c_str());
 			ECharacterTables = OEMCharTables;
 		}
 

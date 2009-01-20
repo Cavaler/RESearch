@@ -310,13 +310,11 @@ string CreateReplaceString(const char *Matched,int *Match,int Count,const char *
 }
 
 void PrepareLocaleStuff() {
-//	char Locale[10];
-//	sprintf(Locale,".%d",GetACP());
-//	setlocale(LC_ALL,Locale);
-
-	setlocale(LC_ALL, ".OCP");
+//	Not .ACP / .OCP - they set locale based on "Standarts and Formats",
+//	not "Language for non-Unicode programs"
+	setlocale(LC_ALL, FormatStr(".%d", GetOEMCP()).c_str());
 	OEMCharTables = pcre_maketables();
-	setlocale(LC_ALL, ".ACP");
+	setlocale(LC_ALL, FormatStr(".%d", GetACP()).c_str());
 	ANSICharTables = pcre_maketables();
 
 	for (unsigned short I=0;I<256;I++) {
