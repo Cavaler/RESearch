@@ -462,6 +462,8 @@ int ScanDirectories(PluginPanelItem **PanelItems,int *ItemsNumber,ProcessFilePro
 }
 
 OperationResult NoFilesFound() {
+	if (g_bInterrupted) return OR_OK;
+
 	const char *Lines[]={GetMsg(MRESearch),GetMsg(MNoFilesFound),GetMsg(MOk)};
 	StartupInfo.Message(StartupInfo.ModuleNumber,0,"NoFilesFound",Lines,3,1);
 	return OR_OK;
