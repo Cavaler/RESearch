@@ -304,7 +304,7 @@ OperationResult RenameFiles(PluginPanelItem **PanelItems,int *ItemsNumber,BOOL S
 
 	if (ScanDirectories(PanelItems,ItemsNumber,RenameFile)) {
 		if (!FROpenModified) return OR_OK; else
-		return (*ItemsNumber==0)?NoFilesFound():OR_PANEL;
+		return (*ItemsNumber==0) ? NoFilesFound() : OR_PANEL;
 	} else return OR_FAILED;
 }
 
@@ -334,10 +334,12 @@ BOOL PerformRenameSelectedFiles(PanelInfo &PInfo,PluginPanelItem **PanelItems,in
 
 		for (int I=0;I<PInfo.ItemsNumber;I++) {
 			if (I==PInfo.CurrentItem) continue;
+			if (g_bInterrupted) break;
 			RenameFile(&PInfo.PanelItems[I].FindData,PanelItems,ItemsNumber);
 		}
 	} else {
 		for (int I=0;I<PInfo.SelectedItemsNumber;I++) {
+			if (g_bInterrupted) break;
 			RenameFile(&PInfo.SelectedItems[I].FindData,PanelItems,ItemsNumber);
 		}
 	}
