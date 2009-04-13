@@ -349,7 +349,7 @@ BOOL PerformRenameSelectedFiles(PanelInfo &PInfo,PluginPanelItem **PanelItems,in
 }
 
 BOOL RenameSelectedFilesPrompt() {
-	CFarDialog Dialog(76,14,"SelectedFileRenameDlg");
+	CFarDialog Dialog(76, 13, "SelectedFileRenameDlg");
 	Dialog.AddFrame(MMenuRename);
 
 	Dialog.Add(new CFarCheckBoxItem(25,2,0,MRegExp,(BOOL *)&FSearchAs));
@@ -361,10 +361,10 @@ BOOL RenameSelectedFilesPrompt() {
 	Dialog.Add(new CFarEditItem(5,5,70,DIF_HISTORY,"ReplaceText", ReplaceText));
 	Dialog.Add(new CFarCheckBoxItem(25,4,0,MRepeating,&FRepeating));
 
-	Dialog.Add(new CFarCheckBoxItem(5,7,0,MConfirmFile,&FRConfirmFile));
-	Dialog.Add(new CFarCheckBoxItem(5,8,0,MConfirmLine,&FRConfirmLine));
+//	Dialog.Add(new CFarCheckBoxItem(5,7,0,MConfirmFile,&FRConfirmFile));
+	Dialog.Add(new CFarCheckBoxItem(5,7,0,MConfirmLine,&FRConfirmLine));
 	Dialog.AddButtons(MOk,MCancel);
-	Dialog.Add(new CFarButtonItem(60,7,0,0,MBtnPresets));
+	Dialog.Add(new CFarButtonItem(60,6,0,0,MBtnPresets));
 	Dialog.SetFocus(4);
 
 	if (FSearchAs>=SA_SEVERALLINE) FSearchAs=SA_PLAINTEXT;
@@ -373,6 +373,7 @@ BOOL RenameSelectedFilesPrompt() {
 	int ExitCode;
 	SearchText=FText;
 	ReplaceText=FRReplace;
+	FRConfirmFile = FALSE;
 	do {
 		switch (ExitCode=Dialog.Display(2, -3, -1)) {
 		case 0:
