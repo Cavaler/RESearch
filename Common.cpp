@@ -461,7 +461,7 @@ void UTF8Converter(string strInit) {
 
 void QuoteRegExpString(string &strText) {
 	for (size_t I=0; I<strText.length();I++) {
-		if (strchr("()[]{}\\^$+*.?",strText[I])) {
+		if (strchr("()[]{}\\^$+*.?|",strText[I])) {
 			strText.insert(I++, 1, '\\');
 			continue;
 		}
