@@ -86,9 +86,8 @@
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\RESearch.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\Debug/RESearch.pdb"
+				ProgramDatabaseFile="$(OutDir)\$(TargetName).pdb"
 				SubSystem="2"
-				ImportLibrary=".\Debug/RESearch.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -150,8 +149,8 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_CRT_SECURE_NO_WARNINGS"
-				RuntimeLibrary="3"
-				StructMemberAlignment="1"
+				RuntimeLibrary="1"
+				StructMemberAlignment="4"
 				EnableFunctionLevelLinking="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="2"
@@ -179,15 +178,14 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				OutputFile="$(FAR_DEBUG_DLLS)\$(ProjectName)\$(ProjectName).dll"
+				OutputFile="$(OutDir)\$(ProjectName) $(PlatformName).dll"
 				Version="6.23"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\RESearch.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\Debug/RESearch.pdb"
+				ProgramDatabaseFile="$(OutDir)\$(TargetName).pdb"
 				SubSystem="2"
-				ImportLibrary=".\Debug/RESearch.lib"
 				TargetMachine="17"
 			/>
 			<Tool
@@ -285,15 +283,14 @@
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
 				AdditionalOptions="/D_USE_INTEL_COMPILER "
-				OutputFile="RESearchI.dll"
+				OutputFile="$(ProjectName)I.dll"
 				Version="6.23"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\RESearch.def"
-				ProgramDatabaseFile=".\Release_Intel/RESearchI.pdb"
+				ProgramDatabaseFile="$(OutDir)\$(TargetName).pdb"
 				SubSystem="2"
 				OptimizeForWindows98="1"
-				ImportLibrary=".\Release_Intel/RESearchI.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -363,7 +360,7 @@
 				IgnoreStandardIncludePath="true"
 				StringPooling="true"
 				RuntimeLibrary="0"
-				StructMemberAlignment="1"
+				StructMemberAlignment="4"
 				EnableFunctionLevelLinking="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="2"
@@ -396,10 +393,9 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\RESearch.def"
-				ProgramDatabaseFile=".\Release_Intel/RESearchI.pdb"
+				ProgramDatabaseFile="$(OutDir)\$(TargetName).pdb"
 				SubSystem="2"
 				OptimizeForWindows98="1"
-				ImportLibrary=".\Release_Intel/RESearchI.lib"
 				TargetMachine="17"
 			/>
 			<Tool
@@ -500,10 +496,9 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\RESearch.def"
-				ProgramDatabaseFile=".\Release/RESearch.pdb"
+				ProgramDatabaseFile="$(OutDir)\$(TargetName).pdb"
 				SubSystem="2"
 				OptimizeForWindows98="1"
-				ImportLibrary=".\Release/RESearch.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -573,7 +568,7 @@
 				PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="0"
-				StructMemberAlignment="2"
+				StructMemberAlignment="4"
 				EnableFunctionLevelLinking="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="2"
@@ -604,10 +599,9 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\RESearch.def"
-				ProgramDatabaseFile=".\Release/RESearch.pdb"
+				ProgramDatabaseFile="$(OutDir)\$(TargetName).pdb"
 				SubSystem="2"
 				OptimizeForWindows98="1"
-				ImportLibrary=".\Release/RESearch.lib"
 				TargetMachine="17"
 			/>
 			<Tool
@@ -699,15 +693,14 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				OutputFile="$(FAR_DEBUG_DLLS)\$(ProjectName)\$(ProjectName).dll"
+				OutputFile="$(FAR2_DEBUG_DLLS)\$(ProjectName)\$(ProjectName)U.dll"
 				Version="6.23"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\RESearch.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\Debug/RESearch.pdb"
+				ProgramDatabaseFile="$(OutDir)\$(TargetName).pdb"
 				SubSystem="2"
-				ImportLibrary=".\Debug/RESearch.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -770,7 +763,7 @@
 				Optimization="0"
 				PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="3"
-				StructMemberAlignment="1"
+				StructMemberAlignment="4"
 				EnableFunctionLevelLinking="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="2"
@@ -804,9 +797,8 @@
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\RESearch.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\Debug/RESearch.pdb"
+				ProgramDatabaseFile="$(OutDir)\$(TargetName).pdb"
 				SubSystem="2"
-				ImportLibrary=".\Debug/RESearch.lib"
 				TargetMachine="17"
 			/>
 			<Tool
@@ -903,15 +895,14 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				OutputFile="$(ProjectName).dll"
+				OutputFile="$(ProjectName)U.dll"
 				Version="6.23"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\RESearch.def"
-				ProgramDatabaseFile=".\Release/RESearch.pdb"
+				ProgramDatabaseFile="$(OutDir)\$(TargetName).pdb"
 				SubSystem="2"
 				OptimizeForWindows98="1"
-				ImportLibrary=".\Release/RESearch.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -981,7 +972,7 @@
 				PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="0"
-				StructMemberAlignment="2"
+				StructMemberAlignment="4"
 				EnableFunctionLevelLinking="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="2"
@@ -1012,10 +1003,9 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\RESearch.def"
-				ProgramDatabaseFile=".\Release/RESearch.pdb"
+				ProgramDatabaseFile="$(OutDir)\$(TargetName).pdb"
 				SubSystem="2"
 				OptimizeForWindows98="1"
-				ImportLibrary=".\Release/RESearch.lib"
 				TargetMachine="17"
 			/>
 			<Tool
@@ -2422,12 +2412,29 @@
 			</FileConfiguration>
 			<FileConfiguration
 				Name="Debug|x64"
+				ExcludedFromBuild="true"
 				>
 				<Tool
 					Name="VCCustomBuildTool"
 					Description="Compiling language file $(InputPath)..."
 					CommandLine="$(COMSPEC) /c ..\MakeLng.bat&#x0D;&#x0A;echo Copying resulting language files...&#x0D;&#x0A;copy *.lng &quot;$(FAR_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;"
 					Outputs="$(TargetName)Eng.lng;$(TargetName)Rus.lng"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release Intel|x64"
+				ExcludedFromBuild="true"
+				>
+				<Tool
+					Name="VCCustomBuildTool"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|x64"
+				ExcludedFromBuild="true"
+				>
+				<Tool
+					Name="VCCustomBuildTool"
 				/>
 			</FileConfiguration>
 			<FileConfiguration
@@ -2442,12 +2449,21 @@
 			</FileConfiguration>
 			<FileConfiguration
 				Name="Debug Unicode|x64"
+				ExcludedFromBuild="true"
 				>
 				<Tool
 					Name="VCCustomBuildTool"
 					Description="Compiling language file $(InputPath)..."
 					CommandLine="$(COMSPEC) /c ..\MakeLng.bat&#x0D;&#x0A;echo Copying resulting language files...&#x0D;&#x0A;copy *.lng &quot;$(FAR_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;"
 					Outputs="$(TargetName)Eng.lng;$(TargetName)Rus.lng"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release Unicode|x64"
+				ExcludedFromBuild="true"
+				>
+				<Tool
+					Name="VCCustomBuildTool"
 				/>
 			</FileConfiguration>
 		</File>

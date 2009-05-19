@@ -9,6 +9,19 @@ Planned:
 	! Performing all regular expression matches in UTF-8
 	* dialogprocs for disabling unneeded elements
 
+Version 6.40 (19.05.2009)
+	- 'Confirm each file' removed from 'Rename selected files'
+    - Symbol '|' escaped when using 'Quote special symbols' button
+    + Experimental x64 version
+
+Version 6.39 (06.04.2009)
+	- 'Cancel' in 'Rename selected files' prompt works correctly
+	- No 'No files found' message after cancelling search/replace/whatever
+
+Version 6.38 (20.01.2009)
+	- Esc from Show All results in editor restores previous position
+	- Correctly working with differing user and system locales
+
 Version 6.37 (03.12.2008)
 	* Hints.txt fixed concerning several-line search in panels
 	- File Masks are properly case-insensitive
