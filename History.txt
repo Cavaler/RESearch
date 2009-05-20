@@ -9,6 +9,10 @@ Planned:
 	! Performing all regular expression matches in UTF-8
 	* dialogprocs for disabling unneeded elements
 
+Version 6.41 (20.05.2009)
+	- Fixed replacing under Far2
+	+ Using PCRE 7.9
+
 Version 6.40 (19.05.2009)
 	- 'Confirm each file' removed from 'Rename selected files'
     - Symbol '|' escaped when using 'Quote special symbols' button
