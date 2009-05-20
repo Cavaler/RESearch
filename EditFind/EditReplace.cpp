@@ -31,6 +31,7 @@ void DoReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, const st
 	Position.CurLine = FirstLine;
 	EctlSetPosition(&Position);
 	EctlGetString(&GetString);
+	string strGetString = ToString(GetString);
 	string DefEOL = GetString.StringEOL;
 
 	// Creating full replace line
@@ -43,15 +44,15 @@ void DoReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, const st
 		NewString = string(GetString.StringText, StartPos) + Replace +
 			string(GetString.StringText + EndPos, GetString.StringLength-EndPos);
 	} else {
-		EditorGetString GetString2 = {-1};
+		GetString.StringNumber = -1;
 		Position.CurLine = LastLine;
 		EctlSetPosition(&Position);
-		EctlGetString(&GetString2);
+		EctlGetString(&GetString);
+		string strGetString2 = ToString(GetString);
 
-		OriginalEndLength = GetString2.StringLength-EndPos;
+		OriginalEndLength = GetString.StringLength-EndPos;
 
-		NewString = string(GetString.StringText, StartPos) + Replace +
-			string(GetString2.StringText + EndPos, GetString2.StringLength-EndPos);
+		NewString = strGetString.substr(0, StartPos) + Replace + strGetString2.substr(EndPos);
 
 		StartupInfo.EditorControl(ECTL_DELETESTRING, NULL);
 		Position.CurLine = FirstLine;

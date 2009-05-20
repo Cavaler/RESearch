@@ -118,6 +118,8 @@ void ECleanup(BOOL PatternOnly);
 extern "C" const unsigned char *far_maketables(struct CharTableSet *pTable);
 
 void EctlGetString(EditorGetString *String);
+string EctlGetString(int nLine);
+string ToString(EditorGetString &String);
 void EctlSetString(EditorSetString *String);
 void EctlSetPosition(EditorSetPosition *Position);
 void EctlForceSetPosition(EditorSetPosition *Position);

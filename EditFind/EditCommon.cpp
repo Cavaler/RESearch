@@ -525,6 +525,20 @@ void EctlGetString(EditorGetString *String) {
 	StartupInfo.EditorControl(ECTL_GETSTRING, String);
 }
 
+string EctlGetString(int nLine) {
+	if (nLine >= 0) {
+		EditorSetPosition Position = {nLine,-1,-1,-1,-1,-1};
+		EctlSetPosition(&Position);
+	}
+	EditorGetString String = {-1};
+	StartupInfo.EditorControl(ECTL_GETSTRING, &String);
+	return ToString(String);
+}
+
+string ToString(EditorGetString &String) {
+	return string(String.StringText, String.StringLength);
+}
+
 void EctlSetString(EditorSetString *String) {
 	StartupInfo.EditorControl(ECTL_SETSTRING, String);
 }
