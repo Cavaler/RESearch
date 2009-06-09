@@ -78,7 +78,7 @@ BOOL SearchInLine(const char *Line,int Length,int Start,int End,int *MatchStart,
 	if (ERegExp) {
 		return SearchIn(Line,Start,Len,MatchStart,MatchLength,NeedMatch);
 	} else {
-		if (EdInfo.AnsiMode || (EdInfo.TableNum >= 0)) {
+		if (EdInfo.AnsiMode || (EdInfo.TableNum != -1)) {
 			char *OEMLine=(char *)malloc(Length);
 			memmove(OEMLine,Line,Length);
 			EditorToOEM(OEMLine,Length);
@@ -339,7 +339,7 @@ BOOL EPreparePattern(string &SearchText) {
 
 		RefreshEditorInfo();
 
-		if (EdInfo.TableNum >= 0) {
+		if (EdInfo.TableNum != -1) {
 			CharTableSet TableSet;
 			StartupInfo.CharTable(EdInfo.TableNum, (char *)&TableSet, sizeof(TableSet));
 			setlocale(LC_ALL, FormatStr(".%d", GetOEMCP()).c_str());

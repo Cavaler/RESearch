@@ -340,7 +340,7 @@ BOOL EditorReplaceAgain() {
 	PatchEditorInfo(EdInfo);
 	EctlForceSetPosition(NULL);
 	m_pReplaceTable = (EdInfo.AnsiMode) ? &XLatTables[XLatTables.size()-1] :
-		(EdInfo.TableNum >= 0) ? &XLatTables[EdInfo.TableNum] : NULL;
+		(EdInfo.TableNum != -1) ? &XLatTables[EdInfo.TableNum] : NULL;
 
 	LastReplaceLine = EdInfo.CurLine;
 	LastReplacePos = EdInfo.CurPos;
