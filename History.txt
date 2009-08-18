@@ -9,6 +9,15 @@ Planned:
 	! Performing all regular expression matches in UTF-8
 	* dialogprocs for disabling unneeded elements
 
+Version 6.43 (18.08.2009)
+	- Files unmodified by File Replace operation retain old access times etc
+	- Fixed problems with custom codepages in editor
+	- Changing codepage and doing Search Again gives correct result
+
+Version 6.42 (09.06.2009)
+	- Search/Replace in non-OEM files under newer builds of Far2 fixed
+	- pcrepattern.html updated for pcre 7.9
+
 Version 6.41 (20.05.2009)
 	- Fixed replacing under Far2
 	+ Using PCRE 7.9
