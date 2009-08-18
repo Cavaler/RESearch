@@ -39,7 +39,7 @@ int FARIsUpper(struct CharTableSet *pTable, int c) {
 
 const unsigned char *far_maketables(struct CharTableSet *pTable) {
 unsigned char *yield, *p;
-int i;
+int i,j;
 
 yield = (unsigned char*)(pcre_malloc)(tables_length);
 
@@ -61,8 +61,9 @@ default locale. This makes it work for the POSIX class [:space:]. */
 
 memset(p, 0, cbit_length);
 for (i = 0; i < 256; i++)
-  {
-  if (isdigit(i))
+{
+  j = pTable->DecodeTable[i];
+  if (isdigit(j))
     {
     p[cbit_digit  + i/8] |= 1 << (i&7);
     p[cbit_word   + i/8] |= 1 << (i&7);
@@ -78,12 +79,12 @@ for (i = 0; i < 256; i++)
     p[cbit_word   + i/8] |= 1 << (i&7);
     }
   if (i == '_')   p[cbit_word   + i/8] |= 1 << (i&7);
-  if (isspace(i)) p[cbit_space  + i/8] |= 1 << (i&7);
-  if (isxdigit(i))p[cbit_xdigit + i/8] |= 1 << (i&7);
-  if (isgraph(i)) p[cbit_graph  + i/8] |= 1 << (i&7);
-  if (isprint(i)) p[cbit_print  + i/8] |= 1 << (i&7);
-  if (ispunct(i)) p[cbit_punct  + i/8] |= 1 << (i&7);
-  if (iscntrl(i)) p[cbit_cntrl  + i/8] |= 1 << (i&7);
+  if (isspace(j)) p[cbit_space  + i/8] |= 1 << (i&7);
+  if (isxdigit(j))p[cbit_xdigit + i/8] |= 1 << (i&7);
+  if (isgraph(j)) p[cbit_graph  + i/8] |= 1 << (i&7);
+  if (isprint(j)) p[cbit_print  + i/8] |= 1 << (i&7);
+  if (ispunct(j)) p[cbit_punct  + i/8] |= 1 << (i&7);
+  if (iscntrl(j)) p[cbit_cntrl  + i/8] |= 1 << (i&7);
   }
 p += cbit_length;
 
@@ -92,13 +93,14 @@ space chars, because Perl doesn't recognize it as such for \s and for comments
 within regexes. */
 
 for (i = 0; i < 256; i++)
-  {
+{
   int x = 0;
-  if (i != 0x0b && isspace(i)) x += ctype_space;
+  j = pTable->DecodeTable[i];
+  if (i != 0x0b && isspace(j)) x += ctype_space;
   if (isalpha(i)) x += ctype_letter;
-  if (isdigit(i)) x += ctype_digit;
-  if (isxdigit(i)) x += ctype_xdigit;
-  if (isalnum(i) || i == '_') x += ctype_word;
+  if (isdigit(j)) x += ctype_digit;
+  if (isxdigit(j)) x += ctype_xdigit;
+  if (isalpha(i) || isdigit(j) || i == '_') x += ctype_word;
 
   /* Note: strchr includes the terminating zero in the characters it considers.
   In this instance, that is ok because we want binary zero to be flagged as a

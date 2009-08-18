@@ -342,7 +342,7 @@ BOOL EPreparePattern(string &SearchText) {
 		if (EdInfo.TableNum != -1) {
 			CharTableSet TableSet;
 			StartupInfo.CharTable(EdInfo.TableNum, (char *)&TableSet, sizeof(TableSet));
-			setlocale(LC_ALL, FormatStr(".%d", GetOEMCP()).c_str());
+			setlocale(LC_ALL, FormatStr(".%d", GetOEMCP()).c_str());	// We use DecodeTable for isspace() etc
 			ECharacterTables = far_maketables(&TableSet);
 		} else if (EdInfo.AnsiMode) {
 			setlocale(LC_ALL, FormatStr(".%d", GetACP()).c_str());
