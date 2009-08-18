@@ -44,7 +44,7 @@ BOOL WriteBuffer(HANDLE hFile,const void *Buffer,DWORD BufLen,const char *FileNa
 	} else return TRUE;
 }
 
-BOOL DoReplace(HANDLE &hFile,const char *&Found,int FoundLen,const char *Replace,int ReplaceLength,const char *&Skip,int SkipLen,WIN32_FIND_DATA *FindData) {
+BOOL DoReplace(HANDLE &hFile,const char *&Found,int FoundLen,const char *Replace,int ReplaceLength,const char *&Skip,int SkipLen,WIN32_FIND_DATA *FindData,int &Count) {
 	if (hFile==INVALID_HANDLE_VALUE) {
 		if (!ConfirmFile(MREReplace,FindData->cFileName)) return FALSE;
 		if (FindData->dwFileAttributes&FILE_ATTRIBUTE_READONLY) {
@@ -67,6 +67,7 @@ BOOL DoReplace(HANDLE &hFile,const char *&Found,int FoundLen,const char *Replace
 
 	if (ConfirmReplacement(szFound,Replace,FindData->cFileName)) {
 		if (!WriteBuffer(hFile,Replace,ReplaceLength,FindData->cFileName)) return FALSE;
+		Count++;
 	} else {
 		if (!WriteBuffer(hFile,Found,FoundLen,FindData->cFileName)) return FALSE;
 	}
@@ -74,8 +75,13 @@ BOOL DoReplace(HANDLE &hFile,const char *&Found,int FoundLen,const char *Replace
 	return TRUE;
 }
 
-BOOL FinishReplace(HANDLE hFile,const char *&Skip,int SkipLen,WIN32_FIND_DATA *FindData) {
+BOOL FinishReplace(HANDLE hFile,const char *&Skip,int SkipLen,WIN32_FIND_DATA *FindData,int Count) {
 	if (hFile!=INVALID_HANDLE_VALUE) {
+		if (Count == 0) {
+			CloseHandle(hFile);
+			return FALSE;
+		}
+
 		WriteBuffer(hFile,Skip,SkipLen,FindData->cFileName);
 		CloseHandle(hFile);
 		if (FindData->dwFileAttributes&FILE_ATTRIBUTE_READONLY)
@@ -88,6 +94,7 @@ BOOL ProcessPlainTextBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindD
 	const char *Current=Buffer;
 	const char *Skip=Buffer;
 	HANDLE hFile=INVALID_HANDLE_VALUE;
+	int Count = 0;
 
 	char *Table=(FCaseSensitive) ? NULL : UpCaseTable;
 
@@ -97,10 +104,10 @@ BOOL ProcessPlainTextBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindD
 		Current += nPosition;
 
 		string Replace=CreateReplaceString(Buffer,NULL,0,FRReplace.c_str(),"\n",NULL,-1);
-		if (!DoReplace(hFile,Current,FText.size(),Replace.c_str(),Replace.length(),Skip,Current-Skip,FindData)) break;
+		if (!DoReplace(hFile,Current,FText.size(),Replace.c_str(),Replace.length(),Skip,Current-Skip,FindData,Count)) break;
 	}
 
-	return FinishReplace(hFile,Skip,Buffer+BufLen-Skip,FindData);
+	return FinishReplace(hFile,Skip,Buffer+BufLen-Skip,FindData,Count);
 }
 
 BOOL ProcessRegExpBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindData) {
@@ -110,6 +117,7 @@ BOOL ProcessRegExpBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindData
 	int MatchCount=pcre_info(FPattern,NULL,NULL)+1;
 	int *Match=new int[MatchCount*3];
 	BOOL Error=FALSE;
+	int Count = 0;
 
 	do {
 		int Start=0;
@@ -118,7 +126,7 @@ BOOL ProcessRegExpBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindData
 		while ((BufEnd!=Buffer)&&do_pcre_exec(FPattern,FPatternExtra,Buffer,BufEnd-Buffer,Start,0,Match,MatchCount*3)>=0) {
 			string Replace=CreateReplaceString(Buffer,Match,MatchCount,FRReplace.c_str(),"\n",NULL,-1);
 			const char *NewBuffer=Buffer+Match[0];
-			if (!DoReplace(hFile,NewBuffer,Match[1]-Match[0],Replace.c_str(),Replace.length(),Skip,NewBuffer-Skip,FindData)) {
+			if (!DoReplace(hFile,NewBuffer,Match[1]-Match[0],Replace.c_str(),Replace.length(),Skip,NewBuffer-Skip,FindData,Count)) {
 				Error=TRUE;break;
 			}
 			Start=NewBuffer-Buffer;
@@ -129,7 +137,7 @@ BOOL ProcessRegExpBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindData
 	} while (BufLen&&(!Error));
 
 	delete[] Match;
-	return FinishReplace(hFile,Skip,BufEnd-Skip,FindData);
+	return FinishReplace(hFile,Skip,BufEnd-Skip,FindData,Count);
 }
 
 int CountLinesIn(const char *Buffer,int Len) {
@@ -141,17 +149,18 @@ int CountLinesIn(const char *Buffer,int Len) {
 }
 
 BOOL ReplaceSeveralLineBuffer(HANDLE &hFile,const char *&Buffer,const char *BufEnd,int *Match,int MatchCount,
-							  const char *&Skip, int &LinesIn,WIN32_FIND_DATA *FindData) {
+							  const char *&Skip, int &LinesIn,WIN32_FIND_DATA *FindData, int &Count) {
 	int Start=0;
 	const char *LineEnd=Buffer;
 	int LineLen=BufEnd-Buffer;
+
 	SkipWholeLine(LineEnd,&LineLen);
 
 	while ((Buffer < BufEnd) && do_pcre_exec(FPattern,FPatternExtra,Buffer,BufEnd-Buffer,Start,0,Match,MatchCount*3)>=0) {
 		const char *NewBuffer=Buffer+Match[0];
 		if (NewBuffer>=LineEnd) break;
 		string Replace=CreateReplaceString(Buffer,Match,MatchCount,FRReplace.c_str(),"\n",NULL,-1);
-		if (!DoReplace(hFile,NewBuffer,Match[1]-Match[0],Replace.c_str(),Replace.length(),Skip,NewBuffer-Skip,FindData)) {
+		if (!DoReplace(hFile,NewBuffer,Match[1]-Match[0],Replace.c_str(),Replace.length(),Skip,NewBuffer-Skip,FindData,Count)) {
 			return FALSE;
 		}
 //		Start=NewBuffer-Buffer;
@@ -176,20 +185,22 @@ BOOL ProcessSeveralLineBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *Fin
 	int MatchCount=pcre_info(FPattern,NULL,NULL)+1;
 	int *Match=new int[MatchCount*3];
 	BOOL Error=FALSE;
+	int Count = 0;
 
 	do {
 		SkipWholeLine(BufEnd,&BufLen);
 		LinesIn++;
 		if ((LinesIn==SeveralLines) || ((BufEnd-Buffer) >= SeveralLinesKB*1024)) {
-			if (!ReplaceSeveralLineBuffer(hFile,Buffer,BufEnd,Match,MatchCount,Skip,LinesIn,FindData)) {Error=TRUE;break;};
+			if (!ReplaceSeveralLineBuffer(hFile,Buffer,BufEnd,Match,MatchCount,Skip,LinesIn,FindData,Count)) {Error=TRUE;break;};
 		}
 	} while (BufLen);
 
 	while (Buffer<BufEnd) {
-		if (!ReplaceSeveralLineBuffer(hFile,Buffer,BufEnd,Match,MatchCount,Skip,LinesIn,FindData)) {Error=TRUE;break;};
+		if (!ReplaceSeveralLineBuffer(hFile,Buffer,BufEnd,Match,MatchCount,Skip,LinesIn,FindData,Count)) {Error=TRUE;break;};
 	}
+
 	delete[] Match;
-	return FinishReplace(hFile,Skip,BufEnd-Skip,FindData);
+	return FinishReplace(hFile,Skip,BufEnd-Skip,FindData,Count);
 }
 
 BOOL ProcessBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindData) {
@@ -256,6 +267,7 @@ void ReplaceFile(WIN32_FIND_DATA *FindData, PluginPanelItem **PanelItems, int *I
 			AddFile(FindData,PanelItems,ItemsNumber);
 		} else {
 			mapFile.Close();
+			DeleteFile(FindData->cFileName);
 			MoveFile(strBackupFileName.c_str(),FindData->cFileName);
 		}
 	} else {
