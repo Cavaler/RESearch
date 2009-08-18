@@ -501,7 +501,7 @@ HANDLE OpenPluginFromEditorMenu(int Item) {
 			//	fall-through
 		case 5:
 			ESearchAgainCalled = TRUE;
-			if (!ERegExp) EPreparePattern(EText);	// Not needed for RegExp
+			EPreparePattern(EText);		// In case codepage changed etc
 
 			switch (LastAction) {
 			case -1:
