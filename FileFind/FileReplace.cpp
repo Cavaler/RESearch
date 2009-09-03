@@ -277,6 +277,14 @@ void ReplaceFile(WIN32_FIND_DATA *FindData, PluginPanelItem **PanelItems, int *I
 	}
 }
 
+bool PrepareFileReplacePattern() {
+	if (!FPreparePattern(false)) return false;
+	if (FAdvanced) {
+		if (!CompileAdvancedSettings()) return false;
+	}
+	return true;
+}
+
 int ReplacePrompt(BOOL Plugin) {
 	CFarDialog Dialog(76,24,"FileReplaceDlg");
 	Dialog.AddFrame(MREReplace);
@@ -354,7 +362,7 @@ int ReplacePrompt(BOOL Plugin) {
 		case -1:
 			return FALSE;
 		}
-	} while ((ExitCode>=1)||!FPreparePattern(false));
+	} while ((ExitCode>=1) || !PrepareFileReplacePattern());
 
 	if (FUTF8) FAllCharTables=FALSE;
 	return TRUE;
@@ -369,7 +377,7 @@ OperationResult FileReplace(PluginPanelItem **PanelItems,int *ItemsNumber,BOOL S
 	if (ShowDialog) {
 		if (!ReplacePrompt(PInfo.Plugin)) return OR_CANCEL;
 	} else {
-		if (!FPreparePattern(false)) return OR_CANCEL;
+		if (!PrepareFileReplacePattern()) return OR_CANCEL;
 	}
 
 	FRConfirmFileThisRun=FRConfirmFile;

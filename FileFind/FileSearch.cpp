@@ -312,6 +312,14 @@ void SearchFile(WIN32_FIND_DATA *FindData,PluginPanelItem **PanelItems,int *Item
 	if ((IsFound)?!FSInverse:FSInverse) AddFile(FindData,PanelItems,ItemsNumber);
 }
 
+bool PrepareFileSearchPattern() {
+	if (!FPreparePattern(true)) return false;
+	if (FAdvanced) {
+		if (!CompileAdvancedSettings()) return false;
+	}
+	return true;
+}
+
 int SearchPrompt(BOOL Plugin) {
 	CFarDialog Dialog(76,24,"FileSearchDlg");
 	Dialog.AddFrame(MRESearch);
@@ -378,7 +386,7 @@ int SearchPrompt(BOOL Plugin) {
 		case -1:
 			return FALSE;
 		}
-	} while ((ExitCode>=1)||!FPreparePattern(true));
+	} while ((ExitCode>=1) || !PrepareFileSearchPattern());
 	if (FUTF8) FAllCharTables=FALSE;
 	return TRUE;
 }
@@ -393,7 +401,7 @@ OperationResult FileFind(PluginPanelItem **PanelItems,int *ItemsNumber,BOOL Show
 		if (!SearchPrompt(PInfo.Plugin)) return OR_CANCEL;
 	} else {
 		if (FUTF8) FAllCharTables=FALSE;
-		if (!FPreparePattern(true)) return OR_CANCEL;
+		if (!PrepareFileSearchPattern()) return OR_CANCEL;
 	}
 
 	if (ScanDirectories(PanelItems,ItemsNumber,SearchFile)) {

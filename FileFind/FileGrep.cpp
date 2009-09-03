@@ -129,6 +129,14 @@ void GrepFile(WIN32_FIND_DATA *FindData,PluginPanelItem **PanelItems,int *ItemsN
 	}
 }
 
+bool PrepareFileGrepPattern() {
+	if (!FPreparePattern(true)) return false;
+	if (FAdvanced) {
+		if (!CompileAdvancedSettings()) return false;
+	}
+	return true;
+}
+
 bool GrepPrompt(BOOL bPlugin) {
 	BOOL AsRegExp = (FSearchAs == SA_REGEXP) || (FSearchAs == SA_SEVERALLINE) || (FSearchAs == SA_MULTILINE) || (FSearchAs == SA_MULTIREGEXP);
 
@@ -202,7 +210,7 @@ bool GrepPrompt(BOOL bPlugin) {
 		case -1:
 			return false;
 		}
-	} while ((ExitCode>=1) || !FPreparePattern(true) || (!FGOutputToFile && !FGOpenInEditor));
+	} while ((ExitCode>=1) || !PrepareFileGrepPattern() || (!FGOutputToFile && !FGOpenInEditor));
 
 	if (FUTF8) FAllCharTables=FALSE;
 	return true;
@@ -217,7 +225,7 @@ OperationResult FileGrep(BOOL ShowDialog) {
 	if (ShowDialog) {
 		if (!GrepPrompt(PInfo.Plugin)) return OR_CANCEL;
 	} else {
-		if (!FPreparePattern(true)) return OR_CANCEL;
+		if (!PrepareFileGrepPattern()) return OR_CANCEL;
 	}
 
 	string strFileName;
