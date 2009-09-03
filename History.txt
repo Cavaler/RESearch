@@ -9,6 +9,16 @@ Planned:
 	! Performing all regular expression matches in UTF-8
 	* dialogprocs for disabling unneeded elements
 
+	
+	- Slow Show All with Several Lines
+	- Launch editor for Replace script
+	
+
+Version 6.44 (03.09.2009)
+	- Fixed compiling "Recurse if full directory matches" in Advanced settings
+	* Hotkey '.' for "Several lines  [...]" button
+	- Cannot start file search when regexp in Addanced settings did not compile
+
 Version 6.43 (18.08.2009)
 	- Files unmodified by File Replace operation retain old access times etc
 	- Fixed problems with custom codepages in editor
