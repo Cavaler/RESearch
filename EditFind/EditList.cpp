@@ -41,12 +41,15 @@ BOOL EditorListAllAgain() {
 			Info.arrString.push_back(str);
 			Info.arrLines.push_back(pair<int, int>(FirstLine, StartPos));
 			CurrentLine = FirstLine;
+		} else {
+			CurrentLine = LastLine;
 		}
 	}
 
 	if (!g_bInterrupted && (Info.arrLines.size() == 0)) {
 		const char *Lines[]={GetMsg(MRESearch),GetMsg(MCannotFind),EText.c_str(),GetMsg(MOk)};
 		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"ECannotFind",Lines,4,1);
+		RestorePosition(_Info);
 		return TRUE;
 	}
 
