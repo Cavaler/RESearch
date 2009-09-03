@@ -402,7 +402,7 @@ BOOL EditorReplace() {
 
 	Dialog.Add(new CFarCheckBoxItem(5, 7, 0, MRegExp, &ERegExp));
 	Dialog.Add(new CFarCheckBoxItem(30, 7, 0, MSeveralLine, &ESeveralLine));
-	Dialog.Add(new CFarButtonItem(48, 7, 0, 0,"..."));
+	Dialog.Add(new CFarButtonItem(48, 7, 0, 0,"&..."));
 
 	Dialog.Add(new CFarCheckBoxItem(5, 8, 0, MCaseSensitive, &ECaseSensitive));
 	Dialog.Add(new CFarCheckBoxItem(30, 8, 0,"", &EUTF8));

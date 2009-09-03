@@ -148,7 +148,7 @@ BOOL EditorSearch() {
 	Dialog.Add(new CFarTextItem(5,4,DIF_BOXCOLOR|DIF_SEPARATOR,""));
 	Dialog.Add(new CFarCheckBoxItem(5,5,0,MRegExp,&ERegExp));
 	Dialog.Add(new CFarCheckBoxItem(30,5,0,MSeveralLine,&ESeveralLine));
-	Dialog.Add(new CFarButtonItem(48,5,0,0,"..."));
+	Dialog.Add(new CFarButtonItem(48,5,0,0,"&..."));
 
 	Dialog.Add(new CFarCheckBoxItem(5,6,0,MCaseSensitive,&ECaseSensitive));
 	Dialog.Add(new CFarCheckBoxItem(30,6,0,"",&EUTF8));
