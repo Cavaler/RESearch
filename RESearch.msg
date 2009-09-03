@@ -241,3 +241,5 @@ MBatchCommands		"Batch commands"					"Команды пакета"
 
 MDeleteBatchQuery	"Are you sure to delete batch"		"Вы хотите удалить пакет"
 MExecuteBatchQuery	"Are you sure to execute batch"		"Вы хотите выполнить пакет"
+
+MRegExpError		"Error in regular expression"		"Ошибка в регулярном выражении"

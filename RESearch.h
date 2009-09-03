@@ -276,6 +276,8 @@ enum eStringTable {
 
 	MDeleteBatchQuery,
 	MExecuteBatchQuery,
+
+	MRegExpError,
 };
 
 HKEY OpenRegistry(const char *szSubKey=NULL, bool bCreate=true);

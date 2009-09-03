@@ -87,7 +87,7 @@ BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,
 	*Pattern=pcre_compile(Text.c_str(),iFlags,&ErrPtr,&ErrOffset,pTables);
 	if (!(*Pattern)) {
 		string ErrPos(Text.length(),' ');
-		const char *Lines[]={"RegExp error",(char *)ErrPtr,"\x01",Text.c_str(),ErrPos.c_str(),GetMsg(MOk)};
+		const char *Lines[]={GetMsg(MRegExpError),(char *)ErrPtr,"\x01",Text.c_str(),ErrPos.c_str(),GetMsg(MOk)};
 		ErrPos[ErrOffset]='^';
 		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"RegExpError",Lines,6,1);
 		return FALSE;
