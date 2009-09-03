@@ -741,7 +741,7 @@ BOOL CompileAdvancedSettings() {
 	}
 
 	if (FADirectoryMatch) {
-		if (PreparePattern(&FADirectoryPattern,&FADirectoryPatternExtra,FADirectoryName,FADirectoryCaseSensitive)) return FALSE;
+		if (!PreparePattern(&FADirectoryPattern,&FADirectoryPatternExtra,FADirectoryName,FADirectoryCaseSensitive)) return FALSE;
 	}
 
 	return TRUE;
