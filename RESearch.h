@@ -223,6 +223,7 @@ enum eStringTable {
 	MRemoveEmpty,
 	MRemoveNoMatch,
 	MEvaluateAsScript,
+	MRunEditor,
 	MCannotFind,
 	MErrorCreatingEngine,
 	MErrorParsingText,
@@ -318,6 +319,8 @@ int do_pcre_exec(const pcre *external_re, const pcre_extra *extra_data,
 
 bool do_pcre_exec(CRegExp &reObject, const char *subject, int length, int start_offset, int options,
 				  int *offsets, int offsetcount);
+
+void RunExternalEditor(string &strText);
 
 inline bool Interrupted256(int nValue) {
 	return (((nValue & 0xFF) == 0) && Interrupted());

@@ -594,3 +594,21 @@ BOOL LocalToSystemTime(FILETIME &ft) {
 	}
 	return TRUE;
 }
+
+void RunExternalEditor(string &strText) {
+	char szBuffer[MAX_PATH], szName[MAX_PATH];
+	GetTempPath(MAX_PATH, szBuffer);
+	GetTempFileName(szBuffer, "re", 0, szName);
+
+	CFileMapping mapFile;
+	mapFile.Open(szName, true, strText.length());
+	memmove((BYTE *)mapFile, strText.data(), strText.length());
+	mapFile.Close();
+
+	StartupInfo.Editor(szName, NULL, 0, 0, -1, -1, EF_DISABLEHISTORY, 0, 1);
+
+	mapFile.Open(szName);
+	strText = string(mapFile, mapFile.Size());
+	mapFile.Close();
+	DeleteFile(szName);
+}

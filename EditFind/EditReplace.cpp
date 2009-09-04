@@ -412,7 +412,8 @@ BOOL EditorReplace() {
 	Dialog.Add(new CFarCheckBoxItem(5, 10, 0, MRemoveEmpty, &ERRemoveEmpty));
 	Dialog.Add(new CFarCheckBoxItem(30, 10, 0, MRemoveNoMatch, &ERRemoveNoMatch));
 	Dialog.Add(new CFarCheckBoxItem(5, 11, 0, MEvaluateAsScript, &EREvaluate));
-	Dialog.Add(new CFarComboBoxItem(30, 11, 60, 0, new CFarListData(m_lstEngines, false), EREvaluateScript));
+	Dialog.Add(new CFarComboBoxItem(30, 11, 55, 0, new CFarListData(m_lstEngines, false), EREvaluateScript));
+	Dialog.Add(new CFarButtonItem(60, 11, 0, FALSE, MRunEditor));
 
 	Dialog.Add(new CFarButtonItem(0, 13, DIF_CENTERGROUP, TRUE, MReplace));
 	Dialog.Add(new CFarButtonItem(0, 13, DIF_CENTERGROUP, FALSE, MAll));
@@ -425,7 +426,7 @@ BOOL EditorReplace() {
 
 	int ExitCode;
 	do {
-		switch (ExitCode = Dialog.Display(8,-4,-3, 5, 6, 10, -1, 13)) {
+		switch (ExitCode = Dialog.Display(8,-4,-3, 5, 6, 10, -1, 13, -5)) {
 		case 0:
 		case 1:
 			break;
@@ -443,6 +444,9 @@ BOOL EditorReplace() {
 			break;
 		case 6:
 			UTF8Converter(SearchText);
+			break;
+		case 7:
+			RunExternalEditor(ReplaceText);
 			break;
 		case -1:
 			return FALSE;
@@ -493,12 +497,14 @@ BOOL CERPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.Add(new CFarCheckBoxItem(5, 11, 0, MRemoveEmpty, &pPreset->m_mapInts["RemoveEmpty"]));
 	Dialog.Add(new CFarCheckBoxItem(30, 11, 0, MRemoveNoMatch, &pPreset->m_mapInts["RemoveNoMatch"]));
 	Dialog.Add(new CFarCheckBoxItem(5, 12, 0, MEvaluateAsScript, &pPreset->m_mapInts["AsScript"]));
-	Dialog.Add(new CFarComboBoxItem(30, 12, 60, 0, new CFarListData(m_lstEngines, false), &pPreset->m_mapInts["Script"]));
+	Dialog.Add(new CFarComboBoxItem(30, 12, 55, 0, new CFarListData(m_lstEngines, false), &pPreset->m_mapInts["Script"]));
+	Dialog.Add(new CFarButtonItem(60, 12, 0, FALSE, MRunEditor));
+
 	Dialog.Add(new CFarCheckBoxItem(5, 14, 0, MAddToMenu, &pPreset->m_bAddToMenu));
 	Dialog.AddButtons(MOk, MCancel);
 
 	do {
-		switch (Dialog.Display(2, -2, -8)) {
+		switch (Dialog.Display(3, -2, -9, -4)) {
 		case 0:
 			return TRUE;
 		case 1:{		// avoid Internal Error for icl
@@ -506,6 +512,10 @@ BOOL CERPresetCollection::EditPreset(CPreset *pPreset) {
 			UTF8Converter(str);
 			break;
 			  }
+		case 2:
+			RunExternalEditor(pPreset->m_mapStrings["Replace"]);
+			break;
+
 		default:
 			return FALSE;
 		}
