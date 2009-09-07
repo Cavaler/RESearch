@@ -265,14 +265,14 @@ string EvaluateReplaceString(const char *Matched,int *Match,int Count,const char
 	EXCEPINFO ExcepInfo;
 	HRESULT hResult;
 
-	if (Interrupted()) return NULL;
+	if (Interrupted()) return "";
 
 	IActiveScriptPtr spEngine;
 	hResult = spEngine.CreateInstance(m_arrEngines[Engine].m_clsid);
 	if (FAILED(hResult)) {
 		ShowHResultError(MErrorCreatingEngine, hResult);
 		g_bInterrupted = TRUE;
-		return NULL;
+		return "";
 	}
 
 	CReplaceParameters *pParams = new CReplaceParameters(Matched, Match, Count, EOL, Numbers);
@@ -281,13 +281,27 @@ string EvaluateReplaceString(const char *Matched,int *Match,int Count,const char
 	pSite->AddRef();
 	spEngine->SetScriptSite(pSite);
 
+	_bstr_t bstrText;
+	if ((strlen(Replace) > 3) && (Replace[1] == ':') && (Replace[2] == '\\')) {
+		CFileMapping mapScript;
+		if (!mapScript.Open(Replace)) {
+			const char *Lines[]={GetMsg(MREReplace),GetMsg(MFileOpenError),Replace,GetMsg(MOk)};
+			StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"FSOpenError",Lines,4,1);
+			g_bInterrupted = TRUE;
+			return "";
+		}
+		bstrText = string(mapScript, mapScript.Size()).c_str();
+	} else {
+		bstrText = Replace;
+	}
+
 	IActiveScriptParsePtr spParser = spEngine;
 	spParser->InitNew();
-	hResult = spParser->ParseScriptText(_bstr_t(Replace), NULL, NULL, NULL, 0, 0, 0, NULL, &ExcepInfo);
+	hResult = spParser->ParseScriptText(bstrText, NULL, NULL, NULL, 0, 0, 0, NULL, &ExcepInfo);
 	if (FAILED(hResult)) {
 		ShowHResultError(MErrorParsingText, hResult);
 		g_bInterrupted = TRUE;
-		return NULL;
+		return "";
 	}
 
 	spEngine->AddNamedItem(L"research", SCRIPTITEM_ISVISIBLE|SCRIPTITEM_NOCODE|SCRIPTITEM_GLOBALMEMBERS);
