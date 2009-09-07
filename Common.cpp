@@ -596,19 +596,23 @@ BOOL LocalToSystemTime(FILETIME &ft) {
 }
 
 void RunExternalEditor(string &strText) {
-	char szBuffer[MAX_PATH], szName[MAX_PATH];
-	GetTempPath(MAX_PATH, szBuffer);
-	GetTempFileName(szBuffer, "re", 0, szName);
+	if ((strText.length() > 3) && (strText[1] == ':') && (strText[2] == '\\')) {
+		StartupInfo.Editor(strText.c_str(), NULL, 0, 0, -1, -1, 0, 0, 1);
+	} else {
+		char szBuffer[MAX_PATH], szName[MAX_PATH];
+		GetTempPath(MAX_PATH, szBuffer);
+		GetTempFileName(szBuffer, "re", 0, szName);
 
-	CFileMapping mapFile;
-	mapFile.Open(szName, true, strText.length());
-	memmove((BYTE *)mapFile, strText.data(), strText.length());
-	mapFile.Close();
+		CFileMapping mapFile;
+		mapFile.Open(szName, true, strText.length());
+		memmove((BYTE *)mapFile, strText.data(), strText.length());
+		mapFile.Close();
 
-	StartupInfo.Editor(szName, NULL, 0, 0, -1, -1, EF_DISABLEHISTORY, 0, 1);
+		StartupInfo.Editor(szName, NULL, 0, 0, -1, -1, EF_DISABLEHISTORY, 0, 1);
 
-	mapFile.Open(szName);
-	strText = string(mapFile, mapFile.Size());
-	mapFile.Close();
-	DeleteFile(szName);
+		mapFile.Open(szName);
+		strText = string(mapFile, mapFile.Size());
+		mapFile.Close();
+		DeleteFile(szName);
+	}
 }
