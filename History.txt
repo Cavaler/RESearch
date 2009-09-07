@@ -9,10 +9,12 @@ Planned:
 	! Performing all regular expression matches in UTF-8
 	* dialogprocs for disabling unneeded elements
 
-	
-	- Slow Show All with Several Lines
 	- Launch editor for Replace script
-	
+
+Version 6.45 (07.09.2009)
+	- 'Show all' with '[X] Several Lines' made much faster when there is not much to be found
+	+ 'Editor' button in Edit Replace opens Replace text in another editor, useful for scripts
+	* Can read script from external file, just put full file name into Replace field
 
 Version 6.44 (03.09.2009)
 	- Fixed compiling "Recurse if full directory matches" in Advanced settings
