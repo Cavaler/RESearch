@@ -203,12 +203,14 @@ enum eStringTable {
 	MTop,
 	MCenter,
 	MBottom,
+	MKeepLineIfVisible,
 	MRightSideOffset,
 	MFindTextAtCursor,
 	MNone,
 	MWordOnly,
 	MAnyText,
 	MFindSelection,
+	MAutoFindInSelection,
 
 	MInvalidNumber,
 

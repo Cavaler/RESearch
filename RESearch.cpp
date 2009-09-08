@@ -695,7 +695,7 @@ void ConfigureFile() {
 }
 
 void ConfigureEditor() {
-	CFarDialog Dialog(60,20,"EditorConfig");
+	CFarDialog Dialog(60,22,"EditorConfig");
 	Dialog.AddFrame(MEditorSearchSettings);
 
 	Dialog.Add(new CFarTextItem(5,3,0,MShowPositionOffset));
@@ -705,16 +705,18 @@ void ConfigureEditor() {
 	Dialog.Add(new CFarRadioButtonItem(10,4,DIF_GROUP,MTop,(int *)&EShowPosition,SP_TOP));
 	Dialog.Add(new CFarRadioButtonItem(10,5,0,MCenter,(int *)&EShowPosition,SP_CENTER));
 	Dialog.Add(new CFarRadioButtonItem(10,6,0,MBottom,(int *)&EShowPosition,SP_BOTTOM));
+	Dialog.Add(new CFarCheckBoxItem(5,7,0,MKeepLineIfVisible,&EKeepLineIfVisible));
 
-	Dialog.Add(new CFarTextItem(5,8,0,MRightSideOffset));
-	Dialog.Add(new CFarEditItem(32,8,39,0,NULL,(int &)ERightSideOffset,new CFarIntegerRangeValidator(0,1024)));
+	Dialog.Add(new CFarTextItem(5,9,0,MRightSideOffset));
+	Dialog.Add(new CFarEditItem(32,9,39,0,NULL,(int &)ERightSideOffset,new CFarIntegerRangeValidator(0,1024)));
 
-	Dialog.Add(new CFarTextItem(5,10,0,MFindTextAtCursor));
-	Dialog.Add(new CFarRadioButtonItem(7,11,DIF_GROUP,MNone,(int *)&EFindTextAtCursor,FT_NONE));
-	Dialog.Add(new CFarRadioButtonItem(7,12,0,MWordOnly,(int *)&EFindTextAtCursor,FT_WORD));
-	Dialog.Add(new CFarRadioButtonItem(7,13,0,MAnyText,(int *)&EFindTextAtCursor,FT_ANY));
+	Dialog.Add(new CFarTextItem(5,11,0,MFindTextAtCursor));
+	Dialog.Add(new CFarRadioButtonItem(7,12,DIF_GROUP,MNone,(int *)&EFindTextAtCursor,FT_NONE));
+	Dialog.Add(new CFarRadioButtonItem(7,13,0,MWordOnly,(int *)&EFindTextAtCursor,FT_WORD));
+	Dialog.Add(new CFarRadioButtonItem(7,14,0,MAnyText,(int *)&EFindTextAtCursor,FT_ANY));
 
-	Dialog.Add(new CFarCheckBoxItem(7,14,0,MFindSelection,&EFindSelection));
+	Dialog.Add(new CFarCheckBoxItem(7,15,0,MFindSelection,&EFindSelection));
+	Dialog.Add(new CFarCheckBoxItem(5,16,0,MAutoFindInSelection,&EAutoFindInSelection));
 
 	Dialog.AddButtons(MOk,MCancel);
 	Dialog.Display(-1);

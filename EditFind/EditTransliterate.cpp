@@ -3,7 +3,7 @@
 
 BOOL EditorTransliterateAgain() {
 	RefreshEditorInfo();
-	EditorInfo StartEdInfo = EdInfo;
+	StartEdInfo = EdInfo;
 
 	EditorSetPosition Position = {0, 0, 0, -1, -1, -1};
 	EditorGetString String = {-1};

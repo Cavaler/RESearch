@@ -67,6 +67,7 @@ EXTERN int MatchedLineLength VALUE(0);
 EXTERN int SelStartLine,SelStartPos,SelEndLine,SelEndPos,SelType;
 
 EXTERN EditorInfo EdInfo;
+EXTERN EditorInfo StartEdInfo;
 void RefreshEditorInfo();
 
 BOOL EditorSearch();
@@ -93,7 +94,7 @@ void PatchEditorInfo(EditorInfo &EdInfo);
 
 BOOL SearchInLine(const char *Line,int Length,int Start,int End,int *MatchStart,int *MatchLength,BOOL NeedMatch);
 BOOL SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,BOOL NeedMatch);
-int  TopLine(int Line,int ScreenHeight,int TotalLines);
+int  TopLine(int NeededLine,int ScreenHeight,int TotalLines,int CurrentTopLine);
 int	LeftColumn(int RightPosition,int ScreenWidth);
 void SaveSelection();
 void RestoreSelection();

@@ -12,7 +12,7 @@ void EditorSearchOK(int FirstLine,int StartPos,int LastLine,int EndPos) {
 	StartupInfo.EditorControl(ECTL_SELECT,&Select);
 
 	EditorSetPosition Position={(EReverse)?FirstLine:LastLine,(EReverse)?StartPos:EndPos,-1,
-		TopLine(FirstLine,EdInfo.WindowSizeY,EdInfo.TotalLines),
+		TopLine(FirstLine,EdInfo.WindowSizeY,EdInfo.TotalLines,StartEdInfo.TopScreenLine),
 		LeftColumn((EReverse)?StartPos:EndPos,EdInfo.WindowSizeX),-1};
 	EctlForceSetPosition(&Position);
 }
@@ -57,7 +57,7 @@ BOOL EditorSearchAgain() {
 	PatchEditorInfo(EdInfo);
 	EctlForceSetPosition(NULL);
 
-	EditorInfo StartEdInfo = EdInfo;
+	StartEdInfo = EdInfo;
 
 	int FirstLine,StartPos,LastLine,EndPos;
 
@@ -137,7 +137,7 @@ BOOL EditorSearchAgain() {
 
 BOOL EditorSearch() {
 	RefreshEditorInfo();
-	EInSelection=(EdInfo.BlockType!=BTYPE_NONE);
+	EInSelection = EAutoFindInSelection && (EdInfo.BlockType!=BTYPE_NONE);
 
 	CFarDialog Dialog(76,13,"SearchDlg");
 	Dialog.AddFrame(MRESearch);
@@ -154,7 +154,7 @@ BOOL EditorSearch() {
 	Dialog.Add(new CFarCheckBoxItem(30,6,0,"",&EUTF8));
 	Dialog.Add(new CFarButtonItem(34,6,0,0,MUTF8));
 	Dialog.Add(new CFarCheckBoxItem(5,7,0,MReverseSearch,&EReverse));
-	if (EInSelection) Dialog.Add(new CFarCheckBoxItem(30,7,0,MInSelection,&EInSelection));
+	if (EdInfo.BlockType!=BTYPE_NONE) Dialog.Add(new CFarCheckBoxItem(30,7,0,MInSelection,&EInSelection));
 	Dialog.AddButtons(MOk, MShowAll); Dialog.AddButton(MCancel);
 	Dialog.Add(new CFarButtonItem(60,5,0,0,MBtnPresets));
 

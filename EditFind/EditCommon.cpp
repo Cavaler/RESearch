@@ -265,15 +265,20 @@ BOOL SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,BOOL Ne
 	return FALSE;
 }
 
-int TopLine(int Line,int ScreenHeight,int TotalLines) {
+int TopLine(int NeededLine,int ScreenHeight,int TotalLines,int CurrentTopLine) {
+	if (EKeepLineIfVisible) {
+		if ((NeededLine >= CurrentTopLine) && (NeededLine < CurrentTopLine+ScreenHeight))
+			return CurrentTopLine;
+	}
+
 	int Top;
 	switch (EShowPosition) {
 	case SP_TOP:
-		Top=Line-EShowPositionOffset;break;
+		Top=NeededLine-EShowPositionOffset;break;
 	case SP_CENTER:
-		Top=Line-ScreenHeight/2-EShowPositionOffset;break;
+		Top=NeededLine-ScreenHeight/2-EShowPositionOffset;break;
 	case SP_BOTTOM:
-		Top=Line-ScreenHeight+EShowPositionOffset+1;break;
+		Top=NeededLine-ScreenHeight+EShowPositionOffset+1;break;
 	}
 	if (Top<0) Top=0;
 	if (Top>=TotalLines) Top=TotalLines-1;

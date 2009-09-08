@@ -16,7 +16,7 @@ string CanonicalLCName(const char *szName) {
 BOOL EditorListAllAgain() {
 	RefreshEditorInfo();
 	EctlForceSetPosition(NULL);
-	EditorInfo _Info = EdInfo;
+	StartEdInfo = EdInfo;
 
 	sFindAllInfo &Info = FindAllInfos[CanonicalLCName(EdInfo.FileName)];
 	Info.arrString.clear();
@@ -49,11 +49,11 @@ BOOL EditorListAllAgain() {
 	if (!g_bInterrupted && (Info.arrLines.size() == 0)) {
 		const char *Lines[]={GetMsg(MRESearch),GetMsg(MCannotFind),EText.c_str(),GetMsg(MOk)};
 		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"ECannotFind",Lines,4,1);
-		RestorePosition(_Info);
+		RestorePosition(StartEdInfo);
 		return TRUE;
 	}
 
-	EdInfo = _Info;
+	EdInfo = StartEdInfo;
 	return EditorListAllShowResults(true);
 }
 
@@ -66,7 +66,7 @@ BOOL EditorListAllShowResults(bool bImmediate) {
 	int nResult = ChooseMenu(Info.arrString, GetMsg(MListAllLines), NULL, "ListAll", 0, FMENU_WRAPMODE);
 	if (nResult >= 0) {
 		EditorSetPosition Position = {Info.arrLines[nResult].first, Info.arrLines[nResult].second, -1,
-			TopLine(Info.arrLines[nResult].first, EdInfo.WindowSizeY, EdInfo.TotalLines),
+			TopLine(Info.arrLines[nResult].first, EdInfo.WindowSizeY, EdInfo.TotalLines,StartEdInfo.TopScreenLine),
 			LeftColumn(Info.arrLines[nResult].second, EdInfo.WindowSizeY), -1};
 		EctlForceSetPosition(&Position);
 	} else {
