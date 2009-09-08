@@ -311,9 +311,9 @@ int ReplacePrompt(BOOL Plugin) {
 	Dialog.Add(new CFarTextItem(5,14,0,MSearchIn));
 	if (Plugin) {
 		if (FSearchIn<SI_FROMCURRENT) FSearchIn=SI_FROMCURRENT;
-		Dialog.Add(new CFarComboBoxItem(15,14,60,0,new CFarListData(g_WhereToSearchPlugin, false),(int *)&FSearchIn,NULL,3));
+		Dialog.Add(new CFarComboBoxItem(15,14,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearchPlugin, false),(int *)&FSearchIn,NULL,3));
 	} else {
-		Dialog.Add(new CFarComboBoxItem(15,14,60,0,new CFarListData(g_WhereToSearch, false),(int *)&FSearchIn));
+		Dialog.Add(new CFarComboBoxItem(15,14,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearch, false),(int *)&FSearchIn));
 	}
 
 	Dialog.Add(new CFarCheckBoxItem(5,16,0,MViewModified,&FROpenModified));
