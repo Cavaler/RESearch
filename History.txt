@@ -9,7 +9,9 @@ Planned:
 	! Performing all regular expression matches in UTF-8
 	* dialogprocs for disabling unneeded elements
 
-	- Launch editor for Replace script
+Version 6.46 (08.09.2009)
+	* 'Keep current line if possible' editor setting
+	* 'Turn 'In selection' on automatically' editor setting
 
 Version 6.45 (07.09.2009)
 	- 'Show all' with '[X] Several Lines' made much faster when there is not much to be found
