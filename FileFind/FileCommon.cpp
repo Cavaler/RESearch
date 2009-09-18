@@ -751,7 +751,7 @@ BOOL CompileAdvancedSettings() {
 
 void SelectAdvancedPreset(int &nID, bool &bSel)
 {
-	int nPreset = FAPresets->ShowMenu(false);
+	int nPreset = FAPresets->ShowMenu(false, nID);
 	if (nPreset >= 0) {
 		CPreset *pPreset = FAPresets->at(nPreset);
 		nID = pPreset->m_nID;

@@ -201,21 +201,24 @@ void CPresetCollection::Save() {
 		at(nPreset)->Save(hKey);
 }
 
-int CPresetCollection::ShowMenu(bool bExecute) {
+int CPresetCollection::ShowMenu(bool bExecute, int nDefaultID) {
 	int piBreakKeys[]={VK_INSERT, VK_DELETE, VK_F4, 0};
 	vector<string> arrItems;
+
 	do {
+		int nDefault = 0;
 		arrItems.resize(size());
-		for (size_t nPreset = 0; nPreset < size(); nPreset++)
-			arrItems[nPreset] = at(nPreset)->Name();
+		for (size_t nPreset = 0; nPreset < size(); nPreset++) {
+			CPreset *pPreset = at(nPreset);
+			arrItems[nPreset] = pPreset->Name();
+			if (pPreset->m_nID == nDefaultID) nDefault = nPreset;
+		}
 
 		int nBreakKey;
 		char szTitle[128];
 		sprintf(szTitle, "%s presets", Name());
-		int nResult = bExecute	? ChooseMenu(arrItems, szTitle, "Ins,Del,F4", "Presets", 0,
-			FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT, piBreakKeys, &nBreakKey)
-								: ChooseMenu(arrItems, szTitle, NULL, "Presets", 0,
-			FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT, NULL, &nBreakKey);
+		int nResult = ChooseMenu(arrItems, szTitle, "Ins,Del,F4", "Presets", nDefault,
+			FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT, piBreakKeys, &nBreakKey);
 
 		switch (nBreakKey) {
 		case -1:

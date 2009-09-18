@@ -54,7 +54,7 @@ public:
 	CPresetCollection(CParameterSet &ParamSet, const char *strKey, int nTitle);
 	virtual ~CPresetCollection();
 	void Save();
-	int ShowMenu(bool bExecute);
+	int ShowMenu(bool bExecute, int nDefaultID = 0);
 	virtual CPreset *LoadPreset(const string &strName, HKEY hKey);
 	virtual CPreset *NewPreset();
 	virtual BOOL EditPreset(CPreset *pPreset) = 0;
