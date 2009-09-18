@@ -51,6 +51,7 @@ EXTERN CFAPresetCollection *FAPresets;
 
 EXTERN BOOL FUTF8 VALUE(FALSE);
 EXTERN BOOL FAdvanced VALUE(FALSE);
+EXTERN int  FAdvancedID VALUE(0);
 
 // Internals
 
@@ -100,6 +101,9 @@ OperationResult FileReplace(PluginPanelItem **PanelItems,int *ItemsNumber,BOOL S
 OperationResult FileGrep(BOOL ShowDialog);
 BOOL AdvancedSettings();
 BOOL CompileAdvancedSettings();
+void SelectAdvancedPreset(int &nID, bool &bSel);
+void ApplyAdvancedPreset();
+
 BOOL MaskCaseHere();
 bool LocalFileTime(char cDrive);
 

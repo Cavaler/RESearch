@@ -375,6 +375,7 @@ int SearchPrompt(BOOL Plugin) {
 			break;
 		case 2:
 			FSPresets->ShowMenu(true);
+			ApplyAdvancedPreset();
 			if (Plugin&&(FSearchIn<SI_FROMCURRENT)) FSearchIn=SI_FROMCURRENT;
 			break;
 		case 3:
@@ -431,6 +432,9 @@ BOOL CFSPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.Add(new CFarTextItem(5,8,DIF_BOXCOLOR|DIF_SEPARATOR,(char *)NULL));
 
 	int *pSearchAs = &pPreset->m_mapInts["SearchAs"];
+	int  nAdvancedID = pPreset->m_mapInts["AdvancedID"];
+	bool bFAdvanced = nAdvancedID >= 0;
+
 	Dialog.Add(new CFarRadioButtonItem(5, 9,DIF_GROUP,MPlainText,pSearchAs,SA_PLAINTEXT));
 	Dialog.Add(new CFarRadioButtonItem(5,10,0,		MRegExp,	 pSearchAs,SA_REGEXP));
 	Dialog.Add(new CFarRadioButtonItem(5,11,0,		MSeveralLineRegExp,	pSearchAs,SA_SEVERALLINE));
@@ -440,17 +444,23 @@ BOOL CFSPresetCollection::EditPreset(CPreset *pPreset) {
 
 	Dialog.Add(new CFarCheckBoxItem(5,16,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
 	Dialog.Add(new CFarCheckBoxItem(5,17,0,MInverseSearch,&pPreset->m_mapInts["Inverse"]));
+	Dialog.Add(new CFarCheckBoxItem(56,9,0,"",&bFAdvanced));
+	Dialog.Add(new CFarButtonItem(60,9,0,0,MBtnAdvanced));
 	Dialog.Add(new CFarCheckBoxItem(56,11,0,"",&pPreset->m_mapInts["UTF8"]));
 	Dialog.Add(new CFarButtonItem(60,11,0,0,MUTF8));
 	Dialog.Add(new CFarCheckBoxItem(5,19,0,MAddToMenu,&pPreset->m_bAddToMenu));
 	Dialog.AddButtons(MOk,MCancel);
 
 	do {
-		switch (Dialog.Display(2, -2, -4)) {
+		switch (Dialog.Display(3, -2, -4, -6)) {
 		case 0:
+			pPreset->m_mapInts["AdvancedID"] = bFAdvanced ? nAdvancedID : 0;
 			return TRUE;
 		case 1:
 			UTF8Converter(pPreset->m_mapStrings["Text"]);
+			break;
+		case 2:
+			SelectAdvancedPreset(nAdvancedID, bFAdvanced);
 			break;
 		default:
 			return FALSE;

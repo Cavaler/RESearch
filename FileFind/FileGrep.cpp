@@ -200,6 +200,7 @@ bool GrepPrompt(BOOL bPlugin) {
 			break;
 		case 2:
 			FGPresets->ShowMenu(true);
+			ApplyAdvancedPreset();
 			break;
 		case 3:
 			if (AdvancedSettings()) FAdvanced=TRUE;
@@ -297,16 +298,25 @@ BOOL CFGPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.Add(new CFarTextItem(22,16,0,MGrepContext));
 	Dialog.Add(new CFarCheckBoxItem(5,17,0,MGrepAddLineNumbers,&pPreset->m_mapInts["AddLineNumbers"]));
 
+	int  nAdvancedID = pPreset->m_mapInts["AdvancedID"];
+	bool bFAdvanced = nAdvancedID >= 0;
+
+	Dialog.Add(new CFarCheckBoxItem(56,12,0,"",&bFAdvanced));
+	Dialog.Add(new CFarButtonItem(60,12,0,0,MBtnAdvanced));
 	Dialog.Add(new CFarCheckBoxItem(5,19,0,MAddToMenu,&pPreset->m_bAddToMenu));
 	Dialog.AddButtons(MOk,MCancel);
 
 	do {
-		switch (Dialog.Display(2, -2, 13)) {
+		switch (Dialog.Display(3, -2, 13, -4)) {
 		case 0:
 			pPreset->m_mapInts["SearchAs"] = AsRegExp ? SA_REGEXP : SA_PLAINTEXT;
+			pPreset->m_mapInts["AdvancedID"] = bFAdvanced ? nAdvancedID : 0;
 			return TRUE;
 		case 1:
 			UTF8Converter(pPreset->m_mapStrings["Text"]);
+			break;
+		case 2:
+			SelectAdvancedPreset(nAdvancedID, bFAdvanced);
 			break;
 		default:
 			return FALSE;

@@ -1,23 +1,25 @@
 #include "StdAfx.h"
 #include "..\RESearch.h"
 
-CParameterSet g_FSParamSet(FileSearchExecutor, 4, 5,
+CParameterSet g_FSParamSet(FileSearchExecutor, 4, 6,
 	"Mask", &MaskText, "Text", &SearchText, "@Mask", &FMask, "@Text", &FText,
 	"MaskAsRegExp", &FMaskAsRegExp, "CaseSensitive", &FCaseSensitive,
-	"UTF8", &FUTF8, "SearchAs", &FSearchAs, "IsInverse", &FSInverse
+	"UTF8", &FUTF8, "SearchAs", &FSearchAs, "IsInverse", &FSInverse,
+	"AdvancedID", &FAdvancedID
 	);
-CParameterSet g_FRParamSet(FileReplaceExecutor, 6, 4,
+CParameterSet g_FRParamSet(FileReplaceExecutor, 6, 5,
 	"Mask", &MaskText, "Text", &SearchText, "Replace", &ReplaceText,
 	"@Mask", &FMask, "@Text", &FText, "@Replace", &FRReplace,
 	"MaskAsRegExp", &FMaskAsRegExp, "CaseSensitive", &FCaseSensitive,
-	"UTF8", &FUTF8, "SearchAs", &FSearchAs
+	"UTF8", &FUTF8, "SearchAs", &FSearchAs, "AdvancedID", &FAdvancedID
 	);
-CParameterSet g_FGParamSet(FileGrepExecutor, 4, 9,
+CParameterSet g_FGParamSet(FileGrepExecutor, 4, 10,
 	"Mask", &MaskText, "Text", &SearchText, "@Mask", &FMask, "@Text", &FText,
 	"MaskAsRegExp", &FMaskAsRegExp, "CaseSensitive", &FCaseSensitive,
 	"UTF8", &FUTF8, "SearchAs", &FSearchAs, "IsInverse", &FSInverse,
 	"GrepWhat", &FGrepWhat, "AddLineNumbers", &FGAddLineNumbers,
-	"AddContext", &FGAddContext, "ContextLines", &FGContextLines
+	"AddContext", &FGAddContext, "ContextLines", &FGContextLines,
+	"AdvancedID", &FAdvancedID
 	);
 
 DWORD g_dwDateAfterThis, g_dwDateBeforeThis;
@@ -300,7 +302,7 @@ int DoScanDirectory(char *Directory,PluginPanelItem **PanelItems,int *ItemsNumbe
 
 	if (FAdvanced) {
 		if (FARecursionLevel && (CurrentRecursionLevel > FARecursionLevel)) return TRUE;
-		if (FADirectoryMatch && FADirectoryPattern && CurrentRecursionLevel) {
+		if (FADirectoryMatch && FADirectoryPattern && (CurrentRecursionLevel > 0)) {
 			bool bNameMatches = do_pcre_exec(FADirectoryPattern,FADirectoryPatternExtra,Directory,strlen(Directory),0,0,NULL,0) >= 0;
 			if (FADirectoryInverse ? bNameMatches : !bNameMatches) return TRUE;
 		}
@@ -745,6 +747,34 @@ BOOL CompileAdvancedSettings() {
 	}
 
 	return TRUE;
+}
+
+void SelectAdvancedPreset(int &nID, bool &bSel)
+{
+	int nPreset = FAPresets->ShowMenu(false);
+	if (nPreset >= 0) {
+		CPreset *pPreset = FAPresets->at(nPreset);
+		nID = pPreset->m_nID;
+		bSel = true;
+	} else {
+		bSel = false;
+	}
+}
+
+void ApplyAdvancedPreset()
+{
+	if (FAdvancedID <= 0) {
+		FAdvanced = false;
+		return;
+	}
+
+	CPreset *pPreset = (*FAPresets)(FAdvancedID);
+	if (pPreset) {
+		pPreset->Apply();
+		FAdvanced = true;
+	} else {
+		FAdvanced = false;
+	}
 }
 
 BOOL CFAPresetCollection::EditPreset(CPreset *pPreset) {
