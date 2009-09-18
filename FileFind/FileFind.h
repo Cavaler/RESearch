@@ -9,23 +9,39 @@ enum MaskCase {MC_SENSITIVE,MC_INSENSITIVE,MC_VOLUME};
 enum eReplaceReadonly {RR_NEVER, RR_ASK, RR_ALWAYS};
 enum GrepWhat {GREP_NAMES, GREP_NAMES_COUNT, GREP_LINES, GREP_NAMES_LINES};
 
-class CFSPresetCollection:public CPresetCollection {
+class CFPreset : public CPreset {
 public:
-	CFSPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "FileFind", MFSPreset) {}
+	CFPreset(CParameterSet &ParamSet);
+	CFPreset(CParameterSet &ParamSet, const string &strName, HKEY hKey);
+	virtual void Apply();
+};
+
+class CFPresetCollection : public CPresetCollection {
+public:
+	CFPresetCollection(CParameterSet &ParamSet, const char *strKey, int nTitle)
+		: CPresetCollection(ParamSet, strKey, nTitle) {}
+
+	virtual CPreset *LoadPreset(const string &strName, HKEY hKey) { return new CFPreset(m_ParamSet, strName, hKey); }
+	virtual CPreset *NewPreset() { return new CFPreset(m_ParamSet); }
+};
+
+class CFSPresetCollection:public CFPresetCollection {
+public:
+	CFSPresetCollection(CParameterSet &ParamSet) : CFPresetCollection(ParamSet, "FileFind", MFSPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
 	virtual int  ID() { return 3; }
 };
 
-class CFRPresetCollection:public CPresetCollection {
+class CFRPresetCollection:public CFPresetCollection {
 public:
-	CFRPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "FileReplace", MFRPreset) {}
+	CFRPresetCollection(CParameterSet &ParamSet) : CFPresetCollection(ParamSet, "FileReplace", MFRPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
 	virtual int  ID() { return 0; }
 };
 
-class CFGPresetCollection:public CPresetCollection {
+class CFGPresetCollection:public CFPresetCollection {
 public:
-	CFGPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "FileGrep", MFGPreset) {}
+	CFGPresetCollection(CParameterSet &ParamSet) : CFPresetCollection(ParamSet, "FileGrep", MFGPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
 	virtual int  ID() { return 4; }
 };

@@ -777,6 +777,23 @@ void ApplyAdvancedPreset()
 	}
 }
 
+CFPreset::CFPreset(CParameterSet &ParamSet)
+: CPreset(ParamSet)
+{
+	m_mapInts["AdvancedID"] = 0;
+}
+
+CFPreset::CFPreset(CParameterSet &ParamSet, const string &strName, HKEY hKey)
+: CPreset(ParamSet, strName, hKey)
+{
+}
+
+void CFPreset::Apply()
+{
+	__super::Apply();
+	ApplyAdvancedPreset();
+}
+
 BOOL CFAPresetCollection::EditPreset(CPreset *pPreset) {
 	CFarDialog Dialog(78,26,"FAPresetDlg");
 	Dialog.AddFrame(MFAPreset);

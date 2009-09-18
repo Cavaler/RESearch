@@ -200,7 +200,6 @@ bool GrepPrompt(BOOL bPlugin) {
 			break;
 		case 2:
 			FGPresets->ShowMenu(true);
-			ApplyAdvancedPreset();
 			break;
 		case 3:
 			if (AdvancedSettings()) FAdvanced=TRUE;
@@ -299,7 +298,7 @@ BOOL CFGPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.Add(new CFarCheckBoxItem(5,17,0,MGrepAddLineNumbers,&pPreset->m_mapInts["AddLineNumbers"]));
 
 	int  nAdvancedID = pPreset->m_mapInts["AdvancedID"];
-	bool bFAdvanced = nAdvancedID >= 0;
+	bool bFAdvanced = nAdvancedID > 0;
 
 	Dialog.Add(new CFarCheckBoxItem(56,12,0,"",&bFAdvanced));
 	Dialog.Add(new CFarButtonItem(60,12,0,0,MBtnAdvanced));

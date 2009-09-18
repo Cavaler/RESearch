@@ -66,7 +66,7 @@ CPreset::CPreset(CParameterSet &ParamSet)
 	}
 }
 
-CPreset::CPreset(CParameterSet &ParamSet, string strName, HKEY hKey)
+CPreset::CPreset(CParameterSet &ParamSet, const string &strName, HKEY hKey)
 : m_ParamSet(ParamSet)
 {
 	CHKey hOwnKey = RegOpenSubkey(hKey, strName.c_str());
@@ -164,11 +164,19 @@ CPresetCollection::CPresetCollection(CParameterSet &ParamSet, const char *strKey
 		DWORD dwcbCurrentKey = sizeof(szCurrentKey);
 
 		if (RegEnumKeyEx(hKey, dwIndex, szCurrentKey, &dwcbCurrentKey, NULL, NULL, NULL, &ftTime) != ERROR_SUCCESS) break;
-		push_back(new CPreset(m_ParamSet, szCurrentKey, hKey));
+		push_back(LoadPreset(szCurrentKey, hKey));
 		dwIndex++;
 	} while (TRUE);
 
 	ValidateIDs();
+}
+
+CPreset *CPresetCollection::LoadPreset(const string &strName, HKEY hKey) {
+	return new CPreset(m_ParamSet, strName, hKey);
+}
+
+CPreset *CPresetCollection::NewPreset() {
+	return new CPreset(m_ParamSet);
 }
 
 CPresetCollection::~CPresetCollection() {
@@ -214,7 +222,7 @@ int CPresetCollection::ShowMenu(bool bExecute) {
 			if (bExecute && (nResult >= 0) && (nResult < (int)size())) at(nResult)->Apply();
 			return nResult;
 		case 0:{
-			CPreset *pPreset = new CPreset(m_ParamSet);
+			CPreset *pPreset = NewPreset();
 			if (EditPreset(pPreset)) {
 				pPreset->m_nID = FindUnusedID();
 				push_back(pPreset);

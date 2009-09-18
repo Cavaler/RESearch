@@ -375,7 +375,6 @@ int SearchPrompt(BOOL Plugin) {
 			break;
 		case 2:
 			FSPresets->ShowMenu(true);
-			ApplyAdvancedPreset();
 			if (Plugin&&(FSearchIn<SI_FROMCURRENT)) FSearchIn=SI_FROMCURRENT;
 			break;
 		case 3:
@@ -433,7 +432,7 @@ BOOL CFSPresetCollection::EditPreset(CPreset *pPreset) {
 
 	int *pSearchAs = &pPreset->m_mapInts["SearchAs"];
 	int  nAdvancedID = pPreset->m_mapInts["AdvancedID"];
-	bool bFAdvanced = nAdvancedID >= 0;
+	bool bFAdvanced = nAdvancedID > 0;
 
 	Dialog.Add(new CFarRadioButtonItem(5, 9,DIF_GROUP,MPlainText,pSearchAs,SA_PLAINTEXT));
 	Dialog.Add(new CFarRadioButtonItem(5,10,0,		MRegExp,	 pSearchAs,SA_REGEXP));

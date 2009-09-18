@@ -31,10 +31,10 @@ public:
 class CPreset {
 public:
 	CPreset(CParameterSet &ParamSet);
-	CPreset(CParameterSet &ParamSet, string strName, HKEY hKey);	// hKey is root key
+	CPreset(CParameterSet &ParamSet, const string &strName, HKEY hKey);	// hKey is root key
 
 	OperationResult ExecutePreset();
-		void Apply();
+	virtual void Apply();
 	void FillMenuItem(FarMenuItem &Item);
 	void Save(HKEY hKey);
 
@@ -55,6 +55,8 @@ public:
 	virtual ~CPresetCollection();
 	void Save();
 	int ShowMenu(bool bExecute);
+	virtual CPreset *LoadPreset(const string &strName, HKEY hKey);
+	virtual CPreset *NewPreset();
 	virtual BOOL EditPreset(CPreset *pPreset) = 0;
 	virtual int  ID() = 0;	// For batches
 	CPreset *operator()(int nID);
