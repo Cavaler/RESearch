@@ -132,8 +132,6 @@ void CPreset::Save(HKEY hKey) {
 	CHKey hOwnKey = RegCreateSubkey(hKey, FormatStr("%04d", m_nID).c_str());
 	if (!hOwnKey) return;
 
-	SetRegBoolValue(hOwnKey, "AddToMenu", m_bAddToMenu);
-
 	map<string, string>::iterator it1 = m_mapStrings.begin();
 	while (it1 != m_mapStrings.end()) {
 		if (it1->first[0] != '@') SetRegStringValue(hOwnKey, it1->first.c_str(), it1->second);
@@ -145,6 +143,8 @@ void CPreset::Save(HKEY hKey) {
 		if (it2->first[0] != '@') SetRegIntValue(hOwnKey, it2->first.c_str(), it2->second);
 		it2++;
 	}
+
+	SetRegBoolValue(hOwnKey, "AddToMenu", m_bAddToMenu);
 }
 
 //////////////////////////////////////////////////////////////////////////
