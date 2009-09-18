@@ -16,14 +16,7 @@ public:
 	virtual void Apply();
 };
 
-class CFPresetCollection : public CPresetCollection {
-public:
-	CFPresetCollection(CParameterSet &ParamSet, const char *strKey, int nTitle)
-		: CPresetCollection(ParamSet, strKey, nTitle) {}
-
-	virtual CPreset *LoadPreset(const string &strName, HKEY hKey) { return new CFPreset(m_ParamSet, strName, hKey); }
-	virtual CPreset *NewPreset() { return new CFPreset(m_ParamSet); }
-};
+typedef CPresetCollectionT<CFPreset> CFPresetCollection;
 
 class CFSPresetCollection:public CFPresetCollection {
 public:
@@ -46,9 +39,9 @@ public:
 	virtual int  ID() { return 4; }
 };
 
-class CFAPresetCollection:public CPresetCollection {
+class CFAPresetCollection:public CStdPresetCollection {
 public:
-	CFAPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "FileAdvanced", MFAPreset) {}
+	CFAPresetCollection(CParameterSet &ParamSet) : CStdPresetCollection(ParamSet, "FileAdvanced", MFAPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
 	virtual int  ID() { return 5; }
 };

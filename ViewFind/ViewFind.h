@@ -4,9 +4,9 @@
 #include "..\RESearch.h"
 #include "..\Presets.h"
 
-class CVSPresetCollection : public CPresetCollection {
+class CVSPresetCollection : public CStdPresetCollection {
 public:
-	CVSPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "ViewFind", MVSPreset) {}
+	CVSPresetCollection(CParameterSet &ParamSet) : CStdPresetCollection(ParamSet, "ViewFind", MVSPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
 	virtual int  ID() { return 0; }
 };

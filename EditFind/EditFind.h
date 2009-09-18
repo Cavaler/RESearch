@@ -5,30 +5,30 @@
 #include "..\FileFind\FileFind.h"
 #include "..\Presets.h"
 
-class CESPresetCollection:public CPresetCollection {
+class CESPresetCollection:public CStdPresetCollection {
 public:
-	CESPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "EditFind", MESPreset) {}
+	CESPresetCollection(CParameterSet &ParamSet) : CStdPresetCollection(ParamSet, "EditFind", MESPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
 	virtual int  ID() { return 3; }
 };
 
-class CERPresetCollection:public CPresetCollection {
+class CERPresetCollection:public CStdPresetCollection {
 public:
-	CERPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "EditReplace", MERPreset) {}
+	CERPresetCollection(CParameterSet &ParamSet) : CStdPresetCollection(ParamSet, "EditReplace", MERPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
 	virtual int  ID() { return 0; }
 };
 
-class CEFPresetCollection:public CPresetCollection {
+class CEFPresetCollection:public CStdPresetCollection {
 public:
-	CEFPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "EditFilter", MEFPreset) {}
+	CEFPresetCollection(CParameterSet &ParamSet) : CStdPresetCollection(ParamSet, "EditFilter", MEFPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
 	virtual int  ID() { return 1; }
 };
 
-class CETPresetCollection:public CPresetCollection {
+class CETPresetCollection:public CStdPresetCollection {
 public:
-	CETPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "EditTransliterate", METPreset) {}
+	CETPresetCollection(CParameterSet &ParamSet) : CStdPresetCollection(ParamSet, "EditTransliterate", METPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
 	virtual int  ID() { return 2; }
 };

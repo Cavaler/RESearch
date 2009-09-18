@@ -5,16 +5,16 @@
 #include "..\Presets.h"
 #include "..\FileFind\FileFind.h"
 
-class CRnPresetCollection:public CPresetCollection {
+class CRnPresetCollection:public CStdPresetCollection {
 public:
-	CRnPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "FileRename", MRnPreset) {}
+	CRnPresetCollection(CParameterSet &ParamSet) : CStdPresetCollection(ParamSet, "FileRename", MRnPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
 	virtual int  ID() { return 1; }
 };
 
-class CQRPresetCollection:public CPresetCollection {
+class CQRPresetCollection:public CStdPresetCollection {
 public:
-	CQRPresetCollection(CParameterSet &ParamSet) : CPresetCollection(ParamSet, "FileQuickRename", MQRPreset) {}
+	CQRPresetCollection(CParameterSet &ParamSet) : CStdPresetCollection(ParamSet, "FileQuickRename", MQRPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
 	virtual int  ID() { return 2; }
 };

@@ -150,7 +150,9 @@ void CPreset::Save(HKEY hKey) {
 //////////////////////////////////////////////////////////////////////////
 
 CPresetCollection::CPresetCollection(CParameterSet &ParamSet, const char *strKey, int nTitle)
-: m_ParamSet(ParamSet), m_strKey(strKey), m_nTitle(nTitle)
+: m_ParamSet(ParamSet), m_strKey(strKey), m_nTitle(nTitle) {}
+
+void CPresetCollection::Load()
 {
 	char szCurrentKey[256];
 	sprintf(szCurrentKey, "%s\\RESearch\\%sPresets", StartupInfo.RootKey, Name());
@@ -169,14 +171,6 @@ CPresetCollection::CPresetCollection(CParameterSet &ParamSet, const char *strKey
 	} while (TRUE);
 
 	ValidateIDs();
-}
-
-CPreset *CPresetCollection::LoadPreset(const string &strName, HKEY hKey) {
-	return new CPreset(m_ParamSet, strName, hKey);
-}
-
-CPreset *CPresetCollection::NewPreset() {
-	return new CPreset(m_ParamSet);
 }
 
 CPresetCollection::~CPresetCollection() {

@@ -52,11 +52,13 @@ public:
 class CPresetCollection : public vector<CPreset *> {
 public:
 	CPresetCollection(CParameterSet &ParamSet, const char *strKey, int nTitle);
+	void Load();
 	virtual ~CPresetCollection();
+
 	void Save();
 	int ShowMenu(bool bExecute, int nDefaultID = 0);
-	virtual CPreset *LoadPreset(const string &strName, HKEY hKey);
-	virtual CPreset *NewPreset();
+	virtual CPreset *LoadPreset(const string &strName, HKEY hKey) = 0;
+	virtual CPreset *NewPreset() = 0;
 	virtual BOOL EditPreset(CPreset *pPreset) = 0;
 	virtual int  ID() = 0;	// For batches
 	CPreset *operator()(int nID);
@@ -75,6 +77,18 @@ protected:
 	int FindUnusedID();
 	void ValidateIDs();
 };
+
+template<class _Preset>
+class CPresetCollectionT : public CPresetCollection
+{
+public:
+	CPresetCollectionT(CParameterSet &ParamSet, const char *strKey, int nTitle)
+		: CPresetCollection(ParamSet, strKey, nTitle) { Load(); } 
+	virtual CPreset *LoadPreset(const string &strName, HKEY hKey) { return new _Preset(m_ParamSet, strName, hKey); }
+	virtual CPreset *NewPreset() { return new _Preset(m_ParamSet); }
+};
+
+typedef CPresetCollectionT<CPreset> CStdPresetCollection;
 
 //////////////////////////////////////////////////////////////////////////
 
