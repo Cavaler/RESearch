@@ -9,6 +9,11 @@ Planned:
 	! Performing all regular expression matches in UTF-8
 	* dialogprocs for disabling unneeded elements
 
+Version 6.50 (18.09.2009)
+	! Presets for File Search/Replace/Grep can link to Advanced presets
+	* Hotkeys in 'search in' list (thanks to HaRT)
+	- "[X] Add to menu" for presets saved properly
+
 Version 6.46 (08.09.2009)
 	* 'Keep current line if possible' editor setting
 	* 'Turn 'In selection' on automatically' editor setting
