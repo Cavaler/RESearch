@@ -2,8 +2,8 @@
 #include "RESearch.h"
 
 void WINAPI GetPluginInfo(PluginInfo *Info) {
-	static const char *ConfigStrings[1];
-	static const char *MenuStrings[1];
+	static const TCHAR *ConfigStrings[1];
+	static const TCHAR *MenuStrings[1];
 	ConfigStrings[0] = GetMsg(MRESearch);
 	MenuStrings[0] = GetMsg(MRESearch);
 
@@ -16,30 +16,32 @@ void WINAPI GetPluginInfo(PluginInfo *Info) {
 	Info->PluginMenuStringsNumber=1;
 	Info->PluginConfigStrings=ConfigStrings;
 	Info->PluginConfigStringsNumber=1;
-	Info->CommandPrefix="ff:fr:rn:qr";
+	Info->CommandPrefix=_T("ff:fr:rn:qr");
 }
 
 void WINAPI SetStartupInfo(const PluginStartupInfo *Info) {
 	StartupInfo=*Info;
+#ifndef UNICODE
 	PrepareLocaleStuff();
+#endif
 	ReadRegistry();
 
 	g_pszOKButton = GetMsg(MOk);
 	g_pszErrorTitle = GetMsg(MError);
 	CFarIntegerRangeValidator::s_szErrorMsg = GetMsg(MInvalidNumber);
-	CFarIntegerRangeValidator::s_szHelpTopic = "REInvalidNumber";
+	CFarIntegerRangeValidator::s_szHelpTopic = _T("REInvalidNumber");
 
 	CoInitialize(NULL);
 	ReadActiveScripts();
 }
 
 void BadCmdLine() {
-	const char *Lines[]={GetMsg(MRESearch),GetMsg(MInvalidCmdLine),GetMsg(MOk)};
-	StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"REInvalidCmdLine",Lines,3,1);
+	const TCHAR *Lines[]={GetMsg(MRESearch),GetMsg(MInvalidCmdLine),GetMsg(MOk)};
+	StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("REInvalidCmdLine"),Lines,3,1);
 }
 
-BOOL ProcessFFLine(char *Line,BOOL *ShowDialog,int *Item) {
-	char Switch=Line[0];
+BOOL ProcessFFLine(TCHAR *Line, BOOL *ShowDialog, int *Item) {
+	TCHAR Switch=Line[0];
 	if (!Switch) {BadCmdLine();return FALSE;}
 	Line++;*ShowDialog=FALSE;*Item=0;
 
@@ -47,12 +49,12 @@ BOOL ProcessFFLine(char *Line,BOOL *ShowDialog,int *Item) {
 		FText=Line;*Item=0;return TRUE;
 	}
 
-	char *NextSwitch=strchr(Line,Switch);
+	TCHAR *NextSwitch=_tcschr(Line,Switch);
 	if (!NextSwitch) {BadCmdLine();return FALSE;}
 	*NextSwitch=0;FMask=Line;
 	*NextSwitch=Switch;Line=NextSwitch+1;
 
-	NextSwitch=strrchr(Line,Switch);
+	NextSwitch=_tcsrchr(Line,Switch);
 	if (NextSwitch) {
 		*NextSwitch=0;FText=Line;
 		*NextSwitch=Switch;Line=NextSwitch+1;
@@ -89,8 +91,8 @@ BOOL ProcessFFLine(char *Line,BOOL *ShowDialog,int *Item) {
 	return TRUE;
 }
 
-BOOL ProcessFRLine(char *Line,BOOL *ShowDialog,int *Item) {
-	char Switch=Line[0];
+BOOL ProcessFRLine(TCHAR *Line,BOOL *ShowDialog,int *Item) {
+	TCHAR Switch=Line[0];
 	if (!Switch) {BadCmdLine();return FALSE;}
 	Line++;*ShowDialog=FALSE;*Item=1;
 
@@ -98,17 +100,17 @@ BOOL ProcessFRLine(char *Line,BOOL *ShowDialog,int *Item) {
 		FText=Line;*Item=0;return TRUE;
 	}
 
-	char *NextSwitch=strchr(Line,Switch);
+	TCHAR *NextSwitch=_tcschr(Line,Switch);
 	if (!NextSwitch) {BadCmdLine();return FALSE;}
 	*NextSwitch=0;FMask=Line;
 	*NextSwitch=Switch;Line=NextSwitch+1;
 
-	NextSwitch=strchr(Line,Switch);
+	NextSwitch=_tcschr(Line,Switch);
 	if (!NextSwitch) {BadCmdLine();return FALSE;}
 	*NextSwitch=0;FText=Line;
 	*NextSwitch=Switch;Line=NextSwitch+1;
 
-	NextSwitch=strrchr(Line,Switch);
+	NextSwitch=_tcsrchr(Line,Switch);
 	if (NextSwitch) {
 		*NextSwitch=0;FRReplace=Line;
 		*NextSwitch=Switch;Line=NextSwitch+1;
@@ -150,8 +152,8 @@ BOOL ProcessFRLine(char *Line,BOOL *ShowDialog,int *Item) {
 	return TRUE;
 }
 
-BOOL ProcessRNLine(char *Line,BOOL *ShowDialog,int *Item) {
-	char Switch=Line[0];
+BOOL ProcessRNLine(TCHAR *Line,BOOL *ShowDialog,int *Item) {
+	TCHAR Switch=Line[0];
 	if (!Switch) {BadCmdLine();return FALSE;}
 	Line++;*ShowDialog=FALSE;*Item=7;
 
@@ -159,17 +161,17 @@ BOOL ProcessRNLine(char *Line,BOOL *ShowDialog,int *Item) {
 		FText=Line;*Item=0;return TRUE;
 	}
 
-	char *NextSwitch=strchr(Line,Switch);
+	TCHAR *NextSwitch=_tcschr(Line,Switch);
 	if (!NextSwitch) {BadCmdLine();return FALSE;}
 	*NextSwitch=0;FMask=Line;
 	*NextSwitch=Switch;Line=NextSwitch+1;
 
-	NextSwitch=strchr(Line,Switch);
+	NextSwitch=_tcschr(Line,Switch);
 	if (!NextSwitch) {BadCmdLine();return FALSE;}
 	*NextSwitch=0;FText=Line;
 	*NextSwitch=Switch;Line=NextSwitch+1;
 
-	NextSwitch=strrchr(Line,Switch);
+	NextSwitch=_tcsrchr(Line,Switch);
 	if (NextSwitch) {
 		*NextSwitch=0;FRReplace=Line;
 		*NextSwitch=Switch;Line=NextSwitch+1;
@@ -204,17 +206,17 @@ BOOL ProcessRNLine(char *Line,BOOL *ShowDialog,int *Item) {
 	return TRUE;
 }
 
-BOOL ProcessQRLine(char *Line,BOOL *ShowDialog,int *Item) {
-	char Switch=Line[0];
+BOOL ProcessQRLine(TCHAR *Line,BOOL *ShowDialog,int *Item) {
+	TCHAR Switch=Line[0];
 	if (!Switch) {BadCmdLine();return FALSE;}
 	Line++;*ShowDialog=FALSE;*Item=8;
 
-	char *NextSwitch=strchr(Line,Switch);
+	TCHAR *NextSwitch=_tcschr(Line,Switch);
 	if (!NextSwitch) {BadCmdLine();return FALSE;}
 	*NextSwitch=0;FText=Line;
 	*NextSwitch=Switch;Line=NextSwitch+1;
 
-	NextSwitch=strrchr(Line,Switch);
+	NextSwitch=_tcsrchr(Line,Switch);
 	if (NextSwitch) {
 		*NextSwitch=0;FRReplace=Line;
 		*NextSwitch=Switch;Line=NextSwitch+1;
@@ -243,7 +245,7 @@ BOOL ProcessQRLine(char *Line,BOOL *ShowDialog,int *Item) {
 	return TRUE;
 }
 
-BOOL ProcessCommandLine(char *Line,BOOL *ShowDialog,int *Item) {
+BOOL ProcessCommandLine(TCHAR *Line,BOOL *ShowDialog,int *Item) {
 //	f?:/mask/findtext/options
 //	f?:/mask/findtext/replacetext/options
 //	f?: FindText
@@ -251,103 +253,101 @@ BOOL ProcessCommandLine(char *Line,BOOL *ShowDialog,int *Item) {
 //	fr:/mask/findtext/replacetext/options
 //	rn:/mask/findtext/replacetext/options
 //	qr:/findtext/replacetext/options
-	if (_strnicmp(Line,"ff:",3)==0) return ProcessFFLine(Line+3,ShowDialog,Item);
-	if (_strnicmp(Line,"fr:",3)==0) return ProcessFRLine(Line+3,ShowDialog,Item);
-	if (_strnicmp(Line,"rn:",3)==0) return ProcessRNLine(Line+3,ShowDialog,Item);
-	if (_strnicmp(Line,"qr:",3)==0) return ProcessQRLine(Line+3,ShowDialog,Item);
+	if (_tcsnicmp(Line,_T("ff:"),3)==0) return ProcessFFLine(Line+3,ShowDialog,Item);
+	if (_tcsnicmp(Line,_T("fr:"),3)==0) return ProcessFRLine(Line+3,ShowDialog,Item);
+	if (_tcsnicmp(Line,_T("rn:"),3)==0) return ProcessRNLine(Line+3,ShowDialog,Item);
+	if (_tcsnicmp(Line,_T("qr:"),3)==0) return ProcessQRLine(Line+3,ShowDialog,Item);
 
-	char Switch=Line[0];
+	TCHAR Switch=Line[0];
 	if (!Switch) {BadCmdLine();return FALSE;}
 
-	char *NextSwitch;
+	TCHAR *NextSwitch;
 	if ((Switch!=' ')&&(Switch!='\t')) {
-		if (NextSwitch=strchr(Line+1,Switch))
-			if (NextSwitch=strchr(NextSwitch+1,Switch))
-				if (NextSwitch=strchr(NextSwitch+1,Switch)) 
+		if (NextSwitch=_tcschr(Line+1,Switch))
+			if (NextSwitch=_tcschr(NextSwitch+1,Switch))
+				if (NextSwitch=_tcschr(NextSwitch+1,Switch)) 
 					return ProcessFRLine(Line+1,ShowDialog,Item);
 	}
 	return ProcessFFLine(Line+1,ShowDialog,Item);
 }
 
 int ShowFileMenu() {
-	vector<FarMenuItem> MenuItems(15);
+	vector<CFarMenuItem> MenuItems;
 
-	strcpy(MenuItems[0].Text,GetMsg(MMenuSearch));
-	strcpy(MenuItems[1].Text,GetMsg(MMenuReplace));
-	strcpy(MenuItems[2].Text,GetMsg(MMenuGrep));
-	MenuItems[3].Separator=TRUE;
-	strcpy(MenuItems[4].Text,GetMsg(MMenuSelect));
-	strcpy(MenuItems[5].Text,GetMsg(MMenuUnselect));
-	strcpy(MenuItems[6].Text,GetMsg(MMenuFlipSelection));
-	MenuItems[7].Separator=TRUE;
-	strcpy(MenuItems[8].Text,GetMsg(MMenuRename));
-	strcpy(MenuItems[9].Text,GetMsg(MMenuRenameSelected));
-	strcpy(MenuItems[10].Text,GetMsg(MMenuRenumber));
-	MenuItems[11].Separator=TRUE;
-	strcpy(MenuItems[12].Text,GetMsg(MMenuUTF8Converter));
-	strcpy(MenuItems[13].Text,GetMsg(MMenuShowLastResults));
+	MenuItems.push_back(CFarMenuItem(MMenuSearch));
+	MenuItems.push_back(CFarMenuItem(MMenuReplace));
+	MenuItems.push_back(CFarMenuItem(MMenuGrep));
+	MenuItems.push_back(CFarMenuItem(true));
+	MenuItems.push_back(CFarMenuItem(MMenuSelect));
+	MenuItems.push_back(CFarMenuItem(MMenuUnselect));
+	MenuItems.push_back(CFarMenuItem(MMenuFlipSelection));
+	MenuItems.push_back(CFarMenuItem(true));
+	MenuItems.push_back(CFarMenuItem(MMenuRename));
+	MenuItems.push_back(CFarMenuItem(MMenuRenameSelected));
+	MenuItems.push_back(CFarMenuItem(MMenuRenumber));
+	MenuItems.push_back(CFarMenuItem(true));
+	MenuItems.push_back(CFarMenuItem(MMenuUTF8Converter));
+	MenuItems.push_back(CFarMenuItem(MMenuShowLastResults));
+	MenuItems.push_back(CFarMenuItem(true));
 
-	MenuItems[14].Separator=TRUE;
 	FSPresets->FillMenuItems(MenuItems);
 	FRPresets->FillMenuItems(MenuItems);
 	FGPresets->FillMenuItems(MenuItems);
 	RnPresets->FillMenuItems(MenuItems);
 	QRPresets->FillMenuItems(MenuItems);
 
-	MenuItems.push_back(MenuItems[14]);	// Separator
-	MenuItems.push_back(MenuItems[0]);
-	strcpy(MenuItems.back().Text, GetMsg(MMenuBatches));
+	MenuItems.push_back(CFarMenuItem(true));
+	MenuItems.push_back(CFarMenuItem(MMenuBatches));
 
 	g_pPanelBatches->FillMenuItems(MenuItems);
 
 	return StartupInfo.Menu(StartupInfo.ModuleNumber,-1,-1,0,FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT,GetMsg(MMenuHeader),
-		NULL,"FileMenu",NULL,NULL,&MenuItems[0],MenuItems.size());
+		NULL,_T("FileMenu"),NULL,NULL,&MenuItems[0],MenuItems.size());
 }
 
 int ShowEditorMenu() {
-	vector<FarMenuItem> MenuItems(11);
+	vector<CFarMenuItem> MenuItems;
 
-	strcpy(MenuItems[0].Text,GetMsg(MMenuSearch));
-	strcpy(MenuItems[1].Text,GetMsg(MMenuReplace));
-	strcpy(MenuItems[2].Text,GetMsg(MMenuFilterText));
-	strcpy(MenuItems[3].Text,GetMsg(MMenuTransliterate));
-	MenuItems[4].Separator=TRUE;
-	strcpy(MenuItems[5].Text,GetMsg(MMenuSearchReplaceAgain));
-	strcpy(MenuItems[6].Text,GetMsg(MMenuSearchReplaceAgainRev));
-	MenuItems[7].Separator=TRUE;
-	strcpy(MenuItems[8].Text,GetMsg(MMenuUTF8Converter));
-	strcpy(MenuItems[9].Text,GetMsg(MMenuShowLastResults));
+	MenuItems.push_back(CFarMenuItem(MMenuSearch));
+	MenuItems.push_back(CFarMenuItem(MMenuReplace));
+	MenuItems.push_back(CFarMenuItem(MMenuFilterText));
+	MenuItems.push_back(CFarMenuItem(MMenuTransliterate));
+	MenuItems.push_back(CFarMenuItem(true));
+	MenuItems.push_back(CFarMenuItem(MMenuSearchReplaceAgain));
+	MenuItems.push_back(CFarMenuItem(MMenuSearchReplaceAgainRev));
+	MenuItems.push_back(CFarMenuItem(true));
+	MenuItems.push_back(CFarMenuItem(MMenuUTF8Converter));
+	MenuItems.push_back(CFarMenuItem(MMenuShowLastResults));
 
-	MenuItems[10].Separator=TRUE;
+	MenuItems.push_back(CFarMenuItem(true));
 	ESPresets->FillMenuItems(MenuItems);
 	ERPresets->FillMenuItems(MenuItems);
 	EFPresets->FillMenuItems(MenuItems);
 	ETPresets->FillMenuItems(MenuItems);
 
-	MenuItems.push_back(MenuItems[10]);	// Separator
-	MenuItems.push_back(MenuItems[0]);
-	strcpy(MenuItems.back().Text, GetMsg(MMenuBatches));
+	MenuItems.push_back(CFarMenuItem(true));
+	MenuItems.push_back(CFarMenuItem(MMenuBatches));
 
 	g_pEditorBatches->FillMenuItems(MenuItems);
 
 	return StartupInfo.Menu(StartupInfo.ModuleNumber,-1,-1,0,FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT,GetMsg(MMenuHeader),
-		NULL,"EditorMenu",NULL,NULL,&MenuItems[0],MenuItems.size());
+		NULL,_T("EditorMenu"),NULL,NULL,&MenuItems[0],MenuItems.size());
 }
 
 int ShowViewerMenu() {
-	vector<FarMenuItem> MenuItems(5);
+	vector<CFarMenuItem> MenuItems;
 
-	strcpy(MenuItems[0].Text,GetMsg(MMenuSearch));
-	strcpy(MenuItems[1].Text,GetMsg(MMenuSearchAgain));
-//	strcpy(MenuItems[2].Text,GetMsg(MMenuSearchAgainRev));
-	MenuItems[2].Separator=TRUE;
-	strcpy(MenuItems[3].Text,GetMsg(MMenuUTF8Converter));
+	MenuItems.push_back(CFarMenuItem(MMenuSearch));
+	MenuItems.push_back(CFarMenuItem(MMenuSearchAgain));
+//	MenuItems.push_back(CFarMenuItem(MMenuSearchAgainRev));
+	MenuItems.push_back(CFarMenuItem(true));
+	MenuItems.push_back(CFarMenuItem(MMenuUTF8Converter));
 
-	MenuItems[4].Separator=TRUE;
+	MenuItems.push_back(CFarMenuItem(true));
 	VSPresets->FillMenuItems(MenuItems);
 
 	return StartupInfo.Menu(StartupInfo.ModuleNumber,-1,-1,0,FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT,GetMsg(MMenuHeader),
-		NULL,"EditorMenu",NULL,NULL,&MenuItems[0],MenuItems.size());
+		NULL,_T("EditorMenu"),NULL,NULL,&MenuItems[0],MenuItems.size());
 }
 
 OperationResult OpenPluginFromFilePreset(int Item) {
@@ -439,14 +439,25 @@ HANDLE OpenPluginFromFileMenu(int Item, BOOL ShowDialog) {
 	}
 
 	if (Result==OR_PANEL) {
+#ifdef UNICODE
+		wchar_t szCurDir[MAX_PATH];
+		StartupInfo.Control(PANEL_ACTIVE, FCTL_GETCURRENTDIRECTORY, MAX_PATH, (LONG_PTR)szCurDir);
+		CTemporaryPanel *Panel=new CTemporaryPanel(PanelItems,ItemsNumber,szCurDir);
+#else
 		PanelInfo PInfo;
 		StartupInfo.Control(INVALID_HANDLE_VALUE,FCTL_GETPANELINFO,&PInfo);
 		CTemporaryPanel *Panel=new CTemporaryPanel(PanelItems,ItemsNumber,PInfo.CurDir);
+#endif
 		PanelItems=NULL;ItemsNumber=0;
 		return (HANDLE)Panel;
 	} else {
+#ifdef UNICODE
+		StartupInfo.Control(PANEL_ACTIVE, FCTL_UPDATEPANEL, TRUE, NULL);
+		StartupInfo.Control(PANEL_ACTIVE, FCTL_REDRAWPANEL, 0, NULL);
+#else
 		StartupInfo.Control(INVALID_HANDLE_VALUE,FCTL_UPDATEPANEL,(void *)~NULL);
 		StartupInfo.Control(INVALID_HANDLE_VALUE,FCTL_REDRAWPANEL,NULL);
+#endif
 		return INVALID_HANDLE_VALUE;
 	}
 }
@@ -583,7 +594,11 @@ HANDLE OpenPluginFromViewerMenu(int Item) {
 	return INVALID_HANDLE_VALUE;
 }
 
-HANDLE WINAPI OpenPlugin(int OpenFrom,int Item) {
+#ifdef UNICODE
+HANDLE WINAPI OpenPlugin(int OpenFrom, INT_PTR Item) {
+#else
+HANDLE WINAPI OpenPlugin(int OpenFrom, int Item) {
+#endif
 	BOOL ShowDialog = TRUE;
 	g_bFromCmdLine = false;
 	g_bInterrupted = FALSE;
@@ -593,7 +608,7 @@ HANDLE WINAPI OpenPlugin(int OpenFrom,int Item) {
 	switch (OpenFrom) {
 	case OPEN_COMMANDLINE:
 		g_bFromCmdLine = true;
-		if (!ProcessCommandLine((char *)Item,&ShowDialog,&Item)) return INVALID_HANDLE_VALUE;
+		if (!ProcessCommandLine((TCHAR *)Item,&ShowDialog,&Item)) return INVALID_HANDLE_VALUE;
 		else // fall-through
 
 	case OPEN_PLUGINSMENU:
@@ -606,9 +621,15 @@ HANDLE WINAPI OpenPlugin(int OpenFrom,int Item) {
 		return OpenPluginFromViewerMenu(Item);
 
 	case OPEN_SHORTCUT:
+#ifdef UNICODE
+		StartupInfo.Control(PANEL_ACTIVE, FCTL_SETPANELDIR, 0, (LONG_PTR)Item);
+		StartupInfo.Control(PANEL_ACTIVE, FCTL_UPDATEPANEL, 0, NULL);
+		StartupInfo.Control(PANEL_ACTIVE, FCTL_REDRAWPANEL, 0, NULL);
+#else
 		StartupInfo.Control(INVALID_HANDLE_VALUE,FCTL_SETPANELDIR,(void *)Item);
 		StartupInfo.Control(INVALID_HANDLE_VALUE,FCTL_UPDATEPANEL,NULL);
 		StartupInfo.Control(INVALID_HANDLE_VALUE,FCTL_REDRAWPANEL,NULL);
+#endif
 		return INVALID_HANDLE_VALUE;
 
 	default:return INVALID_HANDLE_VALUE;
@@ -624,7 +645,7 @@ BOOL AtoI(char *String,int *Number,int Min,int Max) {
 }
 
 int ConfigureSeveralLines() {
-	CFarDialog Dialog(60,9,"CommonConfig");
+	CFarDialog Dialog(60,9,_T("CommonConfig"));
 	Dialog.AddFrame(MCommonSettings);
 
 	Dialog.Add(new CFarTextItem(5,3,0,MSeveralLinesIs));
@@ -638,7 +659,7 @@ int ConfigureSeveralLines() {
 }
 
 int ConfigureCommon() {
-	CFarDialog Dialog(60,17,"CommonConfig");
+	CFarDialog Dialog(60,17,_T("CommonConfig"));
 	Dialog.AddFrame(MCommonSettings);
 
 	Dialog.Add(new CFarTextItem(5,3,0,MSeveralLinesIs));
@@ -662,7 +683,7 @@ int ConfigureCommon() {
 }
 
 void ConfigureFile() {
-	CFarDialog Dialog(70, 23, "FileConfig");
+	CFarDialog Dialog(70, 23, _T("FileConfig"));
 	Dialog.AddFrame(MFileSearchSettings);
 
 	Dialog.Add(new CFarBoxItem(FALSE,5,3,33,7,DIF_LEFTTEXT,MDefaultMaskCase));
@@ -677,25 +698,25 @@ void ConfigureFile() {
 
 	Dialog.Add(new CFarBoxItem(FALSE, 5,9,64,15,DIF_LEFTTEXT,MRenumberOptions));
 	Dialog.Add(new CFarTextItem(7,10,0,MStripFromBeginning));
-	Dialog.Add(new CFarEditItem(40,10,61,DIF_HISTORY,"RESearch.Strip", g_strStrip));
+	Dialog.Add(new CFarEditItem(40,10,61,DIF_HISTORY,_T("RESearch.Strip"), g_strStrip));
 	Dialog.Add(new CFarTextItem(7,11,0,MPrefix));
-	Dialog.Add(new CFarEditItem(32,11,42,DIF_HISTORY,"RESearch.Prefix", g_strPrefix));
+	Dialog.Add(new CFarEditItem(32,11,42,DIF_HISTORY,_T("RESearch.Prefix"), g_strPrefix));
 	Dialog.Add(new CFarTextItem(7,12,0,MPostfix));
-	Dialog.Add(new CFarEditItem(32,12,42,DIF_HISTORY,"RESearch.Postfix", g_strPostfix));
+	Dialog.Add(new CFarEditItem(32,12,42,DIF_HISTORY,_T("RESearch.Postfix"), g_strPostfix));
 	Dialog.Add(new CFarTextItem(7,13,0,MStartFrom));
 	Dialog.Add(new CFarEditItem(32,13,38,0, NULL, (int &)g_nStartWith,new CFarIntegerRangeValidator(0,0x7FFFFFFF)));
 	Dialog.Add(new CFarTextItem(7,14,0,MWidth));
 	Dialog.Add(new CFarEditItem(32,14,38,0, NULL, (int &)g_nWidth,new CFarIntegerRangeValidator(0,MAX_PATH)));
 
 	Dialog.Add(new CFarCheckBoxItem(5,16,0,MSkipSystemFolders,&FASkipSystemFolders));
-	Dialog.Add(new CFarEditItem(9, 17, 45, DIF_HISTORY,"RESearch.SystemFolders", FASystemFolders));
+	Dialog.Add(new CFarEditItem(9, 17, 45, DIF_HISTORY,_T("RESearch.SystemFolders"), FASystemFolders));
 
 	Dialog.AddButtons(MOk,MCancel);
 	Dialog.Display(-1);
 }
 
 void ConfigureEditor() {
-	CFarDialog Dialog(60,22,"EditorConfig");
+	CFarDialog Dialog(60,22,_T("EditorConfig"));
 	Dialog.AddFrame(MEditorSearchSettings);
 
 	Dialog.Add(new CFarTextItem(5,3,0,MShowPositionOffset));
@@ -723,10 +744,10 @@ void ConfigureEditor() {
 }
 
 int WINAPI Configure(int ItemNumber) {
-	const char *ppszItems[]={GetMsg(MCommonSettings),GetMsg(MFileSearchSettings),GetMsg(MEditorSearchSettings)};
+	const TCHAR *ppszItems[]={GetMsg(MCommonSettings),GetMsg(MFileSearchSettings),GetMsg(MEditorSearchSettings)};
 	int iResult = 0;
 	do {
-		switch (iResult = ChooseMenu(3,ppszItems,GetMsg(MRESearch),NULL,"Config",iResult)) {
+		switch (iResult = ChooseMenu(3,ppszItems,GetMsg(MRESearch),NULL,_T("Config"),iResult)) {
 		case 0:ConfigureCommon();break;
 		case 1:ConfigureFile();break;
 		case 2:ConfigureEditor();break;

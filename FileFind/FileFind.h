@@ -12,7 +12,7 @@ enum GrepWhat {GREP_NAMES, GREP_NAMES_COUNT, GREP_LINES, GREP_NAMES_LINES};
 class CFPreset : public CPreset {
 public:
 	CFPreset(CParameterSet &ParamSet);
-	CFPreset(CParameterSet &ParamSet, const string &strName, HKEY hKey);
+	CFPreset(CParameterSet &ParamSet, const tstring &strName, HKEY hKey);
 	virtual void Apply();
 };
 
@@ -20,28 +20,28 @@ typedef CPresetCollectionT<CFPreset> CFPresetCollection;
 
 class CFSPresetCollection:public CFPresetCollection {
 public:
-	CFSPresetCollection(CParameterSet &ParamSet) : CFPresetCollection(ParamSet, "FileFind", MFSPreset) {}
+	CFSPresetCollection(CParameterSet &ParamSet) : CFPresetCollection(ParamSet, _T("FileFind"), MFSPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
 	virtual int  ID() { return 3; }
 };
 
 class CFRPresetCollection:public CFPresetCollection {
 public:
-	CFRPresetCollection(CParameterSet &ParamSet) : CFPresetCollection(ParamSet, "FileReplace", MFRPreset) {}
+	CFRPresetCollection(CParameterSet &ParamSet) : CFPresetCollection(ParamSet, _T("FileReplace"), MFRPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
 	virtual int  ID() { return 0; }
 };
 
 class CFGPresetCollection:public CFPresetCollection {
 public:
-	CFGPresetCollection(CParameterSet &ParamSet) : CFPresetCollection(ParamSet, "FileGrep", MFGPreset) {}
+	CFGPresetCollection(CParameterSet &ParamSet) : CFPresetCollection(ParamSet, _T("FileGrep"), MFGPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
 	virtual int  ID() { return 4; }
 };
 
 class CFAPresetCollection:public CStdPresetCollection {
 public:
-	CFAPresetCollection(CParameterSet &ParamSet) : CStdPresetCollection(ParamSet, "FileAdvanced", MFAPreset) {}
+	CFAPresetCollection(CParameterSet &ParamSet) : CStdPresetCollection(ParamSet, _T("FileAdvanced"), MFAPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
 	virtual int  ID() { return 5; }
 };
@@ -97,11 +97,13 @@ EXTERN int ItemsNumber;
 EXTERN int g_nFoundLine;
 EXTERN int g_nFoundColumn;
 
+#ifndef UNICODE
 struct CharTableSet2 : public CharTableSet {
   unsigned char UpperDecodeTable[256];
 };
 
 EXTERN vector<CharTableSet2> XLatTables;
+#endif
 
 typedef void (*ProcessFileProc)(WIN32_FIND_DATA *FindData,PluginPanelItem **PanelItems,int *ItemsNumber);
 
@@ -157,12 +159,12 @@ struct TempUserData {
 
 class CTemporaryPanel {
 public:
-	CTemporaryPanel(PluginPanelItem *NewItems,int NewCount,char *CalledFolder);
+	CTemporaryPanel(PluginPanelItem *NewItems,int NewCount,TCHAR *CalledFolder);
 	~CTemporaryPanel();
 
 	void GetOpenPluginInfo(OpenPluginInfo *Info);
 	int  GetFindData(PluginPanelItem **PanelItem,int *ItemsNumber,int OpMode);
-	int _SetDirectory(char *Name,int OpMode);
+	int _SetDirectory(TCHAR *Name,int OpMode);
 	int PutFiles(PluginPanelItem *AddItems,int AddNumber,int Move,int OpMode);
 	int ProcessKey(int Key,unsigned int ControlState);
 	void ClosePlugin();
@@ -171,7 +173,7 @@ public:
 private:
 	PluginPanelItem *Items;
 	int Count;
-	char *Folder;
+	TCHAR *Folder;
 	KeyBarTitles KeyBar;
 
 	void UpdateList();

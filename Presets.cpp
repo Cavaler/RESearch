@@ -123,7 +123,7 @@ void CPreset::Apply() {
 	}
 }
 
-void CPreset::FillMenuItem(FarMenuItem &Item) {
+void CPreset::FillMenuItem(CFarMenuItem &Item) {
 	strcat(strcpy(Item.Text, GetMsg(MMenuPreset)), Name().c_str());
 	Item.Selected = Item.Checked = Item.Separator = FALSE;
 }
@@ -256,11 +256,11 @@ CPreset *CPresetCollection::operator()(int nID) {
 	return NULL;
 }
 
-void CPresetCollection::FillMenuItems(vector<FarMenuItem> &MenuItems) {
+void CPresetCollection::FillMenuItems(vector<CFarMenuItem> &MenuItems) {
 	for (size_t nPreset = 0; nPreset < size(); nPreset++) {
 		CPreset *pPreset = at(nPreset);
 		if (pPreset->m_bAddToMenu) {
-			FarMenuItem Item;
+			CFarMenuItem Item;
 			pPreset->FillMenuItem(Item);
 			MenuItems.push_back(Item);
 		}
@@ -467,7 +467,7 @@ void CBatchAction::Execute() {
 	}
 }
 
-FarMenuItem CBatchAction::GetMenuItem() {
+CFarMenuItem CBatchAction::GetMenuItem() {
 	return CFarMenuItem(m_strName);
 }
 
@@ -552,7 +552,7 @@ void CBatchActionCollection::ShowMenu() {
 }
 
 
-void CBatchActionCollection::FillMenuItems(vector<FarMenuItem> &MenuItems) {
+void CBatchActionCollection::FillMenuItems(vector<CFarMenuItem> &MenuItems) {
 	for (size_t nAction = 0; nAction < size(); nAction++) {
 		CBatchAction *pAction = at(nAction);
 		if (pAction->m_bAddToMenu) {

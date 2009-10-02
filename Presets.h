@@ -9,8 +9,8 @@ typedef OperationResult (*PresetExecutor)();
 class CParameterSet {
 public:
 	CParameterSet(PresetExecutor Executor, int nStringCount, int nIntCount, ...);
-	map<string, string *> m_mapStrings;
-	map<string, int *> m_mapInts;
+	map<tstring, tstring *> m_mapStrings;
+	map<tstring, int *> m_mapInts;
 	PresetExecutor m_Executor;
 };
 
@@ -20,8 +20,8 @@ public:
 	void Restore();
 	~CParameterBackup();
 
-	map<string, string> m_mapStrings;
-	map<string, int> m_mapInts;
+	map<tstring, tstring> m_mapStrings;
+	map<tstring, int> m_mapInts;
 
 	CParameterSet &m_Set;
 	bool m_bAutoRestore;
@@ -31,46 +31,46 @@ public:
 class CPreset {
 public:
 	CPreset(CParameterSet &ParamSet);
-	CPreset(CParameterSet &ParamSet, const string &strName, HKEY hKey);	// hKey is root key
+	CPreset(CParameterSet &ParamSet, const tstring &strName, HKEY hKey);	// hKey is root key
 
 	OperationResult ExecutePreset();
 	virtual void Apply();
-	void FillMenuItem(FarMenuItem &Item);
+	void FillMenuItem(CFarMenuItem &Item);
 	void Save(HKEY hKey);
 
-	string &Name() {return m_mapStrings[""];}
+	tstring &Name() {return m_mapStrings[_T("")];}
 
 public:
 	int m_nID;
 	bool m_bAddToMenu;
-	map<string, string> m_mapStrings;
-	map<string, int> m_mapInts;
+	map<tstring, tstring> m_mapStrings;
+	map<tstring, int> m_mapInts;
 
 	CParameterSet &m_ParamSet;
 };
 
 class CPresetCollection : public vector<CPreset *> {
 public:
-	CPresetCollection(CParameterSet &ParamSet, const char *strKey, int nTitle);
+	CPresetCollection(CParameterSet &ParamSet, const TCHAR *strKey, int nTitle);
 	void Load();
 	virtual ~CPresetCollection();
 
 	void Save();
 	int ShowMenu(bool bExecute, int nDefaultID = 0);
-	virtual CPreset *LoadPreset(const string &strName, HKEY hKey) = 0;
+	virtual CPreset *LoadPreset(const tstring &strName, HKEY hKey) = 0;
 	virtual CPreset *NewPreset() = 0;
 	virtual BOOL EditPreset(CPreset *pPreset) = 0;
 	virtual int  ID() = 0;	// For batches
 	CPreset *operator()(int nID);
 
-	void FillMenuItems(vector<FarMenuItem> &MenuItems);
+	void FillMenuItems(vector<CFarMenuItem> &MenuItems);
 	CPreset *FindMenuPreset(int &nIndex);
 
-	const char *Name()  {return m_strKey.c_str();}
-	const char *Title() {return GetMsg(m_nTitle);}
+	const TCHAR *Name()  {return m_strKey.c_str();}
+	const TCHAR *Title() {return GetMsg(m_nTitle);}
 
 	CParameterSet &m_ParamSet;
-	string m_strKey;
+	tstring m_strKey;
 	int m_nTitle;
 
 protected:
@@ -82,9 +82,9 @@ template<class _Preset>
 class CPresetCollectionT : public CPresetCollection
 {
 public:
-	CPresetCollectionT(CParameterSet &ParamSet, const char *strKey, int nTitle)
+	CPresetCollectionT(CParameterSet &ParamSet, const TCHAR *strKey, int nTitle)
 		: CPresetCollection(ParamSet, strKey, nTitle) { Load(); } 
-	virtual CPreset *LoadPreset(const string &strName, HKEY hKey) { return new _Preset(m_ParamSet, strName, hKey); }
+	virtual CPreset *LoadPreset(const tstring &strName, HKEY hKey) { return new _Preset(m_ParamSet, strName, hKey); }
 	virtual CPreset *NewPreset() { return new _Preset(m_ParamSet); }
 };
 
@@ -109,17 +109,17 @@ public:
 class CBatchAction : public vector<BatchActionIndex> {		// Collection index and ID
 public:
 	CBatchAction(CBatchType &Type);
-	CBatchAction(CBatchType &Type, string strName, HKEY hKey);
+	CBatchAction(CBatchType &Type, tstring strName, HKEY hKey);
 	void Save(HKEY hKey);
 
 	bool Edit();
 	void EditItems();
 	void Execute();
 
-	FarMenuItem GetMenuItem();
+	CFarMenuItem GetMenuItem();
 
 	bool m_bAddToMenu;
-	string m_strName;
+	tstring m_strName;
 
 protected:
 	CBatchType &m_Type;
@@ -132,7 +132,7 @@ public:
 
 	void ShowMenu();
 
-	void FillMenuItems(vector<FarMenuItem> &MenuItems);
+	void FillMenuItems(vector<CFarMenuItem> &MenuItems);
 	CBatchAction *FindMenuAction(int &nIndex);
 public:
 	CBatchType &m_Type;

@@ -7,28 +7,28 @@
 
 class CESPresetCollection:public CStdPresetCollection {
 public:
-	CESPresetCollection(CParameterSet &ParamSet) : CStdPresetCollection(ParamSet, "EditFind", MESPreset) {}
+	CESPresetCollection(CParameterSet &ParamSet) : CStdPresetCollection(ParamSet, _T("EditFind"), MESPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
 	virtual int  ID() { return 3; }
 };
 
 class CERPresetCollection:public CStdPresetCollection {
 public:
-	CERPresetCollection(CParameterSet &ParamSet) : CStdPresetCollection(ParamSet, "EditReplace", MERPreset) {}
+	CERPresetCollection(CParameterSet &ParamSet) : CStdPresetCollection(ParamSet, _T("EditReplace"), MERPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
 	virtual int  ID() { return 0; }
 };
 
 class CEFPresetCollection:public CStdPresetCollection {
 public:
-	CEFPresetCollection(CParameterSet &ParamSet) : CStdPresetCollection(ParamSet, "EditFilter", MEFPreset) {}
+	CEFPresetCollection(CParameterSet &ParamSet) : CStdPresetCollection(ParamSet, _T("EditFilter"), MEFPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
 	virtual int  ID() { return 1; }
 };
 
 class CETPresetCollection:public CStdPresetCollection {
 public:
-	CETPresetCollection(CParameterSet &ParamSet) : CStdPresetCollection(ParamSet, "EditTransliterate", METPreset) {}
+	CETPresetCollection(CParameterSet &ParamSet) : CStdPresetCollection(ParamSet, _T("EditTransliterate"), METPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
 	virtual int  ID() { return 2; }
 };
@@ -47,7 +47,7 @@ EXTERN CETPresetCollection *ETPresets;
 
 EXTERN int LastAction VALUE(-1);
 
-EXTERN string ERReplace_O2E;
+EXTERN tstring ERReplace_O2E;
 EXTERN BOOL ERRemoveEmpty;
 EXTERN BOOL ERRemoveNoMatch;
 EXTERN bool EREvaluate VALUE(false);
@@ -56,7 +56,7 @@ EXTERN BOOL ESearchAgainCalled VALUE(FALSE);
 EXTERN BOOL EInSelection;
 EXTERN BOOL EUTF8 VALUE(FALSE);
 
-EXTERN string ETextUpcase;
+EXTERN tstring ETextUpcase;
 EXTERN pcre *EPattern VALUE(NULL);
 EXTERN pcre_extra *EPatternExtra VALUE(NULL);
 EXTERN const unsigned char *ECharacterTables VALUE(NULL);
@@ -99,7 +99,7 @@ int	LeftColumn(int RightPosition,int ScreenWidth);
 void SaveSelection();
 void RestoreSelection();
 void RestorePosition(const EditorInfo &StartEdInfo);
-BOOL EPreparePattern(string &SearchText);
+BOOL EPreparePattern(tstring &SearchText);
 
 void FindIfClockPresent();
 void ShowCurrentLine(int CurLine,int TotalLines,int TotalColumns);

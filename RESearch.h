@@ -283,7 +283,7 @@ enum eStringTable {
 	MRegExpError,
 };
 
-HKEY OpenRegistry(const char *szSubKey=NULL, bool bCreate=true);
+HKEY OpenRegistry(const TCHAR *szSubKey=NULL, bool bCreate=true);
 void ReadRegistry();
 void WriteRegistry();
 void ReadActiveScripts();
@@ -293,25 +293,28 @@ bool CheckUsage(const string &strText, bool bRegExp, bool bSeveralLine);
 void PrepareBMHSearch(const char *String,int StringLength,size_t nPattern = 0);
 BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,int CaseSensitive,BOOL bUTF8=FALSE,const unsigned char *pTables=NULL);
 BOOL PreparePattern(CRegExp &reObject, const string &Text, int CaseSensitive, BOOL bUTF8=FALSE, const unsigned char *pTables=NULL);
-string CreateReplaceString(const char *Matched,int *Match,int Count,const char *Replace,const char *EOL,int *Numbers,int Engine);
-string EvaluateReplaceString(const char *Matched,int *Match,int Count,const char *Replace,const char *EOL,int *Numbers,int Engine);
+tstring CreateReplaceString(const TCHAR *Matched,int *Match,int Count,const TCHAR *Replace,const TCHAR *EOL,int *Numbers,int Engine);
+tstring EvaluateReplaceString(const TCHAR *Matched,int *Match,int Count,const TCHAR *Replace,const TCHAR *EOL,int *Numbers,int Engine);
 
 BOOL LoadPresets(char *Which,char **StringNames,int StringCount,char **IntNames,int IntCount,void **PresetData,int *PresetCount);
 BOOL SavePresets(char *Which,char **StringNames,int StringCount,char **IntNames,int IntCount,void *PresetData,int PresetCount);
 
-void ShowErrorMsg(const char *sz1, const char *sz2 = NULL, const char *szHelp = NULL);
-void ShowHResultError(int nError, HRESULT hResult, const char *szHelp = NULL);
+void ShowErrorMsg(const TCHAR *sz1, const TCHAR *sz2 = NULL, const TCHAR *szHelp = NULL);
+void ShowHResultError(int nError, HRESULT hResult, const TCHAR *szHelp = NULL);
 
+#ifndef UNICODE
 EXTERN char UpCaseTable[256];
 EXTERN CharTableSet *m_pReplaceTable;
 void PrepareLocaleStuff();
 string UpCaseString(const string &strText);
 
+void UTF8Converter(tstring strInit = _T(""));
+#endif
+
 int BMHSearch(const char *Buffer,int BufferLength,const char *String,int StringLength,char *XLatTable,int nPattern = 0);
 int ReverseBMHSearch(const char *Buffer,int BufferLength,const char *String,int StringLength,char *XLatTable,int nPattern = 0);
-void UTF8Converter(string strInit = "");
-void QuoteRegExpString(string &strText);
-void QuoteReplaceString(string &strText);
+void QuoteRegExpString(tstring &strText);
+void QuoteReplaceString(tstring &strText);
 
 void StartREThread();
 void StopREThread();
@@ -322,7 +325,7 @@ int do_pcre_exec(const pcre *external_re, const pcre_extra *extra_data,
 bool do_pcre_exec(CRegExp &reObject, const char *subject, int length, int start_offset, int options,
 				  int *offsets, int offsetcount);
 
-void RunExternalEditor(string &strText);
+void RunExternalEditor(tstring &strText);
 
 inline bool Interrupted256(int nValue) {
 	return (((nValue & 0xFF) == 0) && Interrupted());

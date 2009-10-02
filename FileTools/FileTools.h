@@ -7,14 +7,14 @@
 
 class CRnPresetCollection:public CStdPresetCollection {
 public:
-	CRnPresetCollection(CParameterSet &ParamSet) : CStdPresetCollection(ParamSet, "FileRename", MRnPreset) {}
+	CRnPresetCollection(CParameterSet &ParamSet) : CStdPresetCollection(ParamSet, _T("FileRename"), MRnPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
 	virtual int  ID() { return 1; }
 };
 
 class CQRPresetCollection:public CStdPresetCollection {
 public:
-	CQRPresetCollection(CParameterSet &ParamSet) : CStdPresetCollection(ParamSet, "FileQuickRename", MQRPreset) {}
+	CQRPresetCollection(CParameterSet &ParamSet) : CStdPresetCollection(ParamSet, _T("FileQuickRename"), MQRPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
 	virtual int  ID() { return 2; }
 };

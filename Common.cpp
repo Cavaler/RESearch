@@ -2,10 +2,10 @@
 #define DEFINE_VARS
 #include "RESearch.h"
 
-HKEY OpenRegistry(const char *szSubKey, bool bCreate) {
-	char szCurrentKey[512];
-	strcat(strcpy(szCurrentKey, StartupInfo.RootKey), "\\RESearch");
-	if (szSubKey) strcat(strcat(szCurrentKey, "\\"), szSubKey);
+HKEY OpenRegistry(const TCHAR *szSubKey, bool bCreate) {
+	TCHAR szCurrentKey[512];
+	_tcscat(_tcscpy(szCurrentKey, StartupInfo.RootKey), _T("\\RESearch"));
+	if (szSubKey) _tcscat(_tcscat(szCurrentKey, _T("\\")), szSubKey);
 
 	if (bCreate) {
 		return RegCreateSubkey(HKEY_CURRENT_USER, szCurrentKey);
@@ -25,11 +25,11 @@ void ReadRegistry() {
 	FTReadRegistry(hKey);
 
 	g_pEditorBatchType = new CBatchType(MEditorBatches, ESPresets, ERPresets, EFPresets, ETPresets, NULL);
-	hKey = OpenRegistry("EditorBatches");
+	hKey = OpenRegistry(_T("EditorBatches"));
 	g_pEditorBatches = new CBatchActionCollection(*g_pEditorBatchType, hKey);
 
 	g_pPanelBatchType = new CBatchType(MPanelBatches, FSPresets, FRPresets, RnPresets, QRPresets, FGPresets, NULL);
-	hKey = OpenRegistry("PanelBatches");
+	hKey = OpenRegistry(_T("PanelBatches"));
 	g_pPanelBatches = new CBatchActionCollection(*g_pPanelBatchType, hKey);
 }
 
@@ -44,18 +44,18 @@ void WriteRegistry() {
 	FWriteRegistry(hKey);
 	FTWriteRegistry(hKey);
 
-	hKey = OpenRegistry("EditorBatches");
+	hKey = OpenRegistry(_T("EditorBatches"));
 	g_pEditorBatches->Save(hKey);
 
-	hKey = OpenRegistry("PanelBatches");
+	hKey = OpenRegistry(_T("PanelBatches"));
 	g_pPanelBatches->Save(hKey);
 }
 
-bool CheckUsage(const string &strText, bool bRegExp, bool bSeveralLine) {
+bool CheckUsage(const tstring &strText, bool bRegExp, bool bSeveralLine) {
 	if (!g_bShowUsageWarnings) return true;
 
 	if (!bRegExp) {
-		if ((strText.find("\\r") != string::npos) || (strText.find("\\n") != string::npos)) {
+		if ((strText.find(_T("\\r")) != string::npos) || (strText.find(_T("\\n")) != string::npos)) {
 			int nResult = Message(FMSG_WARNING, NULL, 5, 2,
 				GetMsg(MWarning), GetMsg(MWarnMacrosInPlainText), GetMsg(MWarnContinue), GetMsg(MOk), GetMsg(MCancel));
 			
@@ -64,7 +64,7 @@ bool CheckUsage(const string &strText, bool bRegExp, bool bSeveralLine) {
 	}
 
 	if (bSeveralLine) {
-		if ((strText.find("\\r\\n") != string::npos) || (strText.find("\r\n") != string::npos)) {
+		if ((strText.find(_T("\\r\\n")) != string::npos) || (strText.find(_T("\r\n")) != string::npos)) {
 			int nResult = Message(FMSG_WARNING, NULL, 5, 2,
 				GetMsg(MWarning), GetMsg(MWarnRNInSeveralLine), GetMsg(MWarnContinue), GetMsg(MOk), GetMsg(MCancel));
 
@@ -75,9 +75,9 @@ bool CheckUsage(const string &strText, bool bRegExp, bool bSeveralLine) {
 	return true;
 }
 
-BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,int CaseSensitive,BOOL bUTF8,const unsigned char *pTables) {
+BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const tstring &Text,int CaseSensitive,BOOL bUTF8,const unsigned char *pTables) {
 	if (Text.empty()) return FALSE;		// WAS: Not needed if empty NOW: what is search for nothing?
-	const char *ErrPtr;
+	const TCHAR *ErrPtr;
 	int ErrOffset;
 	int iFlags=PCRE_MULTILINE;
 	if (DotMatchesNewline) iFlags |= PCRE_DOTALL;
@@ -86,10 +86,10 @@ BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,
 
 	*Pattern=pcre_compile(Text.c_str(),iFlags,&ErrPtr,&ErrOffset,pTables);
 	if (!(*Pattern)) {
-		string ErrPos(Text.length(),' ');
-		const char *Lines[]={GetMsg(MRegExpError),(char *)ErrPtr,"\x01",Text.c_str(),ErrPos.c_str(),GetMsg(MOk)};
+		tstring ErrPos(Text.length(),' ');
+		const TCHAR *Lines[]={GetMsg(MRegExpError),ErrPtr,_T("\x01"),Text.c_str(),ErrPos.c_str(),GetMsg(MOk)};
 		ErrPos[ErrOffset]='^';
-		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"RegExpError",Lines,6,1);
+		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("RegExpError"),Lines,6,1);
 		return FALSE;
 	} else {
 		if (PatternExtra) {
@@ -103,8 +103,9 @@ enum ECaseConvert {CCV_NONE,CCV_UPPER,CCV_LOWER,CCV_FLIP};
 ECaseConvert CaseConvert;
 ECaseConvert OneCaseConvert;
 
-char ConvertCase_OEM(char C) {
-	char Ansi,Oem;
+#ifndef UNICODE
+TCHAR ConvertCase_OEM(TCHAR C) {
+	TCHAR Ansi,Oem;
 
 	OemToCharBuff(&C,&Ansi,1);
 	CharToOemBuff(&Ansi,&Oem,1);
@@ -112,12 +113,12 @@ char ConvertCase_OEM(char C) {
 
 	switch (OneCaseConvert) {
 	case CCV_UPPER:
-		Ansi=(char)CharUpper((char *)(unsigned char)Ansi);break;
+		Ansi=(TCHAR)CharUpper((TCHAR *)(UTCHAR)Ansi);break;
 	case CCV_LOWER:
-		Ansi=(char)CharLower((char *)(unsigned char)Ansi);break;
+		Ansi=(TCHAR)CharLower((TCHAR *)(UTCHAR)Ansi);break;
 	case CCV_FLIP:{
-		char Lower=(char)CharLower((char *)(unsigned char)Ansi);
-		Ansi=(Lower==Ansi)?(char)CharUpper((char *)(unsigned char)Ansi):Lower;
+		char Lower=(TCHAR)CharLower((TCHAR *)(UTCHAR)Ansi);
+		Ansi=(Lower==Ansi)?(TCHAR)CharUpper((TCHAR *)(UTCHAR)Ansi):Lower;
 		break;
 				  }
 	}
@@ -126,11 +127,12 @@ char ConvertCase_OEM(char C) {
 	return C;
 }
 
-char ConvertCase(char C) {
+TCHAR ConvertCase(TCHAR C) {
 	if (OneCaseConvert == CCV_NONE) return C;
 
 	if (m_pReplaceTable) {
-		char cUp = m_pReplaceTable->UpperTable[(BYTE)C], cDn = m_pReplaceTable->LowerTable[(BYTE)C];
+		char cUp = m_pReplaceTable->UpperTable[(UTCHAR)C];
+		char cDn = m_pReplaceTable->LowerTable[(UTCHAR)C];
 		switch (OneCaseConvert) {
 		case CCV_UPPER:
 			C = cUp;
@@ -149,16 +151,25 @@ char ConvertCase(char C) {
 	OneCaseConvert=CaseConvert;
 	return C;
 }
+#else
+TCHAR ConvertCase(TCHAR C) {
+	if (OneCaseConvert == CCV_NONE) return C;
 
-void AddChar(string &String, char C) {
+#pragma message("ConvertCase unimplemented for UNICODE")
+
+	return C;
+}
+#endif
+
+void AddChar(tstring &String, TCHAR C) {
 	String += ConvertCase(C);
 }
 
-void AddString(string &String, const char *Add, int Len) {
+void AddString(tstring &String, const TCHAR *Add, int Len) {
 	for (int I=0;I<Len;I++) String += ConvertCase(Add[I]);
 }
 
-int GetDelta(char *&String) {
+int GetDelta(TCHAR *&String) {
 	int Number=0;
 	BOOL Minus=FALSE;
 	String++;
@@ -173,36 +184,36 @@ int GetDelta(char *&String) {
 	return (Minus)?(-Number):Number;
 }
 
-bool GetNumber(const string &str, int &nValue) {
-	CRegExp reNumber("^[-+]?\\d+$");
+bool GetNumber(const tstring &str, int &nValue) {
+	static CRegExp reNumber(_T("^[-+]?\\d+$"));
 	if (reNumber.Match(str)) {
-		nValue = atoi(str.c_str());
+		nValue = _ttoi(str.c_str());
 		return true;
 	} else return false;
 }
 
-BOOL ExpandParameter(const char *Matched,string &String,string Param,int *Match,int Count,int *Numbers) {
+BOOL ExpandParameter(const TCHAR *Matched,tstring &String,tstring Param,int *Match,int Count,int *Numbers) {
 	int Number=0;
 	if (Param.size()==0) return TRUE;
-	if (isdigit((unsigned char)Param[0])) {
+	if (isdigit((UTCHAR)Param[0])) {
 		if (Count) {
 			Number = Param[0] - '0';
 			size_t nPos = 1;
-			while ((nPos < Param.length()) && isdigit((unsigned char)Param[nPos])) {
+			while ((nPos < Param.length()) && isdigit((UTCHAR)Param[nPos])) {
 				Number = Number*10 + Param[nPos] - '0';
 				nPos++;
 			}
 			if ((Number >= Count) || (Match[Number*2] == -1)) return FALSE;
 
-			string strMatch = string(Matched+Match[Number*2], Match[Number*2+1]-Match[Number*2]);
+			tstring strMatch = tstring(Matched+Match[Number*2], Match[Number*2+1]-Match[Number*2]);
 			if ((nPos < Param.length()) && ((Param[nPos] == '+') || (Param[nPos] == '-'))) {
 				int nMatch, nAdd;
 				if (GetNumber(strMatch, nMatch) && GetNumber(Param.substr(nPos), nAdd)) {
 					int MinLen = 1;
 					if (Param.length() >= nPos+1) MinLen = Param.length() - nPos - 1;
 
-					char sz[16];
-					sprintf(sz,"%0*d", MinLen, nMatch + nAdd);
+					TCHAR sz[16];
+					_stprintf_s(sz, 16, _T("%0*d"), MinLen, nMatch + nAdd);
 					strMatch = sz;
 				} else {
 					strMatch += Param.substr(nPos);
@@ -217,7 +228,7 @@ BOOL ExpandParameter(const char *Matched,string &String,string Param,int *Match,
 	int MinLen = 1;
 	if ((Param.size() >= 2) && ((Param[1]=='+') || (Param[1]=='-'))){
 		MinLen = Param.length()-2;
-		sscanf(Param.c_str()+1,"%d",&Number);
+		_stscanf(Param.c_str()+1, _T("%d"), &Number);
 	}
 	switch (toupper(Param[0])) {
 	case 'L':Number+=Numbers[0];break;
@@ -225,17 +236,17 @@ BOOL ExpandParameter(const char *Matched,string &String,string Param,int *Match,
 	case 'R':Number+=Numbers[2];break;
 	default:return FALSE;
 	}
-	char S[16];
-	sprintf(S,"%0*d",MinLen, Number);
-	AddString(String, S, strlen(S));
+	TCHAR S[16];
+	_stprintf_s(S, 16, _T("%0*d"), MinLen, Number);
+	AddString(String, S, _tcslen(S));
 	return TRUE;
 }
 
-string CreateReplaceString(const char *Matched,int *Match,int Count,const char *Replace,const char *EOL,int *Numbers,int Engine) {
+tstring CreateReplaceString(const TCHAR *Matched,int *Match,int Count,const TCHAR *Replace,const TCHAR *EOL,int *Numbers,int Engine) {
 	if ((Engine >= 0) && (Engine < (int)m_arrEngines.size()))
 		return EvaluateReplaceString(Matched, Match, Count, Replace, EOL, Numbers, Engine);
 
-	string String;
+	tstring String;
 	OneCaseConvert=CaseConvert=CCV_NONE;
 	while (*Replace) {
 		if (OneCaseConvert==CCV_NONE) OneCaseConvert=CaseConvert;
@@ -248,7 +259,7 @@ string CreateReplaceString(const char *Matched,int *Match,int Count,const char *
 			case 'b':AddChar(String,'\b');break;
 			case 'e':AddChar(String,'\x1B');break;
 			case 'f':AddChar(String,'\f');break;
-			case 'n':AddString(String,EOL,strlen(EOL));break;
+			case 'n':AddString(String,EOL,_tcslen(EOL));break;
 			case 'r':AddChar(String,'\r');break;
 			case 't':AddChar(String,'\t');break;
 			case 'v':AddChar(String,'\v');break;
@@ -291,14 +302,14 @@ string CreateReplaceString(const char *Matched,int *Match,int Count,const char *
 			int I=2;
 			if (Replace[1]=='{') {
 				while (Replace[I]&&(Replace[I]!='}')) I++;
-				char Save=Replace[I];
-				ExpandParameter(Matched,String,string(Replace+2,I-2),Match,Count,Numbers);
+				TCHAR Save=Replace[I];
+				ExpandParameter(Matched,String,tstring(Replace+2,I-2),Match,Count,Numbers);
 				Replace+=I;
 				break;
 			}
-			while (isdigit((unsigned char)Replace[I])) I++;
-			char Save=Replace[I];
-			ExpandParameter(Matched,String,string(Replace+1,I-1),Match,Count,Numbers);
+			while (isdigit((UTCHAR)Replace[I])) I++;
+			TCHAR Save=Replace[I];
+			ExpandParameter(Matched,String,tstring(Replace+1,I-1),Match,Count,Numbers);
 			Replace+=I-1;
 			break;
 				 }
@@ -309,6 +320,7 @@ string CreateReplaceString(const char *Matched,int *Match,int Count,const char *
 	return String;
 }
 
+#ifndef UNICODE
 void PrepareLocaleStuff() {
 //	Not .ACP / .OCP - they set locale based on "Standarts and Formats",
 //	not "Language for non-Unicode programs"
@@ -338,6 +350,7 @@ string UpCaseString(const string &strText) {
 
 	return strUpCase;
 }
+#endif
 
 #define BufCased(I) ((XLatTable)?(unsigned char)XLatTable[Buf[I]]:Buf[I])
 
@@ -391,18 +404,19 @@ int ReverseBMHSearch(const char *Buffer,int BufferLength,const char *String,int 
 	return -1;
 }
 
-string UTF8ToHex(string &strUTF8) {
-	char szBuffer[6];
+#ifndef UNICODE
+tstring UTF8ToHex(string &strUTF8) {
+	TCHAR szBuffer[6];
 	wstring wstrUnicode = DecodeUTF8(strUTF8);
-	string strHex;
+	tstring strHex;
 	for (size_t nIndex = 0; nIndex < wstrUnicode.length(); nIndex++) {
-		sprintf(szBuffer, "%04X ", wstrUnicode[nIndex]);
+		_stprintf_s(szBuffer, 6, _T("%04X "), wstrUnicode[nIndex]);
 		strHex += szBuffer;
 	}
 	return strHex;
 }
 
-string HexToUTF8(string &strHex) {
+string HexToUTF8(tstring &strHex) {
 	wstring wstrUnicode;
 	size_t nStart = 0;
 	while (nStart < strHex.length()) {
@@ -412,28 +426,28 @@ string HexToUTF8(string &strHex) {
 		if (nStart == nEnd) break;
 		while (isspace(strHex[nStart])) nStart++;
 		int chSymbol;
-		sscanf(strHex.data() + nStart, "%4X", &chSymbol);
+		_stscanf(strHex.data() + nStart, _T("%4X"), &chSymbol);
 		wstrUnicode += (wchar_t)chSymbol;
 		nStart = nEnd;
 	}
 	return EncodeUTF8(wstrUnicode);
 }
 
-void UTF8Converter(string strInit) {
-	string strANSI = strInit;
-	string strUTF8 = strInit;
-	string strHex;
+void UTF8Converter(tstring strInit) {
+	tstring strANSI = strInit;
+	tstring strUTF8 = strInit;
+	tstring strHex;
 
-	CFarDialog Dialog(70,13,"UTF8Converter");
+	CFarDialog Dialog(70,13,_T("UTF8Converter"));
 	Dialog.AddFrame(MUTF8Converter);
 	Dialog.Add(new CFarTextItem(5,3,0,MConverterANSI));
-	Dialog.Add(new CFarEditItem(11,3,57,DIF_HISTORY,"RESearch.ANSI",strANSI));
+	Dialog.Add(new CFarEditItem(11,3,57,DIF_HISTORY,_T("RESearch.ANSI"),strANSI));
 
 	Dialog.Add(new CFarTextItem(5,5,0,MConverterUTF8));
-	Dialog.Add(new CFarEditItem(11,5,57,DIF_HISTORY,"RESearch.UTF8",strUTF8));
+	Dialog.Add(new CFarEditItem(11,5,57,DIF_HISTORY,_T("RESearch.UTF8"),strUTF8));
 
 	Dialog.Add(new CFarTextItem(5,7,0,MConverterHex));
-	Dialog.Add(new CFarEditItem(11,7,57,DIF_HISTORY,"RESearch.Hex",strHex));
+	Dialog.Add(new CFarEditItem(11,7,57,DIF_HISTORY,_T("RESearch.Hex"),strHex));
 
 	Dialog.Add(new CFarButtonItem(60,3,0,0,MConvert));
 	Dialog.Add(new CFarButtonItem(60,5,0,0,MConvert));
@@ -458,17 +472,18 @@ void UTF8Converter(string strInit) {
 		}
 	} while ((iResult == 0) || (iResult == 1) || (iResult == 2));
 }
+#endif
 
-void QuoteRegExpString(string &strText) {
+void QuoteRegExpString(tstring &strText) {
 	for (size_t I=0; I<strText.length();I++) {
-		if (strchr("()[]{}\\^$+*.?|",strText[I])) {
+		if (_tcschr(_T("()[]{}\\^$+*.?|"), strText[I])) {
 			strText.insert(I++, 1, '\\');
 			continue;
 		}
 	}
 }
 
-void QuoteReplaceString(string &strText) {
+void QuoteReplaceString(tstring &strText) {
 	for (size_t I=0; I<strText.length();I++) {
 		if ((strText[I] == '\\') || (strText[I] == '$')) {
 			strText.insert(I++, 1, '\\');
@@ -477,24 +492,24 @@ void QuoteReplaceString(string &strText) {
 	}
 }
 
-void ShowErrorMsg(const char *sz1, const char *sz2, const char *szHelp) {
-	const char *Lines[]={GetMsg(MREReplace),sz1,sz2,GetMsg(MOk)};
+void ShowErrorMsg(const TCHAR *sz1, const TCHAR *sz2, const TCHAR *szHelp) {
+	const TCHAR *Lines[]={GetMsg(MREReplace),sz1,sz2,GetMsg(MOk)};
 	StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,szHelp,Lines,4,1);
 }
 
-void ShowHResultError(int nError, HRESULT hResult, const char *szHelp) {
-	char *szMessage;
+void ShowHResultError(int nError, HRESULT hResult, const TCHAR *szHelp) {
+	TCHAR *szMessage;
 	FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER|FORMAT_MESSAGE_FROM_SYSTEM,
-		NULL, hResult, 0, (LPSTR)&szMessage, 0, NULL);
+		NULL, hResult, 0, (LPTSTR)&szMessage, 0, NULL);
 
-	char szFullMsg[1024];
+	TCHAR szFullMsg[1024];
 
 	if (szMessage) {
-		char *szEnd = strchr(szMessage, '\r');
+		TCHAR *szEnd = _tcschr(szMessage, '\r');
 		if (szEnd) *szEnd = 0;
-		sprintf(szFullMsg, "%s (0x%08X)", szMessage, hResult);
+		_stprintf_s(szFullMsg, 1024, _T("%s (0x%08X)"), szMessage, hResult);
 	} else {
-		sprintf(szFullMsg, "0x%08X", hResult);
+		_stprintf_s(szFullMsg, 1024, _T("0x%08X"), hResult);
 	}
 
 	ShowErrorMsg(GetMsg(nError), szFullMsg, szHelp);
@@ -595,23 +610,31 @@ BOOL LocalToSystemTime(FILETIME &ft) {
 	return TRUE;
 }
 
-void RunExternalEditor(string &strText) {
+void RunExternalEditor(tstring &strText) {
 	if ((strText.length() > 3) && (strText[1] == ':') && (strText[2] == '\\')) {
+#ifdef UNICODE
+		StartupInfo.Editor(strText.c_str(), NULL, 0, 0, -1, -1, 0, 0, 1, 0);
+#else
 		StartupInfo.Editor(strText.c_str(), NULL, 0, 0, -1, -1, 0, 0, 1);
+#endif
 	} else {
-		char szBuffer[MAX_PATH], szName[MAX_PATH];
+		TCHAR szBuffer[MAX_PATH], szName[MAX_PATH];
 		GetTempPath(MAX_PATH, szBuffer);
-		GetTempFileName(szBuffer, "re", 0, szName);
+		GetTempFileName(szBuffer, _T("re"), 0, szName);
 
 		CFileMapping mapFile;
 		mapFile.Open(szName, true, strText.length());
 		memmove((BYTE *)mapFile, strText.data(), strText.length());
 		mapFile.Close();
 
+#ifdef UNICODE
+		StartupInfo.Editor(szName, NULL, 0, 0, -1, -1, EF_DISABLEHISTORY, 0, 1, 0);
+#else
 		StartupInfo.Editor(szName, NULL, 0, 0, -1, -1, EF_DISABLEHISTORY, 0, 1);
+#endif
 
 		mapFile.Open(szName);
-		strText = string(mapFile, mapFile.Size());
+		strText = tstring(mapFile, mapFile.Size());
 		mapFile.Close();
 		DeleteFile(szName);
 	}

@@ -697,7 +697,7 @@
 				Version="6.23"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
-				ModuleDefinitionFile=".\RESearch.def"
+				ModuleDefinitionFile=".\RESearchW.def"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)\$(TargetName).pdb"
 				SubSystem="2"
@@ -899,7 +899,7 @@
 				Version="6.23"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				ModuleDefinitionFile=".\RESearch.def"
+				ModuleDefinitionFile=".\RESearchW.def"
 				ProgramDatabaseFile="$(OutDir)\$(TargetName).pdb"
 				SubSystem="2"
 				OptimizeForWindows98="1"
@@ -2396,6 +2396,22 @@
 		<File
 			RelativePath="RESearch.def"
 			>
+			<FileConfiguration
+				Name="Debug Unicode|Win32"
+				ExcludedFromBuild="true"
+				>
+				<Tool
+					Name="VCCustomBuildTool"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release Unicode|Win32"
+				ExcludedFromBuild="true"
+				>
+				<Tool
+					Name="VCCustomBuildTool"
+				/>
+			</FileConfiguration>
 		</File>
 		<File
 			RelativePath="RESearch.msg"
@@ -2407,7 +2423,7 @@
 					Name="VCCustomBuildTool"
 					Description="Compiling language file $(InputPath)..."
 					CommandLine="$(COMSPEC) /c ..\MakeLng.bat&#x0D;&#x0A;echo Copying resulting language files...&#x0D;&#x0A;copy *.lng &quot;$(FAR_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;"
-					Outputs="$(TargetName)Eng.lng;$(TargetName)Rus.lng"
+					Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
 				/>
 			</FileConfiguration>
 			<FileConfiguration
@@ -2444,7 +2460,7 @@
 					Name="VCCustomBuildTool"
 					Description="Compiling language file $(InputPath)..."
 					CommandLine="$(COMSPEC) /c ..\MakeLng.bat&#x0D;&#x0A;echo Copying resulting language files...&#x0D;&#x0A;copy *.lng &quot;$(FAR_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;"
-					Outputs="$(TargetName)Eng.lng;$(TargetName)Rus.lng"
+					Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
 				/>
 			</FileConfiguration>
 			<FileConfiguration
@@ -2572,6 +2588,34 @@
 		<File
 			RelativePath="RESearchRus.hlf"
 			>
+		</File>
+		<File
+			RelativePath=".\RESearchW.def"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				ExcludedFromBuild="true"
+				>
+				<Tool
+					Name="VCCustomBuildTool"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release Intel|Win32"
+				ExcludedFromBuild="true"
+				>
+				<Tool
+					Name="VCCustomBuildTool"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				ExcludedFromBuild="true"
+				>
+				<Tool
+					Name="VCCustomBuildTool"
+				/>
+			</FileConfiguration>
 		</File>
 	</Files>
 	<Globals>

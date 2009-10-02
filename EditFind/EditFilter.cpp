@@ -56,7 +56,7 @@ BOOL EditorFilter() {
 	if (SearchText.empty()) SearchText=EText;
 	int ExitCode;
 	do {
-		switch (ExitCode=Dialog.Display(4, -3, 3, -1, -5)) {
+		switch (ExitCode=Dialog.Display(4, -3, 3, -1, -4)) {
 		case 0:
 			break;
 		case 1:
