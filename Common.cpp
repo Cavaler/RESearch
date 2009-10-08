@@ -320,7 +320,23 @@ tstring CreateReplaceString(const TCHAR *Matched,int *Match,int Count,const TCHA
 	return String;
 }
 
-#ifndef UNICODE
+#ifdef UNICODE
+
+void PrepareLocaleStuff() {
+	for (int I=0;I<65536;I++) UpCaseTable[I]=I;
+	CharUpper(UpCaseTable);
+}
+
+tstring UpCaseString(const tstring &strText) {
+	tstring strUpCase = strText;
+
+	CharUpper((LPTSTR)strUpCase.c_str());	// Bad but efficient
+
+	return strUpCase;
+}
+
+#else
+
 void PrepareLocaleStuff() {
 //	Not .ACP / .OCP - they set locale based on "Standarts and Formats",
 //	not "Language for non-Unicode programs"
@@ -350,30 +366,39 @@ string UpCaseString(const string &strText) {
 
 	return strUpCase;
 }
+
 #endif
 
 #define BufCased(I) ((XLatTable)?(unsigned char)XLatTable[Buf[I]]:Buf[I])
 
+#ifdef UNICODE
+typedef int BMHTable[65536];
+#else
 typedef int BMHTable[256];
+#endif
 typedef struct {BMHTable m_Table;} BMHTableRec;
 vector<BMHTableRec> g_BMHTables;
 
-void PrepareBMHSearch(const char *String,int StringLength,size_t nPattern) {
+void PrepareBMHSearch(const TCHAR *String,int StringLength,size_t nPattern) {
 	if (nPattern >= g_BMHTables.size()) g_BMHTables.resize(nPattern+1);
 
-	BMHTable &g_BMHTable = g_BMHTables[nPattern].m_Table;
-	for (int I=0;I<256;I++) g_BMHTable[I]=StringLength;
+	BMHTable &Table = g_BMHTables[nPattern].m_Table;
+#ifdef UNICODE
+	for (int I=0;I<65536;I++) Table[I]=StringLength;
+#else
+	for (int I=0;I<256;I++) Table[I]=StringLength;
+#endif
 
 	if (EReverse)
-		for (int I=StringLength-1;I>0;I--) g_BMHTable[((unsigned char *)String)[I]]=I;
+		for (int I=StringLength-1;I>0;I--) Table[((UTCHAR *)String)[I]]=I;
 	else
-		for (int I=0;I<StringLength-1;I++) g_BMHTable[((unsigned char *)String)[I]]=StringLength-I-1;
+		for (int I=0;I<StringLength-1;I++) Table[((UTCHAR *)String)[I]]=StringLength-I-1;
 }
 
 int BMHSearch(const char *Buffer,int BufferLength,const char *String,int StringLength,char *XLatTable,int nPattern) {
 	unsigned char *Buf=(unsigned char *)Buffer;
 	unsigned char *Str=(unsigned char *)String;
-	BMHTable &g_BMHTable = g_BMHTables[nPattern].m_Table;
+	BMHTable &Table = g_BMHTables[nPattern].m_Table;
 	int I;
 
 	if (BufferLength<StringLength) return -1;
@@ -382,7 +407,7 @@ int BMHSearch(const char *Buffer,int BufferLength,const char *String,int StringL
 	while (J<BufferLength) {
 		I=J;K=StringLength-1;
 		while ((K>=0)&&(BufCased(I)==Str[K])) {I--;K--;}
-		if (K<0) return I+1; else J+=g_BMHTable[BufCased(J)];
+		if (K<0) return I+1; else J+=Table[BufCased(J)];
 	}
 	return -1;
 }
@@ -390,7 +415,7 @@ int BMHSearch(const char *Buffer,int BufferLength,const char *String,int StringL
 int ReverseBMHSearch(const char *Buffer,int BufferLength,const char *String,int StringLength,char *XLatTable,int nPattern) {
 	unsigned char *Buf=(unsigned char *)Buffer;
 	unsigned char *Str=(unsigned char *)String;
-	BMHTable &g_BMHTable = g_BMHTables[nPattern].m_Table;
+	BMHTable &Table = g_BMHTables[nPattern].m_Table;
 	int I;
 
 	if (BufferLength<StringLength) return -1;
@@ -399,7 +424,7 @@ int ReverseBMHSearch(const char *Buffer,int BufferLength,const char *String,int 
 	while (J<BufferLength) {
 		I=J;K=StringLength-1;
 		while ((K>=0)&&(BufCased(BufferLength-1-I)==Str[StringLength-1-K])) {I--;K--;}
-		if (K<0) return BufferLength-StringLength-I-1; else J+=g_BMHTable[BufCased(BufferLength-1-J)];
+		if (K<0) return BufferLength-StringLength-I-1; else J+=Table[BufCased(BufferLength-1-J)];
 	}
 	return -1;
 }
@@ -522,7 +547,7 @@ HANDLE g_hREDone = CreateSemaphore(NULL, 0, 1, NULL);
 
 const pcre *g_external_re;
 const pcre_extra *g_extra_data;
-const char *g_subject;
+const TCHAR *g_subject;
 int g_length;
 int g_start_offset;
 int g_options;
@@ -557,7 +582,7 @@ void StopREThread() {
 }
 
 int do_pcre_exec(const pcre *external_re, const pcre_extra *extra_data,
-	const char *subject, int length, int start_offset, int options, int *offsets,
+	const TCHAR *subject, int length, int start_offset, int options, int *offsets,
 	int offsetcount)
 {
 	if (g_bUseSeparateThread && (length > g_nMaxInThreadLength)) {

@@ -294,8 +294,8 @@ void ReadActiveScripts();
 int  ConfigureSeveralLines();
 
 bool CheckUsage(const string &strText, bool bRegExp, bool bSeveralLine);
-void PrepareBMHSearch(const char *String,int StringLength,size_t nPattern = 0);
-BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,int CaseSensitive,BOOL bUTF8=FALSE,const unsigned char *pTables=NULL);
+void PrepareBMHSearch(const TCHAR *String,int StringLength,size_t nPattern = 0);
+BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const tstring &Text,int CaseSensitive,BOOL bUTF8=FALSE,const unsigned char *pTables=NULL);
 BOOL PreparePattern(CRegExp &reObject, const string &Text, int CaseSensitive, BOOL bUTF8=FALSE, const unsigned char *pTables=NULL);
 tstring CreateReplaceString(const TCHAR *Matched,int *Match,int Count,const TCHAR *Replace,const TCHAR *EOL,int *Numbers,int Engine);
 tstring EvaluateReplaceString(const TCHAR *Matched,int *Match,int Count,const TCHAR *Replace,const TCHAR *EOL,int *Numbers,int Engine);
@@ -306,27 +306,30 @@ BOOL SavePresets(char *Which,char **StringNames,int StringCount,char **IntNames,
 void ShowErrorMsg(const TCHAR *sz1, const TCHAR *sz2 = NULL, const TCHAR *szHelp = NULL);
 void ShowHResultError(int nError, HRESULT hResult, const TCHAR *szHelp = NULL);
 
-#ifndef UNICODE
+#ifdef UNICODE
+EXTERN TCHAR UpCaseTable[65536];
+#else
 EXTERN char UpCaseTable[256];
 EXTERN CharTableSet *m_pReplaceTable;
-void PrepareLocaleStuff();
-string UpCaseString(const string &strText);
 
 void UTF8Converter(tstring strInit = _T(""));
 #endif
+void PrepareLocaleStuff();
+tstring UpCaseString(const tstring &strText);
 
-int BMHSearch(const char *Buffer,int BufferLength,const char *String,int StringLength,char *XLatTable,int nPattern = 0);
-int ReverseBMHSearch(const char *Buffer,int BufferLength,const char *String,int StringLength,char *XLatTable,int nPattern = 0);
+int BMHSearch(const TCHAR *Buffer,int BufferLength,const TCHAR *String,int StringLength,TCHAR *XLatTable,int nPattern = 0);
+int ReverseBMHSearch(const TCHAR *Buffer,int BufferLength,const TCHAR *String,int StringLength,TCHAR *XLatTable,int nPattern = 0);
+
 void QuoteRegExpString(tstring &strText);
 void QuoteReplaceString(tstring &strText);
 
 void StartREThread();
 void StopREThread();
 int do_pcre_exec(const pcre *external_re, const pcre_extra *extra_data,
-	const char *subject, int length, int start_offset, int options, int *offsets,
+	const TCHAR *subject, int length, int start_offset, int options, int *offsets,
 	int offsetcount);
 
-bool do_pcre_exec(CRegExp &reObject, const char *subject, int length, int start_offset, int options,
+bool do_pcre_exec(CRegExp &reObject, const TCHAR *subject, int length, int start_offset, int options,
 				  int *offsets, int offsetcount);
 
 void RunExternalEditor(tstring &strText);

@@ -64,7 +64,7 @@ EXTERN int  FAdvancedID VALUE(0);
 
 // Internals
 
-EXTERN string FTextUpcase;
+EXTERN tstring FTextUpcase;
 EXTERN pcre *FPattern;
 EXTERN pcre_extra *FPatternExtra;
 EXTERN vector<string> FSWords;
@@ -82,9 +82,9 @@ EXTERN int  FilesScanned;
 
 EXTERN CFarMaskSet *FASystemFoldersMask VALUE(NULL);
 
-EXTERN string MaskText;
-EXTERN string SearchText;
-EXTERN string ReplaceText;
+EXTERN tstring MaskText;
+EXTERN tstring SearchText;
+EXTERN tstring ReplaceText;
 
 EXTERN CFarListData g_WhereToSearch;
 EXTERN CFarListData g_WhereToSearchPlugin;
@@ -131,7 +131,7 @@ int  ScanDirectories(PluginPanelItem **PanelItems,int *ItemsNumber,ProcessFilePr
 int  FPrepareMaskPattern();
 int  FPreparePattern(bool bAcceptEmpty);
 
-BOOL ConfirmFile(int Title,const char *FileName);
+BOOL ConfirmFile(int Title,const TCHAR *FileName);
 
 void FReadRegistry(HKEY Key);
 void FWriteRegistry(HKEY Key);

@@ -471,12 +471,12 @@ OperationResult NoFilesFound() {
 	return OR_OK;
 }
 
-BOOL ConfirmFile(int Title,const char *FileName) {
+BOOL ConfirmFile(int Title,const TCHAR *FileName) {
 	if (FileConfirmed) return TRUE;
-	const char *Lines[]={
+	const TCHAR *Lines[]={
 		GetMsg(Title),GetMsg(MConfirmRequest),FileName,GetMsg(MOk),GetMsg(MAll),GetMsg(MSkip),GetMsg(MCancel)
 	};
-	switch (StartupInfo.Message(StartupInfo.ModuleNumber,0,"FRConfirmFile",Lines,7,4)) {
+	switch (StartupInfo.Message(StartupInfo.ModuleNumber,0,_T("FRConfirmFile"),Lines,7,4)) {
 	case 1:FRConfirmFileThisRun=FALSE;
 	case 0:return (FileConfirmed=TRUE);
 	case -1:

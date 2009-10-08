@@ -21,9 +21,7 @@ void WINAPI GetPluginInfo(PluginInfo *Info) {
 
 void WINAPI SetStartupInfo(const PluginStartupInfo *Info) {
 	StartupInfo=*Info;
-#ifndef UNICODE
 	PrepareLocaleStuff();
-#endif
 	ReadRegistry();
 
 	g_pszOKButton = GetMsg(MOk);
