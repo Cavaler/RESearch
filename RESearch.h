@@ -1,6 +1,10 @@
 #ifndef __RESEARCH_H
 #define __RESEARCH_H
 
+#undef _FAR_NO_NAMELESS_UNIONS
+#include <FAR.h>
+#include <FarDlg.h>
+
 enum OperationResult {OR_CANCEL,OR_FAILED,OR_OK,OR_PANEL};
 
 #include "Presets.h"
