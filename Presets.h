@@ -9,8 +9,8 @@ typedef OperationResult (*PresetExecutor)();
 class CParameterSet {
 public:
 	CParameterSet(PresetExecutor Executor, int nStringCount, int nIntCount, ...);
-	map<tstring, tstring *> m_mapStrings;
-	map<tstring, int *> m_mapInts;
+	map<string, tstring *> m_mapStrings;
+	map<string, int *> m_mapInts;
 	PresetExecutor m_Executor;
 };
 
@@ -20,8 +20,8 @@ public:
 	void Restore();
 	~CParameterBackup();
 
-	map<tstring, tstring> m_mapStrings;
-	map<tstring, int> m_mapInts;
+	map<string, tstring> m_mapStrings;
+	map<string, int> m_mapInts;
 
 	CParameterSet &m_Set;
 	bool m_bAutoRestore;
@@ -38,13 +38,13 @@ public:
 	void FillMenuItem(CFarMenuItem &Item);
 	void Save(HKEY hKey);
 
-	tstring &Name() {return m_mapStrings[_T("")];}
+	tstring &Name() {return m_mapStrings[""];}
 
 public:
 	int m_nID;
 	bool m_bAddToMenu;
-	map<tstring, tstring> m_mapStrings;
-	map<tstring, int> m_mapInts;
+	map<string, tstring> m_mapStrings;
+	map<string, int> m_mapInts;
 
 	CParameterSet &m_ParamSet;
 };
