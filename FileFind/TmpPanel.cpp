@@ -79,7 +79,7 @@ void CTemporaryPanel::GetOpenPluginInfo(OpenPluginInfo *Info) {
 #define Deleted(i) ((TempUserData *)m_arrItems[i].UserData)->ToBeDeleted
 
 void CTemporaryPanel::UpdateList() {
-	for (int nItem = m_arrItems.size()-1; nItem >= 0; ) {
+	for (int nItem = m_arrItems.size()-1; nItem >= 0; nItem--) {
 		if (Deleted(nItem)) {
 			m_arrItems.erase(m_arrItems.begin()+nItem);
 			continue;
@@ -90,8 +90,6 @@ void CTemporaryPanel::UpdateList() {
 		FindClose(hFind);
 		if (hFind == INVALID_HANDLE_VALUE) {
 			m_arrItems.erase(m_arrItems.begin()+nItem);
-		} else {
-			nItem++;
 		}
 	}
 }

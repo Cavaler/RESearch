@@ -184,91 +184,80 @@ void InitFoundPosition() {
 void AddFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 	CPluginPanelItem Item;
 
-	Item.FindData=*FindData;
-	Item.PackSizeHigh=0;
-	Item.PackSize=0;
-	Item.Flags=0;
-	Item.NumberOfLinks=0;
-	Item.Description=NULL;
-	Item.Owner=NULL;
-	Item.CustomColumnData=NULL;
-	Item.CustomColumnNumber=0;
-	Item.UserData=(DWORD)new TempUserData(g_nFoundLine, g_nFoundColumn);
+#ifdef UNICODE
+	Item.SetFindData(*FindData);
+#else
+	Item.FindData = *FindData;
+	Item.PackSizeHigh = 0;
+	Item.PackSize = 0;
+#endif
+	Item.Flags = 0;
+	Item.NumberOfLinks = 0;
+	Item.Description = NULL;
+	Item.Owner = NULL;
+	Item.CustomColumnData = NULL;
+	Item.CustomColumnNumber = 0;
+	Item.UserData = (DWORD)new TempUserData(g_nFoundLine, g_nFoundColumn);
 
 	PanelItems.push_back(Item);
 }
 
-int AddSlashLen(char *Directory) {
-	int Len=strlen(Directory);
-	if ((Len==0)||(Directory[Len-1]!='\\')) {strcat(Directory,"\\");Len++;}
+int AddSlashLen(TCHAR *Directory) {
+	int Len = _tcslen(Directory);
+	if ((Len == 0) || (Directory[Len-1] != '\\')) {_tcscat(Directory, _T("\\"));Len++;}
 	return Len;
 }
 
-BOOL MaskApplies(string &Mask,size_t Start,char *Filename,BOOL AppendAsterisk) {
-	if (Start>=Mask.size()) return AppendAsterisk||(Filename[0]==0);
-
-	switch (Mask[Start]) {
-	case '?':return (Filename[0])?MaskApplies(Mask,Start+1,Filename+1,AppendAsterisk):FALSE;
-	case '*':
-		if (Start==Mask.size()-1) return TRUE;
-		while (Filename[0]) {
-			if (MaskApplies(Mask,Start+1,Filename,AppendAsterisk)) return TRUE;
-			Filename++;
-		}
-		return FALSE;
-	default:{
-		BOOL Same=(FACaseSensitive)?(Mask[Start]==Filename[0]):(_memicmp(Mask.data()+Start,Filename,1)==0);
-		return (Same)?MaskApplies(Mask,Start+1,Filename+1,AppendAsterisk):FALSE;
-			}
-	}
-}
-
-BOOL MultipleMasksApply(const string &Masks, const char *Filename) {
+BOOL MultipleMasksApply(const TCHAR *FileName) {
 	BOOL Result=FALSE,AnyPositive=FALSE;
 
 	if (FMaskAsRegExp) {
-		return do_pcre_exec(FMaskPattern,FMaskPatternExtra,Filename,strlen(Filename),0,0,NULL,NULL)>=0;
+		return do_pcre_exec(FMaskPattern,FMaskPatternExtra,FileName,_tcslen(FileName),0,0,NULL,NULL)>=0;
 	} else {
-		return (*FMaskSet)(Filename);
+		return (*FMaskSet)(FileName);
 	}
 }
 
-void ShortenFileName(const char *szFrom, char *szTo) {
-	int nLength = strlen(szFrom);
+void ShortenFileName(const TCHAR *szFrom, TCHAR *szTo) {
+	int nLength = _tcslen(szFrom);
 	if (nLength <= 74) {
-		strcpy(szTo, szFrom);
+		_tcscpy(szTo, szFrom);
+#ifdef UNICODE
+		wmemset(szTo+nLength, ' ', 74-nLength);
+#else
 		memset(szTo+nLength, ' ', 74-nLength);
+#endif
 		szTo[74] = 0;
 	} else {
-		const char *szName = strrchr(szFrom, '\\');
+		const TCHAR *szName = _tcsrchr(szFrom, '\\');
 		if (!szName) szName = szFrom;
-		if ((nLength = strlen(szName)) > 74) {
-			strcpy(szTo, szName+nLength-74);
+		if ((nLength = _tcslen(szName)) > 74) {
+			_tcscpy(szTo, szName+nLength-74);
 		} else {
-			strncpy(szTo, szFrom, 74-nLength);
+			_tcsncpy(szTo, szFrom, 74-nLength);
 			szTo[71-nLength] = '.';
 			szTo[72-nLength] = '.';
 			szTo[73-nLength] = '.';
-			strcpy(szTo+74-nLength, szName);
+			_tcscpy(szTo+74-nLength, szName);
 		}
 	}
 }
 
-void ShowProgress(char *Directory, panelitem_vector &PanelItems) {
-	char Scanned[80],Found[80];
+void ShowProgress(const TCHAR *Directory, panelitem_vector &PanelItems) {
+	TCHAR Scanned[80],Found[80];
 
-	sprintf(Scanned,GetMsg(MFilesScanned),FilesScanned);
-	sprintf(Found,GetMsg(MFilesFound),PanelItems.size());
+	_stprintf_s(Scanned, 80, GetMsg(MFilesScanned), FilesScanned);
+	_stprintf_s(Found, 80, GetMsg(MFilesFound), PanelItems.size());
 
-	char szFileName[15][75];
-	const char *Lines[20]={GetMsg(MRESearch), Directory, Scanned, Found, "",
+	TCHAR szFileName[15][75];
+	const TCHAR *Lines[20]={GetMsg(MRESearch), Directory, Scanned, Found, _T(""),
 		szFileName[ 0], szFileName[ 1], szFileName[ 2], szFileName[ 3], szFileName[ 4], 
 		szFileName[ 5], szFileName[ 6], szFileName[ 7], szFileName[ 8], szFileName[ 9],
 		szFileName[10], szFileName[11], szFileName[12], szFileName[13], szFileName[14]};
 
 	int nMax = (PanelItems.size() > 15) ? 15 : PanelItems.size();
 	for (int nItem = 0; nItem < nMax; nItem++)
-		ShortenFileName(PanelItems[nItem+PanelItems.size()-nMax].FindData.cFileName, szFileName[nItem]);
+		ShortenFileName(FarFileName(PanelItems[nItem+PanelItems.size()-nMax].FindData), szFileName[nItem]);
 
 	StartupInfo.Message(StartupInfo.ModuleNumber,0,NULL,Lines,5+nMax,0);
 }
@@ -292,14 +281,14 @@ BOOL AdvancedApplies(WIN32_FIND_DATA *FindData) {
 	if ((FindData->dwFileAttributes & FAAttributesSet) != FAAttributesSet) return FALSE;
 
 	if (FAFullFileNameMatch && FAFullFileNamePattern) {
-		bool bNameMatches = do_pcre_exec(FAFullFileNamePattern,FAFullFileNamePatternExtra,FindData->cFileName,strlen(FindData->cFileName),0,0,NULL,0) >= 0;
+		bool bNameMatches = do_pcre_exec(FAFullFileNamePattern,FAFullFileNamePatternExtra,FindData->cFileName,_tcslen(FindData->cFileName),0,0,NULL,0) >= 0;
 		if (FAFullFileNameInverse ? bNameMatches : !bNameMatches) return FALSE;
 	}
 
 	return TRUE;
 }
 
-int DoScanDirectory(char *Directory, panelitem_vector &PanelItems, ProcessFileProc ProcessFile) {
+int DoScanDirectory(TCHAR *Directory, panelitem_vector &PanelItems, ProcessFileProc ProcessFile) {
 	if (FASkipSystemFolders && FASystemFoldersMask) {
 		if ((*FASystemFoldersMask)(Directory)) return TRUE;
 	}
@@ -307,7 +296,7 @@ int DoScanDirectory(char *Directory, panelitem_vector &PanelItems, ProcessFilePr
 	if (FAdvanced) {
 		if (FARecursionLevel && (CurrentRecursionLevel > FARecursionLevel)) return TRUE;
 		if (FADirectoryMatch && FADirectoryPattern && (CurrentRecursionLevel > 0)) {
-			bool bNameMatches = do_pcre_exec(FADirectoryPattern,FADirectoryPatternExtra,Directory,strlen(Directory),0,0,NULL,0) >= 0;
+			bool bNameMatches = do_pcre_exec(FADirectoryPattern,FADirectoryPatternExtra,Directory,_tcslen(Directory),0,0,NULL,0) >= 0;
 			if (FADirectoryInverse ? bNameMatches : !bNameMatches) return TRUE;
 		}
 	}
@@ -316,24 +305,24 @@ int DoScanDirectory(char *Directory, panelitem_vector &PanelItems, ProcessFilePr
 	WIN32_FIND_DATA *FindDataArray=NULL;
 	int FindDataCount=0;
 	HANDLE HSearch;
-	int Len=AddSlashLen(Directory);
+	int Len = AddSlashLen(Directory);
 	HANDLE hScreen=StartupInfo.SaveScreen(0,0,-1,-1);
-	
-	char ConsoleTitle[MAX_PATH*2];
-	sprintf(ConsoleTitle,GetMsg(MConsoleTitle),Directory);
+
+	TCHAR ConsoleTitle[MAX_PATH*2];
+	_stprintf_s(ConsoleTitle, arrsizeof(ConsoleTitle), GetMsg(MConsoleTitle), Directory);
 	SetConsoleTitle(ConsoleTitle);
 
-	strcat(Directory,"*");
+	_tcscat(Directory, _T("*"));
 	if ((HSearch=FindFirstFile(Directory,&FindData))!=INVALID_HANDLE_VALUE) do {
-		Sleep(0);
+//		Sleep(0);
 		g_bInterrupted|=Interrupted();
 		if (FindData.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) {
-			if (!strcmp(FindData.cFileName,".")) continue;
-			if (!strcmp(FindData.cFileName,"..")) continue;
+			if (!_tcscmp(FindData.cFileName,_T("."))) continue;
+			if (!_tcscmp(FindData.cFileName,_T(".."))) continue;
 		}
-		if (!MultipleMasksApply(FMask,FindData.cFileName)) continue;
-		strcpy(Directory+Len,FindData.cFileName);
-		strcpy(FindData.cFileName,Directory);
+		if (!MultipleMasksApply(FindData.cFileName)) continue;
+		_tcscpy(Directory+Len,FindData.cFileName);
+		_tcscpy(FindData.cFileName,Directory);
 
 		FindDataArray=(WIN32_FIND_DATA *)realloc(FindDataArray,(++FindDataCount)*sizeof(WIN32_FIND_DATA));
 		FindDataArray[FindDataCount-1]=FindData;
@@ -356,16 +345,16 @@ int DoScanDirectory(char *Directory, panelitem_vector &PanelItems, ProcessFilePr
 	if (FSearchIn==SI_CURRENTONLY) return TRUE;
 	if (g_bInterrupted) return FALSE;
 
-	strcpy(Directory+Len,"*");
+	_tcscpy(Directory+Len, _T("*"));
 	if ((HSearch=FindFirstFile(Directory,&FindData))==INVALID_HANDLE_VALUE) return TRUE;
 	CurrentRecursionLevel++;
 	do {
-		Sleep(0);
+//		Sleep(0);
 		if ((FindData.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY)==0) continue;
-		if (strcmp(FindData.cFileName,".")==0) continue;
-		if (strcmp(FindData.cFileName,"..")==0) continue;
-		strcpy(Directory+Len,FindData.cFileName);
-		strcpy(FindData.cFileName,Directory);
+		if (_tcscmp(FindData.cFileName, _T(".")) == 0) continue;
+		if (_tcscmp(FindData.cFileName, _T("..")) == 0) continue;
+		_tcscpy(Directory+Len,FindData.cFileName);
+		_tcscpy(FindData.cFileName,Directory);
 		if (!DoScanDirectory(Directory, PanelItems, ProcessFile)) {
 			CurrentRecursionLevel--;
 			FindClose(HSearch);return FALSE;
@@ -377,23 +366,28 @@ int DoScanDirectory(char *Directory, panelitem_vector &PanelItems, ProcessFilePr
 	return TRUE;
 }
 
-int ScanPluginDirectories(PanelInfo &Info,panelitem_vector &PanelItems,ProcessFileProc ProcessFile) {
-	PluginPanelItem *Items=(FSearchIn==SI_SELECTED)?Info.SelectedItems:Info.PanelItems;
-	int Number=(FSearchIn==SI_SELECTED)?Info.SelectedItemsNumber:Info.ItemsNumber;
+int ScanPluginDirectories(CPanelInfo &Info,panelitem_vector &PanelItems,ProcessFileProc ProcessFile) {
+	int Number=(FSearchIn==SI_SELECTED) ? Info.SelectedItemsNumber : Info.ItemsNumber;
+	if (Number == 0) return TRUE;
+#ifdef UNICODE
+	PluginPanelItem *Items=(FSearchIn==SI_SELECTED) ? &Info.SelectedItems[0] : &Info.PanelItems[0];
+#else
+	PluginPanelItem *Items=(FSearchIn==SI_SELECTED) ? Info.SelectedItems : Info.PanelItems;
+#endif
 	g_bScanningLocalTime = true;
 
 	for (int I=0;I<Number;I++) {
 		if (Items[I].FindData.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) {
-			char CurDir[MAX_PATH];
-			if (strcmp(Items[I].FindData.cFileName,"..")==0) continue;
-			GetFullPathName(Items[I].FindData.cFileName,MAX_PATH,CurDir,NULL);
+			TCHAR CurDir[MAX_PATH];
+			if (_tcscmp(FarFileName(Items[I].FindData), _T("..")) == 0) continue;
+			GetFullPathName(FarFileName(Items[I].FindData),MAX_PATH,CurDir,NULL);
 			if (!DoScanDirectory(CurDir, PanelItems, ProcessFile)) break;
 		} else {
-			if (!MultipleMasksApply(FMask,Items[I].FindData.cFileName)) continue;
+			if (!MultipleMasksApply(FarFileName(Items[I].FindData))) continue;
 			g_bInterrupted|=Interrupted();if (g_bInterrupted) break;
 
-			WIN32_FIND_DATA CurFindData=Items[I].FindData;
-			GetFullPathName(Items[I].FindData.cFileName,arrsizeof(CurFindData.cFileName),CurFindData.cFileName,NULL);
+			WIN32_FIND_DATA CurFindData = FFDtoWFD(Items[I].FindData);
+			GetFullPathName(FarFileName(Items[I].FindData), arrsizeof(CurFindData.cFileName), CurFindData.cFileName, NULL);
 			ProcessFile(&CurFindData,PanelItems);
 			FilesScanned++;
 		}
@@ -402,8 +396,15 @@ int ScanPluginDirectories(PanelInfo &Info,panelitem_vector &PanelItems,ProcessFi
 }
 
 int ScanDirectories(panelitem_vector &PanelItems,ProcessFileProc ProcessFile) {
-	PanelInfo PInfo;
-	StartupInfo.Control(INVALID_HANDLE_VALUE,FCTL_GETPANELINFO,&PInfo);
+	CPanelInfo PInfo;
+	PInfo.GetInfo(false);
+#ifdef UNICODE
+	TCHAR PInfoCurDir[MAX_PATH];
+	_tcscpy(PInfoCurDir, PInfo.CurDir);
+#else
+#define PInfoCurDir PInfo.CurDir
+#endif
+
 	PanelItems.clear();
 	g_bInterrupted=FALSE;
 	FilesScanned=0;
@@ -422,10 +423,10 @@ int ScanDirectories(panelitem_vector &PanelItems,ProcessFileProc ProcessFile) {
 	case SI_ALLDRIVES:
 	case SI_ALLLOCAL:{
 		DWORD Drives=GetLogicalDrives();
-		char RootDir[MAX_PATH]="A:\\";
+		TCHAR RootDir[MAX_PATH] = _T("A:\\");
 		for (int I=0;I<32;I++) if (Drives&(1<<I)) {
 			RootDir[0]='A'+I;
-			UINT DriveType=GetDriveType(RootDir);
+			UINT DriveType = GetDriveType(RootDir);
 			if ((FSearchIn==SI_ALLLOCAL)&&(DriveType==DRIVE_REMOTE)) continue;
 			if ((DriveType!=0)&&(DriveType!=1)&&(DriveType!=DRIVE_REMOVABLE)&&(DriveType!=DRIVE_CDROM))
 				g_bScanningLocalTime = LocalFileTime(RootDir[0]);
@@ -434,36 +435,45 @@ int ScanDirectories(panelitem_vector &PanelItems,ProcessFileProc ProcessFile) {
 		}
 		return TRUE;
 					 }
-	case SI_FROMROOT:PInfo.CurDir[3]=0;
-	case SI_FROMCURRENT:case SI_CURRENTONLY:
-		DoScanDirectory(PInfo.CurDir, PanelItems, ProcessFile);return TRUE;
+
+	case SI_FROMROOT:
+		PInfoCurDir[3]=0;
+	case SI_FROMCURRENT:
+	case SI_CURRENTONLY:
+		DoScanDirectory(PInfoCurDir, PanelItems, ProcessFile);
+		return TRUE;
+
 	case SI_SELECTED:{
-			int Len=AddSlashLen(PInfo.CurDir);
-			if (PInfo.ItemsNumber==0) return FALSE;
+		if (PInfo.ItemsNumber==0) return FALSE;
+		int Len=AddSlashLen(PInfoCurDir);
 
-			for (int I=0;I<PInfo.SelectedItemsNumber;I++) {
-				WIN32_FIND_DATA CurFindData=PInfo.SelectedItems[I].FindData;
-				if (CurFindData.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) {
-					if (strcmp(CurFindData.cFileName,"..")) {
-						// Test if directory itself applies
-						if (MultipleMasksApply(FMask,CurFindData.cFileName)) {
-							strcat(strcpy(CurFindData.cFileName,PInfo.CurDir),PInfo.SelectedItems[I].FindData.cFileName);
-							ProcessFile(&CurFindData,PanelItems);FilesScanned++;
-						}
+		for (int I=0; I<PInfo.SelectedItemsNumber; I++) {
+			WIN32_FIND_DATA CurFindData = FFDtoWFD(PInfo.SelectedItems[I].FindData);
 
-						// Scan subdirectory
-						strcpy(PInfo.CurDir+Len,PInfo.SelectedItems[I].FindData.cFileName);
-						if (!DoScanDirectory(PInfo.CurDir, PanelItems, ProcessFile)) break;
-						PInfo.CurDir[Len]=0;
+			if (CurFindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+				if (_tcscmp(CurFindData.cFileName, _T(".."))) {
+					// Test if directory itself applies
+					if (MultipleMasksApply(CurFindData.cFileName)) {
+						_tcscat(_tcscpy(CurFindData.cFileName, PInfoCurDir), FarFileName(PInfo.SelectedItems[I].FindData));
+						ProcessFile(&CurFindData,PanelItems);
+						FilesScanned++;
 					}
-				} else {
-					if (!MultipleMasksApply(FMask,CurFindData.cFileName)) continue;
-					g_bInterrupted|=Interrupted();if (g_bInterrupted) break;
-					strcat(strcpy(CurFindData.cFileName,PInfo.CurDir),PInfo.SelectedItems[I].FindData.cFileName);
-					ProcessFile(&CurFindData, PanelItems);FilesScanned++;
+
+					// Scan subdirectory
+					_tcscpy(PInfoCurDir+Len, FarFileName(PInfo.SelectedItems[I].FindData));
+					if (!DoScanDirectory(PInfoCurDir, PanelItems, ProcessFile)) break;
+					PInfoCurDir[Len]=0;
 				}
+			} else {
+				if (!MultipleMasksApply(CurFindData.cFileName)) continue;
+				g_bInterrupted|=Interrupted();
+				if (g_bInterrupted) break;
+				_tcscat(_tcscpy(CurFindData.cFileName, PInfoCurDir), FarFileName(PInfo.SelectedItems[I].FindData));
+				ProcessFile(&CurFindData, PanelItems);
+				FilesScanned++;
 			}
-			return TRUE;
+		}
+		return TRUE;
 					 }
 	}
 	return TRUE;
@@ -472,8 +482,8 @@ int ScanDirectories(panelitem_vector &PanelItems,ProcessFileProc ProcessFile) {
 OperationResult NoFilesFound() {
 	if (g_bInterrupted) return OR_OK;
 
-	const char *Lines[]={GetMsg(MRESearch),GetMsg(MNoFilesFound),GetMsg(MOk)};
-	StartupInfo.Message(StartupInfo.ModuleNumber,0,"NoFilesFound",Lines,3,1);
+	const TCHAR *Lines[]={GetMsg(MRESearch),GetMsg(MNoFilesFound),GetMsg(MOk)};
+	StartupInfo.Message(StartupInfo.ModuleNumber, 0, _T("NoFilesFound"), Lines, 3, 1);
 	return OR_OK;
 }
 
@@ -589,11 +599,11 @@ class CFarDateTimeStorage:public CFarStorage {
 public:
 	CFarDateTimeStorage(FILETIME *DT):ftDateTime(DT),   ttDateTime(NULL) {};
 	CFarDateTimeStorage(time_t   *DT):ftDateTime(NULL), ttDateTime(DT) {};
-	virtual void Get(char *pszBuffer, int nSize) const;
-	virtual void Put(const char *pszBuffer);
-	virtual bool Verify(const char *pszBuffer);
-	virtual operator string() const {
-		return "";
+	virtual void Get(TCHAR *pszBuffer, int nSize) const;
+	virtual void Put(const TCHAR *pszBuffer);
+	virtual bool Verify(const TCHAR *pszBuffer);
+	virtual operator tstring() const {
+		return _T("");
 	}
 protected:
 	FILETIME *ftDateTime;
@@ -601,7 +611,7 @@ protected:
 	FILETIME m_ftTemp;
 };
 
-void CFarDateTimeStorage::Get(char *pszBuffer, int nSize) const {
+void CFarDateTimeStorage::Get(TCHAR *pszBuffer, int nSize) const {
 	SYSTEMTIME locTime;
 	FILETIME ft;
 	if (ftDateTime) {
@@ -613,27 +623,27 @@ void CFarDateTimeStorage::Get(char *pszBuffer, int nSize) const {
 	SystemToLocalTime(ft);
 	FileTimeToSystemTime(&ft, &locTime);
 
-	_snprintf(pszBuffer, nSize, "%02d.%02d.%04d %02d:%02d:%02d",
+	_sntprintf(pszBuffer, nSize, _T("%02d.%02d.%04d %02d:%02d:%02d"),
 		locTime.wDay, locTime.wMonth, locTime.wYear, locTime.wHour, locTime.wMinute, locTime.wSecond);
 }
 
-int atoin(const char *Line,int First,int Last) {
-	static char s_szBuffer[128];;
+int atoin(const TCHAR *Line,int First,int Last) {
+	static TCHAR s_szBuffer[128];;
 	if (First==-1) return 0;
 	Line+=First;
-	strncpy(s_szBuffer, Line, Last-First);
+	_tcsncpy(s_szBuffer, Line, Last-First);
 	s_szBuffer[Last-First] = 0;
-	return atoi(s_szBuffer);
+	return _ttoi(s_szBuffer);
 }
 
-bool CFarDateTimeStorage::Verify(const char *pszBuffer) {
+bool CFarDateTimeStorage::Verify(const TCHAR *pszBuffer) {
 	const char *ErrPtr;
 	int ErrOffset;
-	pcre *Pattern=pcre_compile("^\\s*(\\d+)[./](\\d+)[./](\\d+)(\\s+(\\d+)(:(\\d+)(:(\\d+))?)?)?\\s*$",
+	pcre *Pattern = pcre_compile("^\\s*(\\d+)[./](\\d+)[./](\\d+)(\\s+(\\d+)(:(\\d+)(:(\\d+))?)?)?\\s*$",
 		PCRE_CASELESS,&ErrPtr,&ErrOffset,NULL);
 	if (!Pattern) return false;
 	int Match[10*3];
-	if (do_pcre_exec(Pattern,NULL,pszBuffer,strlen(pszBuffer),0,0,Match,arrsizeof(Match))>=0) {
+	if (do_pcre_exec(Pattern,NULL,pszBuffer,_tcslen(pszBuffer),0,0,Match,arrsizeof(Match))>=0) {
 		SYSTEMTIME locTime;
 		locTime.wDay =    atoin(pszBuffer,Match[1*2],Match[1*2+1]);
 		locTime.wMonth =  atoin(pszBuffer,Match[2*2],Match[2*2+1]);
@@ -652,24 +662,24 @@ bool CFarDateTimeStorage::Verify(const char *pszBuffer) {
 	}
 }
 
-void CFarDateTimeStorage::Put(const char *pszBuffer) {
+void CFarDateTimeStorage::Put(const TCHAR *pszBuffer) {
 	if (ftDateTime) {
-		*ftDateTime=m_ftTemp;
+		*ftDateTime = m_ftTemp;
 	} else {
 		*ttDateTime = FTtoTime_t(m_ftTemp);
 	}
 }
 
 BOOL AdvancedSettings() {
-	CFarDialog Dialog(78,24,"AdvancedFileSearchDlg");
+	CFarDialog Dialog(78,24,_T("AdvancedFileSearchDlg"));
 	Dialog.AddFrame(MAdvancedOptions);
 	Dialog.Add(new CFarCheckBoxItem(5,2,0,MFullFileNameMatch,&FAFullFileNameMatch));
-	Dialog.Add(new CFarEditItem(5,3,59,DIF_HISTORY,"FullPath", FAFullFileName));
+	Dialog.Add(new CFarEditItem(5,3,59,DIF_HISTORY,_T("FullPath"), FAFullFileName));
 	Dialog.Add(new CFarCheckBoxItem(50,2,0,MCaseSensitive,&FACaseSensitive));
 	Dialog.Add(new CFarCheckBoxItem(62,3,0,MInverse,&FAFullFileNameInverse));
 
 	Dialog.Add(new CFarCheckBoxItem(5,4,0,MDirectoryMatch,&FADirectoryMatch));
-	Dialog.Add(new CFarEditItem(5,5,59,DIF_HISTORY,"RecurseDirectory", FADirectoryName));
+	Dialog.Add(new CFarEditItem(5,5,59,DIF_HISTORY,_T("RecurseDirectory"), FADirectoryName));
 	Dialog.Add(new CFarCheckBoxItem(50,4,0,MCaseSensitive,&FADirectoryCaseSensitive));
 	Dialog.Add(new CFarCheckBoxItem(62,5,0,MInverse,&FADirectoryInverse));
 	Dialog.Add(new CFarTextItem(5,6,0,MRecursionLevel));
@@ -789,7 +799,7 @@ CFPreset::CFPreset(CParameterSet &ParamSet)
 	m_mapInts["AdvancedID"] = 0;
 }
 
-CFPreset::CFPreset(CParameterSet &ParamSet, const string &strName, HKEY hKey)
+CFPreset::CFPreset(CParameterSet &ParamSet, const tstring &strName, HKEY hKey)
 : CPreset(ParamSet, strName, hKey)
 {
 }
@@ -801,18 +811,18 @@ void CFPreset::Apply()
 }
 
 BOOL CFAPresetCollection::EditPreset(CPreset *pPreset) {
-	CFarDialog Dialog(78,26,"FAPresetDlg");
+	CFarDialog Dialog(78,26,_T("FAPresetDlg"));
 	Dialog.AddFrame(MFAPreset);
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
-	Dialog.Add(new CFarEditItem(20,2,70,DIF_HISTORY,"RESearch.PresetName", pPreset->Name()));
+	Dialog.Add(new CFarEditItem(20,2,70,DIF_HISTORY,_T("RESearch.PresetName"), pPreset->Name()));
 
 	Dialog.Add(new CFarCheckBoxItem(5,4,0,MFullFileNameMatch,&pPreset->m_mapInts["FullFileNameMatch"]));
-	Dialog.Add(new CFarEditItem(5,5,59,DIF_HISTORY,"FullPath", pPreset->m_mapStrings["FullFileName"]));
+	Dialog.Add(new CFarEditItem(5,5,59,DIF_HISTORY,_T("FullPath"), pPreset->m_mapStrings["FullFileName"]));
 	Dialog.Add(new CFarCheckBoxItem(50,4,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
 	Dialog.Add(new CFarCheckBoxItem(62,5,0,MInverse,&pPreset->m_mapInts["FullFileNameInverse"]));
 
 	Dialog.Add(new CFarCheckBoxItem(5,6,0,MDirectoryMatch,&pPreset->m_mapInts["DirectoryMatch"]));
-	Dialog.Add(new CFarEditItem(5,7,59,DIF_HISTORY,"RecurseDirectory", pPreset->m_mapStrings["DirectoryName"]));
+	Dialog.Add(new CFarEditItem(5,7,59,DIF_HISTORY,_T("RecurseDirectory"), pPreset->m_mapStrings["DirectoryName"]));
 	Dialog.Add(new CFarCheckBoxItem(50,6,0,MCaseSensitive,&pPreset->m_mapInts["DirectoryCaseSensitive"]));
 	Dialog.Add(new CFarCheckBoxItem(62,7,0,MInverse,&pPreset->m_mapInts["DirectoryInverse"]));
 	Dialog.Add(new CFarTextItem(5,8,0,MRecursionLevel));
@@ -878,23 +888,23 @@ BOOL MaskCaseHere() {
 	case MC_INSENSITIVE:return FALSE;
 	case MC_VOLUME:{
 		DWORD Flags;
-		char szFSName[64];
+		TCHAR szFSName[64];
 		if (!GetVolumeInformation(NULL,NULL,0,NULL,NULL,&Flags,szFSName,arrsizeof(szFSName))) return FALSE;
-		return _stricmp(szFSName, "NTFS") && (Flags&FS_CASE_SENSITIVE);
+		return _tcsicmp(szFSName, _T("NTFS")) && (Flags&FS_CASE_SENSITIVE);
 				   }
 	}
 	return FALSE;
 }
 
-bool LocalFileTime(char cDrive) {
-	char szRoot[] = {cDrive, ':', '\\', 0};
+bool LocalFileTime(TCHAR cDrive) {
+	TCHAR szRoot[] = {cDrive, ':', '\\', 0};
 	DWORD Flags;
-	char szFSName[64];
+	TCHAR szFSName[64];
 	if (!GetVolumeInformation(szRoot, NULL, 0, NULL, NULL, &Flags, szFSName, arrsizeof(szFSName))) return false;
 
-	if (_stricmp(szFSName, "NTFS") == 0) return false;
-	if (_strnicmp(szFSName, "FAT", 3) == 0) return true;
-	if (_stricmp(szFSName, "CDFS") == 0) return true;
-	if (_stricmp(szFSName, "UDF") == 0) return true;
+	if (_tcsicmp(szFSName, _T("NTFS")) == 0) return false;
+	if (_tcsnicmp(szFSName, _T("FAT"), 3) == 0) return true;
+	if (_tcsicmp(szFSName, _T("CDFS")) == 0) return true;
+	if (_tcsicmp(szFSName, _T("UDF")) == 0) return true;
 	return true;
 }

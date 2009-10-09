@@ -67,7 +67,7 @@ EXTERN int  FAdvancedID VALUE(0);
 EXTERN tstring FTextUpcase;
 EXTERN pcre *FPattern;
 EXTERN pcre_extra *FPatternExtra;
-EXTERN vector<string> FSWords;
+EXTERN vector<tstring> FSWords;
 
 EXTERN pcre *FMaskPattern VALUE(NULL);
 EXTERN pcre_extra *FMaskPatternExtra VALUE(NULL);
@@ -115,7 +115,7 @@ void SelectAdvancedPreset(int &nID, bool &bSel);
 void ApplyAdvancedPreset();
 
 BOOL MaskCaseHere();
-bool LocalFileTime(char cDrive);
+bool LocalFileTime(TCHAR cDrive);
 
 OperationResult FileSearchExecutor();
 OperationResult FileReplaceExecutor();
@@ -124,7 +124,7 @@ OperationResult FileGrepExecutor();
 OperationResult NoFilesFound();
 void InitFoundPosition();
 
-BOOL MultipleMasksApply(const string &Masks, const char *Filename);
+BOOL MultipleMasksApply(const TCHAR *Filename);
 void AddFile(WIN32_FIND_DATA *FindData,panelitem_vector &PanelItems);
 int  ScanDirectories(panelitem_vector &PanelItems,ProcessFileProc ProcessFile);
 int  FPrepareMaskPattern();
