@@ -10,11 +10,11 @@ _COM_SMARTPTR_TYPEDEF(IEnumCLSID, __uuidof(IEnumCLSID));
 void EnumActiveScripts();
 
 void ReadActiveScripts() {
-	CHKey hKey = OpenRegistry("ScriptEngines");
+	CHKey hKey = OpenRegistry(_T("ScriptEngines"));
 
-	char szKey[256];
+	TCHAR szKey[256];
 	DWORD dwIndex = 0, dwSize;
-	while ((dwSize = sizeof(szKey)), (RegEnumValue(hKey, dwIndex++, szKey, &dwSize, NULL, NULL, NULL, NULL) == ERROR_SUCCESS)) {
+	while ((dwSize = arrsizeof(szKey)), (RegEnumValue(hKey, dwIndex++, szKey, &dwSize, NULL, NULL, NULL, NULL) == ERROR_SUCCESS)) {
 		sActiveScript Script;
 		if (FAILED(CLSIDFromString(_bstr_t(szKey), &Script.m_clsid))) continue;
 		QueryRegStringValue(hKey, szKey, Script.m_strName, szKey);
@@ -28,7 +28,7 @@ void ReadActiveScripts() {
 		for (size_t nKey = 0; nKey < m_arrEngines.size(); nKey++) {
 			OLECHAR szGuid[42];
 			if (FAILED(StringFromGUID2(m_arrEngines[nKey].m_clsid, szGuid, 42))) continue;
-			SetRegStringValue(hKey, (const char *)_bstr_t(szGuid), m_arrEngines[nKey].m_strName);
+			SetRegStringValue(hKey, (LPCTSTR)_bstr_t(szGuid), m_arrEngines[nKey].m_strName);
 		}
 	}
 }
@@ -48,11 +48,11 @@ void EnumActiveScripts() {
 
 		BSTR bstrName;
 		if (SUCCEEDED(ProgIDFromCLSID(Script.m_clsid, &bstrName))) {
-			Script.m_strName = (const char *)_bstr_t(bstrName);
+			Script.m_strName = (LPCTSTR)_bstr_t(bstrName);
 		} else {
 			OLECHAR szGuid[42];
 			if (FAILED(StringFromGUID2(Script.m_clsid, szGuid, 42))) continue;
-			Script.m_strName = (const char *)_bstr_t(szGuid);
+			Script.m_strName = (LPCTSTR)_bstr_t(szGuid);
 		}
 		m_arrEngines.push_back(Script);
 		m_lstEngines.Append(Script.m_strName.c_str());
@@ -63,7 +63,7 @@ void EnumActiveScripts() {
 
 class CReplaceParameters : public IReplaceParameters {
 public:
-	CReplaceParameters(const char *Matched, int *Match, int Count, const char *EOL, int *Numbers)
+	CReplaceParameters(const TCHAR *Matched, int *Match, int Count, const TCHAR *EOL, int *Numbers)
 		: m_nCounter(0)
 		, m_szMatched(Matched)
 		, m_pMatch(Match)
@@ -74,7 +74,7 @@ public:
 	{
 	}
 
-	string Result() {return m_strResult;}
+	tstring Result() {return m_strResult;}
 	void SetOuter(IDispatch *pOuter) {m_pOuter = pOuter;}
 	~CReplaceParameters() {}
 
@@ -104,12 +104,12 @@ public:
 	// IReplaceParameters methods
 	STDMETHOD(match)(long lPos, BSTR *pbstrMatch) {
 		if ((lPos < 0) || (lPos >= m_nCount)) return E_INVALIDARG;
-		*pbstrMatch = _bstr_t(string(m_szMatched + m_pMatch[lPos*2], m_pMatch[lPos*2+1] - m_pMatch[lPos*2]).c_str()).copy();
+		*pbstrMatch = _bstr_t(tstring(m_szMatched + m_pMatch[lPos*2], m_pMatch[lPos*2+1] - m_pMatch[lPos*2]).c_str()).Detach();
 		return S_OK;
 	}
 
 	STDMETHOD(get_eol)(BSTR *pbstrEOL) {
-		*pbstrEOL = _bstr_t(m_szEOL).copy();
+		*pbstrEOL = _bstr_t(m_szEOL).Detach();
 		return S_OK;
 	}
 
@@ -135,12 +135,12 @@ public:
 
 private:
 	ULONG m_nCounter;
-	const char *m_szMatched;
+	const TCHAR *m_szMatched;
 	int *m_pMatch;
 	int m_nCount;
-	const char *m_szEOL;
+	const TCHAR *m_szEOL;
 	int *m_pNumbers;
-	string m_strResult;
+	tstring m_strResult;
 
 	IDispatch *m_pOuter;
 };
@@ -150,8 +150,12 @@ private:
 class CReplaceScriptSite : public IActiveScriptSite {
 public:
 	CReplaceScriptSite(CReplaceParameters *pParams) : m_nCounter(0), m_pParams(pParams), m_pDispatch(NULL) {
-		char szModule[MAX_PATH];
-		GetModuleFileName(GetModuleHandle("RESearch.dll"), szModule, MAX_PATH);
+		TCHAR szModule[MAX_PATH];
+#ifdef UNICODE
+		GetModuleFileName(GetModuleHandle(_T("RESearchU.dll")), szModule, MAX_PATH);
+#else
+		GetModuleFileName(GetModuleHandle(_T("RESearch.dll")), szModule, MAX_PATH);
+#endif
 		ITypeLib *pLib;
 		HRESULT hResult = LoadTypeLib(_bstr_t(szModule), &pLib);
 		if (FAILED(hResult)) {
@@ -261,18 +265,18 @@ private:
 	IDispatch *m_pDispatch;
 };
 
-string EvaluateReplaceString(const char *Matched,int *Match,int Count,const char *Replace,const char *EOL,int *Numbers,int Engine) {
+tstring EvaluateReplaceString(const TCHAR *Matched,int *Match,int Count,const TCHAR *Replace,const TCHAR *EOL,int *Numbers,int Engine) {
 	EXCEPINFO ExcepInfo;
 	HRESULT hResult;
 
-	if (Interrupted()) return "";
+	if (Interrupted()) return _T("");
 
 	IActiveScriptPtr spEngine;
 	hResult = spEngine.CreateInstance(m_arrEngines[Engine].m_clsid);
 	if (FAILED(hResult)) {
 		ShowHResultError(MErrorCreatingEngine, hResult);
 		g_bInterrupted = TRUE;
-		return "";
+		return _T("");
 	}
 
 	CReplaceParameters *pParams = new CReplaceParameters(Matched, Match, Count, EOL, Numbers);
@@ -282,15 +286,15 @@ string EvaluateReplaceString(const char *Matched,int *Match,int Count,const char
 	spEngine->SetScriptSite(pSite);
 
 	_bstr_t bstrText;
-	if ((strlen(Replace) > 3) && (Replace[1] == ':') && (Replace[2] == '\\')) {
+	if ((_tcslen(Replace) > 3) && (Replace[1] == ':') && (Replace[2] == '\\')) {
 		CFileMapping mapScript;
 		if (!mapScript.Open(Replace)) {
-			const char *Lines[]={GetMsg(MREReplace),GetMsg(MFileOpenError),Replace,GetMsg(MOk)};
-			StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"FSOpenError",Lines,4,1);
+			const TCHAR *Lines[]={GetMsg(MREReplace),GetMsg(MFileOpenError),Replace,GetMsg(MOk)};
+			StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("FSOpenError"),Lines,4,1);
 			g_bInterrupted = TRUE;
-			return "";
+			return _T("");
 		}
-		bstrText = string(mapScript, mapScript.Size()).c_str();
+		bstrText = tstring(mapScript, mapScript.Size()).c_str();
 	} else {
 		bstrText = Replace;
 	}
@@ -301,13 +305,13 @@ string EvaluateReplaceString(const char *Matched,int *Match,int Count,const char
 	if (FAILED(hResult)) {
 		ShowHResultError(MErrorParsingText, hResult);
 		g_bInterrupted = TRUE;
-		return "";
+		return _T("");
 	}
 
 	spEngine->AddNamedItem(L"research", SCRIPTITEM_ISVISIBLE|SCRIPTITEM_NOCODE|SCRIPTITEM_GLOBALMEMBERS);
 	spEngine->SetScriptState(SCRIPTSTATE_CONNECTED);
 
-	string strResult = pParams->Result();
+	tstring strResult = pParams->Result();
 	spParser = NULL;
 	spEngine = NULL;
 	pSite->Release();

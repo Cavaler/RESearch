@@ -8,6 +8,7 @@ struct ViewerSearchInfo {
 
 map<int, ViewerSearchInfo> g_ViewerInfo;
 
+#ifndef UNICODE
 string ToOEM(ViewerInfo &VInfo, const char *szData, int nLength) {
 	if (nLength == 0) return "";
 
@@ -26,9 +27,14 @@ string ToOEM(ViewerInfo &VInfo, const char *szData, int nLength) {
 	}
 	return strResult;
 }
+#endif
 
-string GetNextLine(ViewerInfo &VInfo, const char *szData, int nLength, int &nSkip) {
+tstring GetNextLine(ViewerInfo &VInfo, char *szData, int nLength, int &nSkip) {
+#ifdef UNICODE
+	if (VInfo.CurMode.CodePage == 1200) {
+#else
 	if (VInfo.CurMode.Unicode) {
+#endif
 		const wchar_t *wszData = (const wchar_t *)szData;
 		const wchar_t *wszCur = wszData;
 		while (nLength && !wcschr(L"\r\n", *wszCur)) {wszCur++; nLength--;}
@@ -37,11 +43,15 @@ string GetNextLine(ViewerInfo &VInfo, const char *szData, int nLength, int &nSki
 			((nLength > 1) && (wszCur[0] == '\r') && (wszCur[1] == '\n')) ? 2 : 1;
 
 		nSkip = (nSkip + (wszCur - wszData)) * 2;
-		if (wszCur == wszData) return "";
+		if (wszCur == wszData) return _T("");
 
+#ifdef UNICODE
+		return wstring(wszData, wszCur);
+#else
 		vector<char> arrData(wszCur - wszData);
 		WideCharToMultiByte(CP_OEMCP, 0, wszData, wszCur-wszData, &arrData[0], wszCur-wszData, " ", NULL);
 		return string(&arrData[0], arrData.size());
+#endif
 	} else {
 		const char *szCur = szData;
 		while (nLength && !strchr("\r\n", *szCur)) {szCur++; nLength--;}
@@ -50,7 +60,11 @@ string GetNextLine(ViewerInfo &VInfo, const char *szData, int nLength, int &nSki
 			((nLength > 1) && (szCur[0] == '\r') && (szCur[1] == '\n')) ? 2 : 1;
 
 		nSkip = nSkip + (szCur - szData);
+#ifdef UNICODE
+		return StrToUnicode(string(szData, szCur), VInfo.CurMode.CodePage);
+#else
 		return ToOEM(VInfo, szData, szCur-szData);
+#endif
 	}
 }
 
@@ -72,16 +86,27 @@ BOOL ViewerSearchAgain() {
 	map<int, ViewerSearchInfo>::iterator it = g_ViewerInfo.find(VInfo.ViewerID);
 	if (it == g_ViewerInfo.end()) {
 		ViewerSearchInfo Info;
+#ifdef UNICODE
+		Info.CurPos = VInfo.FilePos;
+		Info.LeftPos = (int)VInfo.LeftPos;
+#else
 		Info.CurPos = VInfo.FilePos.i64;
 		Info.LeftPos = VInfo.LeftPos;
+#endif
 		g_ViewerInfo[VInfo.ViewerID] = Info;
 	}
 	ViewerSearchInfo &Info = g_ViewerInfo[VInfo.ViewerID];
 
-	CFileMapping mapInput;
-	const char *szData = (const char *)mapInput.Open(VInfo.FileName);
+	CFileMapping mapInput(VInfo.FileName);
+	if (!mapInput) return FALSE;
+
+	char *szData = mapInput;
 	if (!szData) return FALSE;
-	szData += VInfo.CurMode.Unicode ? Info.CurPos*2 : Info.CurPos;
+#ifdef UNICODE
+	szData += (VInfo.CurMode.CodePage == 1200) ? Info.CurPos*2 : Info.CurPos;
+#else
+	szData += (VInfo.CurMode.Unicode) ? Info.CurPos*2 : Info.CurPos;
+#endif
 
 	long nOffset = (long)Info.CurPos;
 	int nMatchCount = ERegExp ? pcre_info(EPattern, NULL, NULL) + 1 : 0;
@@ -89,7 +114,7 @@ BOOL ViewerSearchAgain() {
 
 	if (ESeveralLine) {
 	} else {
-		string strLine;
+		tstring strLine;
 		int nCurrentLine = 0;
 		int nSkip;
 
@@ -126,8 +151,8 @@ BOOL ViewerSearchAgain() {
 
 	if (ERegExp) delete[] pMatch;
 	if (!g_bInterrupted) {
-		const char *Lines[]={GetMsg(MRESearch),GetMsg(MCannotFind),EText.c_str(),GetMsg(MOk)};
-		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"ECannotFind",Lines,4,1);
+		const TCHAR *Lines[]={GetMsg(MRESearch),GetMsg(MCannotFind),EText.c_str(),GetMsg(MOk)};
+		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("VCannotFind"),Lines,4,1);
 	}
 	return TRUE;
 }
@@ -138,17 +163,17 @@ BOOL ViewerSearch() {
 	StartupInfo.ViewerControl(VCTL_GETINFO, &VInfo);
 	g_ViewerInfo.erase(VInfo.ViewerID);
 
-	CFarDialog Dialog(76,13,"SearchDlg");
+	CFarDialog Dialog(76,13,_T("SearchDlg"));
 	Dialog.AddFrame(MRESearch);
 	Dialog.Add(new CFarTextItem(5,2,0,MSearchFor));
-	Dialog.Add(new CFarEditItem(5,3,65,DIF_HISTORY|DIF_VAREDIT,"SearchText",SearchText));
-	Dialog.Add(new CFarButtonItem(67,3,0,0,"&\\"));
+	Dialog.Add(new CFarEditItem(5,3,65,DIF_HISTORY|DIF_VAREDIT,_T("SearchText"),SearchText));
+	Dialog.Add(new CFarButtonItem(67,3,0,0,_T("&\\")));
 
-	Dialog.Add(new CFarTextItem(5,4,DIF_BOXCOLOR|DIF_SEPARATOR,""));
+	Dialog.Add(new CFarTextItem(5,4,DIF_BOXCOLOR|DIF_SEPARATOR,_T("")));
 	Dialog.Add(new CFarCheckBoxItem(5,5,0,MRegExp,&ERegExp));
 	Dialog.Add(new CFarCheckBoxItem(30,5,DIF_DISABLE,MSeveralLine,&ESeveralLine));
 	Dialog.Add(new CFarCheckBoxItem(5,6,0,MCaseSensitive,&ECaseSensitive));
-	Dialog.Add(new CFarCheckBoxItem(30,6,0,"",&EUTF8));
+	Dialog.Add(new CFarCheckBoxItem(30,6,0,_T(""),&EUTF8));
 	Dialog.Add(new CFarButtonItem(34,6,0,0,MUTF8));
 	Dialog.Add(new CFarCheckBoxItem(5,7,DIF_DISABLE,MReverseSearch,&EReverse));
 	Dialog.AddButtons(MOk,MCancel);
@@ -180,18 +205,18 @@ BOOL ViewerSearch() {
 }
 
 BOOL CVSPresetCollection::EditPreset(CPreset *pPreset) {
-	CFarDialog Dialog(76,14,"VSPresetDlg");
+	CFarDialog Dialog(76,14,_T("VSPresetDlg"));
 	Dialog.AddFrame(MVSPreset);
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
-	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,"RESearch.PresetName",pPreset->Name()));
+	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,_T("RESearch.PresetName"),pPreset->Name()));
 
 	Dialog.Add(new CFarTextItem(5,4,0,MSearchFor));
-	Dialog.Add(new CFarEditItem(5,5,70,DIF_HISTORY|DIF_VAREDIT,"SearchText", pPreset->m_mapStrings["Text"]));
+	Dialog.Add(new CFarEditItem(5,5,70,DIF_HISTORY|DIF_VAREDIT,_T("SearchText"), pPreset->m_mapStrings["Text"]));
 
 	Dialog.Add(new CFarCheckBoxItem(5,7,0,MRegExp,&pPreset->m_mapInts["IsRegExp"]));
 	Dialog.Add(new CFarCheckBoxItem(5,8,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
 	Dialog.Add(new CFarCheckBoxItem(30,7,0,MSeveralLine,&pPreset->m_mapInts["SeveralLine"]));
-	Dialog.Add(new CFarCheckBoxItem(30,8,0,"",&pPreset->m_mapInts["UTF8"]));
+	Dialog.Add(new CFarCheckBoxItem(30,8,0,_T(""),&pPreset->m_mapInts["UTF8"]));
 	Dialog.Add(new CFarButtonItem(34,8,0,0,MUTF8));
 	Dialog.AddButtons(MOk,MCancel);
 
@@ -200,7 +225,7 @@ BOOL CVSPresetCollection::EditPreset(CPreset *pPreset) {
 		case 0:
 			return TRUE;
 		case 1:{		// avoid Internal Error for icl
-			string str = pPreset->m_mapStrings["SearchText"];
+			tstring str = pPreset->m_mapStrings["SearchText"];
 			UTF8Converter(str);
 			break;
 			  }

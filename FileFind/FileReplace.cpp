@@ -220,7 +220,7 @@ char *AddExtension(char *FileName,char *Extension) {
 	return strcat(strcpy(New,FileName),Extension);
 }
 
-void ReplaceFile(WIN32_FIND_DATA *FindData, PluginPanelItem **PanelItems, int *ItemsNumber) {
+void ReplaceFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 	string strBackupFileName;
 	BOOL ReturnValue=FALSE;
 
@@ -264,7 +264,7 @@ void ReplaceFile(WIN32_FIND_DATA *FindData, PluginPanelItem **PanelItems, int *I
 		if (ProcessBuffer(mapFile, FindData->nFileSizeLow, FindData)) {
 			mapFile.Close();
 			if (!FRSaveOriginal) DeleteFile(strBackupFileName.c_str());
-			AddFile(FindData,PanelItems,ItemsNumber);
+			AddFile(FindData, PanelItems);
 		} else {
 			mapFile.Close();
 			DeleteFile(FindData->cFileName);
@@ -368,7 +368,7 @@ int ReplacePrompt(BOOL Plugin) {
 	return TRUE;
 }
 
-OperationResult FileReplace(PluginPanelItem **PanelItems,int *ItemsNumber,BOOL ShowDialog,BOOL bSilent) {
+OperationResult FileReplace(panelitem_vector &PanelItems, BOOL ShowDialog, BOOL bSilent) {
 	PanelInfo PInfo;
 	StartupInfo.Control(INVALID_HANDLE_VALUE,FCTL_GETPANELINFO,&PInfo);
 	if (PInfo.PanelType!=PTYPE_FILEPANEL) return OR_FAILED;
@@ -383,9 +383,9 @@ OperationResult FileReplace(PluginPanelItem **PanelItems,int *ItemsNumber,BOOL S
 	FRConfirmFileThisRun=FRConfirmFile;
 	FRConfirmReadonlyThisRun = (FRReplaceReadonly != RR_ALWAYS);
 	FRConfirmLineThisRun=FRConfirmLine;
-	if (ScanDirectories(PanelItems,ItemsNumber,ReplaceFile)) {
+	if (ScanDirectories(PanelItems, ReplaceFile)) {
 		if (!FROpenModified) return OR_OK; else
-			return (*ItemsNumber==0) ? (bSilent ? OR_OK : NoFilesFound()) : OR_PANEL;
+			return (PanelItems.empty()) ? (bSilent ? OR_OK : NoFilesFound()) : OR_PANEL;
 	} else return OR_FAILED;
 }
 
@@ -395,7 +395,7 @@ OperationResult FileReplaceExecutor() {
 	FRReplace = ReplaceText;
 	FROpenModified = FALSE;
 
-	return FileReplace(&PanelItems, &ItemsNumber, FALSE, TRUE);
+	return FileReplace(g_PanelItems, FALSE, TRUE);
 }
 
 BOOL CFRPresetCollection::EditPreset(CPreset *pPreset) {

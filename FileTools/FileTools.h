@@ -32,8 +32,8 @@ void FTWriteRegistry(HKEY Key);
 void FTCleanup(BOOL PatternOnly);
 
 void ChangeSelection(int How);
-OperationResult RenameFiles(PluginPanelItem **PanelItems,int *ItemsNumber,BOOL ShowDialog);
-OperationResult RenameSelectedFiles(PluginPanelItem **PanelItems,int *ItemsNumber,BOOL ShowDialog);
+OperationResult RenameFiles(panelitem_vector &PanelItems,BOOL ShowDialog);
+OperationResult RenameSelectedFiles(panelitem_vector &PanelItems,BOOL ShowDialog);
 OperationResult RenumberFiles();
 
 OperationResult RenameFilesExecutor();

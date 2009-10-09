@@ -88,7 +88,7 @@ CPreset::CPreset(CParameterSet &ParamSet, const tstring &strName, HKEY hKey)
 
 	DWORD dwIndex = 0;
 	TCHAR szName[256];
-	DWORD dwcbName = sizeof(szName), dwType;
+	DWORD dwcbName = arrsizeof(szName), dwType;
 
 	while (RegEnumValue(hOwnKey, dwIndex, szName, &dwcbName, NULL, &dwType, NULL, 0) == ERROR_SUCCESS) {
 		if (dwType == REG_DWORD) {
@@ -100,7 +100,7 @@ CPreset::CPreset(CParameterSet &ParamSet, const tstring &strName, HKEY hKey)
 			QueryRegStringValue(hOwnKey, szName, strValue, _T(""));
 			m_mapStrings[NameKey(szName)] = strValue;
 		}
-		dwcbName = sizeof(szName);
+		dwcbName = arrsizeof(szName);
 		dwIndex++;
 	}
 }
@@ -175,7 +175,7 @@ void CPresetCollection::Load()
 	DWORD dwIndex = 0;
 	do {
 		FILETIME ftTime;
-		DWORD dwcbCurrentKey = sizeof(szCurrentKey);
+		DWORD dwcbCurrentKey = arrsizeof(szCurrentKey);
 
 		if (RegEnumKeyEx(hKey, dwIndex, szCurrentKey, &dwcbCurrentKey, NULL, NULL, NULL, &ftTime) != ERROR_SUCCESS) break;
 		push_back(LoadPreset(szCurrentKey, hKey));
@@ -198,7 +198,7 @@ void CPresetCollection::Save() {
 
 	do {
 		FILETIME ftTime;
-		DWORD dwcbCurrentKey = sizeof(szCurrentKey);
+		DWORD dwcbCurrentKey = arrsizeof(szCurrentKey);
 		if (RegEnumKeyEx(hKey, 0, szCurrentKey, &dwcbCurrentKey, NULL, NULL, NULL, &ftTime) != ERROR_SUCCESS) break;
 		RegDeleteKey(hKey,szCurrentKey);
 	} while (TRUE);
@@ -490,7 +490,7 @@ CBatchActionCollection::CBatchActionCollection(CBatchType &Type, HKEY hKey)
 	TCHAR szKeyName[256];
 	DWORD dwIndex = 0;
 	do {
-		DWORD dwcbKeyName = sizeof(szKeyName);
+		DWORD dwcbKeyName = arrsizeof(szKeyName);
 
 		if (RegEnumKeyEx(hKey, dwIndex, szKeyName, &dwcbKeyName, NULL, NULL, NULL, NULL) != ERROR_SUCCESS) break;
 		push_back(new CBatchAction(m_Type, szKeyName, hKey));

@@ -36,9 +36,9 @@ bool GrepLineFound(const sBufferedLine &strBuf) {
 	return (bResult != 0) != (FSInverse != 0);
 }
 
-void GrepFile(WIN32_FIND_DATA *FindData,PluginPanelItem **PanelItems,int *ItemsNumber) {
+void GrepFile(WIN32_FIND_DATA *FindData,panelitem_vector &PanelItems) {
 	if (FText.empty()) {
-		AddFile(FindData, PanelItems, ItemsNumber);
+		AddFile(FindData, PanelItems);
 		AddGrepLine(FindData->cFileName);
 		return;
 	}
@@ -70,7 +70,7 @@ void GrepFile(WIN32_FIND_DATA *FindData,PluginPanelItem **PanelItems,int *ItemsN
 
 		if (GrepLineFound(arrStringBuffer.back())) {
 			if (++nFoundCount == 1) {
-				AddFile(FindData, PanelItems, ItemsNumber);
+				AddFile(FindData, PanelItems);
 			}
 			nLastMatched = arrStringBuffer.size()-1;
 
@@ -245,7 +245,7 @@ OperationResult FileGrep(BOOL ShowDialog) {
 		return OR_FAILED;
 	}
 
-	if (ScanDirectories(&PanelItems,&ItemsNumber,GrepFile)) {
+	if (ScanDirectories(g_PanelItems,GrepFile)) {
 		g_hOutput.Close();
 		if (FGOpenInEditor) {
 			StartupInfo.Editor(strFileName.c_str(), NULL, 0, 0, -1, -1,

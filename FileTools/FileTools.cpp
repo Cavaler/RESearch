@@ -132,7 +132,7 @@ BOOL FindRename(TCHAR *FileName,int *&Match,int &MatchCount,int &MatchStart,int 
 	return FALSE;
 }
 
-void RenameFile(WIN32_FIND_DATA *FindData,PluginPanelItem **PanelItems,int *ItemsNumber) {
+void RenameFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 	int MatchCount,MatchStart=0,MatchLength,ReplaceNumber=0;
 	int *Match;
 	BOOL Modified=FALSE;
@@ -231,7 +231,7 @@ void RenameFile(WIN32_FIND_DATA *FindData,PluginPanelItem **PanelItems,int *Item
 		}
 		if (g_bInterrupted) return;
 	}
-	if (Modified) AddFile(FindData,PanelItems,ItemsNumber);
+	if (Modified) AddFile(FindData, PanelItems);
 }
 
 BOOL RenameFilesPrompt() {
@@ -288,7 +288,7 @@ BOOL RenameFilesPrompt() {
 	return TRUE;
 }
 
-OperationResult RenameFiles(PluginPanelItem **PanelItems,int *ItemsNumber,BOOL ShowDialog) {
+OperationResult RenameFiles(panelitem_vector &PanelItems, BOOL ShowDialog) {
 	CPanelInfo PInfo;
 	PInfo.GetInfo(false);
 	if (PInfo.Plugin||(PInfo.PanelType!=PTYPE_FILEPANEL)) return OR_FAILED;
@@ -305,9 +305,9 @@ OperationResult RenameFiles(PluginPanelItem **PanelItems,int *ItemsNumber,BOOL S
 	FTAskOverwrite = FTAskCreatePath = true;
 	FileNumber=-1;g_bInterrupted=FALSE;
 
-	if (ScanDirectories(PanelItems,ItemsNumber,RenameFile)) {
+	if (ScanDirectories(PanelItems, RenameFile)) {
 		if (!FROpenModified) return OR_OK; else
-		return (*ItemsNumber==0) ? NoFilesFound() : OR_PANEL;
+		return (PanelItems.empty()) ? NoFilesFound() : OR_PANEL;
 	} else return OR_FAILED;
 }
 
@@ -322,14 +322,14 @@ OperationResult RenameFilesExecutor() {
 	FRConfirmFileThisRun = FALSE;	//FRConfirmFile;
 	FRConfirmLineThisRun = FALSE;	//FRConfirmLine;
 
-	if (ScanDirectories(&PanelItems, &ItemsNumber, RenameFile)) {
+	if (ScanDirectories(g_PanelItems, RenameFile)) {
 //		if (!FROpenModified) return OR_OK; else
 //			return (ItemsNumber == 0) ? OR_OK : OR_PANEL;
 		return OR_OK;
 	} else return OR_FAILED;
 }
 
-BOOL PerformRenameSelectedFiles(CPanelInfo &PInfo,PluginPanelItem **PanelItems,int *ItemsNumber) {
+BOOL PerformRenameSelectedFiles(CPanelInfo &PInfo, panelitem_vector &PanelItems) {
 	FileNumber=-1;g_bInterrupted=FALSE;
 
 	if ((PInfo.SelectedItemsNumber==0)&&(PInfo.ItemsNumber>0)&&
@@ -338,12 +338,12 @@ BOOL PerformRenameSelectedFiles(CPanelInfo &PInfo,PluginPanelItem **PanelItems,i
 		for (int I=0;I<PInfo.ItemsNumber;I++) {
 			if (I==PInfo.CurrentItem) continue;
 			if (g_bInterrupted) break;
-			RenameFile(&FFDtoWFD(PInfo.PanelItems[I].FindData),PanelItems,ItemsNumber);
+			RenameFile(&FFDtoWFD(PInfo.PanelItems[I].FindData),PanelItems);
 		}
 	} else {
 		for (int I=0;I<PInfo.SelectedItemsNumber;I++) {
 			if (g_bInterrupted) break;
-			RenameFile(&FFDtoWFD(PInfo.SelectedItems[I].FindData),PanelItems,ItemsNumber);
+			RenameFile(&FFDtoWFD(PInfo.SelectedItems[I].FindData),PanelItems);
 		}
 	}
 
@@ -397,7 +397,7 @@ BOOL RenameSelectedFilesPrompt() {
 	return TRUE;
 }
 
-OperationResult RenameSelectedFiles(PluginPanelItem **PanelItems,int *ItemsNumber,BOOL ShowDialog) {
+OperationResult RenameSelectedFiles(panelitem_vector &PanelItems, BOOL ShowDialog) {
 	CPanelInfo PInfo;
 	PInfo.GetInfo(false);
 	if (PInfo.Plugin||(PInfo.PanelType!=PTYPE_FILEPANEL)) return OR_FAILED;
@@ -409,13 +409,13 @@ OperationResult RenameSelectedFiles(PluginPanelItem **PanelItems,int *ItemsNumbe
 		if (!FPreparePattern(false)) return OR_CANCEL;
 	}
 
-	*ItemsNumber=0;*PanelItems=NULL;
+	PanelItems.clear();
 	FRConfirmFileThisRun=FRConfirmFile;
 	FRConfirmLineThisRun=FRConfirmLine;
 	FTAskOverwrite = FTAskCreatePath = true;
 
-	PerformRenameSelectedFiles(PInfo,PanelItems,ItemsNumber);
-	return (*ItemsNumber==0) ? NoFilesFound() : OR_OK;
+	PerformRenameSelectedFiles(PInfo, PanelItems);
+	return (PanelItems.empty()) ? NoFilesFound() : OR_OK;
 }
 
 OperationResult QuickRenameFilesExecutor() {
@@ -431,7 +431,7 @@ OperationResult QuickRenameFilesExecutor() {
 	PInfo.GetInfo(false);
 	if (PInfo.Plugin || (PInfo.PanelType!=PTYPE_FILEPANEL)) return OR_FAILED;
 
-	return PerformRenameSelectedFiles(PInfo,&PanelItems,&ItemsNumber) ? OR_OK : OR_CANCEL;
+	return PerformRenameSelectedFiles(PInfo, g_PanelItems) ? OR_OK : OR_CANCEL;
 }
 
 void StripCommonPart(vector<tstring> &arrFileNames) {
@@ -485,7 +485,7 @@ void ProcessNames(vector<tstring> &arrFileNames, vector<tstring> &arrProcessedNa
 
 		if (!strName.empty()) {
 			TCHAR szNumber[16];
-			_tprintf(szNumber, _T("%0*d"), g_nWidth, nItem+g_nStartWithNow);
+			_stprintf_s(szNumber, 16, _T("%0*d"), g_nWidth, nItem+g_nStartWithNow);
 			strName = g_strPrefix + szNumber + g_strPostfix + strName;
 
 			arrProcessedNames.push_back(strName);
@@ -530,7 +530,7 @@ OperationResult RenumberFiles() {
 		vector<tstring> &arrNames = bOriginal ? arrFileNames : arrProcessedNames;
 
 		TCHAR szBreak[32];
-		_tprintf(szBreak, _T("--- %0*d ----------"), g_nWidth, nOK);
+		_stprintf_s(szBreak, 32, _T("--- %0*d ----------"), g_nWidth, nOK);
 		arrNames.insert(arrNames.begin()+nOK, szBreak);
 		if (nPosition >= nOK) nPosition++;
 

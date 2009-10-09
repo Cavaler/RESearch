@@ -395,9 +395,9 @@ void PrepareBMHSearch(const TCHAR *String,int StringLength,size_t nPattern) {
 		for (int I=0;I<StringLength-1;I++) Table[((UTCHAR *)String)[I]]=StringLength-I-1;
 }
 
-int BMHSearch(const char *Buffer,int BufferLength,const char *String,int StringLength,char *XLatTable,int nPattern) {
-	unsigned char *Buf=(unsigned char *)Buffer;
-	unsigned char *Str=(unsigned char *)String;
+int BMHSearch(const TCHAR *Buffer,int BufferLength,const TCHAR *String,int StringLength,TCHAR *XLatTable,int nPattern) {
+	UTCHAR *Buf=(UTCHAR *)Buffer;
+	UTCHAR *Str=(UTCHAR *)String;
 	BMHTable &Table = g_BMHTables[nPattern].m_Table;
 	int I;
 
@@ -412,9 +412,9 @@ int BMHSearch(const char *Buffer,int BufferLength,const char *String,int StringL
 	return -1;
 }
 
-int ReverseBMHSearch(const char *Buffer,int BufferLength,const char *String,int StringLength,char *XLatTable,int nPattern) {
-	unsigned char *Buf=(unsigned char *)Buffer;
-	unsigned char *Str=(unsigned char *)String;
+int ReverseBMHSearch(const TCHAR *Buffer,int BufferLength,const TCHAR *String,int StringLength,TCHAR *XLatTable,int nPattern) {
+	UTCHAR *Buf=(UTCHAR*)Buffer;
+	UTCHAR *Str=(UTCHAR *)String;
 	BMHTable &Table = g_BMHTables[nPattern].m_Table;
 	int I;
 
@@ -429,10 +429,8 @@ int ReverseBMHSearch(const char *Buffer,int BufferLength,const char *String,int 
 	return -1;
 }
 
-#ifndef UNICODE
-tstring UTF8ToHex(string &strUTF8) {
+tstring UniToHex(wstring &wstrUnicode) {
 	TCHAR szBuffer[6];
-	wstring wstrUnicode = DecodeUTF8(strUTF8);
 	tstring strHex;
 	for (size_t nIndex = 0; nIndex < wstrUnicode.length(); nIndex++) {
 		_stprintf_s(szBuffer, 6, _T("%04X "), wstrUnicode[nIndex]);
@@ -441,7 +439,7 @@ tstring UTF8ToHex(string &strUTF8) {
 	return strHex;
 }
 
-string HexToUTF8(tstring &strHex) {
+wstring HexToUni(tstring strHex) {
 	wstring wstrUnicode;
 	size_t nStart = 0;
 	while (nStart < strHex.length()) {
@@ -455,8 +453,19 @@ string HexToUTF8(tstring &strHex) {
 		wstrUnicode += (wchar_t)chSymbol;
 		nStart = nEnd;
 	}
-	return EncodeUTF8(wstrUnicode);
+
+	return wstrUnicode;
 }
+
+#ifndef UNICODE
+tstring UTF8ToHex(string &strUTF8) {
+	return UniToHex(DecodeUTF8(strUTF8));
+}
+
+string HexToUTF8(tstring &strHex) {
+	return EncodeUTF8(HexToUni(strHex));
+}
+#endif
 
 void UTF8Converter(tstring strInit) {
 	tstring strANSI = strInit;
@@ -483,21 +492,35 @@ void UTF8Converter(tstring strInit) {
 	do {
 		switch (iResult = Dialog.Display(4, -4, -3, -2, -1)) {
 		case 0:
+#ifdef UNICODE
+			strUTF8 = OEMToUnicode(EncodeUTF8(strANSI));
+			strHex = UniToHex(strANSI);
+#else
 			strUTF8 = EncodeUTF8(strANSI, CP_OEMCP);
 			strHex = UTF8ToHex(strUTF8);
+#endif
 			break;
 		case 1:
+#ifdef UNICODE
+			strANSI = DecodeUTF8(OEMFromUnicode(strUTF8));
+			strHex = UniToHex(strANSI);
+#else
 			strANSI = DecodeUTF8A(strUTF8, CP_OEMCP);
 			strHex = UTF8ToHex(strUTF8);
+#endif
 			break;
 		case 2:
+#ifdef UNICODE
+			strANSI = HexToUni(strHex);
+			strUTF8 = OEMToUnicode(EncodeUTF8(strANSI));
+#else
 			strUTF8 = HexToUTF8(strHex);
 			strANSI = DecodeUTF8A(strUTF8, CP_OEMCP);
+#endif
 			break;
 		}
 	} while ((iResult == 0) || (iResult == 1) || (iResult == 2));
 }
-#endif
 
 void QuoteRegExpString(tstring &strText) {
 	for (size_t I=0; I<strText.length();I++) {
@@ -638,7 +661,7 @@ BOOL LocalToSystemTime(FILETIME &ft) {
 void RunExternalEditor(tstring &strText) {
 	if ((strText.length() > 3) && (strText[1] == ':') && (strText[2] == '\\')) {
 #ifdef UNICODE
-		StartupInfo.Editor(strText.c_str(), NULL, 0, 0, -1, -1, 0, 0, 1, 0);
+		StartupInfo.Editor(strText.c_str(), NULL, 0, 0, -1, -1, 0, 0, 1, CP_AUTODETECT);
 #else
 		StartupInfo.Editor(strText.c_str(), NULL, 0, 0, -1, -1, 0, 0, 1);
 #endif
@@ -653,7 +676,7 @@ void RunExternalEditor(tstring &strText) {
 		mapFile.Close();
 
 #ifdef UNICODE
-		StartupInfo.Editor(szName, NULL, 0, 0, -1, -1, EF_DISABLEHISTORY, 0, 1, 0);
+		StartupInfo.Editor(szName, NULL, 0, 0, -1, -1, EF_DISABLEHISTORY, 0, 1, CP_AUTODETECT);
 #else
 		StartupInfo.Editor(szName, NULL, 0, 0, -1, -1, EF_DISABLEHISTORY, 0, 1);
 #endif

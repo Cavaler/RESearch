@@ -1,13 +1,13 @@
 LIBRARY
 EXPORTS
-	SetStartupInfoW=SetStartupInfo
-	GetPluginInfoW=GetPluginInfo
-	GetOpenPluginInfoW=GetOpenPluginInfo
-	OpenPluginW=OpenPlugin
-	ProcessKeyW=ProcessKey
-	GetFindDataW=GetFindData
-	SetDirectoryW=SetDirectory
-	PutFilesW=PutFiles
-	ClosePluginW=ClosePlugin
-	ConfigureW=Configure
-	ExitFARW=ExitFAR
+	SetStartupInfoW
+	GetPluginInfoW
+	GetOpenPluginInfoW
+	OpenPluginW
+	ProcessKeyW
+	GetFindDataW
+	SetDirectoryW
+	PutFilesW
+	ClosePluginW
+	ConfigureW
+	ExitFARW

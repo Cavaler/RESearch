@@ -287,13 +287,13 @@ BOOL FindMemoryMapped(char *FileName,BOOL (*Searcher)(const char *,int)) {
 	return Searcher(mapFile, FileSize);
 }
 
-void SearchFile(WIN32_FIND_DATA *FindData,PluginPanelItem **PanelItems,int *ItemsNumber) {
+void SearchFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 	BOOL IsFound;
 
 	InitFoundPosition();
 
 	if (FindData->dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) {
-		if (FText.empty()) AddFile(FindData,PanelItems,ItemsNumber);
+		if (FText.empty()) AddFile(FindData, PanelItems);
 		return;
 	}
 
@@ -309,7 +309,7 @@ void SearchFile(WIN32_FIND_DATA *FindData,PluginPanelItem **PanelItems,int *Item
 	default:IsFound=FALSE;
 	}
 	// This is exclusive 'OR'...
-	if ((IsFound)?!FSInverse:FSInverse) AddFile(FindData,PanelItems,ItemsNumber);
+	if ((IsFound)?!FSInverse:FSInverse) AddFile(FindData, PanelItems);
 }
 
 bool PrepareFileSearchPattern() {
@@ -391,7 +391,7 @@ int SearchPrompt(BOOL Plugin) {
 	return TRUE;
 }
 
-OperationResult FileFind(PluginPanelItem **PanelItems,int *ItemsNumber,BOOL ShowDialog,BOOL bSilent) {
+OperationResult FileFind(panelitem_vector &PanelItems, BOOL ShowDialog, BOOL bSilent) {
 	PanelInfo PInfo;
 	StartupInfo.Control(INVALID_HANDLE_VALUE,FCTL_GETPANELINFO,&PInfo);
 	if (PInfo.PanelType!=PTYPE_FILEPANEL) return OR_FAILED;
@@ -404,15 +404,15 @@ OperationResult FileFind(PluginPanelItem **PanelItems,int *ItemsNumber,BOOL Show
 		if (!PrepareFileSearchPattern()) return OR_CANCEL;
 	}
 
-	if (ScanDirectories(PanelItems,ItemsNumber,SearchFile)) {
-		return (*ItemsNumber==0) ? (bSilent ? OR_OK : NoFilesFound()) : OR_PANEL;
+	if (ScanDirectories(PanelItems, SearchFile)) {
+		return (PanelItems.empty()) ? (bSilent ? OR_OK : NoFilesFound()) : OR_PANEL;
 	} else return OR_FAILED;
 }
 
 OperationResult FileSearchExecutor() {
 	FMask = MaskText;
 	FText = SearchText;
-	return FileFind(&PanelItems, &ItemsNumber, FALSE, TRUE);
+	return FileFind(g_PanelItems, FALSE, TRUE);
 }
 
 BOOL CFSPresetCollection::EditPreset(CPreset *pPreset) {

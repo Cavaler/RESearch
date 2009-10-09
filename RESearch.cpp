@@ -1,7 +1,11 @@
 #include "StdAfx.h"
 #include "RESearch.h"
 
-void WINAPI GetPluginInfo(PluginInfo *Info) {
+#ifdef UNICODE
+#define UNICODE_SKIP
+#endif
+
+void WINAPI FAR_EXPORT(GetPluginInfo)(PluginInfo *Info) {
 	static const TCHAR *ConfigStrings[1];
 	static const TCHAR *MenuStrings[1];
 	ConfigStrings[0] = GetMsg(MRESearch);
@@ -19,7 +23,7 @@ void WINAPI GetPluginInfo(PluginInfo *Info) {
 	Info->CommandPrefix=_T("ff:fr:rn:qr");
 }
 
-void WINAPI SetStartupInfo(const PluginStartupInfo *Info) {
+void WINAPI FAR_EXPORT(SetStartupInfo)(const PluginStartupInfo *Info) {
 	StartupInfo=*Info;
 	PrepareLocaleStuff();
 	ReadRegistry();
@@ -393,26 +397,28 @@ HANDLE OpenPluginFromFileMenu(int Item, BOOL ShowDialog) {
 	}
 
 	switch (Item) {
+#ifndef UNICODE_SKIP
 		case 0:
-			Result = FileFind(&PanelItems,&ItemsNumber,ShowDialog);
+			Result = FileFind(g_PanelItems,ShowDialog);
 			if (Result != OR_CANCEL) SynchronizeWithFile(false);
 			break;
 		case 1:
-			Result = FileReplace(&PanelItems,&ItemsNumber,ShowDialog);
+			Result = FileReplace(g_PanelItems,ShowDialog);
 			if (Result != OR_CANCEL) SynchronizeWithFile(true);
 			break;
 		case 2:
 			Result = FileGrep(ShowDialog);
 			if (Result != OR_CANCEL) SynchronizeWithFile(false);
 			break;
+#endif
 		case 4:ChangeSelection(MMenuSelect);break;
 		case 5:ChangeSelection(MMenuUnselect);break;
 		case 6:ChangeSelection(MMenuFlipSelection);break;
 		case 8:
-			Result=RenameFiles(&PanelItems,&ItemsNumber,ShowDialog);
+			Result=RenameFiles(g_PanelItems,ShowDialog);
 			break;
 		case 9:
-			Result=RenameSelectedFiles(&PanelItems,&ItemsNumber,ShowDialog);
+			Result=RenameSelectedFiles(g_PanelItems,ShowDialog);
 			break;
 		case 10:
 			RenumberFiles();
@@ -440,13 +446,13 @@ HANDLE OpenPluginFromFileMenu(int Item, BOOL ShowDialog) {
 #ifdef UNICODE
 		wchar_t szCurDir[MAX_PATH];
 		StartupInfo.Control(PANEL_ACTIVE, FCTL_GETCURRENTDIRECTORY, MAX_PATH, (LONG_PTR)szCurDir);
-		CTemporaryPanel *Panel=new CTemporaryPanel(PanelItems,ItemsNumber,szCurDir);
+		CTemporaryPanel *Panel=new CTemporaryPanel(g_PanelItems,szCurDir);
 #else
 		PanelInfo PInfo;
 		StartupInfo.Control(INVALID_HANDLE_VALUE,FCTL_GETPANELINFO,&PInfo);
-		CTemporaryPanel *Panel=new CTemporaryPanel(PanelItems,ItemsNumber,PInfo.CurDir);
+		CTemporaryPanel *Panel=new CTemporaryPanel(g_PanelItems,PInfo.CurDir);
 #endif
-		PanelItems=NULL;ItemsNumber=0;
+		g_PanelItems.clear();
 		return (HANDLE)Panel;
 	} else {
 #ifdef UNICODE
@@ -491,6 +497,7 @@ OperationResult OpenPluginFromEditorPreset(int Item) {
 }
 
 HANDLE OpenPluginFromEditorMenu(int Item) {
+#ifndef UNICODE_SKIP
 	FindIfClockPresent();
 	switch (Item = ShowEditorMenu()) {
 		case 0:
@@ -521,7 +528,7 @@ HANDLE OpenPluginFromEditorMenu(int Item) {
 				EditorSearchAgain();
 				break;
 			case 1:
-				_EditorReplaceAgain();
+			_EditorReplaceAgain();
 				break;
 			case 2:
 				EditorFilterAgain();
@@ -547,6 +554,7 @@ HANDLE OpenPluginFromEditorMenu(int Item) {
 		Item -= 11;
 		OpenPluginFromEditorPreset(Item);
 	}
+#endif
 
 	return INVALID_HANDLE_VALUE;
 }
@@ -593,7 +601,7 @@ HANDLE OpenPluginFromViewerMenu(int Item) {
 }
 
 #ifdef UNICODE
-HANDLE WINAPI OpenPlugin(int OpenFrom, INT_PTR Item) {
+HANDLE WINAPI OpenPluginW(int OpenFrom, INT_PTR Item) {
 #else
 HANDLE WINAPI OpenPlugin(int OpenFrom, int Item) {
 #endif
@@ -741,7 +749,7 @@ void ConfigureEditor() {
 	Dialog.Display(-1);
 }
 
-int WINAPI Configure(int ItemNumber) {
+int WINAPI FAR_EXPORT(Configure)(int ItemNumber) {
 	const TCHAR *ppszItems[]={GetMsg(MCommonSettings),GetMsg(MFileSearchSettings),GetMsg(MEditorSearchSettings)};
 	int iResult = 0;
 	do {
@@ -754,10 +762,12 @@ int WINAPI Configure(int ItemNumber) {
 	} while (TRUE);
 }
 
-void WINAPI ExitFAR() {
+void WINAPI FAR_EXPORT(ExitFAR)() {
 	WriteRegistry();
+#ifndef UNICODE_SKIP
 	ECleanup(FALSE);
 	FCleanup(FALSE);
+#endif
 	FTCleanup(FALSE);
 	StopREThread();
 	CoUninitialize();

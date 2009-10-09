@@ -5,6 +5,12 @@
 #include <FAR.h>
 #include <FarDlg.h>
 
+#ifdef UNICODE
+#define DIF_VAREDIT 0
+#endif
+
+#define arrsizeof(arr) (sizeof(arr)/sizeof(arr[0]))
+
 enum OperationResult {OR_CANCEL,OR_FAILED,OR_OK,OR_PANEL};
 
 #include "Presets.h"
@@ -28,7 +34,7 @@ enum   FindTextAtCursor {FT_NONE,FT_WORD,FT_ANY};
 EXTERN bool g_bFromCmdLine;
 
 struct sActiveScript {
-	string m_strName;
+	tstring m_strName;
 	CLSID  m_clsid;
 };
 EXTERN vector<sActiveScript> m_arrEngines;
@@ -293,7 +299,7 @@ void WriteRegistry();
 void ReadActiveScripts();
 int  ConfigureSeveralLines();
 
-bool CheckUsage(const string &strText, bool bRegExp, bool bSeveralLine);
+bool CheckUsage(const tstring &strText, bool bRegExp, bool bSeveralLine);
 void PrepareBMHSearch(const TCHAR *String,int StringLength,size_t nPattern = 0);
 BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const tstring &Text,int CaseSensitive,BOOL bUTF8=FALSE,const unsigned char *pTables=NULL);
 BOOL PreparePattern(CRegExp &reObject, const string &Text, int CaseSensitive, BOOL bUTF8=FALSE, const unsigned char *pTables=NULL);
@@ -311,11 +317,11 @@ EXTERN TCHAR UpCaseTable[65536];
 #else
 EXTERN char UpCaseTable[256];
 EXTERN CharTableSet *m_pReplaceTable;
-
-void UTF8Converter(tstring strInit = _T(""));
 #endif
+
 void PrepareLocaleStuff();
 tstring UpCaseString(const tstring &strText);
+void UTF8Converter(tstring strInit = _T(""));
 
 int BMHSearch(const TCHAR *Buffer,int BufferLength,const TCHAR *String,int StringLength,TCHAR *XLatTable,int nPattern = 0);
 int ReverseBMHSearch(const TCHAR *Buffer,int BufferLength,const TCHAR *String,int StringLength,TCHAR *XLatTable,int nPattern = 0);

@@ -92,8 +92,7 @@ EXTERN CFarListData g_WhereToSearchPlugin;
 EXTERN int  FileConfirmed,FRConfirmFileThisRun,FRConfirmReadonlyThisRun;
 EXTERN int  FRConfirmLineThisRun,FRConfirmLineThisFile;
 
-EXTERN PluginPanelItem *PanelItems;
-EXTERN int ItemsNumber;
+EXTERN panelitem_vector g_PanelItems;
 EXTERN int g_nFoundLine;
 EXTERN int g_nFoundColumn;
 
@@ -105,10 +104,10 @@ struct CharTableSet2 : public CharTableSet {
 EXTERN vector<CharTableSet2> XLatTables;
 #endif
 
-typedef void (*ProcessFileProc)(WIN32_FIND_DATA *FindData,PluginPanelItem **PanelItems,int *ItemsNumber);
+typedef void (*ProcessFileProc)(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems);
 
-OperationResult FileFind(PluginPanelItem **PanelItems,int *ItemsNumber,BOOL ShowDialog,BOOL bSilent=FALSE);
-OperationResult FileReplace(PluginPanelItem **PanelItems,int *ItemsNumber,BOOL ShowDialog,BOOL bSilent=FALSE);
+OperationResult FileFind(panelitem_vector &PanelItems,BOOL ShowDialog,BOOL bSilent=FALSE);
+OperationResult FileReplace(panelitem_vector &PanelItems,BOOL ShowDialog,BOOL bSilent=FALSE);
 OperationResult FileGrep(BOOL ShowDialog);
 BOOL AdvancedSettings();
 BOOL CompileAdvancedSettings();
@@ -126,8 +125,8 @@ OperationResult NoFilesFound();
 void InitFoundPosition();
 
 BOOL MultipleMasksApply(const string &Masks, const char *Filename);
-void AddFile(WIN32_FIND_DATA *FindData,PluginPanelItem **PanelItems,int *ItemsNumber);
-int  ScanDirectories(PluginPanelItem **PanelItems,int *ItemsNumber,ProcessFileProc ProcessFile);
+void AddFile(WIN32_FIND_DATA *FindData,panelitem_vector &PanelItems);
+int  ScanDirectories(panelitem_vector &PanelItems,ProcessFileProc ProcessFile);
 int  FPrepareMaskPattern();
 int  FPreparePattern(bool bAcceptEmpty);
 
@@ -159,7 +158,7 @@ struct TempUserData {
 
 class CTemporaryPanel {
 public:
-	CTemporaryPanel(PluginPanelItem *NewItems,int NewCount,TCHAR *CalledFolder);
+	CTemporaryPanel(panelitem_vector &PanelItems,TCHAR *CalledFolder);
 	~CTemporaryPanel();
 
 	void GetOpenPluginInfo(OpenPluginInfo *Info);
@@ -171,9 +170,8 @@ public:
 
 	bool m_bActive;
 private:
-	PluginPanelItem *Items;
-	int Count;
-	TCHAR *Folder;
+	vector<CPluginPanelItem> m_arrItems;
+	tstring m_strFolder;
 	KeyBarTitles KeyBar;
 
 	void UpdateList();

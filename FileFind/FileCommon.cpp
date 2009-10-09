@@ -47,6 +47,7 @@ void FReadRegistry(HKEY Key) {
 	FGPresets = new CFGPresetCollection(g_FGParamSet);
 	FAPresets = new CFAPresetCollection(g_FAParamSet);
 
+#ifndef UNICODE
 	CharTableSet2 Table;
 
 	while (StartupInfo.CharTable(XLatTables.size(), (char *)&Table, sizeof(CharTableSet))>=0) {
@@ -69,6 +70,7 @@ void FReadRegistry(HKEY Key) {
 	for (int I=0;I<256;I++) Table.UpperDecodeTable[I]=UpCaseTable[Table.UpperDecodeTable[I]];
 
 	XLatTables.push_back(Table);
+#endif
 
 	g_WhereToSearch.Append(GetMsg(MAllDrives));
 	g_WhereToSearch.Append(GetMsg(MAllLocalDrives));
@@ -152,8 +154,8 @@ int FPreparePattern(bool bAcceptEmpty) {
 
 	case SA_MULTITEXT:
 	case SA_MULTIREGEXP:{
-		string What=FText;
-		string Word;
+		tstring What=FText;
+		tstring Word;
 
 		FSWords.clear();
 		do {
@@ -179,19 +181,21 @@ void InitFoundPosition() {
 	g_nFoundColumn = 1;
 }
 
-void AddFile(WIN32_FIND_DATA *FindData,PluginPanelItem **PanelItems,int *ItemsNumber) {
-	*PanelItems=(PluginPanelItem *)realloc(*PanelItems,sizeof(PluginPanelItem)*((*ItemsNumber)+1));
-	(*PanelItems)[*ItemsNumber].FindData=*FindData;
-	(*PanelItems)[*ItemsNumber].PackSizeHigh=0;
-	(*PanelItems)[*ItemsNumber].PackSize=0;
-	(*PanelItems)[*ItemsNumber].Flags=0;
-	(*PanelItems)[*ItemsNumber].NumberOfLinks=0;
-	(*PanelItems)[*ItemsNumber].Description=NULL;
-	(*PanelItems)[*ItemsNumber].Owner=NULL;
-	(*PanelItems)[*ItemsNumber].CustomColumnData=NULL;
-	(*PanelItems)[*ItemsNumber].CustomColumnNumber=0;
-	(*PanelItems)[*ItemsNumber].UserData=(DWORD)new TempUserData(g_nFoundLine, g_nFoundColumn);
-	(*ItemsNumber)++;
+void AddFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
+	CPluginPanelItem Item;
+
+	Item.FindData=*FindData;
+	Item.PackSizeHigh=0;
+	Item.PackSize=0;
+	Item.Flags=0;
+	Item.NumberOfLinks=0;
+	Item.Description=NULL;
+	Item.Owner=NULL;
+	Item.CustomColumnData=NULL;
+	Item.CustomColumnNumber=0;
+	Item.UserData=(DWORD)new TempUserData(g_nFoundLine, g_nFoundColumn);
+
+	PanelItems.push_back(Item);
 }
 
 int AddSlashLen(char *Directory) {
@@ -250,11 +254,11 @@ void ShortenFileName(const char *szFrom, char *szTo) {
 	}
 }
 
-void ShowProgress(char *Directory, PluginPanelItem *PanelItems, int ItemsNumber) {
+void ShowProgress(char *Directory, panelitem_vector &PanelItems) {
 	char Scanned[80],Found[80];
 
 	sprintf(Scanned,GetMsg(MFilesScanned),FilesScanned);
-	sprintf(Found,GetMsg(MFilesFound),ItemsNumber);
+	sprintf(Found,GetMsg(MFilesFound),PanelItems.size());
 
 	char szFileName[15][75];
 	const char *Lines[20]={GetMsg(MRESearch), Directory, Scanned, Found, "",
@@ -262,9 +266,9 @@ void ShowProgress(char *Directory, PluginPanelItem *PanelItems, int ItemsNumber)
 		szFileName[ 5], szFileName[ 6], szFileName[ 7], szFileName[ 8], szFileName[ 9],
 		szFileName[10], szFileName[11], szFileName[12], szFileName[13], szFileName[14]};
 
-	int nMax = (ItemsNumber > 15) ? 15 : ItemsNumber;
+	int nMax = (PanelItems.size() > 15) ? 15 : PanelItems.size();
 	for (int nItem = 0; nItem < nMax; nItem++)
-		ShortenFileName(PanelItems[nItem+ItemsNumber-nMax].FindData.cFileName, szFileName[nItem]);
+		ShortenFileName(PanelItems[nItem+PanelItems.size()-nMax].FindData.cFileName, szFileName[nItem]);
 
 	StartupInfo.Message(StartupInfo.ModuleNumber,0,NULL,Lines,5+nMax,0);
 }
@@ -295,7 +299,7 @@ BOOL AdvancedApplies(WIN32_FIND_DATA *FindData) {
 	return TRUE;
 }
 
-int DoScanDirectory(char *Directory,PluginPanelItem **PanelItems,int *ItemsNumber,ProcessFileProc ProcessFile) {
+int DoScanDirectory(char *Directory, panelitem_vector &PanelItems, ProcessFileProc ProcessFile) {
 	if (FASkipSystemFolders && FASystemFoldersMask) {
 		if ((*FASystemFoldersMask)(Directory)) return TRUE;
 	}
@@ -337,14 +341,14 @@ int DoScanDirectory(char *Directory,PluginPanelItem **PanelItems,int *ItemsNumbe
 	FindClose(HSearch);
 
 	Directory[Len]=0;
-	if (!FindDataCount) ShowProgress(Directory,*PanelItems,*ItemsNumber);
+	if (!FindDataCount) ShowProgress(Directory, PanelItems);
 	for (int I=0;I<FindDataCount;I++) {
 		g_bInterrupted|=Interrupted();if (g_bInterrupted) break;
 		if (!FAdvanced||AdvancedApplies(&FindDataArray[I])) {
-			ProcessFile(&FindDataArray[I],PanelItems,ItemsNumber);
+			ProcessFile(&FindDataArray[I],PanelItems);
 			Sleep(0);FilesScanned++;
 		}
-		if ((I==0)||((FText[0]==0)?(FilesScanned%100==0):(FilesScanned%25==0))) ShowProgress(Directory,*PanelItems,*ItemsNumber);
+		if ((I==0)||((FText[0]==0)?(FilesScanned%100==0):(FilesScanned%25==0))) ShowProgress(Directory, PanelItems);
 	}
 
 	free(FindDataArray);
@@ -362,7 +366,7 @@ int DoScanDirectory(char *Directory,PluginPanelItem **PanelItems,int *ItemsNumbe
 		if (strcmp(FindData.cFileName,"..")==0) continue;
 		strcpy(Directory+Len,FindData.cFileName);
 		strcpy(FindData.cFileName,Directory);
-		if (!DoScanDirectory(Directory,PanelItems,ItemsNumber,ProcessFile)) {
+		if (!DoScanDirectory(Directory, PanelItems, ProcessFile)) {
 			CurrentRecursionLevel--;
 			FindClose(HSearch);return FALSE;
 		}
@@ -373,7 +377,7 @@ int DoScanDirectory(char *Directory,PluginPanelItem **PanelItems,int *ItemsNumbe
 	return TRUE;
 }
 
-int ScanPluginDirectories(PanelInfo &Info,PluginPanelItem **PanelItems,int *ItemsNumber,ProcessFileProc ProcessFile) {
+int ScanPluginDirectories(PanelInfo &Info,panelitem_vector &PanelItems,ProcessFileProc ProcessFile) {
 	PluginPanelItem *Items=(FSearchIn==SI_SELECTED)?Info.SelectedItems:Info.PanelItems;
 	int Number=(FSearchIn==SI_SELECTED)?Info.SelectedItemsNumber:Info.ItemsNumber;
 	g_bScanningLocalTime = true;
@@ -383,24 +387,26 @@ int ScanPluginDirectories(PanelInfo &Info,PluginPanelItem **PanelItems,int *Item
 			char CurDir[MAX_PATH];
 			if (strcmp(Items[I].FindData.cFileName,"..")==0) continue;
 			GetFullPathName(Items[I].FindData.cFileName,MAX_PATH,CurDir,NULL);
-			if (!DoScanDirectory(CurDir,PanelItems,ItemsNumber,ProcessFile)) break;
+			if (!DoScanDirectory(CurDir, PanelItems, ProcessFile)) break;
 		} else {
 			if (!MultipleMasksApply(FMask,Items[I].FindData.cFileName)) continue;
 			g_bInterrupted|=Interrupted();if (g_bInterrupted) break;
 
 			WIN32_FIND_DATA CurFindData=Items[I].FindData;
-			GetFullPathName(Items[I].FindData.cFileName,sizeof(CurFindData.cFileName),CurFindData.cFileName,NULL);
-			ProcessFile(&CurFindData,PanelItems,ItemsNumber);
+			GetFullPathName(Items[I].FindData.cFileName,arrsizeof(CurFindData.cFileName),CurFindData.cFileName,NULL);
+			ProcessFile(&CurFindData,PanelItems);
 			FilesScanned++;
 		}
 	}
 	return TRUE;
 }
 
-int ScanDirectories(PluginPanelItem **PanelItems,int *ItemsNumber,ProcessFileProc ProcessFile) {
+int ScanDirectories(panelitem_vector &PanelItems,ProcessFileProc ProcessFile) {
 	PanelInfo PInfo;
 	StartupInfo.Control(INVALID_HANDLE_VALUE,FCTL_GETPANELINFO,&PInfo);
-	*ItemsNumber=0;*PanelItems=NULL;g_bInterrupted=FALSE;FilesScanned=0;
+	PanelItems.clear();
+	g_bInterrupted=FALSE;
+	FilesScanned=0;
 	CurrentRecursionLevel=0;
 
 	FADateBeforeThisLocal = FADateBeforeThis;
@@ -410,7 +416,7 @@ int ScanDirectories(PluginPanelItem **PanelItems,int *ItemsNumber,ProcessFilePro
 
 	g_bScanningLocalTime = LocalFileTime(PInfo.CurDir[0]);
 
-	if (PInfo.Plugin) return ScanPluginDirectories(PInfo,PanelItems,ItemsNumber,ProcessFile);
+	if (PInfo.Plugin) return ScanPluginDirectories(PInfo, PanelItems, ProcessFile);
 
 	switch (FSearchIn) {
 	case SI_ALLDRIVES:
@@ -423,14 +429,14 @@ int ScanDirectories(PluginPanelItem **PanelItems,int *ItemsNumber,ProcessFilePro
 			if ((FSearchIn==SI_ALLLOCAL)&&(DriveType==DRIVE_REMOTE)) continue;
 			if ((DriveType!=0)&&(DriveType!=1)&&(DriveType!=DRIVE_REMOVABLE)&&(DriveType!=DRIVE_CDROM))
 				g_bScanningLocalTime = LocalFileTime(RootDir[0]);
-				DoScanDirectory(RootDir,PanelItems,ItemsNumber,ProcessFile);
+				DoScanDirectory(RootDir, PanelItems, ProcessFile);
 				RootDir[3]=0;
 		}
 		return TRUE;
 					 }
 	case SI_FROMROOT:PInfo.CurDir[3]=0;
 	case SI_FROMCURRENT:case SI_CURRENTONLY:
-		DoScanDirectory(PInfo.CurDir,PanelItems,ItemsNumber,ProcessFile);return TRUE;
+		DoScanDirectory(PInfo.CurDir, PanelItems, ProcessFile);return TRUE;
 	case SI_SELECTED:{
 			int Len=AddSlashLen(PInfo.CurDir);
 			if (PInfo.ItemsNumber==0) return FALSE;
@@ -442,19 +448,19 @@ int ScanDirectories(PluginPanelItem **PanelItems,int *ItemsNumber,ProcessFilePro
 						// Test if directory itself applies
 						if (MultipleMasksApply(FMask,CurFindData.cFileName)) {
 							strcat(strcpy(CurFindData.cFileName,PInfo.CurDir),PInfo.SelectedItems[I].FindData.cFileName);
-							ProcessFile(&CurFindData,PanelItems,ItemsNumber);FilesScanned++;
+							ProcessFile(&CurFindData,PanelItems);FilesScanned++;
 						}
 
 						// Scan subdirectory
 						strcpy(PInfo.CurDir+Len,PInfo.SelectedItems[I].FindData.cFileName);
-						if (!DoScanDirectory(PInfo.CurDir,PanelItems,ItemsNumber,ProcessFile)) break;
+						if (!DoScanDirectory(PInfo.CurDir, PanelItems, ProcessFile)) break;
 						PInfo.CurDir[Len]=0;
 					}
 				} else {
 					if (!MultipleMasksApply(FMask,CurFindData.cFileName)) continue;
 					g_bInterrupted|=Interrupted();if (g_bInterrupted) break;
 					strcat(strcpy(CurFindData.cFileName,PInfo.CurDir),PInfo.SelectedItems[I].FindData.cFileName);
-					ProcessFile(&CurFindData,PanelItems,ItemsNumber);FilesScanned++;
+					ProcessFile(&CurFindData, PanelItems);FilesScanned++;
 				}
 			}
 			return TRUE;
@@ -627,7 +633,7 @@ bool CFarDateTimeStorage::Verify(const char *pszBuffer) {
 		PCRE_CASELESS,&ErrPtr,&ErrOffset,NULL);
 	if (!Pattern) return false;
 	int Match[10*3];
-	if (do_pcre_exec(Pattern,NULL,pszBuffer,strlen(pszBuffer),0,0,Match,sizeof(Match)/sizeof(int))>=0) {
+	if (do_pcre_exec(Pattern,NULL,pszBuffer,strlen(pszBuffer),0,0,Match,arrsizeof(Match))>=0) {
 		SYSTEMTIME locTime;
 		locTime.wDay =    atoin(pszBuffer,Match[1*2],Match[1*2+1]);
 		locTime.wMonth =  atoin(pszBuffer,Match[2*2],Match[2*2+1]);
@@ -873,7 +879,7 @@ BOOL MaskCaseHere() {
 	case MC_VOLUME:{
 		DWORD Flags;
 		char szFSName[64];
-		if (!GetVolumeInformation(NULL,NULL,0,NULL,NULL,&Flags,szFSName,sizeof(szFSName))) return FALSE;
+		if (!GetVolumeInformation(NULL,NULL,0,NULL,NULL,&Flags,szFSName,arrsizeof(szFSName))) return FALSE;
 		return _stricmp(szFSName, "NTFS") && (Flags&FS_CASE_SENSITIVE);
 				   }
 	}
@@ -884,7 +890,7 @@ bool LocalFileTime(char cDrive) {
 	char szRoot[] = {cDrive, ':', '\\', 0};
 	DWORD Flags;
 	char szFSName[64];
-	if (!GetVolumeInformation(szRoot, NULL, 0, NULL, NULL, &Flags, szFSName, sizeof(szFSName))) return false;
+	if (!GetVolumeInformation(szRoot, NULL, 0, NULL, NULL, &Flags, szFSName, arrsizeof(szFSName))) return false;
 
 	if (_stricmp(szFSName, "NTFS") == 0) return false;
 	if (_strnicmp(szFSName, "FAT", 3) == 0) return true;

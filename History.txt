@@ -6,8 +6,8 @@ Regular Expression Search and Replace
  * Minor change
 
 Planned:
-	! Performing all regular expression matches in UTF-8
 	* dialogprocs for disabling unneeded elements
+	* Disabling all special chars in Replace without Regexps
 
 Version 6.50 (18.09.2009)
 	! Presets for File Search/Replace/Grep can link to Advanced presets
