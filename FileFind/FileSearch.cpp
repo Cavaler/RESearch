@@ -81,7 +81,7 @@ BOOL FindTextInBufferWithTable(const char *Buffer, int Size, string &TextUpcase,
 	return BMHSearch(Buffer, Size, TextUpcase.data(), TextUpcase.size(), Table) >= 0;
 }
 
-BOOL FindTextInBuffer(const char *Buffer, int Size, string &Text) {
+BOOL FindTextInBuffer(const char *Buffer, int Size, tstring &Text) {
 	if (Size == 0) return FALSE;
 
 	char *Table=(FCaseSensitive) ? NULL : UpCaseTable;
@@ -233,7 +233,7 @@ BOOL FindMultiLineRegExp(const char *Buffer,int Size) {
 
 //////////////////////////////////////////////////////////////////////////
 
-BOOL FindRegExpInBuffer(const char *Buffer,int Size,string &Text) {
+BOOL FindRegExpInBuffer(const char *Buffer,int Size,tstring &Text) {
 	if (!Text[0]) return TRUE;
 	pcre *Pattern;
 	pcre_extra *PatternExtra;
@@ -244,9 +244,9 @@ BOOL FindRegExpInBuffer(const char *Buffer,int Size,string &Text) {
 	} else {g_bInterrupted=TRUE;return FALSE;}
 }
 
-BOOL FindMulti(const char *Buffer,int Size,BOOL (*Searcher)(const char *,int,string &)) {
-	string What=FText;
-	string Word;
+BOOL FindMulti(const char *Buffer,int Size,BOOL (*Searcher)(const char *,int,tstring &)) {
+	tstring What = FText;
+	tstring Word;
 	BOOL Return=TRUE,WereAnyMaybes=FALSE,AnyMaybesFound=FALSE;
 
 	do {
@@ -274,11 +274,11 @@ BOOL FindMulti(const char *Buffer,int Size,BOOL (*Searcher)(const char *,int,str
 BOOL FindMultiPlainText(const char *Buffer,int Size) {return FindMulti(Buffer,Size,FindTextInBuffer);}
 BOOL FindMultiRegExp(const char *Buffer,int Size) {return FindMulti(Buffer,Size,FindRegExpInBuffer);}
 
-BOOL FindMemoryMapped(char *FileName,BOOL (*Searcher)(const char *,int)) {
+BOOL FindMemoryMapped(TCHAR *FileName,BOOL (*Searcher)(const char *,int)) {
 	CFileMapping mapFile;
 	if (!mapFile.Open(FileName)) {
-		const char *Lines[]={GetMsg(MREReplace),GetMsg(MFileOpenError),FileName,GetMsg(MOk)};
-		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"FSOpenError",Lines,4,1);
+		const TCHAR *Lines[]={GetMsg(MREReplace),GetMsg(MFileOpenError),FileName,GetMsg(MOk)};
+		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("FSOpenError"),Lines,4,1);
 		return FALSE;
 	}
 
@@ -321,18 +321,18 @@ bool PrepareFileSearchPattern() {
 }
 
 int SearchPrompt(BOOL Plugin) {
-	CFarDialog Dialog(76,24,"FileSearchDlg");
+	CFarDialog Dialog(76,24,_T("FileSearchDlg"));
 	Dialog.AddFrame(MRESearch);
 
 	Dialog.Add(new CFarCheckBoxItem(35,2,0,MAsRegExp,&FMaskAsRegExp));
 	Dialog.Add(new CFarTextItem(5,2,0,MMask));
-	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,"Masks", MaskText));
+	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,_T("Masks"), MaskText));
 
 	Dialog.Add(new CFarTextItem(5,4,0,MText));
-	Dialog.Add(new CFarEditItem(5,5,65,DIF_HISTORY|DIF_VAREDIT,"SearchText", SearchText));
-	Dialog.Add(new CFarButtonItem(67,5,0,0,"&\\"));
+	Dialog.Add(new CFarEditItem(5,5,65,DIF_HISTORY|DIF_VAREDIT,_T("SearchText"), SearchText));
+	Dialog.Add(new CFarButtonItem(67,5,0,0,_T("&\\")));
 
-	Dialog.Add(new CFarTextItem(5,6,DIF_BOXCOLOR|DIF_SEPARATOR,(char *)NULL));
+	Dialog.Add(new CFarTextItem(5,6,DIF_BOXCOLOR|DIF_SEPARATOR,_T("")));
 	Dialog.Add(new CFarRadioButtonItem(5,7,DIF_GROUP,MPlainText,(int *)&FSearchAs,SA_PLAINTEXT));
 	Dialog.Add(new CFarRadioButtonItem(5,8,0,MRegExp,			(int *)&FSearchAs,SA_REGEXP));
 	Dialog.Add(new CFarRadioButtonItem(5,9,0,MSeveralLineRegExp,(int *)&FSearchAs,SA_SEVERALLINE));
@@ -354,9 +354,9 @@ int SearchPrompt(BOOL Plugin) {
 
 	Dialog.AddButtons(MOk,MCancel);
 	Dialog.Add(new CFarButtonItem(60,7,0,0,MBtnPresets));
-	Dialog.Add(new CFarCheckBoxItem(56,9,0,"",&FAdvanced));
+	Dialog.Add(new CFarCheckBoxItem(56,9,0,_T(""),&FAdvanced));
 	Dialog.Add(new CFarButtonItem(60,9,0,0,MBtnAdvanced));
-	Dialog.Add(new CFarCheckBoxItem(56,11,0,"",&FUTF8));
+	Dialog.Add(new CFarCheckBoxItem(56,11,0,_T(""),&FUTF8));
 	Dialog.Add(new CFarButtonItem(60,11,0,0,MUTF8));
 	Dialog.SetFocus(3);
 	FACaseSensitive=FADirectoryCaseSensitive=MaskCaseHere();
@@ -392,8 +392,8 @@ int SearchPrompt(BOOL Plugin) {
 }
 
 OperationResult FileFind(panelitem_vector &PanelItems, BOOL ShowDialog, BOOL bSilent) {
-	PanelInfo PInfo;
-	StartupInfo.Control(INVALID_HANDLE_VALUE,FCTL_GETPANELINFO,&PInfo);
+	CPanelInfo PInfo;
+	PInfo.GetInfo(false);
 	if (PInfo.PanelType!=PTYPE_FILEPANEL) return OR_FAILED;
 	if (PInfo.Plugin&&((PInfo.Flags&PFLAGS_REALNAMES)==0)) return OR_FAILED;
 
@@ -416,19 +416,19 @@ OperationResult FileSearchExecutor() {
 }
 
 BOOL CFSPresetCollection::EditPreset(CPreset *pPreset) {
-	CFarDialog Dialog(76,25,"FSPresetDlg");
+	CFarDialog Dialog(76,25,_T("FSPresetDlg"));
 	Dialog.AddFrame(MFSPreset);
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
-	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,"RESearch.PresetName", pPreset->Name()));
+	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,_T("RESearch.PresetName"), pPreset->Name()));
 
 	Dialog.Add(new CFarCheckBoxItem(35,4,0,MAsRegExp,&pPreset->m_mapInts["MaskAsRegExp"]));
 	Dialog.Add(new CFarTextItem(5,4,0,MMask));
-	Dialog.Add(new CFarEditItem(5,5,70,DIF_HISTORY,"Masks", pPreset->m_mapStrings["Mask"]));
+	Dialog.Add(new CFarEditItem(5,5,70,DIF_HISTORY,_T("Masks"), pPreset->m_mapStrings["Mask"]));
 
 	Dialog.Add(new CFarTextItem(5,6,0,MSearchFor));
-	Dialog.Add(new CFarEditItem(5,7,70,DIF_HISTORY|DIF_VAREDIT,"SearchText", pPreset->m_mapStrings["Text"]));
+	Dialog.Add(new CFarEditItem(5,7,70,DIF_HISTORY|DIF_VAREDIT,_T("SearchText"), pPreset->m_mapStrings["Text"]));
 
-	Dialog.Add(new CFarTextItem(5,8,DIF_BOXCOLOR|DIF_SEPARATOR,(char *)NULL));
+	Dialog.Add(new CFarTextItem(5,8,DIF_BOXCOLOR|DIF_SEPARATOR,_T("")));
 
 	int *pSearchAs = &pPreset->m_mapInts["SearchAs"];
 	int  nAdvancedID = pPreset->m_mapInts["AdvancedID"];
@@ -443,9 +443,9 @@ BOOL CFSPresetCollection::EditPreset(CPreset *pPreset) {
 
 	Dialog.Add(new CFarCheckBoxItem(5,16,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
 	Dialog.Add(new CFarCheckBoxItem(5,17,0,MInverseSearch,&pPreset->m_mapInts["Inverse"]));
-	Dialog.Add(new CFarCheckBoxItem(56,9,0,"",&bFAdvanced));
+	Dialog.Add(new CFarCheckBoxItem(56,9,0,_T(""),&bFAdvanced));
 	Dialog.Add(new CFarButtonItem(60,9,0,0,MBtnAdvanced));
-	Dialog.Add(new CFarCheckBoxItem(56,11,0,"",&pPreset->m_mapInts["UTF8"]));
+	Dialog.Add(new CFarCheckBoxItem(56,11,0,_T(""),&pPreset->m_mapInts["UTF8"]));
 	Dialog.Add(new CFarButtonItem(60,11,0,0,MUTF8));
 	Dialog.Add(new CFarCheckBoxItem(5,19,0,MAddToMenu,&pPreset->m_bAddToMenu));
 	Dialog.AddButtons(MOk,MCancel);

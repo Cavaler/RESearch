@@ -39,7 +39,7 @@ void EWriteRegistry(HKEY Key) {
 	#include "PersistVars.h"
 }
 
-BOOL SearchIn(const char *Line,int Start,int Length,int *MatchStart,int *MatchLength,BOOL NeedMatch) {
+BOOL SearchIn(const TCHAR *Line,int Start,int Length,int *MatchStart,int *MatchLength,BOOL NeedMatch) {
 	if (Length==0) return FALSE;
 	if (ERegExp) {
 		MatchCount=pcre_info(EPattern,NULL,NULL)+1;
@@ -54,7 +54,7 @@ BOOL SearchIn(const char *Line,int Start,int Length,int *MatchStart,int *MatchLe
 		}
 		if (!NeedMatch) {delete[] Match;Match=NULL;}
 	} else {
-		char *Table = ECaseSensitive ? NULL : UpCaseTable;
+		TCHAR *Table = ECaseSensitive ? NULL : UpCaseTable;
 		Match=NULL;
 		int Position=(EReverse)?ReverseBMHSearch(Line+Start,Length,ETextUpcase.data(),ETextUpcase.length(),Table)
 									  :BMHSearch(Line+Start,Length,ETextUpcase.data(),ETextUpcase.length(),Table);
@@ -67,7 +67,7 @@ BOOL SearchIn(const char *Line,int Start,int Length,int *MatchStart,int *MatchLe
 	return FALSE;
 }
 
-BOOL SearchInLine(const char *Line,int Length,int Start,int End,int *MatchStart,int *MatchLength,BOOL NeedMatch) {
+BOOL SearchInLine(const TCHAR *Line,int Length,int Start,int End,int *MatchStart,int *MatchLength,BOOL NeedMatch) {
 	int Len;
 
 	if (Start>Length) return FALSE;
@@ -75,6 +75,9 @@ BOOL SearchInLine(const char *Line,int Length,int Start,int End,int *MatchStart,
 	if ((End==-1)||(End>Length)) Len=Length-Start; else Len=End-Start;
 	if (Len<=0) return FALSE;
 
+#ifdef UNICODE
+	return SearchIn(Line,Start,Len,MatchStart,MatchLength,NeedMatch);
+#else
 	if (ERegExp) {
 		return SearchIn(Line,Start,Len,MatchStart,MatchLength,NeedMatch);
 	} else {
@@ -89,14 +92,15 @@ BOOL SearchInLine(const char *Line,int Length,int Start,int End,int *MatchStart,
 			return SearchIn(Line, Start, Len, MatchStart, MatchLength, NeedMatch);
 		}
 	}
+#endif
 }
 
-void Relative2Absolute(int Line,char *Lines,int MatchStart,int MatchLength,int &FirstLine,int &StartPos,int &LastLine,int &EndPos) {
+void Relative2Absolute(int Line,TCHAR *Lines,int MatchStart,int MatchLength,int &FirstLine,int &StartPos,int &LastLine,int &EndPos) {
 	FirstLine=Line;StartPos=MatchStart;
 	do {			// Find first line
-		void *NewLine=memchr(Lines,'\n',StartPos);
+		TCHAR *NewLine=(TCHAR *)_tmemchr(Lines,'\n',StartPos);
 		if (NewLine) {
-			int Pos=(char *)NewLine-Lines;
+			int Pos=NewLine-Lines;
 			Lines+=Pos+1;
 			StartPos-=Pos+1;
 			FirstLine++;
@@ -105,9 +109,9 @@ void Relative2Absolute(int Line,char *Lines,int MatchStart,int MatchLength,int &
 
 	LastLine=FirstLine;EndPos=StartPos+MatchLength;
 	do {			// Find last line
-		void *NewLine=memchr(Lines,'\n',EndPos);
+		TCHAR *NewLine=(TCHAR *)_tmemchr(Lines,'\n',EndPos);
 		if (NewLine) {
-			int Pos=(char *)NewLine-Lines;
+			int Pos=NewLine-Lines;
 			Lines+=Pos+1;
 			EndPos-=Pos+1;
 			LastLine++;
@@ -115,7 +119,7 @@ void Relative2Absolute(int Line,char *Lines,int MatchStart,int MatchLength,int &
 	} while (TRUE);
 }
 
-vector<char>	g_LineBuffer;
+vector<TCHAR>	g_LineBuffer;
 vector<int>		g_LineOffsets;
 size_t			g_FirstLine;
 
@@ -162,7 +166,7 @@ void FillLineBuffer(size_t FirstLine, size_t LastLine) {
 	String.StringNumber=-1;
 
 	if (FirstLine < g_FirstLine) {
-		vector<char> NewBuffer;
+		vector<TCHAR> NewBuffer;
 
 		for (Position.CurLine = g_FirstLine-1; Position.CurLine >= (int)FirstLine; Position.CurLine--) {
 			EctlSetPosition(&Position);
@@ -200,7 +204,8 @@ void FillLineBuffer(size_t FirstLine, size_t LastLine) {
 
 BOOL SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,BOOL NeedMatch) {
 	int Line,MatchStart,MatchLength;
-	char *Lines;int LinesLength;
+	TCHAR *Lines;
+	int LinesLength;
 
 	ClearLineBuffer();
 	RefreshEditorInfo();
@@ -330,35 +335,42 @@ void RestorePosition(const EditorInfo &StartEdInfo) {
 	EctlForceSetPosition(&Position);
 }
 
-BOOL EPreparePattern(string &SearchText) {
+BOOL EPreparePattern(tstring &SearchText) {
 	ECleanup(TRUE);
 
 	if (!CheckUsage(SearchText, ERegExp!=0, ESeveralLine!=0)) return FALSE;
 
 	if (ERegExp) {
-		char *OEMLine = _strdup(SearchText.c_str());
-		OEMToEditor(OEMLine, SearchText.size());
-
 		if (ECharacterTables && (ECharacterTables != ANSICharTables) && (ECharacterTables != OEMCharTables))
 			pcre_free((void *)ECharacterTables);
 
 		RefreshEditorInfo();
 
+#ifdef UNICODE
+		ECharacterTables = NULL;
+#else
 		if (EdInfo.TableNum != -1) {
 			CharTableSet TableSet;
 			StartupInfo.CharTable(EdInfo.TableNum, (char *)&TableSet, sizeof(TableSet));
-			setlocale(LC_ALL, FormatStr(".%d", GetOEMCP()).c_str());	// We use DecodeTable for isspace() etc
+			setlocale(LC_ALL, FormatStr(_T(".%d"), GetOEMCP()).c_str());	// We use DecodeTable for isspace() etc
 			ECharacterTables = far_maketables(&TableSet);
 		} else if (EdInfo.AnsiMode) {
-			setlocale(LC_ALL, FormatStr(".%d", GetACP()).c_str());
+			setlocale(LC_ALL, FormatStr(_T(".%d"), GetACP()).c_str());
 			ECharacterTables = ANSICharTables;
 		} else {
-			setlocale(LC_ALL, FormatStr(".%d", GetOEMCP()).c_str());
+			setlocale(LC_ALL, FormatStr(_T(".%d"), GetOEMCP()).c_str());
 			ECharacterTables = OEMCharTables;
 		}
+#endif
 
+#ifdef UNICODE
+		BOOL Result = PreparePattern(&EPattern,&EPatternExtra,SearchText,ECaseSensitive,EUTF8,ECharacterTables);
+#else
+		char *OEMLine = _strdup(SearchText.c_str());
+		OEMToEditor(OEMLine, SearchText.size());
 		BOOL Result = PreparePattern(&EPattern,&EPatternExtra,OEMLine,ECaseSensitive,EUTF8,ECharacterTables);
 		free(OEMLine);
+#endif
 		return Result;
 	} else {
 		ETextUpcase = (ECaseSensitive) ? SearchText : UpCaseString(SearchText);
@@ -407,9 +419,9 @@ BOOL ClockPresent=FALSE;
 
 void FindIfClockPresent() {
 	HKEY Key;
-	RegCreateKeyEx(HKEY_CURRENT_USER,"Software\\Far\\Screen",0,NULL,0,KEY_ALL_ACCESS,NULL,&Key,NULL);
+	RegCreateKeyEx(HKEY_CURRENT_USER,_T("Software\\Far\\Screen"),0,NULL,0,KEY_ALL_ACCESS,NULL,&Key,NULL);
 	if (Key==INVALID_HANDLE_VALUE) return;
-	QueryRegIntValue(Key,"ViewerEditorClock",&ClockPresent,0,0,1);
+	QueryRegIntValue(Key,_T("ViewerEditorClock"),&ClockPresent,0,0,1);
 	RegCloseKey(Key);
 }
 
@@ -419,27 +431,31 @@ void ShowCurrentLine(int CurLine,int TotalLines,int TotalColumns) {
 		if (TotalColumns>80) Position+=(TotalColumns-81);
 		Position+=23;
 
-		char LineStr[20];
-		sprintf(LineStr,"%d/%d",CurLine,TotalLines);
-		StartupInfo.Text(Position+12-strlen(LineStr),0,0x30,LineStr);
+		TCHAR LineStr[20];
+		_stprintf_s(LineStr,20,_T("%d/%d"),CurLine,TotalLines);
+		StartupInfo.Text(Position+12-_tcslen(LineStr),0,0x30,LineStr);
 		StartupInfo.Text(0,0,0x30,NULL);
 		LastLine=CurLine;
 		LastTickCount=GetTickCount();
 	}
 }
 
-string PickupSelection() {
+tstring PickupSelection() {
 	EditorGetString String;
 
 	RefreshEditorInfo();
-	if (EdInfo.BlockType==BTYPE_NONE) return "";
+	if (EdInfo.BlockType==BTYPE_NONE) return _T("");
 	String.StringNumber=EdInfo.BlockStartLine+1;
 	EctlGetString(&String);
-	if (String.SelStart>=0) return "";
+	if (String.SelStart>=0) return _T("");
 
 	String.StringNumber=EdInfo.BlockStartLine;
 	EctlGetString(&String);
 	if (String.SelEnd==-1) String.SelEnd=String.StringLength;
+
+#ifdef UNICODE
+	return tstring(String.StringText+String.SelStart, String.SelEnd-String.SelStart);
+#else
 	char *Word=(char *)malloc(String.SelEnd-String.SelStart+1);
 	strncpy(Word,String.StringText+String.SelStart,String.SelEnd-String.SelStart);
 	Word[String.SelEnd-String.SelStart]=0;
@@ -447,46 +463,57 @@ string PickupSelection() {
 	string RetWord = Word;
 	free(Word);
 	return RetWord;
+#endif
 }
 
+#ifdef UNICODE
+BOOL IsWordChar(TCHAR C) {
+	return iswalnum(C)||(C=='_');
+}
+#else
 BOOL IsWordChar(char C) {
 	WCHAR WChar;
 	MultiByteToWideChar(CP_OEMCP,0,&C,1,&WChar,1);
 	return iswalnum(WChar)||(C=='_');
 }
+#endif
 
-string PickupWord() {
-	if (EFindTextAtCursor==FT_NONE) return "";
+tstring PickupWord() {
+	if (EFindTextAtCursor==FT_NONE) return _T("");
 	RefreshEditorInfo();
 
 	EditorGetString String;
 	String.StringNumber=-1;
 	EctlGetString(&String);
 
-	if (EdInfo.CurPos>=String.StringLength) return "";
+	if (EdInfo.CurPos>=String.StringLength) return _T("");
 
-	char *WordStart=(char *)String.StringText+EdInfo.CurPos,*WordEnd=WordStart;
+	TCHAR *WordStart=(TCHAR *)String.StringText+EdInfo.CurPos,*WordEnd=WordStart;
 
 	if (IsWordChar(*WordStart)) {
 		while (IsWordChar(*(WordStart-1))&&(WordStart>String.StringText)) WordStart--;
 		while (IsWordChar(*WordEnd)&&(WordEnd<String.StringText+String.StringLength)) WordEnd++;
 	} else {
-		if (EFindTextAtCursor==FT_WORD) return "";
+		if (EFindTextAtCursor==FT_WORD) return _T("");
 	}
 
 	if (WordEnd==WordStart) WordEnd++;
 
 	int WordLen=WordEnd-WordStart;
+#ifdef UNICODE
+	return tstring(WordStart,WordLen);
+#else
 	char *Word=(char *)malloc(WordLen+1);
 	strncpy(Word,WordStart,WordLen);Word[WordLen]=0;
 	EditorToOEM(Word,WordLen);
 	string RetWord = Word;
 	free(Word);
 	return RetWord;
+#endif
 }
 
-string PickupText() {
-	string PickUp;
+tstring PickupText() {
+	tstring PickUp;
 	if (EFindSelection) {
 		PickUp=PickupSelection();
 		if (!PickUp.empty()) return PickUp;
@@ -495,8 +522,10 @@ string PickupText() {
 		PickUp=PickupWord();
 		if (!PickUp.empty()) return PickUp;
 	}
-	return "";
+	return _T("");
 }
+
+#ifndef UNICODE
 
 void EditorToOEM(char *Buffer,int Length) {
 	EditorConvertText Convert={Buffer,Length};
@@ -526,11 +555,13 @@ void OEMToEditor(string &String) {
 	free(szString);
 }
 
+#endif
+
 void EctlGetString(EditorGetString *String) {
 	StartupInfo.EditorControl(ECTL_GETSTRING, String);
 }
 
-string EctlGetString(int nLine) {
+tstring EctlGetString(int nLine) {
 	if (nLine >= 0) {
 		EditorSetPosition Position = {nLine,-1,-1,-1,-1,-1};
 		EctlSetPosition(&Position);
@@ -540,8 +571,8 @@ string EctlGetString(int nLine) {
 	return ToString(String);
 }
 
-string ToString(EditorGetString &String) {
-	return string(String.StringText, String.StringLength);
+tstring ToString(EditorGetString &String) {
+	return tstring(String.StringText, String.StringLength);
 }
 
 void EctlSetString(EditorSetString *String) {
@@ -568,6 +599,16 @@ void EctlForceSetPosition(EditorSetPosition *Position) {
 
 void RefreshEditorInfo() {
 	StartupInfo.EditorControl(ECTL_GETINFO, &EdInfo);
+#ifdef UNICODE
+	size_t FileNameSize=StartupInfo.EditorControl(ECTL_GETFILENAME, NULL);
+	if (FileNameSize) {
+		vector<TCHAR> arrFileName(FileNameSize);
+		StartupInfo.EditorControl(ECTL_GETFILENAME, &arrFileName[0]);
+		EditorFileName = &arrFileName[0];
+	} else {
+		EditorFileName = _T("");
+	}
+#endif
 }
 
 void EditorSeekToBeginEnd() {

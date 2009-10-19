@@ -393,10 +393,10 @@ BOOL EditorReplace() {
 	CFarDialog Dialog(76, 17,"ReplaceDlg");
 	Dialog.AddFrame(MREReplace);
 	Dialog.Add(new CFarTextItem(5, 2, 0, MSearchFor));
-	Dialog.Add(new CFarEditItem(5, 3, 65, DIF_HISTORY|DIF_VAREDIT,"SearchText", SearchText));
+	Dialog.Add(new CFarEditItem(5, 3, 65, DIF_HISTORY|DIF_VAREDIT,_T("SearchText"), SearchText));
 
 	Dialog.Add(new CFarTextItem(5, 4, 0, MReplaceWith));
-	Dialog.Add(new CFarEditItem(5, 5, 65, DIF_HISTORY|DIF_VAREDIT,"ReplaceText", ReplaceText));
+	Dialog.Add(new CFarEditItem(5, 5, 65, DIF_HISTORY|DIF_VAREDIT,_T("ReplaceText"), ReplaceText));
 
 	Dialog.Add(new CFarButtonItem(67, 3, 0, 0,"&\\"));
 	Dialog.Add(new CFarButtonItem(67, 5, 0, 0,"&/"));
@@ -484,13 +484,13 @@ BOOL CERPresetCollection::EditPreset(CPreset *pPreset) {
 	CFarDialog Dialog(76, 20, "ERPresetDlg");
 	Dialog.AddFrame(MERPreset);
 	Dialog.Add(new CFarTextItem(5, 2, 0, MPresetName));
-	Dialog.Add(new CFarEditItem(5, 3, 70, DIF_HISTORY,"RESearch.PresetName", pPreset->Name()));
+	Dialog.Add(new CFarEditItem(5, 3, 70, DIF_HISTORY,_T("RESearch.PresetName"), pPreset->Name()));
 
 	Dialog.Add(new CFarTextItem(5, 4, 0, MSearchFor));
-	Dialog.Add(new CFarEditItem(5, 5, 70, DIF_HISTORY|DIF_VAREDIT,"SearchText", pPreset->m_mapStrings["Text"]));
+	Dialog.Add(new CFarEditItem(5, 5, 70, DIF_HISTORY|DIF_VAREDIT,_T("SearchText"), pPreset->m_mapStrings["Text"]));
 
 	Dialog.Add(new CFarTextItem(5, 6, 0, MReplaceWith));
-	Dialog.Add(new CFarEditItem(5, 7, 70, DIF_HISTORY|DIF_VAREDIT,"ReplaceText", pPreset->m_mapStrings["Replace"]));
+	Dialog.Add(new CFarEditItem(5, 7, 70, DIF_HISTORY|DIF_VAREDIT,_T("ReplaceText"), pPreset->m_mapStrings["Replace"]));
 
 	Dialog.Add(new CFarCheckBoxItem(5, 9, 0, MRegExp, &pPreset->m_mapInts["IsRegExp"]));
 	Dialog.Add(new CFarCheckBoxItem(5, 10, 0, MCaseSensitive, &pPreset->m_mapInts["CaseSensitive"]));

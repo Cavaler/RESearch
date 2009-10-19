@@ -7,6 +7,9 @@
 
 #ifdef UNICODE
 #define DIF_VAREDIT 0
+#define _tmemchr wmemchr
+#else
+#define _tmemchr memchr
 #endif
 
 #define arrsizeof(arr) (sizeof(arr)/sizeof(arr[0]))
@@ -302,7 +305,7 @@ int  ConfigureSeveralLines();
 bool CheckUsage(const tstring &strText, bool bRegExp, bool bSeveralLine);
 void PrepareBMHSearch(const TCHAR *String,int StringLength,size_t nPattern = 0);
 BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const tstring &Text,int CaseSensitive,BOOL bUTF8=FALSE,const unsigned char *pTables=NULL);
-BOOL PreparePattern(CRegExp &reObject, const string &Text, int CaseSensitive, BOOL bUTF8=FALSE, const unsigned char *pTables=NULL);
+//BOOL PreparePattern(CRegExp &reObject, const string &Text, int CaseSensitive, BOOL bUTF8=FALSE, const unsigned char *pTables=NULL);
 tstring CreateReplaceString(const TCHAR *Matched,int *Match,int Count,const TCHAR *Replace,const TCHAR *EOL,int *Numbers,int Engine);
 tstring EvaluateReplaceString(const TCHAR *Matched,int *Match,int Count,const TCHAR *Replace,const TCHAR *EOL,int *Numbers,int Engine);
 

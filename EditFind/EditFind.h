@@ -62,11 +62,14 @@ EXTERN pcre_extra *EPatternExtra VALUE(NULL);
 EXTERN const unsigned char *ECharacterTables VALUE(NULL);
 EXTERN int *Match VALUE(NULL);
 EXTERN int MatchCount VALUE(0);
-EXTERN char *MatchedLine VALUE(NULL);
+EXTERN TCHAR *MatchedLine VALUE(NULL);
 EXTERN int MatchedLineLength VALUE(0);
 EXTERN int SelStartLine,SelStartPos,SelEndLine,SelEndPos,SelType;
 
 EXTERN EditorInfo EdInfo;
+#ifdef UNICODE
+EXTERN wstring EditorFileName;
+#endif
 EXTERN EditorInfo StartEdInfo;
 void RefreshEditorInfo();
 
@@ -92,7 +95,7 @@ void EditorSeekToBeginEnd();
 
 void PatchEditorInfo(EditorInfo &EdInfo);
 
-BOOL SearchInLine(const char *Line,int Length,int Start,int End,int *MatchStart,int *MatchLength,BOOL NeedMatch);
+BOOL SearchInLine(const TCHAR *Line,int Length,int Start,int End,int *MatchStart,int *MatchLength,BOOL NeedMatch);
 BOOL SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,BOOL NeedMatch);
 int  TopLine(int NeededLine,int ScreenHeight,int TotalLines,int CurrentTopLine);
 int	LeftColumn(int RightPosition,int ScreenWidth);
@@ -103,12 +106,15 @@ BOOL EPreparePattern(tstring &SearchText);
 
 void FindIfClockPresent();
 void ShowCurrentLine(int CurLine,int TotalLines,int TotalColumns);
-string PickupText();
+tstring PickupText();
+
+#ifndef UNICODE
 void EditorToOEM(char *Buffer,int Length);
 void EditorToOEM(EditorGetString &String);
 void EditorToOEM(string &String);
 void OEMToEditor(char *Buffer,int Length);
 void OEMToEditor(string &String);
+#endif
 
 void SynchronizeWithFile(bool bReplace);
 void EReadRegistry(HKEY Key);
@@ -119,8 +125,8 @@ void ECleanup(BOOL PatternOnly);
 extern "C" const unsigned char *far_maketables(struct CharTableSet *pTable);
 
 void EctlGetString(EditorGetString *String);
-string EctlGetString(int nLine);
-string ToString(EditorGetString &String);
+tstring EctlGetString(int nLine);
+tstring ToString(EditorGetString &String);
 void EctlSetString(EditorSetString *String);
 void EctlSetPosition(EditorSetPosition *Position);
 void EctlForceSetPosition(EditorSetPosition *Position);

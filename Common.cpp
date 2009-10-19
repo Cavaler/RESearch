@@ -657,6 +657,7 @@ int do_pcre_exec(const pcre *external_re, const pcre_extra *extra_data,
 	return pcre_exec(external_re, extra_data, subject, length, start_offset, options, offsets, offsetcount);
 }
 
+#ifdef UNICODE
 int do_pcre_execA(const pcre *external_re, const pcre_extra *extra_data,
 	const char *subject, int length, int start_offset, int options, int *offsets,
 	int offsetcount)
@@ -680,6 +681,7 @@ int do_pcre_execA(const pcre *external_re, const pcre_extra *extra_data,
 	}
 	return pcre_exec(external_re, extra_data, subject, length, start_offset, options, offsets, offsetcount);
 }
+#endif
 
 BOOL SystemToLocalTime(FILETIME &ft) {
 	TIME_ZONE_INFORMATION tzi;

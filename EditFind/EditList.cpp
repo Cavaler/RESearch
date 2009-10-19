@@ -2,14 +2,14 @@
 #include "..\RESearch.h"
 
 struct sFindAllInfo {
-	vector<string> arrString;
+	vector<tstring> arrString;
 	vector<pair<int, int> > arrLines;
 };
-map<string, sFindAllInfo> FindAllInfos;
+map<tstring, sFindAllInfo> FindAllInfos;
 
-string CanonicalLCName(const char *szName) {
-	string strResult = GetFullFileName(szName);
-	CharLower((LPSTR)strResult.c_str());		// Lazy!
+tstring CanonicalLCName(const TCHAR *szName) {
+	tstring strResult = GetFullFileName(szName);
+	CharLower((LPTSTR)strResult.c_str());		// Lazy!
 	return strResult;
 }
 
@@ -18,7 +18,11 @@ BOOL EditorListAllAgain() {
 	EctlForceSetPosition(NULL);
 	StartEdInfo = EdInfo;
 
+#ifdef UNICODE
+	sFindAllInfo &Info = FindAllInfos[CanonicalLCName(EditorFileName.c_str())];
+#else
 	sFindAllInfo &Info = FindAllInfos[CanonicalLCName(EdInfo.FileName)];
+#endif
 	Info.arrString.clear();
 	Info.arrLines.clear();
 
@@ -33,11 +37,13 @@ BOOL EditorListAllAgain() {
 			EditorGetString String = {-1};
 			EctlGetString(&String);
 
-			char szNumber[8];
-			sprintf(szNumber, "%3d|", FirstLine+1);
+			TCHAR szNumber[8];
+			_stprintf_s(szNumber, 8, _T("%3d|"), FirstLine+1);
 
-			string str = string(szNumber) + String.StringText;
+			tstring str = tstring(szNumber) + String.StringText;
+#ifndef UNICODE
 			EditorToOEM(str);
+#endif
 			Info.arrString.push_back(str);
 			Info.arrLines.push_back(pair<int, int>(FirstLine, StartPos));
 			CurrentLine = FirstLine;
@@ -47,8 +53,8 @@ BOOL EditorListAllAgain() {
 	}
 
 	if (!g_bInterrupted && (Info.arrLines.size() == 0)) {
-		const char *Lines[]={GetMsg(MRESearch),GetMsg(MCannotFind),EText.c_str(),GetMsg(MOk)};
-		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"ECannotFind",Lines,4,1);
+		const TCHAR *Lines[]={GetMsg(MRESearch),GetMsg(MCannotFind),EText.c_str(),GetMsg(MOk)};
+		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("ECannotFind"),Lines,4,1);
 		RestorePosition(StartEdInfo);
 		return TRUE;
 	}
@@ -60,10 +66,14 @@ BOOL EditorListAllAgain() {
 BOOL EditorListAllShowResults(bool bImmediate) {
 	if (!bImmediate) RefreshEditorInfo();
 
+#ifdef UNICODE
+	sFindAllInfo &Info = FindAllInfos[CanonicalLCName(EditorFileName.c_str())];
+#else
 	sFindAllInfo &Info = FindAllInfos[CanonicalLCName(EdInfo.FileName)];
+#endif
 	if (Info.arrLines.size() == 0) return TRUE;
 
-	int nResult = ChooseMenu(Info.arrString, GetMsg(MListAllLines), NULL, "ListAll", 0, FMENU_WRAPMODE);
+	int nResult = ChooseMenu(Info.arrString, GetMsg(MListAllLines), NULL, _T("ListAll"), 0, FMENU_WRAPMODE);
 	if (nResult >= 0) {
 		EditorSetPosition Position = {Info.arrLines[nResult].first, Info.arrLines[nResult].second, -1,
 			TopLine(Info.arrLines[nResult].first, EdInfo.WindowSizeY, EdInfo.TotalLines,StartEdInfo.TopScreenLine),

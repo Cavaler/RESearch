@@ -291,13 +291,13 @@ int ReplacePrompt(BOOL Plugin) {
 
 	Dialog.Add(new CFarCheckBoxItem(35,2,0,MAsRegExp,&FMaskAsRegExp));
 	Dialog.Add(new CFarTextItem(5,2,0,MMask));
-	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,"Masks", MaskText));
+	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,_T("Masks"), MaskText));
 
 	Dialog.Add(new CFarTextItem(5,4,0,MSearchFor));
-	Dialog.Add(new CFarEditItem(5,5,65,DIF_HISTORY|DIF_VAREDIT,"SearchText", SearchText));
+	Dialog.Add(new CFarEditItem(5,5,65,DIF_HISTORY|DIF_VAREDIT,_T("SearchText"), SearchText));
 
 	Dialog.Add(new CFarTextItem(5,6,0,MReplaceWith));
-	Dialog.Add(new CFarEditItem(5,7,65,DIF_HISTORY|DIF_VAREDIT,"ReplaceText", ReplaceText));
+	Dialog.Add(new CFarEditItem(5,7,65,DIF_HISTORY|DIF_VAREDIT,_T("ReplaceText"), ReplaceText));
 
 	Dialog.Add(new CFarButtonItem(67,5,0,0,"&\\"));
 	Dialog.Add(new CFarButtonItem(67,7,0,0,"&/"));
@@ -402,17 +402,17 @@ BOOL CFRPresetCollection::EditPreset(CPreset *pPreset) {
 	CFarDialog Dialog(76, 22, "FRPresetDlg");
 	Dialog.AddFrame(MFRPreset);
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
-	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,"RESearch.PresetName", pPreset->Name()));
+	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,_T("RESearch.PresetName"), pPreset->Name()));
 
 	Dialog.Add(new CFarCheckBoxItem(35,4,0,MAsRegExp,&pPreset->m_mapInts["MaskAsRegExp"]));
 	Dialog.Add(new CFarTextItem(5,4,0,MMask));
-	Dialog.Add(new CFarEditItem(5,5,70,DIF_HISTORY,"Masks", pPreset->m_mapStrings["Mask"]));
+	Dialog.Add(new CFarEditItem(5,5,70,DIF_HISTORY,_T("Masks"), pPreset->m_mapStrings["Mask"]));
 
 	Dialog.Add(new CFarTextItem(5,6,0,MSearchFor));
-	Dialog.Add(new CFarEditItem(5,7,70,DIF_HISTORY|DIF_VAREDIT,"SearchText", pPreset->m_mapStrings["Text"]));
+	Dialog.Add(new CFarEditItem(5,7,70,DIF_HISTORY|DIF_VAREDIT,_T("SearchText"), pPreset->m_mapStrings["Text"]));
 
 	Dialog.Add(new CFarTextItem(5,8,0,MReplaceWith));
-	Dialog.Add(new CFarEditItem(5,9,70,DIF_HISTORY|DIF_VAREDIT,"ReplaceText", pPreset->m_mapStrings["Replace"]));
+	Dialog.Add(new CFarEditItem(5,9,70,DIF_HISTORY|DIF_VAREDIT,_T("ReplaceText"), pPreset->m_mapStrings["Replace"]));
 
 	Dialog.Add(new CFarTextItem(5,10,DIF_BOXCOLOR|DIF_SEPARATOR,(char *)NULL));
 

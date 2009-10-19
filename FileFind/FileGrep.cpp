@@ -11,27 +11,43 @@ struct sBufferedLine {
 	const char *szBufEnd;
 };
 
-void AddGrepLine(const char *szLine, bool bEOL = true) {
+void AddGrepLine(const TCHAR *szLine, bool bEOL = true) {
 	DWORD dwWritten;
-	WriteFile(g_hOutput, szLine, strlen(szLine), &dwWritten, NULL);
-	if (bEOL) WriteFile(g_hOutput, "\r\n", 2, &dwWritten, NULL);
+	WriteFile(g_hOutput, szLine, _tcslen(szLine), &dwWritten, NULL);
+	if (bEOL) WriteFile(g_hOutput, _T("\r\n"), 2, &dwWritten, NULL);
 }
 
 void AddGrepResultLine(const sBufferedLine &Line, int nLineNumber) {
 	if (FGAddLineNumbers) {
-		AddGrepLine(FormatStr("%d:", nLineNumber).c_str(), false);
+		AddGrepLine(FormatStr(_T("%d:"), nLineNumber).c_str(), false);
 	}
+#ifdef UNICODE
+	AddGrepLine(OEMToUnicode(string(Line.szBuffer, Line.szBufEnd)).c_str());
+#else
 	AddGrepLine(string(Line.szBuffer, Line.szBufEnd).c_str());
+#endif
 }
 
 bool GrepLineFound(const sBufferedLine &strBuf) {
 	BOOL bResult;
+
+#ifdef UNICODE
+	wstring strWBuf = OEMToUnicode(string(strBuf.szBuffer, strBuf.Length()));
+
+	if (FSearchAs == SA_REGEXP) {
+		bResult = do_pcre_exec(FPattern, FPatternExtra, strWBuf.data(), strWBuf.length(), 0, 0, NULL, 0) >= 0;
+	} else {
+		TCHAR *Table = (FCaseSensitive) ? NULL : UpCaseTable;
+		bResult = BMHSearch(strWBuf.data(), strWBuf.length(), FTextUpcase.data(), FTextUpcase.size(), Table) >= 0;
+	}
+#else
 	if (FSearchAs == SA_REGEXP) {
 		bResult = do_pcre_exec(FPattern, FPatternExtra, strBuf.szBuffer, strBuf.Length(), 0, 0, NULL, 0) >= 0;
 	} else {
-		char *Table = (FCaseSensitive) ? NULL : UpCaseTable;
+		TCHAR *Table = (FCaseSensitive) ? NULL : UpCaseTable;
 		bResult = BMHSearch(strBuf.szBuffer, strBuf.Length(), FTextUpcase.data(), FTextUpcase.size(), Table) >= 0;
 	}
+#endif
 
 	return (bResult != 0) != (FSInverse != 0);
 }
@@ -45,7 +61,7 @@ void GrepFile(WIN32_FIND_DATA *FindData,panelitem_vector &PanelItems) {
 
 	CFileMapping mapFile;
 	if (!mapFile.Open(FindData->cFileName)) {
-//		const char *Lines[]={GetMsg(MREReplace),GetMsg(MFileOpenError),FindData->cFileName,GetMsg(MOk)};
+//		const TCHAR *Lines[]={GetMsg(MREReplace),GetMsg(MFileOpenError),FindData->cFileName,GetMsg(MOk)};
 //		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"FSOpenError",Lines,4,1);
 		return;
 	}
@@ -88,11 +104,11 @@ void GrepFile(WIN32_FIND_DATA *FindData,panelitem_vector &PanelItems) {
 					switch (FGrepWhat) {
 					case GREP_NAMES_LINES:
 					case GREP_LINES:
-						if (nContextLines > 0) AddGrepLine(">>>");
+						if (nContextLines > 0) AddGrepLine(_T(">>>"));
 						for (int nLine = 0; nLine <= nLastMatched+nContextLines; nLine++) {
 							AddGrepResultLine(arrStringBuffer[nLine], nLine + nFirstBufferLine + 1);
 						}
-						if (nContextLines > 0) AddGrepLine("<<<");
+						if (nContextLines > 0) AddGrepLine(_T("<<<"));
 						break;
 					}
 					while ((int)arrStringBuffer.size() > nContextLines) {
@@ -114,16 +130,16 @@ void GrepFile(WIN32_FIND_DATA *FindData,panelitem_vector &PanelItems) {
 
 	switch (FGrepWhat) {
 	case GREP_NAMES_COUNT:
-		if (nFoundCount > 0) AddGrepLine(FormatStr("%s:%d", FindData->cFileName, nFoundCount).c_str());
+		if (nFoundCount > 0) AddGrepLine(FormatStr(_T("%s:%d"), FindData->cFileName, nFoundCount).c_str());
 		break;
 	case GREP_NAMES_LINES:
 	case GREP_LINES:
 		if (nLastMatched >= 0) {
-			if (nContextLines > 0) AddGrepLine(">>>");
+			if (nContextLines > 0) AddGrepLine(_T(">>>"));
 			for (int nLine = 0; (nLine < (int)arrStringBuffer.size()) && (nLine <= nLastMatched+nContextLines); nLine++) {
 				AddGrepResultLine(arrStringBuffer[nLine], nLine + nFirstBufferLine + 1);
 			}
-			if (nContextLines > 0) AddGrepLine("<<<");
+			if (nContextLines > 0) AddGrepLine(_T("<<<"));
 		}
 		break;
 	}
@@ -140,23 +156,23 @@ bool PrepareFileGrepPattern() {
 bool GrepPrompt(BOOL bPlugin) {
 	BOOL AsRegExp = (FSearchAs == SA_REGEXP) || (FSearchAs == SA_SEVERALLINE) || (FSearchAs == SA_MULTILINE) || (FSearchAs == SA_MULTIREGEXP);
 
-	CFarDialog Dialog(76,25,"FileGrepDlg");
+	CFarDialog Dialog(76,25,_T("FileGrepDlg"));
 	Dialog.AddFrame(MREGrep);
 
 	Dialog.Add(new CFarCheckBoxItem(35,2,0,MAsRegExp,&FMaskAsRegExp));
 	Dialog.Add(new CFarTextItem(5,2,0,MMask));
-	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,"Masks", MaskText));
+	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,_T("Masks"), MaskText));
 
 	Dialog.Add(new CFarTextItem(5,4,0,MText));
-	Dialog.Add(new CFarEditItem(5,5,65,DIF_HISTORY|DIF_VAREDIT,"SearchText", SearchText));
-	Dialog.Add(new CFarButtonItem(67,5,0,0,"&\\"));
+	Dialog.Add(new CFarEditItem(5,5,65,DIF_HISTORY|DIF_VAREDIT,_T("SearchText"), SearchText));
+	Dialog.Add(new CFarButtonItem(67,5,0,0,_T("&\\")));
 
-	Dialog.Add(new CFarTextItem(5,6,DIF_BOXCOLOR|DIF_SEPARATOR,(char *)NULL));
+	Dialog.Add(new CFarTextItem(5,6,DIF_BOXCOLOR|DIF_SEPARATOR,_T("")));
 	Dialog.Add(new CFarCheckBoxItem(5,7,0,MRegExp,&AsRegExp));
 	Dialog.Add(new CFarCheckBoxItem(35,7,0,MCaseSensitive,&FCaseSensitive));
 	Dialog.Add(new CFarCheckBoxItem(5,8,0,MInverseSearch,&FSInverse));
 	Dialog.Add(new CFarCheckBoxItem(35,8,0,MAllCharTables,&FAllCharTables));
-	Dialog.Add(new CFarTextItem(5,9,DIF_BOXCOLOR|DIF_SEPARATOR,""));
+	Dialog.Add(new CFarTextItem(5,9,DIF_BOXCOLOR|DIF_SEPARATOR,_T("")));
 
 	Dialog.Add(new CFarRadioButtonItem(5,10,DIF_GROUP,MGrepNames,		(int *)&FGrepWhat,GREP_NAMES));
 	Dialog.Add(new CFarRadioButtonItem(5,11,0,MGrepNamesCount,	(int *)&FGrepWhat,GREP_NAMES_COUNT));
@@ -169,7 +185,7 @@ bool GrepPrompt(BOOL bPlugin) {
 	Dialog.Add(new CFarCheckBoxItem(5,15,0,MGrepAddLineNumbers,&FGAddLineNumbers));
 
 	Dialog.Add(new CFarCheckBoxItem(5,16,0,MGrepOutput,&FGOutputToFile));
-	Dialog.Add(new CFarEditItem(20,16,45,DIF_HISTORY,"RESearch.GrepOutput", FGOutputFile));
+	Dialog.Add(new CFarEditItem(20,16,45,DIF_HISTORY,_T("RESearch.GrepOutput"), FGOutputFile));
 	Dialog.Add(new CFarCheckBoxItem(5,17,0,MGrepEditor,&FGOpenInEditor));
 
 	Dialog.Add(new CFarTextItem(5,19,0,MSearchIn));
@@ -177,9 +193,9 @@ bool GrepPrompt(BOOL bPlugin) {
 
 	Dialog.AddButtons(MOk,MCancel);
 	Dialog.Add(new CFarButtonItem(60,10,0,0,MBtnPresets));
-	Dialog.Add(new CFarCheckBoxItem(56,11,0,"",&FAdvanced));
+	Dialog.Add(new CFarCheckBoxItem(56,11,0,_T(""),&FAdvanced));
 	Dialog.Add(new CFarButtonItem(60,11,0,0,MBtnAdvanced));
-	Dialog.Add(new CFarCheckBoxItem(56,12,0,"",&FUTF8));
+	Dialog.Add(new CFarCheckBoxItem(56,12,0,_T(""),&FUTF8));
 	Dialog.Add(new CFarButtonItem(60,12,0,0,MUTF8));
 	Dialog.SetFocus(3);
 	FACaseSensitive=FADirectoryCaseSensitive=MaskCaseHere();
@@ -217,8 +233,8 @@ bool GrepPrompt(BOOL bPlugin) {
 }
 
 OperationResult FileGrep(BOOL ShowDialog) {
-	PanelInfo PInfo;
-	StartupInfo.Control(INVALID_HANDLE_VALUE,FCTL_GETPANELINFO,&PInfo);
+	CPanelInfo PInfo;
+	PInfo.GetInfo(false);
 	if (PInfo.PanelType!=PTYPE_FILEPANEL) return OR_FAILED;
 	if (PInfo.Plugin&&((PInfo.Flags&PFLAGS_REALNAMES)==0)) return OR_FAILED;
 
@@ -228,13 +244,13 @@ OperationResult FileGrep(BOOL ShowDialog) {
 		if (!PrepareFileGrepPattern()) return OR_CANCEL;
 	}
 
-	string strFileName;
+	tstring strFileName;
 	if (FGOutputToFile && !FGOutputFile.empty()) {
 		strFileName = FGOutputFile;
 	} else {
-		char szBuffer[MAX_PATH], szName[MAX_PATH];
+		TCHAR szBuffer[MAX_PATH], szName[MAX_PATH];
 		GetTempPath(MAX_PATH, szBuffer);
-		GetTempFileName(szBuffer, "re", 0, szName);
+		GetTempFileName(szBuffer, _T("re"), 0, szName);
 		strFileName = szName;
 	}
 
@@ -249,7 +265,11 @@ OperationResult FileGrep(BOOL ShowDialog) {
 		g_hOutput.Close();
 		if (FGOpenInEditor) {
 			StartupInfo.Editor(strFileName.c_str(), NULL, 0, 0, -1, -1,
-				EF_NONMODAL|EF_IMMEDIATERETURN|EF_ENABLE_F6| (FGOutputToFile ? 0 : EF_DELETEONLYFILEONCLOSE), 0, 1);
+				EF_NONMODAL|EF_IMMEDIATERETURN|EF_ENABLE_F6| (FGOutputToFile ? 0 : EF_DELETEONLYFILEONCLOSE), 0, 1
+#ifdef UNICODE
+				, CP_AUTODETECT
+#endif
+				);
 		}
 		return OR_OK;
 	} else return OR_FAILED;
@@ -266,26 +286,26 @@ BOOL CFGPresetCollection::EditPreset(CPreset *pPreset) {
 	SearchAs FSA = (SearchAs)pPreset->m_mapInts["SearchAs"];
 	BOOL AsRegExp = (FSA == SA_REGEXP) || (FSA == SA_SEVERALLINE) || (FSA == SA_MULTILINE) || (FSA == SA_MULTIREGEXP);
 
-	CFarDialog Dialog(76,25,"FGPresetDlg");
+	CFarDialog Dialog(76,25,_T("FGPresetDlg"));
 	Dialog.AddFrame(MREGrep);
 
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
-	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,"RESearch.PresetName", pPreset->Name()));
+	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,_T("RESearch.PresetName"), pPreset->Name()));
 	Dialog.Add(new CFarCheckBoxItem(35,4,0,MAsRegExp,&pPreset->m_mapInts["MaskAsRegExp"]));
 	Dialog.Add(new CFarTextItem(5,4,0,MMask));
-	Dialog.Add(new CFarEditItem(5,5,70,DIF_HISTORY,"Masks", pPreset->m_mapStrings["Mask"]));
+	Dialog.Add(new CFarEditItem(5,5,70,DIF_HISTORY,_T("Masks"), pPreset->m_mapStrings["Mask"]));
 
 	Dialog.Add(new CFarTextItem(5,6,0,MSearchFor));
-	Dialog.Add(new CFarEditItem(5,7,70,DIF_HISTORY|DIF_VAREDIT,"SearchText", pPreset->m_mapStrings["Text"]));
+	Dialog.Add(new CFarEditItem(5,7,70,DIF_HISTORY|DIF_VAREDIT,_T("SearchText"), pPreset->m_mapStrings["Text"]));
 
-	Dialog.Add(new CFarTextItem(5,8,DIF_BOXCOLOR|DIF_SEPARATOR,(char *)NULL));
+	Dialog.Add(new CFarTextItem(5,8,DIF_BOXCOLOR|DIF_SEPARATOR,_T("")));
 	Dialog.Add(new CFarCheckBoxItem(5,9,0,MRegExp,&AsRegExp));
 	Dialog.Add(new CFarCheckBoxItem(35,9,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
 	Dialog.Add(new CFarCheckBoxItem(5,10,0,MInverseSearch,&pPreset->m_mapInts["Inverse"]));
-	Dialog.Add(new CFarCheckBoxItem(35,10,0,"",&pPreset->m_mapInts["UTF8"]));
+	Dialog.Add(new CFarCheckBoxItem(35,10,0,_T(""),&pPreset->m_mapInts["UTF8"]));
 	Dialog.Add(new CFarButtonItem(39,10,0,0,MUTF8));
 
-	Dialog.Add(new CFarTextItem(5,11,DIF_BOXCOLOR|DIF_SEPARATOR,""));
+	Dialog.Add(new CFarTextItem(5,11,DIF_BOXCOLOR|DIF_SEPARATOR,_T("")));
 
 	Dialog.Add(new CFarRadioButtonItem(5,12,DIF_GROUP,MGrepNames,	&pPreset->m_mapInts["GrepWhat"],GREP_NAMES));
 	Dialog.Add(new CFarRadioButtonItem(5,13,0,MGrepNamesCount,		&pPreset->m_mapInts["GrepWhat"],GREP_NAMES_COUNT));
@@ -300,7 +320,7 @@ BOOL CFGPresetCollection::EditPreset(CPreset *pPreset) {
 	int  nAdvancedID = pPreset->m_mapInts["AdvancedID"];
 	bool bFAdvanced = nAdvancedID > 0;
 
-	Dialog.Add(new CFarCheckBoxItem(56,12,0,"",&bFAdvanced));
+	Dialog.Add(new CFarCheckBoxItem(56,12,0,_T(""),&bFAdvanced));
 	Dialog.Add(new CFarButtonItem(60,12,0,0,MBtnAdvanced));
 	Dialog.Add(new CFarCheckBoxItem(5,19,0,MAddToMenu,&pPreset->m_bAddToMenu));
 	Dialog.AddButtons(MOk,MCancel);

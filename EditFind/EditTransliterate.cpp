@@ -45,9 +45,9 @@ BOOL EditorTransliterate() {
 	CFarDialog Dialog(76,13,"TransliterateDlg");
 	Dialog.AddFrame(MTransliterate);
 	Dialog.Add(new CFarTextItem(5,2,0,MTransSource));
-	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,"SourceChars",SearchText));
+	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,_T("SourceChars"),SearchText));
 	Dialog.Add(new CFarTextItem(5,4,0,MTransTarget));
-	Dialog.Add(new CFarEditItem(5,5,70,DIF_HISTORY,"TargetChars",ReplaceText));
+	Dialog.Add(new CFarEditItem(5,5,70,DIF_HISTORY,_T("TargetChars"),ReplaceText));
 
 	Dialog.AddButtons(MOk,MCancel);
 	Dialog.Add(new CFarButtonItem(60,7,0,0,MBtnPresets));
@@ -87,12 +87,12 @@ BOOL CETPresetCollection::EditPreset(CPreset *pPreset) {
 	CFarDialog Dialog(76,15,"ETPresetDlg");
 	Dialog.AddFrame(METPreset);
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
-	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,"RESearch.PresetName",pPreset->Name()));
+	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,_T("RESearch.PresetName"),pPreset->Name()));
 
 	Dialog.Add(new CFarTextItem(5,4,0,MTransSource));
-	Dialog.Add(new CFarEditItem(5,5,70,DIF_HISTORY,"SourceChars",SearchText));
+	Dialog.Add(new CFarEditItem(5,5,70,DIF_HISTORY,_T("SourceChars"),SearchText));
 	Dialog.Add(new CFarTextItem(5,6,0,MTransTarget));
-	Dialog.Add(new CFarEditItem(5,7,70,DIF_HISTORY,"TargetChars",ReplaceText));
+	Dialog.Add(new CFarEditItem(5,7,70,DIF_HISTORY,_T("TargetChars"),ReplaceText));
 
 	Dialog.Add(new CFarCheckBoxItem(5,9,0,MAddToMenu,&pPreset->m_bAddToMenu));
 	Dialog.AddButtons(MOk,MCancel);
