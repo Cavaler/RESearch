@@ -7,7 +7,7 @@ enum eReplaceResult {RR_OK, RR_SKIP, RR_CANCEL};
 
 int LastReplaceLine, LastReplacePos;
 
-void DoReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, const string &Replace) {
+void DoReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, const tstring &Replace) {
 	EditorSetPosition Position = {-1,-1,-1,-1,-1,-1};
 	EditorGetString GetString = {-1};
 	int I;
@@ -31,24 +31,24 @@ void DoReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, const st
 	Position.CurLine = FirstLine;
 	EctlSetPosition(&Position);
 	EctlGetString(&GetString);
-	string strGetString = ToString(GetString);
-	string DefEOL = GetString.StringEOL;
+	tstring strGetString = ToString(GetString);
+	tstring DefEOL = GetString.StringEOL;
 
 	// Creating full replace line
 	int OriginalEndLength;
-	string NewString;
+	tstring NewString;
 
 	if (LastLine == FirstLine) {
 		OriginalEndLength = GetString.StringLength-EndPos;
 
-		NewString = string(GetString.StringText, StartPos) + Replace +
-			string(GetString.StringText + EndPos, GetString.StringLength-EndPos);
+		NewString = tstring(GetString.StringText, StartPos) + Replace +
+			tstring(GetString.StringText + EndPos, GetString.StringLength-EndPos);
 	} else {
 		GetString.StringNumber = -1;
 		Position.CurLine = LastLine;
 		EctlSetPosition(&Position);
 		EctlGetString(&GetString);
-		string strGetString2 = ToString(GetString);
+		tstring strGetString2 = ToString(GetString);
 
 		OriginalEndLength = GetString.StringLength-EndPos;
 
@@ -63,11 +63,11 @@ void DoReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, const st
 	EditorSetString SetString = {-1, NewString.c_str(), NULL, NULL};
 //	Position.CurLine = EdInfo.CurLine;
 	while (TRUE) {
-		const char *CR = (const char *)memchr(SetString.StringText, '\r', NewString.length());
-		const char *LF = (const char *)memchr(SetString.StringText, '\n', NewString.length());
-		const char *EOL, *NextLine;
+		const TCHAR *CR = (const TCHAR *)_tmemchr(SetString.StringText, '\r', NewString.length());
+		const TCHAR *LF = (const TCHAR *)_tmemchr(SetString.StringText, '\n', NewString.length());
+		const TCHAR *EOL, *NextLine;
 		if (CR) {
-			EOL = (LF == CR + 1)?"\x0D\x0A":"\x0D";
+			EOL = (LF == CR + 1) ? _T("\x0D\x0A") : _T("\x0D");
 			NextLine = CR + ((LF == CR + 1)?2:1);
 		} else {
 			if (!LF) break;
@@ -114,29 +114,33 @@ void DoReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, const st
 	ReplaceNumber++;
 }
 
-void QuoteString(const char *Source, int Length, vector<string> &arrQuoted, int MaxWidth) {
-	string str;
+void QuoteString(const TCHAR *Source, int Length, vector<tstring> &arrQuoted, int MaxWidth) {
+	tstring str;
 
 	if (Length>MaxWidth) {
-		str = "\"" + string(Source, (MaxWidth-5)/2) + "..." + string(Source + Length-(MaxWidth-5)/2) + "\"";
+		str = _T("\"") + tstring(Source, (MaxWidth-5)/2) + _T("...") + tstring(Source + Length-(MaxWidth-5)/2) + _T("\"");
 	} else {
-		str = "\"" + string(Source, Length) + "\"";
+		str = _T("\"") + tstring(Source, Length) + _T("\"");
 	}
 	arrQuoted.push_back(str);
 }
 
-void QuoteStrings(const char *Source, vector<string> &arrQuoted, int MaxWidth) {
+void QuoteStrings(const TCHAR *Source, vector<tstring> &arrQuoted, int MaxWidth) {
 	do {
-		const char *Pos = strchr(Source,'\n');
+		const TCHAR *Pos = _tcschr(Source,'\n');
 		if (Pos) {
 			QuoteString(Source, Pos-Source, arrQuoted, MaxWidth);
 			Source = Pos + 1;
 		} else break;
 	} while (TRUE);
-	QuoteString(Source, strlen(Source), arrQuoted, MaxWidth);
+	QuoteString(Source, _tcslen(Source), arrQuoted, MaxWidth);
 }
 
-eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &EndPos, char *Original, const string &Replace, const string &Replace_O2E) {
+#ifdef UNICODE
+eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &EndPos, TCHAR *Original, const tstring &Replace) {
+#else
+eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &EndPos, TCHAR *Original, const tstring &Replace, const tstring &Replace_O2E) {
+#endif
 	RefreshEditorInfo();
 
 	LastReplaceLine = LastLine;LastReplacePos = EndPos;
@@ -160,27 +164,27 @@ eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &
 	if (NoAsking) Result = 0; else {
 		int Width = 0;
 		if (FirstLine != LastLine) {
-			char *NewOriginal = Original + StartPos;
+			TCHAR *NewOriginal = Original + StartPos;
 			for (int I = 0; I < LastLine-FirstLine; I++) {
-				char *CR = strchr(NewOriginal,'\n');
+				TCHAR *CR = _tcschr(NewOriginal, '\n');
 				if (CR) {
 					Width += (CR-NewOriginal) + 1;
 					NewOriginal = CR + 1;
 				} else {
-					Width += strlen(NewOriginal)-EndPos;
+					Width += _tcslen(NewOriginal)-EndPos;
 					break;
 				}
 			}
 			Width += EndPos;
 		} else Width = EndPos-StartPos;
 
-		vector<string> arrFound;
-		char Save = Original[StartPos + Width];
+		vector<tstring> arrFound;
+		TCHAR Save = Original[StartPos + Width];
 		Original[StartPos + Width] = 0;
 		QuoteStrings(Original + StartPos, arrFound, EdInfo.WindowSizeX-12);
 		Original[StartPos + Width] = Save;
 
-		vector<string> arrReplaced;
+		vector<tstring> arrReplaced;
 		QuoteStrings(Replace.c_str(), arrReplaced, EdInfo.WindowSizeX-12);
 
 		int L, H, TotalCount = arrFound.size() + arrReplaced.size();					// Calculate dialog width
@@ -200,18 +204,20 @@ eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &
 			H = (L-9)/2;
 		}
 
-		CFarDialog Dialog(-1, H + 1, Len + 8, H + 8+TotalCount,"ERAskReplace");
+		CFarDialog Dialog(-1, H + 1, Len + 8, H + 8+TotalCount, _T("ERAskReplace"));
 		Dialog.AddFrame(MREReplace);
 		Dialog.Add(new CFarTextItem(-1, 2, 0, MAskReplace));
-		for (size_t I = 0; I<arrFound.size();I++) Dialog.Add(new CFarTextItem(-1, 3 + I, 0, arrFound[I]));
+		for (size_t I = 0; I<arrFound.size();I++)
+			Dialog.Add(new CFarTextItem(-1, 3 + I, 0, arrFound[I]));
 		Dialog.Add(new CFarTextItem(-1, 3 + arrFound.size(), 0, MAskWith));
-		for (size_t I = 0; I<arrReplaced.size();I++) Dialog.Add(new CFarTextItem(-1, 4 + arrFound.size() + I, 0, arrReplaced[I]));
+		for (size_t I = 0; I<arrReplaced.size();I++)
+			Dialog.Add(new CFarTextItem(-1, 4 + arrFound.size() + I, 0, arrReplaced[I]));
 		Dialog.Add(new CFarButtonItem(0, 5 + TotalCount, DIF_CENTERGROUP|DIF_NOBRACKETS, TRUE, MReplace));
 		Dialog.Add(new CFarButtonItem(0, 5 + TotalCount, DIF_CENTERGROUP|DIF_NOBRACKETS, FALSE, MAll));
 		Dialog.Add(new CFarButtonItem(0, 5 + TotalCount, DIF_CENTERGROUP|DIF_NOBRACKETS, FALSE, MSkip));
 		Dialog.Add(new CFarButtonItem(0, 5 + TotalCount, DIF_CENTERGROUP|DIF_NOBRACKETS, FALSE, MCancel));
 		Result = Dialog.Display(4,-4,-3,-2,-1);
-	}
+	}	//	!NoAsking
 
 	switch (Result) {
 	case 1:
@@ -219,7 +225,11 @@ eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &
 		Select.BlockType = BTYPE_NONE;
 		StartupInfo.EditorControl(ECTL_SELECT, &Select);
 	case 0:
+#ifdef UNICODE
+		DoReplace(FirstLine, StartPos, LastLine, EndPos, Replace);
+#else
 		DoReplace(FirstLine, StartPos, LastLine, EndPos, Replace_O2E);
+#endif
 		return RR_OK;
 	case 2:return RR_SKIP;
 	default:
@@ -240,16 +250,25 @@ BOOL ReplaceInText(int FirstLine, int StartPos, int LastLine, int EndPos) {
 		int Numbers[3] = {MatchFirstLine, MatchFirstLine-ReplaceStartLine, ReplaceNumber};
 		int FoundLastLine = MatchLastLine;
 		BOOL ZeroMatch = (MatchFirstLine == MatchLastLine)&&(MatchStartPos == MatchEndPos);
+
+#ifdef UNICODE
+		tstring Replace = CreateReplaceString(MatchedLine, Match, MatchCount, ERReplace.c_str(),_T("\n"), Numbers,(EREvaluate ? EREvaluateScript : -1));
+#else
 		string Replace_O2E = CreateReplaceString(MatchedLine, Match, MatchCount, ERReplace_O2E.c_str(),"\n", Numbers,(EREvaluate ? EREvaluateScript : -1));
+#endif
 		if (g_bInterrupted) {	// Script failed
 			break;
 		}
 
+#ifdef UNICODE
+		eReplaceResult Result = EditorReplaceOK(MatchFirstLine, MatchStartPos, MatchLastLine, MatchEndPos, MatchedLine, Replace);
+#else
 		string Replace = Replace_O2E;
 		EditorToOEM(Replace);
 		EditorToOEM(MatchedLine, MatchedLineLength);
 
 		eReplaceResult Result = EditorReplaceOK(MatchFirstLine, MatchStartPos, MatchLastLine, MatchEndPos, MatchedLine, Replace, Replace_O2E);
+#endif
 		DeleteMatchInfo();
 
 		if (Result == RR_CANCEL) return TRUE;
@@ -279,19 +298,30 @@ BOOL ReplaceInTextByLine(int FirstLine, int StartPos, int LastLine, int EndPos, 
 			RefreshEditorInfo();
 
 			int Numbers[3] = {MatchFirstLine, MatchFirstLine-ReplaceStartLine, ReplaceNumber};
-			string Replace_O2E = CreateReplaceString(MatchedLine, Match, MatchCount, ERReplace_O2E.c_str(),"\n", Numbers,(EREvaluate ? EREvaluateScript : -1));
+
+#ifdef UNICODE
+			tstring Replace = CreateReplaceString(MatchedLine, Match, MatchCount, ERReplace.c_str(), _T("\n"), Numbers,(EREvaluate ? EREvaluateScript : -1));
+#else
+			string Replace_O2E = CreateReplaceString(MatchedLine, Match, MatchCount, ERReplace_O2E.c_str(), "\n", Numbers,(EREvaluate ? EREvaluateScript : -1));
+#endif
 			if (g_bInterrupted) {	// Script failed
 				break;
 			}
 
+#ifndef UNICODE
 			string Replace = Replace_O2E;
 			EditorToOEM(Replace);
 			EditorToOEM(MatchedLine, MatchedLineLength);
+#endif
 
 			int TailLength = MatchEndPos-FoundEndPos;
 			int FoundLastLine = MatchLastLine;
 			BOOL ZeroMatch = (FoundStartPos == FoundEndPos);
+#ifdef UNICODE
+			eReplaceResult Result = EditorReplaceOK(MatchFirstLine, FoundStartPos, MatchLastLine, FoundEndPos, MatchedLine, Replace);
+#else
 			eReplaceResult Result = EditorReplaceOK(MatchFirstLine, FoundStartPos, MatchLastLine, FoundEndPos, MatchedLine, Replace, Replace_O2E);
+#endif
 			DeleteMatchInfo();
 
 			if (Result == RR_CANCEL) return TRUE;
@@ -342,8 +372,10 @@ BOOL EditorReplaceAgain() {
 
 	StartEdInfo = EdInfo;
 
+#ifndef UNICODE
 	m_pReplaceTable = (EdInfo.AnsiMode) ? &XLatTables[XLatTables.size()-1] :
 		(EdInfo.TableNum != -1) ? &XLatTables[EdInfo.TableNum] : NULL;
+#endif
 
 	LastReplaceLine = EdInfo.CurLine;
 	LastReplacePos = EdInfo.CurPos;
@@ -382,7 +414,7 @@ BOOL EditorReplaceAgain() {
 	EctlForceSetPosition(&Position);
 
 	if (NoAsking||g_bInterrupted) return TRUE;
-	ShowErrorMsg(GetMsg(MCannotFind), EText.c_str(), "ECannotFind");
+	ShowErrorMsg(GetMsg(MCannotFind), EText.c_str(), _T("ECannotFind"));
 	return FALSE;
 }
 
@@ -390,7 +422,7 @@ BOOL EditorReplace() {
 	RefreshEditorInfo();
 	EInSelection = EAutoFindInSelection && (EdInfo.BlockType != BTYPE_NONE);
 
-	CFarDialog Dialog(76, 17,"ReplaceDlg");
+	CFarDialog Dialog(76, 17, _T("ReplaceDlg"));
 	Dialog.AddFrame(MREReplace);
 	Dialog.Add(new CFarTextItem(5, 2, 0, MSearchFor));
 	Dialog.Add(new CFarEditItem(5, 3, 65, DIF_HISTORY|DIF_VAREDIT,_T("SearchText"), SearchText));
@@ -398,17 +430,17 @@ BOOL EditorReplace() {
 	Dialog.Add(new CFarTextItem(5, 4, 0, MReplaceWith));
 	Dialog.Add(new CFarEditItem(5, 5, 65, DIF_HISTORY|DIF_VAREDIT,_T("ReplaceText"), ReplaceText));
 
-	Dialog.Add(new CFarButtonItem(67, 3, 0, 0,"&\\"));
-	Dialog.Add(new CFarButtonItem(67, 5, 0, 0,"&/"));
+	Dialog.Add(new CFarButtonItem(67, 3, 0, 0, _T("&\\")));
+	Dialog.Add(new CFarButtonItem(67, 5, 0, 0, _T("&/")));
 
-	Dialog.Add(new CFarTextItem(5, 6, DIF_BOXCOLOR|DIF_SEPARATOR,(char *)NULL));
+	Dialog.Add(new CFarTextItem(5, 6, DIF_BOXCOLOR|DIF_SEPARATOR, _T("")));
 
 	Dialog.Add(new CFarCheckBoxItem(5, 7, 0, MRegExp, &ERegExp));
 	Dialog.Add(new CFarCheckBoxItem(30, 7, 0, MSeveralLine, &ESeveralLine));
-	Dialog.Add(new CFarButtonItem(48, 7, 0, 0,"&..."));
+	Dialog.Add(new CFarButtonItem(48, 7, 0, 0, _T("&...")));
 
 	Dialog.Add(new CFarCheckBoxItem(5, 8, 0, MCaseSensitive, &ECaseSensitive));
-	Dialog.Add(new CFarCheckBoxItem(30, 8, 0,"", &EUTF8));
+	Dialog.Add(new CFarCheckBoxItem(30, 8, 0, _T(""), &EUTF8));
 	Dialog.Add(new CFarButtonItem(34, 8, 0, 0, MUTF8));
 	Dialog.Add(new CFarCheckBoxItem(5, 9, 0, MReverseSearch, &EReverse));
 	if (EdInfo.BlockType != BTYPE_NONE) Dialog.Add(new CFarCheckBoxItem(30, 9, 0, MInSelection, &EInSelection));
@@ -455,9 +487,14 @@ BOOL EditorReplace() {
 			return FALSE;
 		}
 	} while ((ExitCode >= 2)||!EPreparePattern(SearchText));
+	
 	EText = SearchText;
+#ifdef UNICODE
+	ERReplace = ReplaceText;
+#else
 	ERReplace = ERReplace_O2E = ReplaceText;
 	OEMToEditor(ERReplace_O2E);
+#endif
 
 	NoAsking = (ExitCode == 1);ReplaceStartLine = -1;ReplaceNumber = 0;
 	g_bInterrupted = FALSE;
@@ -469,8 +506,12 @@ OperationResult EditorReplaceExecutor() {
 	if (!EPreparePattern(SearchText)) return OR_FAILED;
 
 	EText = SearchText;
+#ifdef UNICODE
+	ERReplace = ReplaceText;
+#else
 	ERReplace = ERReplace_O2E = ReplaceText;
 	OEMToEditor(ERReplace_O2E);
+#endif
 
 	NoAsking = TRUE;
 	ReplaceNumber = 0;
@@ -481,7 +522,7 @@ OperationResult EditorReplaceExecutor() {
 }
 
 BOOL CERPresetCollection::EditPreset(CPreset *pPreset) {
-	CFarDialog Dialog(76, 20, "ERPresetDlg");
+	CFarDialog Dialog(76, 20, _T("ERPresetDlg"));
 	Dialog.AddFrame(MERPreset);
 	Dialog.Add(new CFarTextItem(5, 2, 0, MPresetName));
 	Dialog.Add(new CFarEditItem(5, 3, 70, DIF_HISTORY,_T("RESearch.PresetName"), pPreset->Name()));
@@ -495,7 +536,7 @@ BOOL CERPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.Add(new CFarCheckBoxItem(5, 9, 0, MRegExp, &pPreset->m_mapInts["IsRegExp"]));
 	Dialog.Add(new CFarCheckBoxItem(5, 10, 0, MCaseSensitive, &pPreset->m_mapInts["CaseSensitive"]));
 	Dialog.Add(new CFarCheckBoxItem(30, 9, 0, MSeveralLine, &pPreset->m_mapInts["SeveralLine"]));
-	Dialog.Add(new CFarCheckBoxItem(30, 10, 0,"", &pPreset->m_mapInts["UTF8"]));
+	Dialog.Add(new CFarCheckBoxItem(30, 10, 0, _T(""), &pPreset->m_mapInts["UTF8"]));
 	Dialog.Add(new CFarButtonItem(34, 10, 0, 0, MUTF8));
 	Dialog.Add(new CFarCheckBoxItem(5, 11, 0, MRemoveEmpty, &pPreset->m_mapInts["RemoveEmpty"]));
 	Dialog.Add(new CFarCheckBoxItem(30, 11, 0, MRemoveNoMatch, &pPreset->m_mapInts["RemoveNoMatch"]));
@@ -511,7 +552,7 @@ BOOL CERPresetCollection::EditPreset(CPreset *pPreset) {
 		case 0:
 			return TRUE;
 		case 1:{		// avoid Internal Error for icl
-			string str = pPreset->m_mapStrings["Text"];
+			tstring str = pPreset->m_mapStrings["Text"];
 			UTF8Converter(str);
 			break;
 			  }

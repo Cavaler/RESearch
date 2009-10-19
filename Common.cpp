@@ -155,7 +155,20 @@ TCHAR ConvertCase(TCHAR C) {
 TCHAR ConvertCase(TCHAR C) {
 	if (OneCaseConvert == CCV_NONE) return C;
 
-#pragma message("ConvertCase unimplemented for UNICODE")
+	TCHAR cUp = (TCHAR)CharUpper((LPTSTR)C);
+	TCHAR cDn = (TCHAR)CharLower((LPTSTR)C);
+
+	switch (OneCaseConvert) {
+	case CCV_UPPER:
+		C = cUp;
+		break;
+	case CCV_LOWER:
+		C = cDn;
+		break;
+	case CCV_FLIP:
+		C = (C == cUp) ? cDn : cUp;
+		break;
+	}
 
 	return C;
 }

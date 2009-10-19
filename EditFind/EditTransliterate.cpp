@@ -13,7 +13,7 @@ BOOL EditorTransliterateAgain() {
 		Position.CurLine = nLine;
 		EctlSetPosition(&Position);
 		EctlGetString(&String);
-		string strData(String.StringText, String.StringLength);
+		tstring strData(String.StringText, String.StringLength);
 
 		for (size_t nChar = 0; nChar < strData.length(); nChar++) {
 			size_t nIndex = ETSource.find(strData[nChar]);
@@ -28,7 +28,7 @@ BOOL EditorTransliterateAgain() {
 			}
 		}
 
-		if (strData != string(String.StringText, String.StringLength)) {
+		if (strData != tstring(String.StringText, String.StringLength)) {
 			SetString.StringText = strData.data();
 			SetString.StringLength = strData.length();
 			SetString.StringEOL = String.StringEOL;
@@ -42,7 +42,7 @@ BOOL EditorTransliterateAgain() {
 }
 
 BOOL EditorTransliterate() {
-	CFarDialog Dialog(76,13,"TransliterateDlg");
+	CFarDialog Dialog(76,13,_T("TransliterateDlg"));
 	Dialog.AddFrame(MTransliterate);
 	Dialog.Add(new CFarTextItem(5,2,0,MTransSource));
 	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,_T("SourceChars"),SearchText));
@@ -84,7 +84,7 @@ OperationResult EditorTransliterateExecutor() {
 }
 
 BOOL CETPresetCollection::EditPreset(CPreset *pPreset) {
-	CFarDialog Dialog(76,15,"ETPresetDlg");
+	CFarDialog Dialog(76,15,_T("ETPresetDlg"));
 	Dialog.AddFrame(METPreset);
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
 	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,_T("RESearch.PresetName"),pPreset->Name()));

@@ -47,7 +47,9 @@ EXTERN CETPresetCollection *ETPresets;
 
 EXTERN int LastAction VALUE(-1);
 
+#ifndef UNICODE
 EXTERN tstring ERReplace_O2E;
+#endif
 EXTERN BOOL ERRemoveEmpty;
 EXTERN BOOL ERRemoveNoMatch;
 EXTERN bool EREvaluate VALUE(false);

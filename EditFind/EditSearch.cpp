@@ -127,8 +127,8 @@ BOOL EditorSearchAgain() {
 	RestorePosition(StartEdInfo);
 
 	if (!g_bInterrupted) {
-		const char *Lines[]={GetMsg(MRESearch),GetMsg(MCannotFind),EText.c_str(),GetMsg(MOk)};
-		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"ECannotFind",Lines,4,1);
+		const TCHAR *Lines[]={GetMsg(MRESearch),GetMsg(MCannotFind),EText.c_str(),GetMsg(MOk)};
+		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("ECannotFind"),Lines,4,1);
 	}
 
 	if (EInSelection) RestoreSelection();
@@ -139,19 +139,19 @@ BOOL EditorSearch() {
 	RefreshEditorInfo();
 	EInSelection = EAutoFindInSelection && (EdInfo.BlockType!=BTYPE_NONE);
 
-	CFarDialog Dialog(76,13,"SearchDlg");
+	CFarDialog Dialog(76,13,_T("SearchDlg"));
 	Dialog.AddFrame(MRESearch);
 	Dialog.Add(new CFarTextItem(5,2,0,MSearchFor));
 	Dialog.Add(new CFarEditItem(5,3,65,DIF_HISTORY|DIF_VAREDIT,_T("SearchText"),SearchText));
-	Dialog.Add(new CFarButtonItem(67,3,0,0,"&\\"));
+	Dialog.Add(new CFarButtonItem(67,3,0,0,_T("&\\")));
 
-	Dialog.Add(new CFarTextItem(5,4,DIF_BOXCOLOR|DIF_SEPARATOR,""));
+	Dialog.Add(new CFarTextItem(5,4,DIF_BOXCOLOR|DIF_SEPARATOR,_T("")));
 	Dialog.Add(new CFarCheckBoxItem(5,5,0,MRegExp,&ERegExp));
 	Dialog.Add(new CFarCheckBoxItem(30,5,0,MSeveralLine,&ESeveralLine));
-	Dialog.Add(new CFarButtonItem(48,5,0,0,"&..."));
+	Dialog.Add(new CFarButtonItem(48,5,0,0,_T("&...")));
 
 	Dialog.Add(new CFarCheckBoxItem(5,6,0,MCaseSensitive,&ECaseSensitive));
-	Dialog.Add(new CFarCheckBoxItem(30,6,0,"",&EUTF8));
+	Dialog.Add(new CFarCheckBoxItem(30,6,0,_T(""),&EUTF8));
 	Dialog.Add(new CFarButtonItem(34,6,0,0,MUTF8));
 	Dialog.Add(new CFarCheckBoxItem(5,7,0,MReverseSearch,&EReverse));
 	if (EdInfo.BlockType!=BTYPE_NONE) Dialog.Add(new CFarCheckBoxItem(30,7,0,MInSelection,&EInSelection));
@@ -202,7 +202,7 @@ OperationResult EditorSearchExecutor() {
 }
 
 BOOL CESPresetCollection::EditPreset(CPreset *pPreset) {
-	CFarDialog Dialog(76,16,"ESPresetDlg");
+	CFarDialog Dialog(76,16,_T("ESPresetDlg"));
 	Dialog.AddFrame(MESPreset);
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
 	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,_T("RESearch.PresetName"),pPreset->Name()));
@@ -213,7 +213,7 @@ BOOL CESPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.Add(new CFarCheckBoxItem(5,7,0,MRegExp,&pPreset->m_mapInts["IsRegExp"]));
 	Dialog.Add(new CFarCheckBoxItem(5,8,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
 	Dialog.Add(new CFarCheckBoxItem(35,7,0,MSeveralLine,&pPreset->m_mapInts["SeveralLine"]));
-	Dialog.Add(new CFarCheckBoxItem(35,8,0,"",&pPreset->m_mapInts["UTF8"]));
+	Dialog.Add(new CFarCheckBoxItem(35,8,0,_T(""),&pPreset->m_mapInts["UTF8"]));
 	Dialog.Add(new CFarButtonItem(39,8,0,0,MUTF8));
 	Dialog.Add(new CFarCheckBoxItem(5,10,0,MAddToMenu,&pPreset->m_bAddToMenu));
 	Dialog.Add(new CFarCheckBoxItem(35,10,0,MListAllFromPreset,&pPreset->m_mapInts["ListAll"]));
@@ -224,7 +224,7 @@ BOOL CESPresetCollection::EditPreset(CPreset *pPreset) {
 		case 0:
 			return TRUE;
 		case 1:{		// avoid Internal Error for icl
-			string str = pPreset->m_mapStrings["SearchText"];
+			tstring str = pPreset->m_mapStrings["SearchText"];
 			UTF8Converter(str);
 			break;
 			  }
