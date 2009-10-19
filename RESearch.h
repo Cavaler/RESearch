@@ -334,9 +334,11 @@ void StopREThread();
 int do_pcre_exec(const pcre *external_re, const pcre_extra *extra_data,
 	const TCHAR *subject, int length, int start_offset, int options, int *offsets,
 	int offsetcount);
-
-bool do_pcre_exec(CRegExp &reObject, const TCHAR *subject, int length, int start_offset, int options,
-				  int *offsets, int offsetcount);
+#ifdef UNICODE
+int do_pcre_execA(const pcre *external_re, const pcre_extra *extra_data,
+	const char *subject, int length, int start_offset, int options, int *offsets,
+	int offsetcount);
+#endif
 
 void RunExternalEditor(tstring &strText);
 
