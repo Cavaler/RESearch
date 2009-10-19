@@ -406,11 +406,11 @@ HANDLE OpenPluginFromFileMenu(int Item, BOOL ShowDialog) {
 			Result = FileReplace(g_PanelItems,ShowDialog);
 			if (Result != OR_CANCEL) SynchronizeWithFile(true);
 			break;
+#endif
 		case 2:
 			Result = FileGrep(ShowDialog);
 			if (Result != OR_CANCEL) SynchronizeWithFile(false);
 			break;
-#endif
 		case 4:ChangeSelection(MMenuSelect);break;
 		case 5:ChangeSelection(MMenuUnselect);break;
 		case 6:ChangeSelection(MMenuFlipSelection);break;
@@ -497,7 +497,6 @@ OperationResult OpenPluginFromEditorPreset(int Item) {
 }
 
 HANDLE OpenPluginFromEditorMenu(int Item) {
-#ifndef UNICODE_SKIP
 	FindIfClockPresent();
 	switch (Item = ShowEditorMenu()) {
 		case 0:
@@ -554,7 +553,6 @@ HANDLE OpenPluginFromEditorMenu(int Item) {
 		Item -= 11;
 		OpenPluginFromEditorPreset(Item);
 	}
-#endif
 
 	return INVALID_HANDLE_VALUE;
 }
@@ -764,10 +762,8 @@ int WINAPI FAR_EXPORT(Configure)(int ItemNumber) {
 
 void WINAPI FAR_EXPORT(ExitFAR)() {
 	WriteRegistry();
-#ifndef UNICODE_SKIP
 	ECleanup(FALSE);
 	FCleanup(FALSE);
-#endif
 	FTCleanup(FALSE);
 	StopREThread();
 	CoUninitialize();

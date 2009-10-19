@@ -316,7 +316,7 @@ void ShowErrorMsg(const TCHAR *sz1, const TCHAR *sz2 = NULL, const TCHAR *szHelp
 void ShowHResultError(int nError, HRESULT hResult, const TCHAR *szHelp = NULL);
 
 #ifdef UNICODE
-EXTERN TCHAR UpCaseTable[65536];
+EXTERN TCHAR UpCaseTable[65537];
 #else
 EXTERN char UpCaseTable[256];
 EXTERN CharTableSet *m_pReplaceTable;

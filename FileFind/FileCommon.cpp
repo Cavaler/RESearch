@@ -1,6 +1,14 @@
 #include "StdAfx.h"
 #include "..\RESearch.h"
 
+#ifdef UNICODE
+BOOL CFSPresetCollection::EditPreset(CPreset *pPreset) { return FALSE; }
+BOOL CFRPresetCollection::EditPreset(CPreset *pPreset) { return FALSE; }
+
+OperationResult FileSearchExecutor() { return OR_CANCEL; }
+OperationResult FileReplaceExecutor() { return OR_CANCEL; }
+#endif
+
 CParameterSet g_FSParamSet(FileSearchExecutor, 4, 6,
 	"Mask", &MaskText, "Text", &SearchText, "@Mask", &FMask, "@Text", &FText,
 	"MaskAsRegExp", &FMaskAsRegExp, "CaseSensitive", &FCaseSensitive,

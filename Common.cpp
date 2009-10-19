@@ -337,7 +337,8 @@ tstring CreateReplaceString(const TCHAR *Matched,int *Match,int Count,const TCHA
 
 void PrepareLocaleStuff() {
 	for (int I=0;I<65536;I++) UpCaseTable[I]=I;
-	CharUpper(UpCaseTable);
+	UpCaseTable[65536]=0;
+	CharUpper(UpCaseTable+1);
 }
 
 tstring UpCaseString(const tstring &strText) {
@@ -382,7 +383,7 @@ string UpCaseString(const string &strText) {
 
 #endif
 
-#define BufCased(I) ((XLatTable)?(unsigned char)XLatTable[Buf[I]]:Buf[I])
+#define BufCased(I) ((XLatTable)?(UTCHAR)XLatTable[Buf[I]]:Buf[I])
 
 #ifdef UNICODE
 typedef int BMHTable[65536];
