@@ -1,10 +1,6 @@
 #include "StdAfx.h"
 #include "RESearch.h"
 
-#ifdef UNICODE
-#define UNICODE_SKIP
-#endif
-
 void WINAPI FAR_EXPORT(GetPluginInfo)(PluginInfo *Info) {
 	static const TCHAR *ConfigStrings[1];
 	static const TCHAR *MenuStrings[1];
@@ -397,7 +393,6 @@ HANDLE OpenPluginFromFileMenu(int Item, BOOL ShowDialog) {
 	}
 
 	switch (Item) {
-#ifndef UNICODE_SKIP
 		case 0:
 			Result = FileFind(g_PanelItems,ShowDialog);
 			if (Result != OR_CANCEL) SynchronizeWithFile(false);
@@ -406,7 +401,6 @@ HANDLE OpenPluginFromFileMenu(int Item, BOOL ShowDialog) {
 			Result = FileReplace(g_PanelItems,ShowDialog);
 			if (Result != OR_CANCEL) SynchronizeWithFile(true);
 			break;
-#endif
 		case 2:
 			Result = FileGrep(ShowDialog);
 			if (Result != OR_CANCEL) SynchronizeWithFile(false);

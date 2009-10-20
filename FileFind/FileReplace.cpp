@@ -1,14 +1,14 @@
 #include "StdAfx.h"
 #include "..\RESearch.h"
 
-BOOL ConfirmFileReadonly(char *FileName) {
+BOOL ConfirmFileReadonly(TCHAR *FileName) {
 	if (!FRConfirmReadonlyThisRun) return TRUE;
 	if (FRReplaceReadonly == RR_NEVER) return FALSE;
-	const char *Lines[]={
+	const TCHAR *Lines[]={
 		GetMsg(MREReplace),GetMsg(MTheFile),FileName,GetMsg(MModifyReadonlyRequest),
 		GetMsg(MOk),GetMsg(MAll),GetMsg(MSkip),GetMsg(MCancel)
 	};
-	switch (StartupInfo.Message(StartupInfo.ModuleNumber,0,"FRConfirmReadonly",Lines,8,4)) {
+	switch (StartupInfo.Message(StartupInfo.ModuleNumber,0,_T("FRConfirmReadonly"),Lines,8,4)) {
 	case 1:FRConfirmReadonlyThisRun=FALSE;
 	case 0:return TRUE;
 	case -1:
@@ -17,14 +17,26 @@ BOOL ConfirmFileReadonly(char *FileName) {
 	return FALSE;
 }
 
-BOOL ConfirmReplacement(const char *Found, const char *Replaced, const char *FileName) {
+BOOL ConfirmReplacement(const char *Found, const char *Replaced, const TCHAR *FileName) {
 	if (!FRConfirmLineThisFile) return TRUE;
 	if (g_bInterrupted) return FALSE;
-	const char *Lines[]={
+
+#ifdef UNICODE
+	wstring strFound = OEMToUnicode(Found);
+	wstring strReplaced = OEMToUnicode(Replaced);
+
+	const TCHAR *Lines[]={
+		GetMsg(MREReplace),GetMsg(MAskReplace),strFound.c_str(),GetMsg(MAskWith),strReplaced.c_str(),
+		GetMsg(MInFile),FileName,GetMsg(MReplace),GetMsg(MAll),GetMsg(MAllFiles),GetMsg(MSkip),GetMsg(MCancel)
+	};
+#else
+	const TCHAR *Lines[]={
 		GetMsg(MREReplace),GetMsg(MAskReplace),Found,GetMsg(MAskWith),Replaced,
 		GetMsg(MInFile),FileName,GetMsg(MReplace),GetMsg(MAll),GetMsg(MAllFiles),GetMsg(MSkip),GetMsg(MCancel)
 	};
-	switch (StartupInfo.Message(StartupInfo.ModuleNumber,0,"FRAskReplace",Lines,12,5)) {
+#endif
+
+	switch (StartupInfo.Message(StartupInfo.ModuleNumber,0,_T("FRAskReplace"),Lines,12,5)) {
 	case 2:FRConfirmLineThisRun=FALSE;
 	case 1:FRConfirmLineThisFile=FALSE;
 	case 0:return TRUE;
@@ -34,12 +46,12 @@ BOOL ConfirmReplacement(const char *Found, const char *Replaced, const char *Fil
 	return FALSE;
 }
 
-BOOL WriteBuffer(HANDLE hFile,const void *Buffer,DWORD BufLen,const char *FileName) {
+BOOL WriteBuffer(HANDLE hFile,const void *Buffer,DWORD BufLen,const TCHAR *FileName) {
 	DWORD WrittenBytes;
 	if (!WriteFile(hFile,Buffer,BufLen,&WrittenBytes,NULL)||
 		(WrittenBytes!=BufLen)) {
-		const char *Lines[]={GetMsg(MREReplace),GetMsg(MFileWriteError),FileName,GetMsg(MOk)};
-		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"FRWriteError",Lines,4,1);
+		const TCHAR *Lines[]={GetMsg(MREReplace),GetMsg(MFileWriteError),FileName,GetMsg(MOk)};
+		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("FRWriteError"),Lines,4,1);
 		return FALSE;
 	} else return TRUE;
 }
@@ -53,9 +65,10 @@ BOOL DoReplace(HANDLE &hFile,const char *&Found,int FoundLen,const char *Replace
 		}
 		hFile=CreateFile(FindData->cFileName,GENERIC_WRITE,0,NULL,CREATE_ALWAYS,
 			FindData->dwFileAttributes,INVALID_HANDLE_VALUE);
+
 		if (hFile==INVALID_HANDLE_VALUE) {
-			const char *Lines[]={GetMsg(MREReplace),GetMsg(MFileOpenError),FindData->cFileName,GetMsg(MOk)};
-			StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"FRCreateError",Lines,4,1);
+			const TCHAR *Lines[]={GetMsg(MREReplace),GetMsg(MFileOpenError),FindData->cFileName,GetMsg(MOk)};
+			StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("FRCreateError"),Lines,4,1);
 			return FALSE;
 		}
 	}
@@ -286,7 +299,7 @@ bool PrepareFileReplacePattern() {
 }
 
 int ReplacePrompt(BOOL Plugin) {
-	CFarDialog Dialog(76,24,"FileReplaceDlg");
+	CFarDialog Dialog(76,24,_T("FileReplaceDlg"));
 	Dialog.AddFrame(MREReplace);
 
 	Dialog.Add(new CFarCheckBoxItem(35,2,0,MAsRegExp,&FMaskAsRegExp));
@@ -299,8 +312,8 @@ int ReplacePrompt(BOOL Plugin) {
 	Dialog.Add(new CFarTextItem(5,6,0,MReplaceWith));
 	Dialog.Add(new CFarEditItem(5,7,65,DIF_HISTORY|DIF_VAREDIT,_T("ReplaceText"), ReplaceText));
 
-	Dialog.Add(new CFarButtonItem(67,5,0,0,"&\\"));
-	Dialog.Add(new CFarButtonItem(67,7,0,0,"&/"));
+	Dialog.Add(new CFarButtonItem(67,5,0,0,_T("&\\")));
+	Dialog.Add(new CFarButtonItem(67,7,0,0,_T("&/")));
 
 	Dialog.Add(new CFarTextItem(5,8,DIF_BOXCOLOR|DIF_SEPARATOR,""));
 	Dialog.Add(new CFarRadioButtonItem(5,9,DIF_GROUP,MPlainText,(int *)&FSearchAs,SA_PLAINTEXT));
@@ -324,9 +337,9 @@ int ReplacePrompt(BOOL Plugin) {
 
 	Dialog.AddButtons(MOk,MCancel);
 	Dialog.Add(new CFarButtonItem(60,9,0,0,MBtnPresets));
-	Dialog.Add(new CFarCheckBoxItem(56,10,0,"",&FAdvanced));
+	Dialog.Add(new CFarCheckBoxItem(56,10,0,_T(""),&FAdvanced));
 	Dialog.Add(new CFarButtonItem(60,10,0,0,MBtnAdvanced));
-	Dialog.Add(new CFarCheckBoxItem(56,11,0,"",&FUTF8));
+	Dialog.Add(new CFarCheckBoxItem(56,11,0,_T(""),&FUTF8));
 	Dialog.Add(new CFarButtonItem(60,11,0,0,MUTF8));
 	Dialog.SetFocus(3);
 	if (FSearchAs>=SA_MULTILINE) FSearchAs=SA_PLAINTEXT;
@@ -399,7 +412,7 @@ OperationResult FileReplaceExecutor() {
 }
 
 BOOL CFRPresetCollection::EditPreset(CPreset *pPreset) {
-	CFarDialog Dialog(76, 22, "FRPresetDlg");
+	CFarDialog Dialog(76, 22, _T("FRPresetDlg"));
 	Dialog.AddFrame(MFRPreset);
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
 	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,_T("RESearch.PresetName"), pPreset->Name()));
@@ -425,9 +438,9 @@ BOOL CFRPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.Add(new CFarRadioButtonItem(5,13,0,MSeveralLineRegExp,pSearchAs,SA_SEVERALLINE));
 
 	Dialog.Add(new CFarCheckBoxItem(5,14,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
-	Dialog.Add(new CFarCheckBoxItem(56,11,0,"",&bFAdvanced));
+	Dialog.Add(new CFarCheckBoxItem(56,11,0,_T(""),&bFAdvanced));
 	Dialog.Add(new CFarButtonItem(60,11,0,0,MBtnAdvanced));
-	Dialog.Add(new CFarCheckBoxItem(56,13,0,"",&pPreset->m_mapInts["UTF8"]));
+	Dialog.Add(new CFarCheckBoxItem(56,13,0,_T(""),&pPreset->m_mapInts["UTF8"]));
 	Dialog.Add(new CFarButtonItem(60,13,0,0,MUTF8));
 	Dialog.Add(new CFarCheckBoxItem(5,16,0,MAddToMenu,&pPreset->m_bAddToMenu));
 	Dialog.AddButtons(MOk,MCancel);
@@ -438,7 +451,7 @@ BOOL CFRPresetCollection::EditPreset(CPreset *pPreset) {
 			pPreset->m_mapInts["AdvancedID"] = bFAdvanced ? nAdvancedID : 0;
 			return TRUE;
 		case 1:{		// avoid Internal Error for icl
-			string str = pPreset->m_mapStrings["Text"];
+			tstring str = pPreset->m_mapStrings["Text"];
 			UTF8Converter(str);
 			break;
 			  }

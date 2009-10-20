@@ -336,9 +336,21 @@ tstring CreateReplaceString(const TCHAR *Matched,int *Match,int Count,const TCHA
 #ifdef UNICODE
 
 void PrepareLocaleStuff() {
-	for (int I=0;I<65536;I++) UpCaseTable[I]=I;
+	for (int nChar=0;nChar<65536;nChar++) UpCaseTable[nChar]=nChar;
 	UpCaseTable[65536]=0;
 	CharUpper(UpCaseTable+1);
+
+	for (unsigned short nChar=0; nChar<256; nChar++) {
+		WCHAR wChar, wCharU, wCharL;
+		MultiByteToWideChar(CP_OEMCP, 0, (char *)&nChar, 1, &wChar, 1);
+		wCharU = (WCHAR)CharUpper((LPWSTR)wChar);
+		wCharL = (WCHAR)CharLower((LPWSTR)wCharU);
+		if ((wChar==wCharU) || (wChar==wCharL)) {
+			char cChar;
+			WideCharToMultiByte(CP_OEMCP, 0, &wCharU, 1, &cChar, 1, NULL, NULL);
+			UpCaseTableA[nChar] = cChar;
+		} else UpCaseTableA[nChar] = (char)nChar;
+	}
 }
 
 tstring UpCaseString(const tstring &strText) {
@@ -359,16 +371,16 @@ void PrepareLocaleStuff() {
 	setlocale(LC_ALL, FormatStr(".%d", GetACP()).c_str());
 	ANSICharTables = pcre_maketables();
 
-	for (unsigned short I=0;I<256;I++) {
-		WCHAR W,U,L;
-		unsigned char C;
-		MultiByteToWideChar(CP_OEMCP,0,(char *)&I,1,&W,1);
-		U=towupper(W);
-		L=towlower(U);
-		if ((W==U)||(W==L)) {
-			WideCharToMultiByte(CP_OEMCP,0,&U,1,(char *)&C,1,NULL,NULL);
-			UpCaseTable[I]=C;
-		} else UpCaseTable[I]=(char)I;
+	for (unsigned short nChar=0; nChar<256; nChar++) {
+		WCHAR wChar, wCharU, wCharL;
+		MultiByteToWideChar(CP_OEMCP, 0, (char *)&nChar, 1, &wChar, 1);
+		wCharU = (WCHAR)CharUpperW((LPWSTR)wChar);
+		wCharL = (WCHAR)CharLowerW((LPWSTR)wCharU);
+		if ((wChar==wCharU) || (wChar==wCharL)) {
+			char cChar;
+			WideCharToMultiByte(CP_OEMCP, 0, &wCharU, 1, &cChar, 1, NULL, NULL);
+			UpCaseTable[nChar] = cChar;
+		} else UpCaseTable[nChar] = (char)nChar;
 	}
 }
 
@@ -383,13 +395,17 @@ string UpCaseString(const string &strText) {
 
 #endif
 
-#define BufCased(I) ((XLatTable)?(UTCHAR)XLatTable[Buf[I]]:Buf[I])
+#define BufCased(nChar) ((XLatTable)?(UTCHAR)XLatTable[Buf[nChar]]:Buf[nChar])
+#define BufCasedA(nChar) ((XLatTable)?(BYTE)XLatTable[Buf[nChar]]:Buf[nChar])
 
 #ifdef UNICODE
 typedef int BMHTable[65536];
+typedef int BMHTableA[256];
+BMHTableA g_BMHTableA;
 #else
 typedef int BMHTable[256];
 #endif
+
 typedef struct {BMHTable m_Table;} BMHTableRec;
 vector<BMHTableRec> g_BMHTables;
 
@@ -425,6 +441,36 @@ int BMHSearch(const TCHAR *Buffer,int BufferLength,const TCHAR *String,int Strin
 	}
 	return -1;
 }
+
+#ifdef UNICODE
+
+void PrepareBMHSearchA(const char *String,int StringLength) {
+	BMHTableA &Table = g_BMHTableA;//g_BMHTables[nPattern].m_Table;
+	for (int I=0;I<256;I++) Table[I]=StringLength;
+
+	if (EReverse)
+		for (int I=StringLength-1;I>0;I--) Table[((BYTE *)String)[I]]=I;
+	else
+		for (int I=0;I<StringLength-1;I++) Table[((BYTE *)String)[I]]=StringLength-I-1;
+}
+
+int BMHSearchA(const char *Buffer,int BufferLength,const char *String,int StringLength,char *XLatTable) {
+	BYTE *Buf=(BYTE *)Buffer;
+	BYTE *Str=(BYTE *)String;
+	BMHTableA &Table = g_BMHTableA;//g_BMHTables[nPattern].m_Table;
+	int I;
+
+	if (BufferLength<StringLength) return -1;
+
+	int J=StringLength-1,K;
+	while (J<BufferLength) {
+		I=J;K=StringLength-1;
+		while ((K>=0)&&(BufCasedA(I)==Str[K])) {I--;K--;}
+		if (K<0) return I+1; else J+=Table[BufCasedA(J)];
+	}
+	return -1;
+}
+#endif
 
 int ReverseBMHSearch(const TCHAR *Buffer,int BufferLength,const TCHAR *String,int StringLength,TCHAR *XLatTable,int nPattern) {
 	UTCHAR *Buf=(UTCHAR*)Buffer;

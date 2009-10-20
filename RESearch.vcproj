@@ -1551,13 +1551,6 @@
 			<File
 				RelativePath=".\FileFind\FileGrep.cpp"
 				>
-				<FileConfiguration
-					Name="Debug Unicode|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="FileFind\FileReplace.cpp"
@@ -1600,7 +1593,6 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug Unicode|Win32"
-					ExcludedFromBuild="true"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -1657,7 +1649,6 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug Unicode|Win32"
-					ExcludedFromBuild="true"
 					>
 					<Tool
 						Name="VCCLCompilerTool"

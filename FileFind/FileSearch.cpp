@@ -1,35 +1,52 @@
 #include "StdAfx.h"
 #include "..\RESearch.h"
 
+#ifndef UNICODE
 void XLatBuffer(BYTE *Buffer,int Length,int Table) {
 	for (register int I=0;I<Length;I++) Buffer[I]=XLatTables[Table].DecodeTable[Buffer[I]];
 }
+#endif
 
-bool FromUnicodeLE(const char *Buffer, int Size, vector<char> &arrData) {
+bool FromUnicodeLE(const char *Buffer, int Size, vector<TCHAR> &arrData) {
 	arrData.resize(Size/2);
 	if (arrData.size() == 0) return true;
 
+#ifdef UNICODE
+	wmemmove(&arrData[0], (LPCWSTR)Buffer, Size/2);
+#else
 	int nResult = WideCharToMultiByte(CP_OEMCP, 0, (LPCWSTR)Buffer, Size/2, &arrData[0], arrData.size(), NULL, NULL);
 	if (nResult <= 0) return false;
 	arrData.resize(nResult);
+#endif
+
 	return true;
 }
 
 // Could be slow
-bool FromUnicodeBE(const char *Buffer, int Size, vector<char> &arrData) {
+bool FromUnicodeBE(const char *Buffer, int Size, vector<TCHAR> &arrData) {
 	arrData.resize(Size/2);
 	if (arrData.size() == 0) return true;
 
 	for (int nChar = 0; nChar < Size/2; nChar++) {
 		wchar_t wcSingle = (Buffer[nChar*2]<<8) + Buffer[nChar*2+1];
+#ifdef UNICODE
+		arrData[nChar] = wcSingle;
+#else
 		WideCharToMultiByte(CP_OEMCP, 0, &wcSingle, 1, &arrData[nChar], 1, NULL, NULL);
+#endif
 	}
 	return true;
 }
 
-bool FromUTF8(const char *Buffer, int Size, vector<char> &arrData) {
+bool FromUTF8(const char *Buffer, int Size, vector<TCHAR> &arrData) {
 	if (Size == 0) {arrData.clear(); return true;}
 
+#ifdef UNICODE
+	arrData.resize(Size);
+	int nResult = MultiByteToWideChar(CP_UTF8, 0, Buffer, Size, &arrData[0], arrData.size());
+	if (nResult <= 0) return false;
+	arrData.resize(nResult);
+#else
 	vector<wchar_t> arrWData(Size);
 	int nResult = MultiByteToWideChar(CP_UTF8, 0, Buffer, Size, &arrWData[0], arrWData.size());
 	if (nResult <= 0) return false;
@@ -38,6 +55,8 @@ bool FromUTF8(const char *Buffer, int Size, vector<char> &arrData) {
 	nResult = WideCharToMultiByte(CP_OEMCP, 0, &arrWData[0], nResult, &arrData[0], nResult, NULL, NULL);
 	if (nResult <= 0) return false;
 	arrData.resize(nResult);
+#endif
+
 	return true;
 }
 
@@ -51,7 +70,7 @@ eLikeUnicode LikeUnicode(const char *Buffer, int Size) {
 	return UNI_NONE;
 }
 
-bool FromUnicodeDetect(const char *Buffer, int Size, vector<char> &arrData, eLikeUnicode nDetect) {
+bool FromUnicodeDetect(const char *Buffer, int Size, vector<TCHAR> &arrData, eLikeUnicode nDetect) {
 	switch (nDetect) {
 	case UNI_LE:
 		return FromUnicodeLE(Buffer, Size, arrData);
@@ -63,7 +82,7 @@ bool FromUnicodeDetect(const char *Buffer, int Size, vector<char> &arrData, eLik
 	return false;
 }
 
-bool FromUnicodeSkipDetect(const char *Buffer, int Size, vector<char> &arrData, eLikeUnicode nDetect) {
+bool FromUnicodeSkipDetect(const char *Buffer, int Size, vector<TCHAR> &arrData, eLikeUnicode nDetect) {
 	switch (nDetect) {
 	case UNI_LE:
 		return FromUnicodeLE(Buffer+2, Size-2, arrData);
@@ -77,20 +96,20 @@ bool FromUnicodeSkipDetect(const char *Buffer, int Size, vector<char> &arrData, 
 
 //////////////////////////////////////////////////////////////////////////
 
-BOOL FindTextInBufferWithTable(const char *Buffer, int Size, string &TextUpcase, char *Table) {
+BOOL FindTextInBufferWithTable(const TCHAR *Buffer, int Size, tstring &TextUpcase, TCHAR *Table) {
 	return BMHSearch(Buffer, Size, TextUpcase.data(), TextUpcase.size(), Table) >= 0;
 }
 
 BOOL FindTextInBuffer(const char *Buffer, int Size, tstring &Text) {
 	if (Size == 0) return FALSE;
 
-	char *Table=(FCaseSensitive) ? NULL : UpCaseTable;
+	TCHAR *Table=(FCaseSensitive) ? NULL : UpCaseTable;
 
 //	Re-preparing BMH for the multi-text search
-	string TextUpcase = (FCaseSensitive) ? Text : UpCaseString(Text);
+	tstring TextUpcase = (FCaseSensitive) ? Text : UpCaseString(Text);
 	PrepareBMHSearch(TextUpcase.data(), TextUpcase.length());
 
-	vector<char> arrData;
+	vector<TCHAR> arrData;
 	eLikeUnicode nDetect = UNI_NONE;
 
 	nDetect = LikeUnicode(Buffer, Size);
@@ -99,13 +118,23 @@ BOOL FindTextInBuffer(const char *Buffer, int Size, tstring &Text) {
 		if (!FAllCharTables) return FALSE;
 	}
 
+#ifdef UNICODE
+	string OEMTextUpcase = OEMFromUnicode(TextUpcase);
+	char *OEMTable=(FCaseSensitive) ? NULL : UpCaseTableA;
+	PrepareBMHSearchA(OEMTextUpcase.data(), OEMTextUpcase.size());
+	if (BMHSearchA(Buffer, Size, OEMTextUpcase.data(), OEMTextUpcase.size(), OEMTable) >= 0) return TRUE;
+#else
 	if (FindTextInBufferWithTable(Buffer, Size, TextUpcase, Table)) return TRUE;
+#endif
+
+#ifndef UNICODE
 	if (!FAllCharTables) return FALSE;
 
 	for (size_t I=0; I<XLatTables.size(); I++) {
 		Table = (char *)((FCaseSensitive) ? XLatTables[I].DecodeTable : XLatTables[I].UpperDecodeTable);
 		if (FindTextInBufferWithTable(Buffer, Size, TextUpcase, Table)) return TRUE;
 	}
+#endif
 
 	// Restore initial
 	Table = (FCaseSensitive) ? NULL : UpCaseTable;
@@ -134,14 +163,21 @@ BOOL FindPlainText(const char *Buffer,int Size) {
 BOOL FindPattern(pcre *Pattern, pcre_extra *PatternExtra, const char *Buffer, int Size, eLikeUnicode nUni) {
 	if (Size == 0) return FALSE;
 
-	vector<char> arrData;
+	vector<TCHAR> arrData;
 	if ((nUni != UNI_NONE) && FromUnicodeDetect(Buffer, Size, arrData, nUni)) {
 		if ((arrData.size() > 0) && (do_pcre_exec(Pattern, PatternExtra, &arrData[0], arrData.size(), 0, 0, NULL, 0) >= 0)) return TRUE;
 		return FALSE;
 	}
 
+#ifdef UNICODE
+//	do_pcre_execA doesn't work since pattern is compiled as Unicode one
+	wstring wstrData = OEMToUnicode(string(Buffer, Size));
+	if (do_pcre_exec(Pattern, PatternExtra, wstrData.data(), wstrData.size(), 0, 0, NULL, 0) >= 0) return TRUE;
+#else
 	if (do_pcre_exec(Pattern, PatternExtra, Buffer, Size, 0, 0, NULL, 0) >= 0) return TRUE;
+#endif
 
+#ifndef UNICODE
 	if (FAllCharTables && !XLatTables.empty()) {
 		vector<char> SaveBuf(Size);
 		for (size_t I=0; I < XLatTables.size(); I++) {
@@ -150,7 +186,8 @@ BOOL FindPattern(pcre *Pattern, pcre_extra *PatternExtra, const char *Buffer, in
 			if (do_pcre_exec(Pattern, PatternExtra, &SaveBuf[0], Size, 0, 0, NULL, 0) >= 0) return TRUE;
 		}
 	}
-	
+#endif
+
 	return FALSE;
 }
 
