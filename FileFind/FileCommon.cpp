@@ -2,10 +2,10 @@
 #include "..\RESearch.h"
 
 #ifdef UNICODE
-BOOL CFSPresetCollection::EditPreset(CPreset *pPreset) { return FALSE; }
+//BOOL CFSPresetCollection::EditPreset(CPreset *pPreset) { return FALSE; }
 BOOL CFRPresetCollection::EditPreset(CPreset *pPreset) { return FALSE; }
 
-OperationResult FileSearchExecutor() { return OR_CANCEL; }
+//OperationResult FileSearchExecutor() { return OR_CANCEL; }
 OperationResult FileReplaceExecutor() { return OR_CANCEL; }
 #endif
 
