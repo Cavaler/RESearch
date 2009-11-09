@@ -736,6 +736,7 @@
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -791,7 +792,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				OutputFile="$(FAR_DEBUG_DLLS)\$(ProjectName)\$(ProjectName).dll"
+				OutputFile="$(FAR2_DEBUG_DLLS)\$(ProjectName)\$(ProjectName) $(PlatformName).dll"
 				Version="6.23"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -938,6 +939,7 @@
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
 			<Tool
@@ -998,7 +1000,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				OutputFile="$(ProjectName) $(PlatformName).dll"
+				OutputFile="$(ProjectName)U $(PlatformName).dll"
 				Version="6.23"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
