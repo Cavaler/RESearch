@@ -763,7 +763,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_CRT_SECURE_NO_WARNINGS"
-				RuntimeLibrary="3"
+				RuntimeLibrary="1"
 				StructMemberAlignment="4"
 				EnableFunctionLevelLinking="true"
 				RuntimeTypeInfo="true"
