@@ -250,6 +250,13 @@ enum eStringTable {
 	MTransSource,
 	MTransTarget,
 
+	MBtnREBuilder,
+	MREBuilder,
+	MRBSourceText,
+	MRBResultRE,
+	MRBReplaceText,
+	MRBResultText,
+
 	MAskReplace,
 	MAskWith,
 	MSearch,

@@ -202,6 +202,13 @@ MTransliterate		"Transliterate"					"Транслитерация"
 MTransSource		"Source characters"				"Исходные символы"
 MTransTarget		"Target characters"				"Результирующие символы"
 
+MBtnREBuilder		"RE Builder"					"RE Builder"
+MREBuilder			"RE Builder"					"RE Builder"
+MRBSourceText		"Source &text:"
+MRBResultRE			"Resulting &regexp:"
+MRBReplaceText		"Replace w&ith:"
+MRBResultText		"Resulting te&xt:"
+
 MAskReplace			"Replace"						"Заменить"
 MAskWith			"with"							"на"
 MSearch				"Search"						"&Искать"
