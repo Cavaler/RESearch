@@ -66,7 +66,7 @@ void UpdateStrings(HANDLE hDlg, sREData *pData) {
 	StartupInfo.SendDlgMessage(hDlg, DM_SETTEXTPTR, 8, (LONG_PTR)strResult.data());
 }
 
-long WINAPI REBuilderDialogProc(HANDLE hDlg, int nMsg, int nParam1, long lParam2) {
+LONG_PTR WINAPI REBuilderDialogProc(HANDLE hDlg, int nMsg, int nParam1, LONG_PTR lParam2) {
 	sREData *pData = (sREData *)StartupInfo.SendDlgMessage(hDlg, DM_GETDLGDATA, 0, 0);
 
 	switch (nMsg) {
@@ -257,9 +257,11 @@ void QuoteString(const TCHAR *Source, int Length, vector<tstring> &arrQuoted, in
 	tstring str;
 
 	if (Length>MaxWidth) {
-		str = _T("\"") + tstring(Source, (MaxWidth-5)/2) + _T("...") + tstring(Source + Length-(MaxWidth-5)/2) + _T("\"");
+//		str = _T("\"") + tstring(Source, (MaxWidth-5)/2) + _T("...") + tstring(Source + Length-(MaxWidth-5)/2) + _T("\"");
+		str = tstring(Source, (MaxWidth-5)/2) + _T("...") + tstring(Source + Length-(MaxWidth-5)/2);
 	} else {
-		str = _T("\"") + tstring(Source, Length) + _T("\"");
+//		str = _T("\"") + tstring(Source, Length) + _T("\"");
+		str = tstring(Source, Length);
 	}
 	arrQuoted.push_back(str);
 }
@@ -347,10 +349,10 @@ eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &
 		Dialog.AddFrame(MREReplace);
 		Dialog.Add(new CFarTextItem(-1, 2, 0, MAskReplace));
 		for (size_t I = 0; I<arrFound.size();I++)
-			Dialog.Add(new CFarTextItem(-1, 3 + I, 0, arrFound[I]));
+			Dialog.Add(new CFarTextItem(-1, 3 + I, DIF_SETCOLOR|0x30, arrFound[I]));
 		Dialog.Add(new CFarTextItem(-1, 3 + arrFound.size(), 0, MAskWith));
 		for (size_t I = 0; I<arrReplaced.size();I++)
-			Dialog.Add(new CFarTextItem(-1, 4 + arrFound.size() + I, 0, arrReplaced[I]));
+			Dialog.Add(new CFarTextItem(-1, 4 + arrFound.size() + I, DIF_SETCOLOR|0xB0, arrReplaced[I]));
 		Dialog.Add(new CFarButtonItem(0, 5 + TotalCount, DIF_CENTERGROUP|DIF_NOBRACKETS, TRUE, MReplace));
 		Dialog.Add(new CFarButtonItem(0, 5 + TotalCount, DIF_CENTERGROUP|DIF_NOBRACKETS, FALSE, MAll));
 		Dialog.Add(new CFarButtonItem(0, 5 + TotalCount, DIF_CENTERGROUP|DIF_NOBRACKETS, FALSE, MSkip));
