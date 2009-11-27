@@ -345,6 +345,8 @@ if regular expression search is selected.
   #Evaluate as script# Forces evaluating of a replace string as script in a specified language.
 For more information, see ~Replace Scripting~@RegularReplaceScripting@.
 
+  #RE Builder#         See ~RegExp Builder~@REBuilder@.
+
  For other options, see ~Regular Expression Search~@SearchDlg@.
 
 @FilterDlg
@@ -746,3 +748,15 @@ $ #UTF-8 converter#
 
   Pressing #û# near one of the three fields encode value in this field into both
 other fields.
+@REBuilder
+$ #RegExp Builder#
+  RegExp Builder allows you to make a regexp by marking up certain parts of a source
+text to be replaced with appropriate wildcard.
+
+  You can select appropriate part in #Source text# line, and see the resulting regexp
+in the next one.
+  Pressing #Enter# in the source line rememebers one part and allows marking another one.
+Pressing #Esc# clears all remembered parts. Note, that parts cannot overlap.
+
+  Also, you can type some #Replace with# text and see what results in replacing
+a source line with it.

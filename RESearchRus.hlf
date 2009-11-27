@@ -301,6 +301,9 @@ $ #Замена по регулярному выражению#
   #Удалить не совпавшие строки#
  Если нет совпадений в пределах строки, то удалить ее.
 
+  #RE Builder#
+ См. ~RegExp Builder~@REBuilder@.
+
  По другим опциям смотрите ~Поиск по регулярному выражению~@SearchDlg@.
 
  Следующие макрокоманды поддерживаются в строке замены:
@@ -763,3 +766,15 @@ $ #Конвертер UTF-8#
  Здесь вы можете производить преобразование некоторых строк между основным текстом, UTF-8 и шестнадцатеричным представлениями.
 
  Нажатие #√# около одного из трех полей перекодирует значение этого поля в двух остальных полях.
+@REBuilder
+$ #RegExp Builder#
+  RegExp Builder allows you to make a regexp by marking up certain parts of a source
+text to be replaced with appropriate wildcard.
+
+  You can select appropriate part in #Source text# line, and see the resulting regexp
+in the next one.
+  Pressing #Enter# in the source line rememebers one part and allows marking another one.
+Pressing #Esc# clears all remembered parts. Note, that parts cannot overlap.
+
+  Also, you can type some #Replace with# text and see what results in replacing
+a source line with it.
