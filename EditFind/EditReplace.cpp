@@ -39,6 +39,33 @@ struct sREData {
 	int      nCurrentPart;
 };
 
+tstring GetDialogText(HANDLE hDlg, int nItem) {
+#ifdef UNICODE
+	return (const wchar_t *)StartupInfo.SendDlgMessage(hDlg, DM_GETCONSTTEXTPTR, nItem, 0);
+#else
+	FarDialogItem Item;
+	StartupInfo.SendDlgMessage(hDlg, DM_GETDLGITEM, nItem, (LONG_PTR)&Item);
+	return Item.Data;
+#endif
+}
+
+void UpdateStrings(HANDLE hDlg, sREData *pData) {
+	tstring strSource = GetDialogText(hDlg, 2);
+	tstring strRE = BuildRE(strSource, pData->mapParts);
+	StartupInfo.SendDlgMessage(hDlg, DM_SETTEXTPTR, 4, (LONG_PTR)strRE.data());
+
+	pcre *re;
+	if (!PreparePattern(&re, NULL, strRE, ECaseSensitive)) return;
+
+	int nMatch = pcre_info(re, NULL, NULL)+1;
+	vector<int> arrMatch(nMatch*3);
+	if (pcre_exec(re, NULL, strSource.c_str(), strSource.length(), 0, 0, &arrMatch[0], nMatch*3) < 0) return;
+
+	tstring strReplace = GetDialogText(hDlg, 6);
+	tstring strResult = CreateReplaceString(strSource.c_str(), &arrMatch[0], nMatch, strReplace.c_str(), _T("\n"), NULL, -1);
+	StartupInfo.SendDlgMessage(hDlg, DM_SETTEXTPTR, 8, (LONG_PTR)strResult.data());
+}
+
 long WINAPI REBuilderDialogProc(HANDLE hDlg, int nMsg, int nParam1, long lParam2) {
 	sREData *pData = (sREData *)StartupInfo.SendDlgMessage(hDlg, DM_GETDLGDATA, 0, 0);
 
@@ -69,15 +96,8 @@ long WINAPI REBuilderDialogProc(HANDLE hDlg, int nMsg, int nParam1, long lParam2
 			} else {
 				pData->nCurrentPart = -1;
 			}
-#ifdef UNICODE
-			tstring strSource = (const wchar_t *)StartupInfo.SendDlgMessage(m_hDlg, DM_GETCONSTTEXTPTR, 2, 0);
-#else
-			FarDialogItem Item;
-			StartupInfo.SendDlgMessage(hDlg, DM_GETDLGITEM, 2, (LONG_PTR)&Item);
-			tstring strSource = Item.Data;
-#endif
-			tstring strRE = BuildRE(strSource, pData->mapParts);
-			StartupInfo.SendDlgMessage(hDlg, DM_SETTEXTPTR, 4, (LONG_PTR)strRE.data());
+
+			UpdateStrings(hDlg, pData);
 		}
 		break;
 	case DN_KEY:
@@ -108,7 +128,7 @@ bool RunREBuilder(tstring &strSearch, tstring &strReplace)
 	Dialog.Add(new CFarTextItem(5, 2, 0, MRBSourceText));
 	Dialog.Add(new CFarEditItem(5, 3, 70, DIF_HISTORY,_T("SearchText"), strSource));
 	Dialog.Add(new CFarTextItem(5, 4, 0, MRBResultRE));
-	Dialog.Add(new CFarEditItem(5, 5, 70, DIF_HISTORY,_T("RESearch.RBResultRE"), strRE));
+	Dialog.Add(new CFarEditItem(5, 5, 70, DIF_HISTORY|DIF_READONLY,_T("RESearch.RBResultRE"), strRE));
 	Dialog.Add(new CFarTextItem(5, 6, 0, MRBReplaceText));
 	Dialog.Add(new CFarEditItem(5, 7, 70, DIF_HISTORY,_T("ReplaceText"), strReplace));
 	Dialog.Add(new CFarTextItem(5, 8, 0, MRBResultText));
@@ -604,7 +624,9 @@ BOOL EditorReplace() {
 			RunExternalEditor(ReplaceText);
 			break;
 		case 8:
-			RunREBuilder(SearchText, ReplaceText);
+			if (RunREBuilder(SearchText, ReplaceText)) {
+				ERegExp = TRUE;
+			}
 			break;
 		case -1:
 			return FALSE;
