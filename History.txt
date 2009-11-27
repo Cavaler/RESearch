@@ -9,6 +9,10 @@ Planned:
 	* dialogprocs for disabling unneeded elements
 	* Disabling all special chars in Replace without Regexps
 
+Version 6.60 (27.11.2009)
+	! "RegExp Builder" available from Editor Replace (see help)
+    * Different background color for text in "Replace ... with ..." confirmations
+
 Version 6.50 (18.09.2009)
 	! Presets for File Search/Replace/Grep can link to Advanced presets
 	* Hotkeys in 'search in' list (thanks to HaRT)
