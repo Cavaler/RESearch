@@ -174,38 +174,39 @@ TCHAR ConvertCase(TCHAR C) {
 }
 #endif
 
-void AddChar(tstring &String, TCHAR C) {
-	String += ConvertCase(C);
-}
+template<class CHAR>
+class CStringOperations {
+public:
+	typedef basic_string<CHAR> cstring;
+	static int ctoi(const CHAR *sz);
+	static int cstrlen(const CHAR *sz);
+	static int csprintf_s(CHAR *sz, size_t count, const CHAR *szFormat, ...);
+	static CHAR *_T2(char *sz, wchar_t *wsz);
 
-void AddString(tstring &String, const TCHAR *Add, int Len) {
-	for (int I=0;I<Len;I++) String += ConvertCase(Add[I]);
+static void AddChar(cstring &String, CHAR c) {
+	String += (CHAR)ConvertCase(c);
 }
-
-int GetDelta(TCHAR *&String) {
+static void AddString(cstring &String, const CHAR *Add, int Len) {
+	for (int I=0;I<Len;I++) String += (CHAR)ConvertCase(Add[I]);
+}
+static int GetDelta(CHAR *&String) {
 	int Number=0;
 	BOOL Minus=FALSE;
 	String++;
 	if (*String=='-') {Minus=TRUE;String++;} else
-	if (*String=='+') {String++;}
-	while (*String) {
-		if (isdigit((unsigned char)*String)) Number=Number*10+(*String)-'0'; else
-			if (*String=='$') {String++;break;} else break;
-		String++;
-	}
-	String--;
-	return (Minus)?(-Number):Number;
+		if (*String=='+') {String++;}
+		while (*String) {
+			if (isdigit((unsigned char)*String)) Number=Number*10+(*String)-'0'; else
+				if (*String=='$') {String++;break;} else break;
+			String++;
+		}
+		String--;
+		return (Minus)?(-Number):Number;
 }
 
-bool GetNumber(const tstring &str, int &nValue) {
-	static CRegExp reNumber(_T("^[-+]?\\d+$"));
-	if (reNumber.Match(str)) {
-		nValue = _ttoi(str.c_str());
-		return true;
-	} else return false;
-}
+static bool GetNumber(const cstring &str, int &nValue);
 
-BOOL ExpandParameter(const TCHAR *Matched,tstring &String,tstring Param,int *Match,int Count,int *Numbers) {
+static BOOL ExpandParameter(const CHAR *Matched, cstring &String, const cstring &Param, int *Match, int Count, int *Numbers) {
 	int Number=0;
 	if (Param.size()==0) return TRUE;
 	if (isdigit((UTCHAR)Param[0])) {
@@ -218,15 +219,15 @@ BOOL ExpandParameter(const TCHAR *Matched,tstring &String,tstring Param,int *Mat
 			}
 			if ((Number >= Count) || (Match[Number*2] == -1)) return FALSE;
 
-			tstring strMatch = tstring(Matched+Match[Number*2], Match[Number*2+1]-Match[Number*2]);
+			cstring strMatch = cstring(Matched+Match[Number*2], Match[Number*2+1]-Match[Number*2]);
 			if ((nPos < Param.length()) && ((Param[nPos] == '+') || (Param[nPos] == '-'))) {
 				int nMatch, nAdd;
 				if (GetNumber(strMatch, nMatch) && GetNumber(Param.substr(nPos), nAdd)) {
 					int MinLen = 1;
 					if (Param.length() >= nPos+1) MinLen = Param.length() - nPos - 1;
 
-					TCHAR sz[16];
-					_stprintf_s(sz, 16, _T("%0*d"), MinLen, nMatch + nAdd);
+					CHAR sz[16];
+					csprintf_s(sz, 16, _T2("%0*d", L"%0*d"), MinLen, nMatch + nAdd);
 					strMatch = sz;
 				} else {
 					strMatch += Param.substr(nPos);
@@ -241,7 +242,7 @@ BOOL ExpandParameter(const TCHAR *Matched,tstring &String,tstring Param,int *Mat
 	int MinLen = 1;
 	if ((Param.size() >= 2) && ((Param[1]=='+') || (Param[1]=='-'))){
 		MinLen = Param.length()-2;
-		_stscanf(Param.c_str()+1, _T("%d"), &Number);
+		Number = ctoi(Param.c_str()+1);
 	}
 	switch (toupper(Param[0])) {
 	case 'L':Number+=Numbers[0];break;
@@ -249,17 +250,17 @@ BOOL ExpandParameter(const TCHAR *Matched,tstring &String,tstring Param,int *Mat
 	case 'R':Number+=Numbers[2];break;
 	default:return FALSE;
 	}
-	TCHAR S[16];
-	_stprintf_s(S, 16, _T("%0*d"), MinLen, Number);
-	AddString(String, S, _tcslen(S));
+	CHAR S[16];
+	csprintf_s(S, 16, _T2("%0*d", L"%0*d"), MinLen, Number);
+	AddString(String, S, cstrlen(S));
 	return TRUE;
 }
 
-tstring CreateReplaceString(const TCHAR *Matched,int *Match,int Count,const TCHAR *Replace,const TCHAR *EOL,int *Numbers,int Engine) {
+static cstring CreateReplaceString(const CHAR *Matched,int *Match,int Count,const CHAR *Replace,const CHAR *EOL,int *Numbers,int Engine) {
 	if ((Engine >= 0) && (Engine < (int)m_arrEngines.size()))
 		return EvaluateReplaceString(Matched, Match, Count, Replace, EOL, Numbers, Engine);
 
-	tstring String;
+	cstring String;
 	OneCaseConvert=CaseConvert=CCV_NONE;
 	while (*Replace) {
 		if (OneCaseConvert==CCV_NONE) OneCaseConvert=CaseConvert;
@@ -272,7 +273,7 @@ tstring CreateReplaceString(const TCHAR *Matched,int *Match,int Count,const TCHA
 			case 'b':AddChar(String,'\b');break;
 			case 'e':AddChar(String,'\x1B');break;
 			case 'f':AddChar(String,'\f');break;
-			case 'n':AddString(String,EOL,_tcslen(EOL));break;
+			case 'n':AddString(String,EOL,cstrlen(EOL));break;
 			case 'r':AddChar(String,'\r');break;
 			case 't':AddChar(String,'\t');break;
 			case 'v':AddChar(String,'\v');break;
@@ -285,7 +286,7 @@ tstring CreateReplaceString(const TCHAR *Matched,int *Match,int Count,const TCHA
 						Char=Char*8+(*Replace-'0');Replace++;
 					} else break;
 				}
-				Replace--;AddChar(String, Char);
+				Replace--;AddChar(String, (CHAR)Char);
 					 }
 			case 'x':{
 				int Char=0;Replace++;
@@ -297,7 +298,7 @@ tstring CreateReplaceString(const TCHAR *Matched,int *Match,int Count,const TCHA
 						Replace++;
 					} else break;
 				}
-				Replace--;AddChar(String, Char);break;
+				Replace--;AddChar(String, (CHAR)Char);break;
 					 }
 
 			case 'l':OneCaseConvert=CCV_LOWER;break;
@@ -316,13 +317,13 @@ tstring CreateReplaceString(const TCHAR *Matched,int *Match,int Count,const TCHA
 			if (Replace[1]=='{') {
 				while (Replace[I]&&(Replace[I]!='}')) I++;
 				TCHAR Save=Replace[I];
-				ExpandParameter(Matched,String,tstring(Replace+2,I-2),Match,Count,Numbers);
+				ExpandParameter(Matched,String,cstring(Replace+2,I-2),Match,Count,Numbers);
 				Replace+=I;
 				break;
 			}
 			while (isdigit((UTCHAR)Replace[I])) I++;
 			TCHAR Save=Replace[I];
-			ExpandParameter(Matched,String,tstring(Replace+1,I-1),Match,Count,Numbers);
+			ExpandParameter(Matched,String,cstring(Replace+1,I-1),Match,Count,Numbers);
 			Replace+=I-1;
 			break;
 				 }
@@ -333,7 +334,72 @@ tstring CreateReplaceString(const TCHAR *Matched,int *Match,int Count,const TCHA
 	return String;
 }
 
+};	//	CStringOperations
+
+template<> static bool CStringOperations<char>   ::GetNumber(const cstring &str, int &nValue) {
+	static CRegExp reNumber(_T("^[-+]?\\d+$"));
 #ifdef UNICODE
+	if (reNumber.Match(OEMToUnicode(str))) {
+#else
+	if (reNumber.Match(str)) {
+#endif
+		nValue = ctoi(str.c_str());
+		return true;
+	} else return false;
+}
+
+template<> static bool CStringOperations<wchar_t>::GetNumber(const cstring &str, int &nValue) {
+	static CRegExp reNumber(_T("^[-+]?\\d+$"));
+#ifdef UNICODE
+	if (reNumber.Match(str)) {
+#else
+	if (reNumber.Match(OEMFromUnicode(str))) {
+#endif
+		nValue = ctoi(str.c_str());
+		return true;
+	} else return false;
+}
+
+template<> static int CStringOperations<char>   ::ctoi(const char    *sz) { return  atoi(sz); }
+template<> static int CStringOperations<wchar_t>::ctoi(const wchar_t *sz) { return _wtoi(sz); }
+
+template<> static int CStringOperations<char>   ::cstrlen(const char   *sz)  { return strlen(sz); }
+template<> static int CStringOperations<wchar_t>::cstrlen(const wchar_t *sz) { return wcslen(sz); }
+
+template<> static int CStringOperations<char>   ::csprintf_s(char    *sz, size_t count, const char    *szFormat, ...) {
+	va_list vaList;
+	va_start(vaList, szFormat);
+	return vsprintf_s(sz, count, szFormat, vaList);
+}
+template<> static int CStringOperations<wchar_t>::csprintf_s(wchar_t *sz, size_t count, const wchar_t *szFormat, ...) {
+	va_list vaList;
+	va_start(vaList, szFormat);
+	return vswprintf_s(sz, count, szFormat, vaList);
+}
+
+template<> static char    * CStringOperations<char>   ::_T2(char *sz, wchar_t *wsz) { return  sz; }
+template<> static wchar_t * CStringOperations<wchar_t>::_T2(char *sz, wchar_t *wsz) { return wsz; }
+
+//////////////////////////////////////////////////////////////////////////
+
+tstring CreateReplaceString(const TCHAR *Matched,int *Match,int Count,const TCHAR *Replace,const TCHAR *EOL,int *Numbers,int Engine) {
+	return CStringOperations<TCHAR>::CreateReplaceString(Matched, Match, Count, Replace, EOL, Numbers, Engine);
+}
+
+#ifdef UNICODE
+
+string CreateReplaceString(const char *Matched,int *Match,int Count,const char *Replace,const char *EOL,int *Numbers,int Engine) {
+	return CStringOperations<char>::CreateReplaceString(Matched, Match, Count, Replace, EOL, Numbers, Engine);
+}
+
+string EvaluateReplaceString(const char *Matched,int *Match,int Count,const char *Replace,const char *EOL,int *Numbers,int Engine) {
+	wstring strEval = EvaluateReplaceString(
+		OEMToUnicode(Matched).c_str(), Match, Count,
+		OEMToUnicode(Replace).c_str(),
+		OEMToUnicode(EOL).c_str(), Numbers, Engine);
+
+	return OEMFromUnicode(strEval);
+}
 
 void PrepareLocaleStuff() {
 	for (int nChar=0;nChar<65536;nChar++) UpCaseTable[nChar]=nChar;

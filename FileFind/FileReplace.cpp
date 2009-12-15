@@ -109,14 +109,27 @@ BOOL ProcessPlainTextBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindD
 	HANDLE hFile=INVALID_HANDLE_VALUE;
 	int Count = 0;
 
+#ifdef UNICODE
+	string OEMTextUpcase = OEMFromUnicode(FTextUpcase);
+	char *Table=(FCaseSensitive) ? NULL : UpCaseTableA;
+#else
 	char *Table=(FCaseSensitive) ? NULL : UpCaseTable;
+#endif
 
 	while (Current+FText.size()<=Buffer+BufLen) {
+#ifdef UNICODE
+		int nPosition = BMHSearchA(Current, Buffer+BufLen-Current, OEMTextUpcase.data(), OEMTextUpcase.size(), Table);
+#else
 		int nPosition = BMHSearch(Current, Buffer+BufLen-Current, FTextUpcase.data(), FTextUpcase.size(), Table);
+#endif
 		if (nPosition < 0) break;
 		Current += nPosition;
 
+#ifdef UNICODE
+		string Replace = OEMFromUnicode(CreateReplaceString(NULL, NULL, 0, FRReplace.c_str(), _T("\n"), NULL, -1));
+#else
 		string Replace=CreateReplaceString(Buffer,NULL,0,FRReplace.c_str(),"\n",NULL,-1);
+#endif
 		if (!DoReplace(hFile,Current,FText.size(),Replace.c_str(),Replace.length(),Skip,Current-Skip,FindData,Count)) break;
 	}
 
@@ -136,8 +149,12 @@ BOOL ProcessRegExpBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindData
 		int Start=0;
 		Buffer=BufEnd;
 		SkipNoCRLF(BufEnd,&BufLen);
-		while ((BufEnd!=Buffer)&&do_pcre_exec(FPattern,FPatternExtra,Buffer,BufEnd-Buffer,Start,0,Match,MatchCount*3)>=0) {
+		while ((BufEnd!=Buffer)&&do_pcre_execA(FPattern,FPatternExtra,Buffer,BufEnd-Buffer,Start,0,Match,MatchCount*3)>=0) {
+#ifdef UNICODE
+			string Replace=CreateReplaceString(Buffer,Match,MatchCount,OEMFromUnicode(FRReplace).c_str(),"\n",NULL,-1);
+#else
 			string Replace=CreateReplaceString(Buffer,Match,MatchCount,FRReplace.c_str(),"\n",NULL,-1);
+#endif
 			const char *NewBuffer=Buffer+Match[0];
 			if (!DoReplace(hFile,NewBuffer,Match[1]-Match[0],Replace.c_str(),Replace.length(),Skip,NewBuffer-Skip,FindData,Count)) {
 				Error=TRUE;break;
@@ -169,10 +186,14 @@ BOOL ReplaceSeveralLineBuffer(HANDLE &hFile,const char *&Buffer,const char *BufE
 
 	SkipWholeLine(LineEnd,&LineLen);
 
-	while ((Buffer < BufEnd) && do_pcre_exec(FPattern,FPatternExtra,Buffer,BufEnd-Buffer,Start,0,Match,MatchCount*3)>=0) {
+	while ((Buffer < BufEnd) && do_pcre_execA(FPattern,FPatternExtra,Buffer,BufEnd-Buffer,Start,0,Match,MatchCount*3)>=0) {
 		const char *NewBuffer=Buffer+Match[0];
 		if (NewBuffer>=LineEnd) break;
+#ifdef UNICODE
+		string Replace=CreateReplaceString(Buffer,Match,MatchCount,OEMFromUnicode(FRReplace).c_str(),"\n",NULL,-1);
+#else
 		string Replace=CreateReplaceString(Buffer,Match,MatchCount,FRReplace.c_str(),"\n",NULL,-1);
+#endif
 		if (!DoReplace(hFile,NewBuffer,Match[1]-Match[0],Replace.c_str(),Replace.length(),Skip,NewBuffer-Skip,FindData,Count)) {
 			return FALSE;
 		}
@@ -219,7 +240,9 @@ BOOL ProcessSeveralLineBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *Fin
 BOOL ProcessBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindData) {
 	FRConfirmLineThisFile = FRConfirmLineThisRun;
 	FileConfirmed = !FRConfirmFileThisRun;
+#ifndef UNICODE
 	m_pReplaceTable = NULL;
+#endif
 	switch (FSearchAs) {
 	case SA_PLAINTEXT:	return ProcessPlainTextBuffer(Buffer,BufLen,FindData);
 	case SA_REGEXP:		return ProcessRegExpBuffer(Buffer,BufLen,FindData);
@@ -234,7 +257,7 @@ char *AddExtension(char *FileName,char *Extension) {
 }
 
 void ReplaceFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
-	string strBackupFileName;
+	tstring strBackupFileName;
 	BOOL ReturnValue=FALSE;
 
 	InitFoundPosition();
@@ -246,11 +269,11 @@ void ReplaceFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 	do {
 		strBackupFileName = FindData->cFileName;
 		if (nTry > 0) {
-			char szNum[8];
-			sprintf(szNum, ".%02d", nTry);
+			TCHAR szNum[8];
+			_stprintf_s(szNum, 8, _T(".%02d"), nTry);
 			strBackupFileName += szNum;
 		}
-		strBackupFileName += ".bak";
+		strBackupFileName += _T(".bak");
 
 		if (FRSaveOriginal && FROverwriteBackup) {
 			if (MoveFileEx(FindData->cFileName, strBackupFileName.c_str(), MOVEFILE_REPLACE_EXISTING)) {
@@ -267,8 +290,8 @@ void ReplaceFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 			}
 		}
 
-		const char *Lines[]={GetMsg(MREReplace),GetMsg(MFileCreateError),strBackupFileName.c_str(),GetMsg(MOk)};
-		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"FRBackupError",Lines,4,1);
+		const TCHAR *Lines[]={GetMsg(MREReplace),GetMsg(MFileCreateError),strBackupFileName.c_str(),GetMsg(MOk)};
+		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("FRBackupError"),Lines,4,1);
 		return;
 	} while (true);
 
@@ -284,8 +307,8 @@ void ReplaceFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 			MoveFile(strBackupFileName.c_str(),FindData->cFileName);
 		}
 	} else {
-		const char *Lines[]={GetMsg(MREReplace),GetMsg(MFileOpenError),FindData->cFileName,GetMsg(MOk)};
-		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"FSOpenError",Lines,4,1);
+		const TCHAR *Lines[]={GetMsg(MREReplace),GetMsg(MFileOpenError),FindData->cFileName,GetMsg(MOk)};
+		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("FSOpenError"),Lines,4,1);
 		return;
 	}
 }
@@ -315,7 +338,7 @@ int ReplacePrompt(BOOL Plugin) {
 	Dialog.Add(new CFarButtonItem(67,5,0,0,_T("&\\")));
 	Dialog.Add(new CFarButtonItem(67,7,0,0,_T("&/")));
 
-	Dialog.Add(new CFarTextItem(5,8,DIF_BOXCOLOR|DIF_SEPARATOR,""));
+	Dialog.Add(new CFarTextItem(5,8,DIF_BOXCOLOR|DIF_SEPARATOR, _T("")));
 	Dialog.Add(new CFarRadioButtonItem(5,9,DIF_GROUP,MPlainText,(int *)&FSearchAs,SA_PLAINTEXT));
 	Dialog.Add(new CFarRadioButtonItem(5,10,0,MRegExp,			 (int *)&FSearchAs,SA_REGEXP));
 	Dialog.Add(new CFarRadioButtonItem(5,11,0,MSeveralLineRegExp,(int *)&FSearchAs,SA_SEVERALLINE));
@@ -382,8 +405,8 @@ int ReplacePrompt(BOOL Plugin) {
 }
 
 OperationResult FileReplace(panelitem_vector &PanelItems, BOOL ShowDialog, BOOL bSilent) {
-	PanelInfo PInfo;
-	StartupInfo.Control(INVALID_HANDLE_VALUE,FCTL_GETPANELINFO,&PInfo);
+	CPanelInfo PInfo;
+	PInfo.GetInfo(false);
 	if (PInfo.PanelType!=PTYPE_FILEPANEL) return OR_FAILED;
 	if (PInfo.Plugin&&((PInfo.Flags&PFLAGS_REALNAMES)==0)) return OR_FAILED;
 
@@ -427,7 +450,7 @@ BOOL CFRPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.Add(new CFarTextItem(5,8,0,MReplaceWith));
 	Dialog.Add(new CFarEditItem(5,9,70,DIF_HISTORY|DIF_VAREDIT,_T("ReplaceText"), pPreset->m_mapStrings["Replace"]));
 
-	Dialog.Add(new CFarTextItem(5,10,DIF_BOXCOLOR|DIF_SEPARATOR,(char *)NULL));
+	Dialog.Add(new CFarTextItem(5,10,DIF_BOXCOLOR|DIF_SEPARATOR,_T("")));
 
 	int *pSearchAs = &pPreset->m_mapInts["SearchAs"];
 	int  nAdvancedID = pPreset->m_mapInts["AdvancedID"];
