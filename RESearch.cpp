@@ -38,7 +38,7 @@ void BadCmdLine() {
 	StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("REInvalidCmdLine"),Lines,3,1);
 }
 
-BOOL ProcessFFLine(TCHAR *Line, BOOL *ShowDialog, int *Item) {
+BOOL ProcessFFLine(TCHAR *Line, BOOL *ShowDialog, INT_PTR *Item) {
 	TCHAR Switch=Line[0];
 	if (!Switch) {BadCmdLine();return FALSE;}
 	Line++;*ShowDialog=FALSE;*Item=0;
@@ -89,7 +89,7 @@ BOOL ProcessFFLine(TCHAR *Line, BOOL *ShowDialog, int *Item) {
 	return TRUE;
 }
 
-BOOL ProcessFRLine(TCHAR *Line,BOOL *ShowDialog,int *Item) {
+BOOL ProcessFRLine(TCHAR *Line,BOOL *ShowDialog,INT_PTR *Item) {
 	TCHAR Switch=Line[0];
 	if (!Switch) {BadCmdLine();return FALSE;}
 	Line++;*ShowDialog=FALSE;*Item=1;
@@ -150,7 +150,7 @@ BOOL ProcessFRLine(TCHAR *Line,BOOL *ShowDialog,int *Item) {
 	return TRUE;
 }
 
-BOOL ProcessRNLine(TCHAR *Line,BOOL *ShowDialog,int *Item) {
+BOOL ProcessRNLine(TCHAR *Line,BOOL *ShowDialog,INT_PTR *Item) {
 	TCHAR Switch=Line[0];
 	if (!Switch) {BadCmdLine();return FALSE;}
 	Line++;*ShowDialog=FALSE;*Item=7;
@@ -204,7 +204,7 @@ BOOL ProcessRNLine(TCHAR *Line,BOOL *ShowDialog,int *Item) {
 	return TRUE;
 }
 
-BOOL ProcessQRLine(TCHAR *Line,BOOL *ShowDialog,int *Item) {
+BOOL ProcessQRLine(TCHAR *Line,BOOL *ShowDialog,INT_PTR *Item) {
 	TCHAR Switch=Line[0];
 	if (!Switch) {BadCmdLine();return FALSE;}
 	Line++;*ShowDialog=FALSE;*Item=8;
@@ -243,7 +243,7 @@ BOOL ProcessQRLine(TCHAR *Line,BOOL *ShowDialog,int *Item) {
 	return TRUE;
 }
 
-BOOL ProcessCommandLine(TCHAR *Line,BOOL *ShowDialog,int *Item) {
+BOOL ProcessCommandLine(TCHAR *Line,BOOL *ShowDialog,INT_PTR *Item) {
 //	f?:/mask/findtext/options
 //	f?:/mask/findtext/replacetext/options
 //	f?: FindText
@@ -595,7 +595,7 @@ HANDLE OpenPluginFromViewerMenu(int Item) {
 #ifdef UNICODE
 HANDLE WINAPI OpenPluginW(int OpenFrom, INT_PTR Item) {
 #else
-HANDLE WINAPI OpenPlugin(int OpenFrom, int Item) {
+HANDLE WINAPI OpenPlugin(int OpenFrom, INT_PTR Item) {
 #endif
 	BOOL ShowDialog = TRUE;
 	g_bFromCmdLine = false;

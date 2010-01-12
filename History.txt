@@ -9,9 +9,14 @@ Planned:
 	* dialogprocs for disabling unneeded elements
 	* Disabling all special chars in Replace without Regexps
 
+Version 7.00 beta 1 (12.01.2010)
+	! Test release of Unicode version
+	KNOWN ISSUES:
+		[\W] does not work properly
+
 Version 6.60 (27.11.2009)
 	! "RegExp Builder" available from Editor Replace (see help)
-    * Different background color for text in "Replace ... with ..." confirmations
+	* Different background color for text in "Replace ... with ..." confirmations
 
 Version 6.50 (18.09.2009)
 	! Presets for File Search/Replace/Grep can link to Advanced presets
@@ -47,8 +52,8 @@ Version 6.41 (20.05.2009)
 
 Version 6.40 (19.05.2009)
 	- 'Confirm each file' removed from 'Rename selected files'
-    - Symbol '|' escaped when using 'Quote special symbols' button
-    + Experimental x64 version
+	- Symbol '|' escaped when using 'Quote special symbols' button
+	+ Experimental x64 version
 
 Version 6.39 (06.04.2009)
 	- 'Cancel' in 'Rename selected files' prompt works correctly
@@ -69,7 +74,7 @@ Version 6.36 (04.09.2008)
 
 Version 6.35 (12.08.2008)
 	+ If file has Unicode signature, it is always scanned (FileSearch only) as Unicode
-	    regardless of "Use All CharTables" option
+		regardless of "Use All CharTables" option
 	- "[X] Use all character tables" rewritten, should work better for Unicode
 	- Multi-text/regexp searches fixed. But - does anyone need them?
 
