@@ -2452,43 +2452,11 @@
 					Name="VCCustomBuildTool"
 					Description="Compiling language file $(InputPath)..."
 					CommandLine="$(COMSPEC) /c ..\MakeLng.bat&#x0D;&#x0A;echo Copying resulting language files...&#x0D;&#x0A;copy *.lng &quot;$(FAR_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;"
-					Outputs="$(TargetName)Eng.lng;$(TargetName)Rus.lng"
+					Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
 				/>
 			</FileConfiguration>
 			<FileConfiguration
 				Name="Release Intel|Win32"
-				ExcludedFromBuild="true"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release Intel|x64"
-				ExcludedFromBuild="true"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release|Win32"
-				ExcludedFromBuild="true"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release|x64"
-				ExcludedFromBuild="true"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Debug Unicode|Win32"
 				ExcludedFromBuild="true"
 				>
 				<Tool
@@ -2499,14 +2467,57 @@
 				/>
 			</FileConfiguration>
 			<FileConfiguration
-				Name="Debug Unicode|x64"
+				Name="Release Intel|x64"
 				ExcludedFromBuild="true"
 				>
 				<Tool
 					Name="VCCustomBuildTool"
 					Description="Compiling language file $(InputPath)..."
 					CommandLine="$(COMSPEC) /c ..\MakeLng.bat&#x0D;&#x0A;echo Copying resulting language files...&#x0D;&#x0A;copy *.lng &quot;$(FAR_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;"
-					Outputs="$(TargetName)Eng.lng;$(TargetName)Rus.lng"
+					Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				ExcludedFromBuild="true"
+				>
+				<Tool
+					Name="VCCustomBuildTool"
+					Description="Compiling language file $(InputPath)..."
+					CommandLine="$(COMSPEC) /c ..\MakeLng.bat&#x0D;&#x0A;echo Copying resulting language files...&#x0D;&#x0A;copy *.lng &quot;$(FAR_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;"
+					Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|x64"
+				ExcludedFromBuild="true"
+				>
+				<Tool
+					Name="VCCustomBuildTool"
+					Description="Compiling language file $(InputPath)..."
+					CommandLine="$(COMSPEC) /c ..\MakeLng.bat&#x0D;&#x0A;echo Copying resulting language files...&#x0D;&#x0A;copy *.lng &quot;$(FAR_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;"
+					Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Debug Unicode|Win32"
+				>
+				<Tool
+					Name="VCCustomBuildTool"
+					Description="Compiling language file $(InputPath)..."
+					CommandLine="$(COMSPEC) /c ..\MakeLng.bat&#x0D;&#x0A;echo Copying resulting language files...&#x0D;&#x0A;copy *.lng &quot;$(FAR2_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;"
+					Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Debug Unicode|x64"
+				ExcludedFromBuild="true"
+				>
+				<Tool
+					Name="VCCustomBuildTool"
+					Description="Compiling language file $(InputPath)..."
+					CommandLine="$(COMSPEC) /c ..\MakeLng.bat&#x0D;&#x0A;echo Copying resulting language files...&#x0D;&#x0A;copy *.lng &quot;$(FAR2_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;"
+					Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
 				/>
 			</FileConfiguration>
 			<FileConfiguration
@@ -2515,6 +2526,9 @@
 				>
 				<Tool
 					Name="VCCustomBuildTool"
+					Description="Compiling language file $(InputPath)..."
+					CommandLine="$(COMSPEC) /c ..\MakeLng.bat&#x0D;&#x0A;echo Copying resulting language files...&#x0D;&#x0A;copy *.lng &quot;$(FAR2_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;"
+					Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
 				/>
 			</FileConfiguration>
 			<FileConfiguration
@@ -2523,6 +2537,9 @@
 				>
 				<Tool
 					Name="VCCustomBuildTool"
+					Description="Compiling language file $(InputPath)..."
+					CommandLine="$(COMSPEC) /c ..\MakeLng.bat&#x0D;&#x0A;echo Copying resulting language files...&#x0D;&#x0A;copy *.lng &quot;$(FAR2_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;"
+					Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
 				/>
 			</FileConfiguration>
 		</File>
