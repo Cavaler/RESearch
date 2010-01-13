@@ -731,12 +731,8 @@ int ConfigureCP() {
 }
 #endif
 
-int ConfigureCommon() {
-#ifdef UNICODE
-	CFarDialog Dialog(60,20,_T("CommonConfig"));
-#else
+void ConfigureCommon() {
 	CFarDialog Dialog(60,17,_T("CommonConfig"));
-#endif
 	Dialog.AddFrame(MCommonSettings);
 
 	Dialog.Add(new CFarTextItem(5,3,0,MSeveralLinesIs));
@@ -755,36 +751,16 @@ int ConfigureCommon() {
 
 	Dialog.Add(new CFarCheckBoxItem(5,11,0,MShowUsageWarnings,&g_bShowUsageWarnings));
 
-#ifdef UNICODE
-	Dialog.Add(new CFarTextItem(5,13,0,MDefaultCP));
-	Dialog.Add(new CFarRadioButtonItem(35,13,0,MDefaultOEM,&g_bDefaultOEM,TRUE));
-	Dialog.Add(new CFarRadioButtonItem(45,13,0,MDefaultANSI,&g_bDefaultOEM,FALSE));
-	Dialog.Add(new CFarTextItem(5,14,0,MAllCPInclude));
-	Dialog.Add(new CFarButtonItem(35,14,0,FALSE,MAllCPSelect));
-
 	Dialog.AddButtons(MOk,MCancel);
-	do {
-		int nResult = Dialog.Display(2, -2, -3);
-
-		switch (nResult) {
-		case 0:
-			return 0;
-		case 1:
-			ConfigureCP();
-			break;
-		default:
-			return -1;
-		}
-	} while (true);
-
-#else
-	Dialog.AddButtons(MOk,MCancel);
-	return Dialog.Display(-1);
-#endif
+	Dialog.Display(-1);
 }
 
 void ConfigureFile() {
+#ifdef UNICODE
+	CFarDialog Dialog(70, 26, _T("FileConfig"));
+#else
 	CFarDialog Dialog(70, 23, _T("FileConfig"));
+#endif
 	Dialog.AddFrame(MFileSearchSettings);
 
 	Dialog.Add(new CFarBoxItem(FALSE,5,3,33,7,DIF_LEFTTEXT,MDefaultMaskCase));
@@ -812,8 +788,30 @@ void ConfigureFile() {
 	Dialog.Add(new CFarCheckBoxItem(5,16,0,MSkipSystemFolders,&FASkipSystemFolders));
 	Dialog.Add(new CFarEditItem(9, 17, 45, DIF_HISTORY,_T("RESearch.SystemFolders"), FASystemFolders));
 
+#ifdef UNICODE
+	Dialog.Add(new CFarTextItem(5,19,0,MDefaultCP));
+	Dialog.Add(new CFarRadioButtonItem(35,19,0,MDefaultOEM,&g_bDefaultOEM,TRUE));
+	Dialog.Add(new CFarRadioButtonItem(45,19,0,MDefaultANSI,&g_bDefaultOEM,FALSE));
+	Dialog.Add(new CFarTextItem(5,20,0,MAllCPInclude));
+	Dialog.Add(new CFarButtonItem(35,20,0,FALSE,MAllCPSelect));
+
+	Dialog.AddButtons(MOk,MCancel);
+	do {
+		int nResult = Dialog.Display(2, -2, -3);
+
+		switch (nResult) {
+		case 1:
+			ConfigureCP();
+			break;
+		default:
+			return;
+		}
+	} while (true);
+
+#else
 	Dialog.AddButtons(MOk,MCancel);
 	Dialog.Display(-1);
+#endif
 }
 
 void ConfigureEditor() {
