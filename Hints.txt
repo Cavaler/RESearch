@@ -18,3 +18,12 @@ so '\r?\n' is good for most cases.
 - If '[ ] Dot matches newline also' is not set, you can use '\C' as 'Any symbol including newline'
 
 - If zero-width string is found, characters surrounding it are highlighted
+
+- If If UTF-16LE/BE or UTF-8 byte-order mark (BOM) is found in Search/Grep, no other encodings are tried!
+
+- Without [ ] Use all character tables, search/grep from panel is performed:
+  1. if BOM is found, that encoding is used
+  2. In ANSI version, OEM codepage is used
+  3. In Unicode version, codepage selected as default is used (OEM or ANSI)
+
+- In Replace from panels, only OEM/default CP is used.

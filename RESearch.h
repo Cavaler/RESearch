@@ -16,6 +16,8 @@
 
 enum OperationResult {OR_CANCEL,OR_FAILED,OR_OK,OR_PANEL};
 
+//	#define TRY_ENCODINGS_WITH_BOM
+
 #include "Presets.h"
 
 #ifdef DEFINE_VARS

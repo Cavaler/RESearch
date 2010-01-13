@@ -113,9 +113,15 @@ BOOL FindTextInBuffer(const char *Buffer, int Size, tstring &Text) {
 	eLikeUnicode nDetect = UNI_NONE;
 
 	nDetect = LikeUnicode(Buffer, Size);
-	if ((nDetect != UNI_NONE) && FromUnicodeSkipDetect(Buffer, Size, arrData, nDetect)) {
-		if ((arrData.size() > 0) && FindTextInBufferWithTable(&arrData[0], arrData.size(), TextUpcase, Table)) return TRUE;
+	if (nDetect != UNI_NONE) {
+		if (FromUnicodeSkipDetect(Buffer, Size, arrData, nDetect)) {
+			if ((arrData.size() > 0) && FindTextInBufferWithTable(&arrData[0], arrData.size(), TextUpcase, Table)) return TRUE;
+		}
+#ifdef TRY_ENCODINGS_WITH_BOM
 		if (!FAllCharTables) return FALSE;
+#else
+		return FALSE;
+#endif
 	}
 
 #ifdef UNICODE
@@ -154,27 +160,26 @@ BOOL FindTextInBuffer(const char *Buffer, int Size, tstring &Text) {
 	// Restore initial
 	Table = (FCaseSensitive) ? NULL : UpCaseTable;
 
-	if (nDetect == UNI_NONE) {		// No signature, but anyway Unicode?
-		if (FromUnicodeLE(Buffer, Size, arrData)
+	// No signature, but anyway Unicode?
+	if (FromUnicodeLE(Buffer, Size, arrData)
 #ifdef UNICODE
-			&& (g_setAllCPs.find(CP_UNICODE) != g_setAllCPs.end())
+		&& (g_setAllCPs.find(CP_UNICODE) != g_setAllCPs.end())
 #endif
-			) {
-			if ((arrData.size() > 0) && FindTextInBufferWithTable(&arrData[0], arrData.size(), TextUpcase, Table)) return TRUE;
-		}
-		if (FromUnicodeBE(Buffer, Size, arrData)
-#ifdef UNICODE
-			&& (g_setAllCPs.find(CP_REVERSEBOM) != g_setAllCPs.end())
-#endif
-			) {
-			if ((arrData.size() > 0) && FindTextInBufferWithTable(&arrData[0], arrData.size(), TextUpcase, Table)) return TRUE;
-		}
-#ifndef UNICODE
-		if (FromUTF8(Buffer, Size, arrData)) {
-			if ((arrData.size() > 0) && FindTextInBufferWithTable(&arrData[0], arrData.size(), TextUpcase, Table)) return TRUE;
-		}
-#endif
+		) {
+		if ((arrData.size() > 0) && FindTextInBufferWithTable(&arrData[0], arrData.size(), TextUpcase, Table)) return TRUE;
 	}
+	if (FromUnicodeBE(Buffer, Size, arrData)
+#ifdef UNICODE
+		&& (g_setAllCPs.find(CP_REVERSEBOM) != g_setAllCPs.end())
+#endif
+		) {
+		if ((arrData.size() > 0) && FindTextInBufferWithTable(&arrData[0], arrData.size(), TextUpcase, Table)) return TRUE;
+	}
+#ifndef UNICODE
+	if (FromUTF8(Buffer, Size, arrData)) {
+		if ((arrData.size() > 0) && FindTextInBufferWithTable(&arrData[0], arrData.size(), TextUpcase, Table)) return TRUE;
+	}
+#endif
 
 	return FALSE;
 }
@@ -189,27 +194,59 @@ BOOL FindPattern(pcre *Pattern, pcre_extra *PatternExtra, const char *Buffer, in
 	if (Size == 0) return FALSE;
 
 	vector<TCHAR> arrData;
-	if ((nUni != UNI_NONE) && FromUnicodeDetect(Buffer, Size, arrData, nUni)) {
-		if ((arrData.size() > 0) && (do_pcre_exec(Pattern, PatternExtra, &arrData[0], arrData.size(), 0, 0, NULL, 0) >= 0)) return TRUE;
+	if (nUni != UNI_NONE) {
+		if (FromUnicodeDetect(Buffer, Size, arrData, nUni)) {
+			if ((arrData.size() > 0) && (do_pcre_exec(Pattern, PatternExtra, &arrData[0], arrData.size(), 0, 0, NULL, 0) >= 0)) return TRUE;
+		}
 		return FALSE;
 	}
 
 #ifdef UNICODE
 //	do_pcre_execA doesn't work since pattern is compiled as Unicode one
-	wstring wstrData = OEMToUnicode(string(Buffer, Size));
+	string strData(Buffer, Size);
+	wstring wstrData = DefToUnicode(strData);
 	if (do_pcre_exec(Pattern, PatternExtra, wstrData.data(), wstrData.size(), 0, 0, NULL, 0) >= 0) return TRUE;
 #else
 	if (do_pcre_exec(Pattern, PatternExtra, Buffer, Size, 0, 0, NULL, 0) >= 0) return TRUE;
 #endif
 
+	if (!FAllCharTables) return FALSE;
+
+#ifdef UNICODE
+	for (cp_set::iterator it = g_setAllCPs.begin(); it != g_setAllCPs.end(); it++) {
+		UINT nCP = *it;
+		if (nCP == (g_bDefaultOEM ? GetOEMCP() : GetACP())) continue;
+		if ((nCP == CP_UNICODE) || (nCP == CP_REVERSEBOM)) continue;
+
+		wstring wstrData = StrToUnicode(strData, nCP);
+		if (do_pcre_exec(Pattern, PatternExtra, wstrData.data(), wstrData.size(), 0, 0, NULL, 0) >= 0) return TRUE;
+	}
+#else
+	vector<char> SaveBuf(Size);
+	for (size_t I=0; I < XLatTables.size(); I++) {
+		memmove(&SaveBuf[0], Buffer, Size);
+		XLatBuffer((BYTE *)&SaveBuf[0], Size, I);
+		if (do_pcre_exec(Pattern, PatternExtra, &SaveBuf[0], Size, 0, 0, NULL, 0) >= 0) return TRUE;
+	}
+#endif
+
+	if ((nUni != UNI_LE) && FromUnicodeLE(Buffer, Size, arrData)
+#ifdef UNICODE
+		&& (g_setAllCPs.find(CP_UNICODE) != g_setAllCPs.end())
+#endif
+		) {
+		if ((arrData.size() > 0) && (do_pcre_exec(Pattern, PatternExtra, &arrData[0], arrData.size(), 0, 0, NULL, 0) >= 0)) return TRUE;
+	}
+	if ((nUni != UNI_BE) && FromUnicodeBE(Buffer, Size, arrData)
+#ifdef UNICODE
+		&& (g_setAllCPs.find(CP_REVERSEBOM) != g_setAllCPs.end())
+#endif
+		) {
+			if ((arrData.size() > 0) && (do_pcre_exec(Pattern, PatternExtra, &arrData[0], arrData.size(), 0, 0, NULL, 0) >= 0)) return TRUE;
+	}
 #ifndef UNICODE
-	if (FAllCharTables && !XLatTables.empty()) {
-		vector<char> SaveBuf(Size);
-		for (size_t I=0; I < XLatTables.size(); I++) {
-			memmove(&SaveBuf[0], Buffer, Size);
-			XLatBuffer((BYTE *)&SaveBuf[0], Size, I);
-			if (do_pcre_exec(Pattern, PatternExtra, &SaveBuf[0], Size, 0, 0, NULL, 0) >= 0) return TRUE;
-		}
+	if ((nUni != UNI_UTF8) && FromUTF8(Buffer, Size, arrData)) {
+		if ((arrData.size() > 0) && (do_pcre_exec(Pattern, PatternExtra, &arrData[0], arrData.size(), 0, 0, NULL, 0) >= 0)) return TRUE;
 	}
 #endif
 
@@ -259,23 +296,27 @@ BOOL FindMultiLineRegExpWithEncoding(const char *Buffer, int Size, eLikeUnicode 
 	return FindPattern(FPattern, FPatternExtra, Buffer, Size, nUni);
 }
 
-BOOL FindExamineEncoding(const char *Buffer, int Size, BOOL (*Searcher)(const char *,int,eLikeUnicode)) {
+BOOL FindExamineEncoding(const char *Buffer, int Size, BOOL (*Searcher)(const char *, int, eLikeUnicode)) {
 	eLikeUnicode nDetect = UNI_NONE;
 
 	nDetect = LikeUnicode(Buffer, Size);
 	if (nDetect != UNI_NONE) {
 		int nSkip = (nDetect == UNI_UTF8) ? 3 : 2;
 		if (Searcher(Buffer+nSkip, Size-nSkip, nDetect)) return TRUE;
+#ifdef TRY_ENCODINGS_WITH_BOM
 		if (!FAllCharTables) return FALSE;
+#else
+		return FALSE;
+#endif
 	}
 
 	// Checking existing chartables is per-line
 	if (Searcher(Buffer, Size, UNI_NONE)) return TRUE;
 
-	if (FAllCharTables && (nDetect == UNI_NONE)) {		// No signature, but anyway Unicode?
-		if (Searcher(Buffer, Size, UNI_LE)) return TRUE;
-		if (Searcher(Buffer, Size, UNI_BE)) return TRUE;
-		if (Searcher(Buffer, Size, UNI_UTF8)) return TRUE;
+	if (FAllCharTables) {		// No signature, but anyway Unicode?
+		if ((nDetect != UNI_LE)   && Searcher(Buffer, Size, UNI_LE))   return TRUE;
+		if ((nDetect != UNI_BE)   && Searcher(Buffer, Size, UNI_BE))   return TRUE;
+		if ((nDetect != UNI_UTF8) && Searcher(Buffer, Size, UNI_UTF8)) return TRUE;
 	}
 
 	return FALSE;

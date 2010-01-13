@@ -19,6 +19,7 @@ void ReadRegistry() {
 #define DECLARE_PERSIST_LOAD hKey
 #include "PersistVars.h"
 
+#ifdef UNICODE
 	vector<BYTE> arrCPs;
 	QueryRegBinaryValue(hKey, _T("AllCP"), arrCPs);
 	if (arrCPs.empty()) {
@@ -32,6 +33,7 @@ void ReadRegistry() {
 			g_setAllCPs.insert(*dwPtr);
 		}
 	}
+#endif
 
 	EReadRegistry(hKey);
 	VReadRegistry(hKey);
@@ -53,10 +55,12 @@ void WriteRegistry() {
 #define DECLARE_PERSIST_SAVE hKey
 #include "PersistVars.h"
 
+#ifdef UNICODE
 	vector<DWORD> arrCPs;
 	for (cp_set::iterator it = g_setAllCPs.begin(); it != g_setAllCPs.end(); it++)
 		arrCPs.push_back(*it);
 	SetRegBinaryValue(hKey, _T("AllCP"), arrCPs.empty() ? NULL : &arrCPs[0], arrCPs.size()*sizeof(DWORD));
+#endif
 
 	EWriteRegistry(hKey);
 	VWriteRegistry(hKey);
