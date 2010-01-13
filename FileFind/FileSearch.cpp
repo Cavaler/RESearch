@@ -119,17 +119,32 @@ BOOL FindTextInBuffer(const char *Buffer, int Size, tstring &Text) {
 	}
 
 #ifdef UNICODE
-	string OEMTextUpcase = OEMFromUnicode(TextUpcase);
-	char *OEMTable=(FCaseSensitive) ? NULL : UpCaseTableA;
-	PrepareBMHSearchA(OEMTextUpcase.data(), OEMTextUpcase.size());
-	if (BMHSearchA(Buffer, Size, OEMTextUpcase.data(), OEMTextUpcase.size(), OEMTable) >= 0) return TRUE;
+	if (FCanUseDefCP) {
+		string OEMTextUpcase = DefFromUnicode(TextUpcase);
+		char *OEMTable=(FCaseSensitive) ? NULL : GetUpCaseTable(-1);
+		PrepareBMHSearchA(OEMTextUpcase.data(), OEMTextUpcase.size());
+		if (BMHSearchA(Buffer, Size, OEMTextUpcase.data(), OEMTextUpcase.size(), OEMTable) >= 0) return TRUE;
+	}
 #else
 	if (FindTextInBufferWithTable(Buffer, Size, TextUpcase, Table)) return TRUE;
 #endif
 
-#ifndef UNICODE
 	if (!FAllCharTables) return FALSE;
 
+#ifdef UNICODE
+	for (cp_set::iterator it = g_setAllCPs.begin(); it != g_setAllCPs.end(); it++) {
+		UINT nCP = *it;
+		if (nCP == (g_bDefaultOEM ? GetOEMCP() : GetACP())) continue;
+		if ((nCP == CP_UNICODE) || (nCP == CP_REVERSEBOM)) continue;
+
+		string strTextUpcase = StrFromUnicode(TextUpcase, nCP);
+		if (StrToUnicode(strTextUpcase, nCP) != TextUpcase) continue;
+
+		char *szTable=(FCaseSensitive) ? NULL : GetUpCaseTable(nCP);
+		PrepareBMHSearchA(strTextUpcase.data(), strTextUpcase.size());
+		if (BMHSearchA(Buffer, Size, strTextUpcase.data(), strTextUpcase.size(), szTable) >= 0) return TRUE;
+	}
+#else
 	for (size_t I=0; I<XLatTables.size(); I++) {
 		Table = (char *)((FCaseSensitive) ? XLatTables[I].DecodeTable : XLatTables[I].UpperDecodeTable);
 		if (FindTextInBufferWithTable(Buffer, Size, TextUpcase, Table)) return TRUE;
@@ -140,15 +155,25 @@ BOOL FindTextInBuffer(const char *Buffer, int Size, tstring &Text) {
 	Table = (FCaseSensitive) ? NULL : UpCaseTable;
 
 	if (nDetect == UNI_NONE) {		// No signature, but anyway Unicode?
-		if (FromUnicodeLE(Buffer, Size, arrData)) {
+		if (FromUnicodeLE(Buffer, Size, arrData)
+#ifdef UNICODE
+			&& (g_setAllCPs.find(CP_UNICODE) != g_setAllCPs.end())
+#endif
+			) {
 			if ((arrData.size() > 0) && FindTextInBufferWithTable(&arrData[0], arrData.size(), TextUpcase, Table)) return TRUE;
 		}
-		if (FromUnicodeBE(Buffer, Size, arrData)) {
+		if (FromUnicodeBE(Buffer, Size, arrData)
+#ifdef UNICODE
+			&& (g_setAllCPs.find(CP_REVERSEBOM) != g_setAllCPs.end())
+#endif
+			) {
 			if ((arrData.size() > 0) && FindTextInBufferWithTable(&arrData[0], arrData.size(), TextUpcase, Table)) return TRUE;
 		}
+#ifndef UNICODE
 		if (FromUTF8(Buffer, Size, arrData)) {
 			if ((arrData.size() > 0) && FindTextInBufferWithTable(&arrData[0], arrData.size(), TextUpcase, Table)) return TRUE;
 		}
+#endif
 	}
 
 	return FALSE;

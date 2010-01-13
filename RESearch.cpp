@@ -701,7 +701,7 @@ int ConfigureCP() {
 	int nBreakKeys[] = {VK_INSERT, 0};
 	int nBreakCode;
 
-	set<int> setCPs = g_setAllCPs;
+	cp_set setCPs = g_setAllCPs;
 
 	int nItem = 0;
 	do {

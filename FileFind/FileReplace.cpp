@@ -111,7 +111,7 @@ BOOL ProcessPlainTextBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindD
 
 #ifdef UNICODE
 	string OEMTextUpcase = DefFromUnicode(FTextUpcase);
-	char *Table=(FCaseSensitive) ? NULL : UpCaseTableA;
+	char *Table=(FCaseSensitive) ? NULL : GetUpCaseTable(-1);
 #else
 	char *Table=(FCaseSensitive) ? NULL : UpCaseTable;
 #endif

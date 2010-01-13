@@ -27,7 +27,7 @@ void ReadRegistry() {
 		g_setAllCPs.insert(CP_UTF8);
 		g_setAllCPs.insert(CP_UNICODE);
 	} else {
-		for (int nCP = 0; nCP < arrCPs.size()-3; nCP+=4) {
+		for (size_t nCP = 0; nCP < arrCPs.size()-3; nCP+=4) {
 			DWORD *dwPtr = (DWORD *)(&arrCPs[0]+nCP);
 			g_setAllCPs.insert(*dwPtr);
 		}
@@ -54,7 +54,7 @@ void WriteRegistry() {
 #include "PersistVars.h"
 
 	vector<DWORD> arrCPs;
-	for (set<int>::iterator it = g_setAllCPs.begin(); it != g_setAllCPs.end(); it++)
+	for (cp_set::iterator it = g_setAllCPs.begin(); it != g_setAllCPs.end(); it++)
 		arrCPs.push_back(*it);
 	SetRegBinaryValue(hKey, _T("AllCP"), arrCPs.empty() ? NULL : &arrCPs[0], arrCPs.size()*sizeof(DWORD));
 
@@ -420,22 +420,41 @@ string EvaluateReplaceString(const char *Matched,int *Match,int Count,const char
 	return OEMFromUnicode(strEval);
 }
 
+void BuildUpCaseTable(UINT nCP, char *pTable) {
+	for (unsigned short nChar=0; nChar<256; nChar++) {
+		WCHAR wChar, wCharU, wCharL;
+		MultiByteToWideChar(nCP, 0, (char *)&nChar, 1, &wChar, 1);
+		wCharU = (WCHAR)CharUpper((LPWSTR)wChar);
+		wCharL = (WCHAR)CharLower((LPWSTR)wCharU);
+		if ((wChar==wCharU) || (wChar==wCharL)) {
+			char cChar;
+			WideCharToMultiByte(nCP, 0, &wCharU, 1, &cChar, 1, NULL, NULL);
+			pTable[nChar] = cChar;
+		} else pTable[nChar] = (char)nChar;
+	}
+}
+
+char *GetUpCaseTable(int nCP) {
+	if (nCP == -1) nCP = (g_bDefaultOEM ? CP_OEMCP : CP_ACP);
+
+	upcase_map::iterator it = UpCaseTables.find(nCP);
+
+	if (it == UpCaseTables.end()) {
+		UpCaseTables[nCP] = new char[256];
+		it = UpCaseTables.find(nCP);
+		BuildUpCaseTable(nCP, it->second);
+	}
+
+	return it->second;
+}
+
 void PrepareLocaleStuff() {
 	for (int nChar=0;nChar<65536;nChar++) UpCaseTable[nChar]=nChar;
 	UpCaseTable[65536]=0;
 	CharUpper(UpCaseTable+1);
 
-	for (unsigned short nChar=0; nChar<256; nChar++) {
-		WCHAR wChar, wCharU, wCharL;
-		MultiByteToWideChar(CP_OEMCP, 0, (char *)&nChar, 1, &wChar, 1);
-		wCharU = (WCHAR)CharUpper((LPWSTR)wChar);
-		wCharL = (WCHAR)CharLower((LPWSTR)wCharU);
-		if ((wChar==wCharU) || (wChar==wCharL)) {
-			char cChar;
-			WideCharToMultiByte(CP_OEMCP, 0, &wCharU, 1, &cChar, 1, NULL, NULL);
-			UpCaseTableA[nChar] = cChar;
-		} else UpCaseTableA[nChar] = (char)nChar;
-	}
+	UpCaseTables[GetOEMCP()] = GetUpCaseTable(CP_OEMCP);
+	UpCaseTables[GetACP()]   = GetUpCaseTable(CP_ACP);
 }
 
 tstring UpCaseString(const tstring &strText) {
@@ -893,8 +912,13 @@ void RunExternalEditor(tstring &strText) {
 wstring DefToUnicode(const string &strDef) {
 	return (g_bDefaultOEM) ? OEMToUnicode(strDef) : ANSIToUnicode(strDef);
 }
+
 string DefFromUnicode(const wstring &strUnicode) {
 	return (g_bDefaultOEM) ? OEMFromUnicode(strUnicode) : ANSIFromUnicode(strUnicode);
+}
+
+bool CanUseCP(UINT nCP, const wstring &strUnicode) {
+	return StrToUnicode(StrFromUnicode(strUnicode, nCP), nCP) == strUnicode;
 }
 
 #endif

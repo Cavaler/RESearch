@@ -33,8 +33,10 @@ enum   FindTextAtCursor {FT_NONE,FT_WORD,FT_ANY};
 
 #define DECLARE_PERSIST_VARS
 #include "PersistVars.h"
+
 #ifdef UNICODE
-EXTERN set<int>	g_setAllCPs;
+typedef set<UINT> cp_set;
+EXTERN cp_set	g_setAllCPs;
 #endif
 
 EXTERN bool g_bFromCmdLine;
@@ -335,7 +337,12 @@ void ShowHResultError(int nError, HRESULT hResult, const TCHAR *szHelp = NULL);
 
 #ifdef UNICODE
 EXTERN TCHAR UpCaseTable[65537];
-EXTERN char UpCaseTableA[256];
+//EXTERN char UpCaseTableOEM[256];
+//EXTERN char UpCaseTableANSI[256];
+void BuildUpCaseTable(UINT nCP, char *pTable);
+char *GetUpCaseTable(int nCP);
+typedef map<UINT, char *> upcase_map;
+EXTERN upcase_map UpCaseTables;
 #else
 EXTERN char UpCaseTable[256];
 EXTERN CharTableSet *m_pReplaceTable;
@@ -347,7 +354,8 @@ void UTF8Converter(tstring strInit = _T(""));
 
 #ifdef UNICODE
 wstring DefToUnicode(const string &strDef);
-string DefFromUnicode(const wstring &strUnicode);
+string  DefFromUnicode(const wstring &strUnicode);
+bool    CanUseCP(UINT nCP, const wstring &strUnicode);
 #endif
 
 void PrepareBMHSearch(const TCHAR *String,int StringLength,size_t nPattern = 0);

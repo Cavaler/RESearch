@@ -146,6 +146,9 @@ int FPreparePattern(bool bAcceptEmpty) {
 	if (bPlainText) {
 		FTextUpcase = (FCaseSensitive) ? FText : UpCaseString(FText);
 	}
+#ifdef UNICODE
+	FCanUseDefCP = CanUseCP(g_bDefaultOEM ? CP_OEMCP : CP_ACP, FText);
+#endif
 
 	switch (FSearchAs) {
 	case SA_PLAINTEXT:
