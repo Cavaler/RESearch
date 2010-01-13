@@ -22,8 +22,8 @@ BOOL ConfirmReplacement(const char *Found, const char *Replaced, const TCHAR *Fi
 	if (g_bInterrupted) return FALSE;
 
 #ifdef UNICODE
-	wstring strFound = OEMToUnicode(Found);
-	wstring strReplaced = OEMToUnicode(Replaced);
+	wstring strFound = DefToUnicode(Found);
+	wstring strReplaced = DefToUnicode(Replaced);
 
 	const TCHAR *Lines[]={
 		GetMsg(MREReplace),GetMsg(MAskReplace),strFound.c_str(),GetMsg(MAskWith),strReplaced.c_str(),
@@ -110,7 +110,7 @@ BOOL ProcessPlainTextBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindD
 	int Count = 0;
 
 #ifdef UNICODE
-	string OEMTextUpcase = OEMFromUnicode(FTextUpcase);
+	string OEMTextUpcase = DefFromUnicode(FTextUpcase);
 	char *Table=(FCaseSensitive) ? NULL : UpCaseTableA;
 #else
 	char *Table=(FCaseSensitive) ? NULL : UpCaseTable;
@@ -126,7 +126,7 @@ BOOL ProcessPlainTextBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindD
 		Current += nPosition;
 
 #ifdef UNICODE
-		string Replace = OEMFromUnicode(CreateReplaceString(NULL, NULL, 0, FRReplace.c_str(), _T("\n"), NULL, -1));
+		string Replace = DefFromUnicode(CreateReplaceString(NULL, NULL, 0, FRReplace.c_str(), _T("\n"), NULL, -1));
 #else
 		string Replace=CreateReplaceString(Buffer,NULL,0,FRReplace.c_str(),"\n",NULL,-1);
 #endif
@@ -151,7 +151,7 @@ BOOL ProcessRegExpBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindData
 		SkipNoCRLF(BufEnd,&BufLen);
 		while ((BufEnd!=Buffer)&&do_pcre_execA(FPattern,FPatternExtra,Buffer,BufEnd-Buffer,Start,0,Match,MatchCount*3)>=0) {
 #ifdef UNICODE
-			string Replace=CreateReplaceString(Buffer,Match,MatchCount,OEMFromUnicode(FRReplace).c_str(),"\n",NULL,-1);
+			string Replace=CreateReplaceString(Buffer,Match,MatchCount,DefFromUnicode(FRReplace).c_str(),"\n",NULL,-1);
 #else
 			string Replace=CreateReplaceString(Buffer,Match,MatchCount,FRReplace.c_str(),"\n",NULL,-1);
 #endif
@@ -190,7 +190,7 @@ BOOL ReplaceSeveralLineBuffer(HANDLE &hFile,const char *&Buffer,const char *BufE
 		const char *NewBuffer=Buffer+Match[0];
 		if (NewBuffer>=LineEnd) break;
 #ifdef UNICODE
-		string Replace=CreateReplaceString(Buffer,Match,MatchCount,OEMFromUnicode(FRReplace).c_str(),"\n",NULL,-1);
+		string Replace=CreateReplaceString(Buffer,Match,MatchCount,DefFromUnicode(FRReplace).c_str(),"\n",NULL,-1);
 #else
 		string Replace=CreateReplaceString(Buffer,Match,MatchCount,FRReplace.c_str(),"\n",NULL,-1);
 #endif

@@ -887,3 +887,14 @@ void RunExternalEditor(tstring &strText) {
 		DeleteFile(szName);
 	}
 }
+
+#ifdef UNICODE
+
+wstring DefToUnicode(const string &strDef) {
+	return (g_bDefaultOEM) ? OEMToUnicode(strDef) : ANSIToUnicode(strDef);
+}
+string DefFromUnicode(const wstring &strUnicode) {
+	return (g_bDefaultOEM) ? OEMFromUnicode(strUnicode) : ANSIFromUnicode(strUnicode);
+}
+
+#endif

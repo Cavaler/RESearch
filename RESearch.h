@@ -345,6 +345,11 @@ void PrepareLocaleStuff();
 tstring UpCaseString(const tstring &strText);
 void UTF8Converter(tstring strInit = _T(""));
 
+#ifdef UNICODE
+wstring DefToUnicode(const string &strDef);
+string DefFromUnicode(const wstring &strUnicode);
+#endif
+
 void PrepareBMHSearch(const TCHAR *String,int StringLength,size_t nPattern = 0);
 int BMHSearch(const TCHAR *Buffer,int BufferLength,const TCHAR *String,int StringLength,TCHAR *XLatTable,int nPattern = 0);
 int ReverseBMHSearch(const TCHAR *Buffer,int BufferLength,const TCHAR *String,int StringLength,TCHAR *XLatTable,int nPattern = 0);

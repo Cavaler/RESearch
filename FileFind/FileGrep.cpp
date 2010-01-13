@@ -22,7 +22,7 @@ void AddGrepResultLine(const sBufferedLine &Line, int nLineNumber) {
 		AddGrepLine(FormatStr(_T("%d:"), nLineNumber).c_str(), false);
 	}
 #ifdef UNICODE
-	AddGrepLine(OEMToUnicode(string(Line.szBuffer, Line.szBufEnd)).c_str());
+	AddGrepLine(DefToUnicode(string(Line.szBuffer, Line.szBufEnd)).c_str());
 #else
 	AddGrepLine(string(Line.szBuffer, Line.szBufEnd).c_str());
 #endif
@@ -32,7 +32,7 @@ bool GrepLineFound(const sBufferedLine &strBuf) {
 	BOOL bResult;
 
 #ifdef UNICODE
-	wstring strWBuf = OEMToUnicode(string(strBuf.szBuffer, strBuf.Length()));
+	wstring strWBuf = DefToUnicode(string(strBuf.szBuffer, strBuf.Length()));
 
 	if (FSearchAs == SA_REGEXP) {
 		bResult = do_pcre_exec(FPattern, FPatternExtra, strWBuf.data(), strWBuf.length(), 0, 0, NULL, 0) >= 0;
