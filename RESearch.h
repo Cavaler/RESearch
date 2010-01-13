@@ -33,6 +33,9 @@ enum   FindTextAtCursor {FT_NONE,FT_WORD,FT_ANY};
 
 #define DECLARE_PERSIST_VARS
 #include "PersistVars.h"
+#ifdef UNICODE
+EXTERN set<int>	g_setAllCPs;
+#endif
 
 EXTERN bool g_bFromCmdLine;
 
@@ -187,6 +190,13 @@ enum eStringTable {
 	MMaxInThreadLength,
 	MThreadStackMB,
 	MShowUsageWarnings,
+
+	MDefaultCP,
+	MDefaultOEM,
+	MDefaultANSI,
+	MAllCPInclude,
+	MAllCPSelect,
+	MAllCPMenu,
 
 	MFileSearchSettings,
 	MReadAtOnceLimit,

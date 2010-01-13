@@ -7,6 +7,7 @@ PERSIST_bool_VARIABLE_(g_bUseSeparateThread, _T("UseSeparateThread"), true)
 PERSIST_TYPED_VARIABLE_(int, g_nMaxInThreadLength, _T("MaxInThreadLength"), 1024, 0, MAXINT_PTR)
 PERSIST_TYPED_VARIABLE_(int, g_nThreadStackMB, _T("ThreadStackMB"), 64, 0, MAXINT_PTR)
 PERSIST_bool_VARIABLE_(g_bShowUsageWarnings, _T("ShowUsageWarnings"), true)
+PERSIST_BOOL_VARIABLE(g_bDefaultOEM, TRUE)
 
 PERSIST_TYPED_VARIABLE(ShowPosition, EShowPosition, SP_CENTER, SP_TOP, SP_BOTTOM)
 PERSIST_TYPED_VARIABLE(int, EShowPositionOffset, 0, -1024, 1024)

@@ -19,6 +19,20 @@ void ReadRegistry() {
 #define DECLARE_PERSIST_LOAD hKey
 #include "PersistVars.h"
 
+	vector<BYTE> arrCPs;
+	QueryRegBinaryValue(hKey, _T("AllCP"), arrCPs);
+	if (arrCPs.empty()) {
+		g_setAllCPs.insert(GetOEMCP());
+		g_setAllCPs.insert(GetACP());
+		g_setAllCPs.insert(CP_UTF8);
+		g_setAllCPs.insert(CP_UNICODE);
+	} else {
+		for (int nCP = 0; nCP < arrCPs.size()-3; nCP+=4) {
+			DWORD *dwPtr = (DWORD *)(&arrCPs[0]+nCP);
+			g_setAllCPs.insert(*dwPtr);
+		}
+	}
+
 	EReadRegistry(hKey);
 	VReadRegistry(hKey);
 	FReadRegistry(hKey);
@@ -38,6 +52,11 @@ void WriteRegistry() {
 
 #define DECLARE_PERSIST_SAVE hKey
 #include "PersistVars.h"
+
+	vector<DWORD> arrCPs;
+	for (set<int>::iterator it = g_setAllCPs.begin(); it != g_setAllCPs.end(); it++)
+		arrCPs.push_back(*it);
+	SetRegBinaryValue(hKey, _T("AllCP"), arrCPs.empty() ? NULL : &arrCPs[0], arrCPs.size()*sizeof(DWORD));
 
 	EWriteRegistry(hKey);
 	VWriteRegistry(hKey);

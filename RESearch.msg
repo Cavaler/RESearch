@@ -140,6 +140,13 @@ MMaxInThreadLength	"For &lines longer than:"				"Для строк &длиннее:"
 MThreadStackMB		"&Thread stack, in MB:"					"Стек потока, в MB:"
 MShowUsageWarnings	"Show &warnings on common mistakes"		"&Предупреждения о неправильном использовании"
 
+MDefaultCP			"Default &codepage:"					"&Кодировка по умолчанию:"
+MDefaultOEM			"OEM"
+MDefaultANSI		"ANSI"
+MAllCPInclude		"'&All codepages' include:"				"'&Все кодировки' включают:"
+MAllCPSelect		"S&elect"								"В&ыбрать"
+MAllCPMenu			"Select codepages"						"Выберите кодировки"
+
 MFileSearchSettings	"Panel search settings"		"Поиск в файловой панели"
 MReadAtOnceLimit	"&Read at once maximum"		"Читать сразу &максимум"
 MKB					"KB"						"КБ"

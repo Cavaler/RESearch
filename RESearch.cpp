@@ -656,8 +656,87 @@ int ConfigureSeveralLines() {
 	return Dialog.Display(-1);
 }
 
+#ifdef UNICODE
+
+vector<CFarMenuItem> g_arrCPItems;
+vector<int> g_arrCPs;
+
+void AddCP(int nCP, LPCTSTR szText) {
+	g_arrCPItems.push_back(FormatStrW(L"%5d | %s", nCP, szText));
+	g_arrCPs.push_back(nCP);
+
+	if (g_setAllCPs.find(nCP) != g_setAllCPs.end()) {
+		g_arrCPItems[g_arrCPItems.size()-1].Checked = true;
+	}
+}
+
+BOOL CALLBACK EnumCPProc(LPTSTR lpCodePageString) {
+	UINT codePage = _ttoi(lpCodePageString);
+
+	if ((codePage == GetOEMCP()) || (codePage == GetACP())) return TRUE;
+
+	CPINFOEX cpiex;
+	if (!GetCPInfoEx(codePage, 0, &cpiex)) return TRUE;
+	if (cpiex.MaxCharSize != 1) return TRUE;
+
+	AddCP(codePage, cpiex.CodePageName);
+
+	return TRUE;
+}
+
+int ConfigureCP() {
+	g_arrCPItems.clear();
+
+	AddCP(GetOEMCP(), L"OEM");
+	AddCP(GetACP(), L"ANSI");
+	g_arrCPItems.push_back(true);	g_arrCPs.push_back(0);
+	AddCP(CP_UTF7, L"UTF-7");
+	AddCP(CP_UTF8, L"UTF-8");
+	AddCP(CP_UNICODE, L"UTF-16 (Little endian)");
+	AddCP(CP_REVERSEBOM, L"UTF-16 (Big endian)");
+	g_arrCPItems.push_back(true);	g_arrCPs.push_back(0);
+
+	EnumSystemCodePages(EnumCPProc, CP_INSTALLED);
+
+	int nBreakKeys[] = {VK_INSERT, 0};
+	int nBreakCode;
+
+	set<int> setCPs = g_setAllCPs;
+
+	int nItem = 0;
+	do {
+		g_arrCPItems[nItem].Selected = true;
+		int nResult = StartupInfo.Menu(StartupInfo.ModuleNumber, -1, -1, 0, FMENU_WRAPMODE, GetMsg(MAllCPMenu), L"Ins, Enter/Esc",
+			L"Help", nBreakKeys, &nBreakCode, &g_arrCPItems[0], g_arrCPItems.size());
+		g_arrCPItems[nItem].Selected = false;
+		nItem = nResult;
+
+		if (nBreakCode == -1) {
+			if (nResult >= 0) {
+				g_setAllCPs = setCPs;
+			}
+			return TRUE;
+		}
+
+		if (g_arrCPs[nItem] != 0) {
+			if (g_arrCPItems[nItem].Checked) {
+				g_arrCPItems[nItem].Checked = false;
+				setCPs.erase(g_arrCPs[nItem]);
+			} else {
+				g_arrCPItems[nItem].Checked = true;
+				setCPs.insert(g_arrCPs[nItem]);
+			}
+		}
+	} while (true);
+}
+#endif
+
 int ConfigureCommon() {
+#ifdef UNICODE
+	CFarDialog Dialog(60,20,_T("CommonConfig"));
+#else
 	CFarDialog Dialog(60,17,_T("CommonConfig"));
+#endif
 	Dialog.AddFrame(MCommonSettings);
 
 	Dialog.Add(new CFarTextItem(5,3,0,MSeveralLinesIs));
@@ -676,8 +755,32 @@ int ConfigureCommon() {
 
 	Dialog.Add(new CFarCheckBoxItem(5,11,0,MShowUsageWarnings,&g_bShowUsageWarnings));
 
+#ifdef UNICODE
+	Dialog.Add(new CFarTextItem(5,13,0,MDefaultCP));
+	Dialog.Add(new CFarRadioButtonItem(35,13,0,MDefaultOEM,&g_bDefaultOEM,TRUE));
+	Dialog.Add(new CFarRadioButtonItem(45,13,0,MDefaultANSI,&g_bDefaultOEM,FALSE));
+	Dialog.Add(new CFarTextItem(5,14,0,MAllCPInclude));
+	Dialog.Add(new CFarButtonItem(35,14,0,FALSE,MAllCPSelect));
+
+	Dialog.AddButtons(MOk,MCancel);
+	do {
+		int nResult = Dialog.Display(2, -2, -3);
+
+		switch (nResult) {
+		case 0:
+			return 0;
+		case 1:
+			ConfigureCP();
+			break;
+		default:
+			return -1;
+		}
+	} while (true);
+
+#else
 	Dialog.AddButtons(MOk,MCancel);
 	return Dialog.Display(-1);
+#endif
 }
 
 void ConfigureFile() {
