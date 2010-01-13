@@ -13,7 +13,7 @@ struct sBufferedLine {
 
 void AddGrepLine(const TCHAR *szLine, bool bEOL = true) {
 	DWORD dwWritten;
-	WriteFile(g_hOutput, szLine, _tcslen(szLine), &dwWritten, NULL);
+	WriteFile(g_hOutput, szLine, _tcslen(szLine)*sizeof(TCHAR), &dwWritten, NULL);
 	if (bEOL) WriteFile(g_hOutput, _T("\r\n"), 2, &dwWritten, NULL);
 }
 
@@ -260,6 +260,10 @@ OperationResult FileGrep(BOOL ShowDialog) {
 		ShowLastError(GetMsg(MFileCreateError), strFileName.c_str());
 		return OR_FAILED;
 	}
+
+#ifdef UNICODE
+	AddGrepLine(L"\xFEFF", false);
+#endif
 
 	if (ScanDirectories(g_PanelItems,GrepFile)) {
 		g_hOutput.Close();
