@@ -122,6 +122,67 @@ bool GrepBuffer(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems, const T
 	return nFoundCount > 0;
 }
 
+class CDelayedEncoder {
+public:
+	CDelayedEncoder(const char *szData, DWORD dwSize) : m_szData(szData), m_dwSize(dwSize) {
+		GetSystemInfo(&m_Info);
+
+		m_dwBufferSize = m_dwSize;
+		m_szBuffer = (char *)VirtualAlloc(NULL, m_dwBufferSize, MEM_RESERVE, PAGE_READWRITE);
+
+		m_dwCommitRead = 0;
+		m_dwCommitWrite = 0;
+	}
+
+	operator const char * () { return m_szBuffer; }
+
+	int ExcFilter(const _EXCEPTION_POINTERS *pExcInfo) {
+		if (pExcInfo->ExceptionRecord->ExceptionCode != EXCEPTION_ACCESS_VIOLATION)
+			return EXCEPTION_EXECUTE_HANDLER;
+
+		const char *szAddress = (const char *)pExcInfo->ExceptionRecord->ExceptionInformation[1];
+		if ((szAddress < m_szBuffer) || (szAddress >= m_szBuffer+m_dwBufferSize))
+			return EXCEPTION_EXECUTE_HANDLER;
+
+		//	Round up to page size
+		DWORD dwCommitSize = szAddress-m_szBuffer+1;
+		dwCommitSize = ((dwCommitSize+m_Info.dwPageSize-1)/m_Info.dwPageSize)*m_Info.dwPageSize;
+
+		//	Allocate
+		VirtualAlloc(m_szBuffer, dwCommitSize, MEM_COMMIT, PAGE_READWRITE);
+
+		//	Encode
+		DWORD dwEncodeSize = dwCommitSize;
+		if (dwCommitSize > m_dwBufferSize) m_dwBufferSize = dwCommitSize;
+		memmove(m_szBuffer+m_dwCommitWrite, m_szData+m_dwCommitRead, dwCommitSize-m_dwCommitRead);
+		m_dwCommitRead  += dwEncodeSize;
+		m_dwCommitWrite += dwEncodeSize;
+
+		return EXCEPTION_CONTINUE_EXECUTION;
+	}
+
+protected:
+	const char *m_szData;
+	DWORD m_dwSize;
+
+	char *m_szBuffer;
+	DWORD m_dwBufferSize;
+
+	DWORD m_dwCommitRead, m_dwCommitWrite;
+
+	SYSTEM_INFO m_Info;
+};
+
+void TestEncoder() {
+	CDelayedEncoder Encoder("Some Text", 10);
+	const char *szText = Encoder;
+	__try {
+		char c = szText[0];
+	} __except (Encoder.ExcFilter(GetExceptionInformation())) {
+		return;
+	}
+}
+
 void GrepFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 	if (FText.empty()) {
 		AddFile(FindData, PanelItems);
@@ -212,6 +273,8 @@ bool PrepareFileGrepPattern() {
 }
 
 bool GrepPrompt(BOOL bPlugin) {
+	TestEncoder();
+
 	BOOL AsRegExp = (FSearchAs == SA_REGEXP) || (FSearchAs == SA_SEVERALLINE) || (FSearchAs == SA_MULTILINE) || (FSearchAs == SA_MULTIREGEXP);
 
 	CFarDialog Dialog(76,25,_T("FileGrepDlg"));
