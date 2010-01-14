@@ -214,216 +214,6 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Release Intel|Win32"
-			OutputDirectory="$(ConfigurationName)\$(PlatformName)"
-			IntermediateDirectory="$(ConfigurationName)\$(PlatformName)"
-			ConfigurationType="2"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
-			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="false"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-				PreprocessorDefinitions="NDEBUG"
-				MkTypLibCompatible="true"
-				SuppressStartupBanner="true"
-				TargetEnvironment="1"
-				TypeLibraryName=".\Release_Intel/RESearch.tlb"
-				HeaderFileName=""
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="0"
-				InlineFunctionExpansion="2"
-				EnableIntrinsicFunctions="true"
-				FavorSizeOrSpeed="1"
-				OmitFramePointers="true"
-				AdditionalIncludeDirectories="\CPP\STLport-4.5.3\stlport,D:\MSDEV\VC98\Include,\CPP\Include"
-				PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=INTEL"
-				IgnoreStandardIncludePath="true"
-				StringPooling="true"
-				RuntimeLibrary="0"
-				StructMemberAlignment="1"
-				EnableFunctionLevelLinking="true"
-				RuntimeTypeInfo="true"
-				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="StdAfx.h"
-				PrecompiledHeaderFile="$(IntDir)\$(ProjectName).pch"
-				AssemblerListingLocation="$(IntDir)\"
-				ObjectFile="$(IntDir)\"
-				ProgramDataBaseFileName="$(IntDir)\"
-				WarningLevel="3"
-				SuppressStartupBanner="true"
-				CompileAs="0"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG"
-				Culture="2057"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				IgnoreImportLibrary="true"
-				AdditionalOptions="/D_USE_INTEL_COMPILER "
-				OutputFile="$(ProjectName)I.dll"
-				Version="6.23"
-				LinkIncremental="1"
-				SuppressStartupBanner="true"
-				ModuleDefinitionFile="RESearch.def"
-				ProgramDatabaseFile="$(OutDir)\$(TargetName).pdb"
-				SubSystem="2"
-				OptimizeForWindows98="1"
-				TargetMachine="1"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
-			Name="Release Intel|x64"
-			OutputDirectory="$(ConfigurationName)\$(PlatformName)"
-			IntermediateDirectory="$(ConfigurationName)\$(PlatformName)"
-			ConfigurationType="2"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
-			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="false"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-				PreprocessorDefinitions="NDEBUG"
-				MkTypLibCompatible="true"
-				SuppressStartupBanner="true"
-				TargetEnvironment="3"
-				TypeLibraryName=".\Release_Intel/RESearch.tlb"
-				HeaderFileName=""
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="0"
-				InlineFunctionExpansion="2"
-				EnableIntrinsicFunctions="true"
-				FavorSizeOrSpeed="1"
-				OmitFramePointers="true"
-				AdditionalIncludeDirectories="\CPP\STLport-4.5.3\stlport,D:\MSDEV\VC98\Include,\CPP\Include"
-				PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=INTEL"
-				IgnoreStandardIncludePath="true"
-				StringPooling="true"
-				RuntimeLibrary="0"
-				StructMemberAlignment="4"
-				EnableFunctionLevelLinking="true"
-				RuntimeTypeInfo="true"
-				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="StdAfx.h"
-				PrecompiledHeaderFile="$(IntDir)\$(ProjectName).pch"
-				AssemblerListingLocation="$(IntDir)\"
-				ObjectFile="$(IntDir)\"
-				ProgramDataBaseFileName="$(IntDir)\"
-				WarningLevel="3"
-				SuppressStartupBanner="true"
-				CompileAs="0"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG"
-				Culture="2057"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				IgnoreImportLibrary="true"
-				AdditionalOptions="/D_USE_INTEL_COMPILER "
-				OutputFile="RESearchI.dll"
-				Version="6.23"
-				LinkIncremental="1"
-				SuppressStartupBanner="true"
-				ModuleDefinitionFile="RESearch.def"
-				ProgramDatabaseFile="$(OutDir)\$(TargetName).pdb"
-				SubSystem="2"
-				OptimizeForWindows98="1"
-				TargetMachine="17"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="$(ConfigurationName)\$(PlatformName)"
 			IntermediateDirectory="$(ConfigurationName)\$(PlatformName)"
@@ -792,7 +582,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				OutputFile="$(FAR2_DEBUG_DLLS)\$(ProjectName)\$(ProjectName) $(PlatformName).dll"
+				OutputFile="$(OutDir)\$(ProjectName) $(PlatformName).dll"
 				Version="6.23"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -1062,26 +852,6 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release Intel|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=INTEL;$(NoInherit)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release Intel|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=INTEL;$(NoInherit)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug Unicode|Win32"
 					>
 					<Tool
@@ -1115,26 +885,6 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release Intel|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=INTEL;$(NoInherit)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release Intel|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=INTEL;$(NoInherit)"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1178,26 +928,6 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release Intel|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=INTEL;$(NoInherit)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release Intel|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=INTEL;$(NoInherit)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug Unicode|Win32"
 					>
 					<Tool
@@ -1231,26 +961,6 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release Intel|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=INTEL;$(NoInherit)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release Intel|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=INTEL;$(NoInherit)"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1290,26 +1000,6 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release Intel|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=INTEL;$(NoInherit)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release Intel|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=INTEL;$(NoInherit)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug Unicode|Win32"
 					>
 					<Tool
@@ -1343,26 +1033,6 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release Intel|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=INTEL;$(NoInherit)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release Intel|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=INTEL;$(NoInherit)"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1405,26 +1075,6 @@
 						PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;$(NoInherit)"
 						UsePrecompiledHeader="0"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release Intel|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=INTEL;$(NoInherit)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release Intel|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=INTEL;$(NoInherit)"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1510,26 +1160,6 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release Intel|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=INTEL;$(NoInherit)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release Intel|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=INTEL;$(NoInherit)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug Unicode|Win32"
 					>
 					<Tool
@@ -1574,26 +1204,6 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release Intel|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=INTEL;$(NoInherit)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release Intel|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=INTEL;$(NoInherit)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug Unicode|Win32"
 					>
 					<Tool
@@ -1627,26 +1237,6 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release Intel|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=INTEL;$(NoInherit)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release Intel|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=INTEL;$(NoInherit)"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1690,26 +1280,6 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release Intel|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=INTEL;$(NoInherit)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release Intel|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=INTEL;$(NoInherit)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug Unicode|Win32"
 					>
 					<Tool
@@ -1747,26 +1317,6 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release Intel|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=INTEL;$(NoInherit)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release Intel|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=INTEL;$(NoInherit)"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1818,26 +1368,6 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release Intel|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=INTEL;$(NoInherit)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release Intel|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=INTEL;$(NoInherit)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug Unicode|Win32"
 					>
 					<Tool
@@ -1875,26 +1405,6 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release Intel|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=INTEL;$(NoInherit)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release Intel|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=INTEL;$(NoInherit)"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1962,26 +1472,6 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release Intel|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=INTEL;$(NoInherit)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release Intel|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=INTEL;$(NoInherit)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug Unicode|Win32"
 					>
 					<Tool
@@ -2015,26 +1505,6 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release Intel|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=INTEL;$(NoInherit)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release Intel|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=INTEL;$(NoInherit)"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -2076,26 +1546,6 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release Intel|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=INTEL;$(NoInherit)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release Intel|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=INTEL;$(NoInherit)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug Unicode|Win32"
 					>
 					<Tool
@@ -2133,34 +1583,6 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCMIDLTool"
-						PreprocessorDefinitions=""
-						MkTypLibCompatible="false"
-						TargetEnvironment="1"
-						GenerateStublessProxies="true"
-						TypeLibraryName=".\RESearch.tlb"
-						HeaderFileName=".\RESearchIDL.h"
-						InterfaceIdentifierFileName=".\uuids.c"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release Intel|Win32"
-					>
-					<Tool
-						Name="VCMIDLTool"
-						PreprocessorDefinitions=""
-						MkTypLibCompatible="false"
-						TargetEnvironment="1"
-						GenerateStublessProxies="true"
-						TypeLibraryName=".\RESearch.tlb"
-						HeaderFileName=".\RESearchIDL.h"
-						InterfaceIdentifierFileName=".\uuids.c"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release Intel|x64"
 					>
 					<Tool
 						Name="VCMIDLTool"
@@ -2275,26 +1697,6 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release Intel|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=INTEL;$(NoInherit)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release Intel|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;_USE_COMPILER=INTEL;$(NoInherit)"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -2456,28 +1858,6 @@
 				/>
 			</FileConfiguration>
 			<FileConfiguration
-				Name="Release Intel|Win32"
-				ExcludedFromBuild="true"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-					Description="Compiling language file $(InputPath)..."
-					CommandLine="$(COMSPEC) /c ..\MakeLng.bat&#x0D;&#x0A;echo Copying resulting language files...&#x0D;&#x0A;copy *.lng &quot;$(FAR_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;"
-					Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release Intel|x64"
-				ExcludedFromBuild="true"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-					Description="Compiling language file $(InputPath)..."
-					CommandLine="$(COMSPEC) /c ..\MakeLng.bat&#x0D;&#x0A;echo Copying resulting language files...&#x0D;&#x0A;copy *.lng &quot;$(FAR_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;"
-					Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
 				Name="Release|Win32"
 				ExcludedFromBuild="true"
 				>
@@ -2565,24 +1945,6 @@
 				/>
 			</FileConfiguration>
 			<FileConfiguration
-				Name="Release Intel|Win32"
-				>
-				<Tool
-					Name="VCResourceCompilerTool"
-					PreprocessorDefinitions=""
-					AdditionalIncludeDirectories="$(OUTDIR)"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release Intel|x64"
-				>
-				<Tool
-					Name="VCResourceCompilerTool"
-					PreprocessorDefinitions=""
-					AdditionalIncludeDirectories="$(OUTDIR)"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
 				Name="Release|Win32"
 				>
 				<Tool
@@ -2662,22 +2024,6 @@
 			</FileConfiguration>
 			<FileConfiguration
 				Name="Debug|x64"
-				ExcludedFromBuild="true"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release Intel|Win32"
-				ExcludedFromBuild="true"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release Intel|x64"
 				ExcludedFromBuild="true"
 				>
 				<Tool
