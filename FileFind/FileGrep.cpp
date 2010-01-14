@@ -52,28 +52,11 @@ bool GrepLineFound(const sBufferedLine &strBuf) {
 	return (bResult != 0) != (FSInverse != 0);
 }
 
-void GrepFile(WIN32_FIND_DATA *FindData,panelitem_vector &PanelItems) {
-	if (FText.empty()) {
-		AddFile(FindData, PanelItems);
-		AddGrepLine(FindData->cFileName);
-		return;
-	}
-
-	CFileMapping mapFile;
-	if (!mapFile.Open(FindData->cFileName)) {
-//		const TCHAR *Lines[]={GetMsg(MREReplace),GetMsg(MFileOpenError),FindData->cFileName,GetMsg(MOk)};
-//		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"FSOpenError",Lines,4,1);
-		return;
-	}
-
-	int FileSize = mapFile.Size();
-	if (FAdvanced && FASearchHead && (FileSize > (int)FASearchHeadLimit)) FileSize=FASearchHeadLimit;
+bool GrepBuffer(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems, const char *szBuffer, int FileSize) {
+	const char *szBufEnd = szBuffer;
 
 	deque<sBufferedLine> arrStringBuffer;
-	const char *szBuffer, *szBufEnd = mapFile;
-
 	int nFoundCount = 0;
-
 	int nFirstBufferLine = 0;
 	int nLastMatched = -1;
 
@@ -93,7 +76,7 @@ void GrepFile(WIN32_FIND_DATA *FindData,panelitem_vector &PanelItems) {
 			switch (FGrepWhat) {
 			case GREP_NAMES:
 				AddGrepLine(FindData->cFileName);
-				return;
+				return true;
 			case GREP_NAMES_LINES:
 				if (nFoundCount == 1) AddGrepLine(FindData->cFileName);
 				break;
@@ -143,6 +126,29 @@ void GrepFile(WIN32_FIND_DATA *FindData,panelitem_vector &PanelItems) {
 		}
 		break;
 	}
+
+	return nFoundCount > 0;
+}
+
+void GrepFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
+	if (FText.empty()) {
+		AddFile(FindData, PanelItems);
+		AddGrepLine(FindData->cFileName);
+		return;
+	}
+
+	CFileMapping mapFile;
+	if (!mapFile.Open(FindData->cFileName)) {
+//		const TCHAR *Lines[]={GetMsg(MREReplace),GetMsg(MFileOpenError),FindData->cFileName,GetMsg(MOk)};
+//		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"FSOpenError",Lines,4,1);
+		return;
+	}
+
+	int FileSize = mapFile.Size();
+	if (FAdvanced && FASearchHead && (FileSize > (int)FASearchHeadLimit)) FileSize=FASearchHeadLimit;
+	if ((FSearchAs == SA_PLAINTEXT) && (FileSize < FText.length())) return;
+
+	GrepBuffer(FindData, PanelItems, mapFile, FileSize);
 }
 
 bool PrepareFileGrepPattern() {
