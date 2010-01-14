@@ -254,7 +254,7 @@ BOOL RenameFilesPrompt() {
 	Dialog.Add(new CFarTextItem(5,8,DIF_BOXCOLOR|DIF_SEPARATOR,_T("")));
 
 	Dialog.Add(new CFarTextItem(5,9,0,MSearchIn));
-	Dialog.Add(new CFarComboBoxItem(15,9,60,0,new CFarListData(g_WhereToSearch, false),(int *)&FSearchIn));
+	Dialog.Add(new CFarComboBoxItem(15,9,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearch, false),(int *)&FSearchIn));
 
 	Dialog.Add(new CFarCheckBoxItem(5,11,0,MViewModified,&FROpenModified));
 	Dialog.Add(new CFarCheckBoxItem(5,12,0,MConfirmFile,&FRConfirmFile));
