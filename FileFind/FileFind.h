@@ -139,16 +139,24 @@ void FReadRegistry(HKEY Key);
 void FWriteRegistry(HKEY Key);
 void FCleanup(BOOL PatternOnly);
 
+#ifndef UNICODE
+void XLatBuffer(BYTE *Buffer,int Length,int Table);
+#endif
 enum eLikeUnicode {UNI_NONE, UNI_LE, UNI_BE, UNI_UTF8};
+eLikeUnicode LikeUnicode(const char *Buffer, int Size);
+bool FromUnicodeDetect(const char *Buffer, int Size, vector<TCHAR> &arrData, eLikeUnicode nDetect);
+bool FromUnicodeSkipDetect(const char *Buffer, int Size, vector<TCHAR> &arrData, eLikeUnicode nDetect);
+bool FromUnicodeLE(const char *Buffer, int Size, vector<TCHAR> &arrData);
+bool FromUnicodeBE(const char *Buffer, int Size, vector<TCHAR> &arrData);
+bool FromUTF8(const char *Buffer, int Size, vector<TCHAR> &arrData);
 
-void SkipNoCRLF(const char *&Buffer,int *Size);
-void SkipCRLF(const char *&Buffer,int *Size);
-void SkipWholeLine(const char *&Buffer,int *Size);
+template<class CHAR> void SkipNoCRLF(const CHAR *&Buffer,int *Size);
+template<class CHAR> void SkipCRLF(const CHAR *&Buffer,int *Size);
+template<class CHAR> void SkipWholeLine(const CHAR *&Buffer,int *Size);
 
 void SkipNoCRLF(const char *&Buffer,int *Size, eLikeUnicode nUni);
 void SkipCRLF(const char *&Buffer,int *Size, eLikeUnicode nUni);
 void SkipWholeLine(const char *&Buffer,int *Size, eLikeUnicode nUni);
-
 
 struct TempUserData {
 	TempUserData() : FoundLine(0), FoundColumn(1), ToBeDeleted(false) {}

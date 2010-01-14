@@ -10,6 +10,8 @@
 #define _tmemchr wmemchr
 #else
 #define _tmemchr memchr
+#define CP_UNICODE 1200
+#define CP_REVERSEBOM 1201
 #endif
 
 #define arrsizeof(arr) (sizeof(arr)/sizeof(arr[0]))

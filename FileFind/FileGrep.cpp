@@ -5,10 +5,17 @@ CHandle g_hOutput;
 int     g_nLines;
 
 struct sBufferedLine {
-	sBufferedLine(const char *_Buffer, const char *_BufEnd) : szBuffer(_Buffer), szBufEnd(_BufEnd) {}
+	sBufferedLine(const TCHAR *_Buffer, const TCHAR *_BufEnd) : szBuffer(_Buffer), szBufEnd(_BufEnd) {}
+	sBufferedLine(const tstring &_Data) : strData(_Data) {
+		szBuffer = strData.data();
+		szBufEnd = szBuffer + strData.length();
+	}
+
 	inline int Length() const {return szBufEnd - szBuffer;}
-	const char *szBuffer;
-	const char *szBufEnd;
+	const TCHAR *szBuffer;
+	const TCHAR *szBufEnd;
+
+	tstring strData;
 };
 
 void AddGrepLine(const TCHAR *szLine, bool bEOL = true) {
@@ -21,39 +28,24 @@ void AddGrepResultLine(const sBufferedLine &Line, int nLineNumber) {
 	if (FGAddLineNumbers) {
 		AddGrepLine(FormatStr(_T("%d:"), nLineNumber).c_str(), false);
 	}
-#ifdef UNICODE
-	AddGrepLine(DefToUnicode(string(Line.szBuffer, Line.szBufEnd)).c_str());
-#else
-	AddGrepLine(string(Line.szBuffer, Line.szBufEnd).c_str());
-#endif
+	AddGrepLine(tstring(Line.szBuffer, Line.szBufEnd).c_str());
 }
 
 bool GrepLineFound(const sBufferedLine &strBuf) {
 	BOOL bResult;
 
-#ifdef UNICODE
-	wstring strWBuf = DefToUnicode(string(strBuf.szBuffer, strBuf.Length()));
-
-	if (FSearchAs == SA_REGEXP) {
-		bResult = do_pcre_exec(FPattern, FPatternExtra, strWBuf.data(), strWBuf.length(), 0, 0, NULL, 0) >= 0;
-	} else {
-		TCHAR *Table = (FCaseSensitive) ? NULL : UpCaseTable;
-		bResult = BMHSearch(strWBuf.data(), strWBuf.length(), FTextUpcase.data(), FTextUpcase.size(), Table) >= 0;
-	}
-#else
 	if (FSearchAs == SA_REGEXP) {
 		bResult = do_pcre_exec(FPattern, FPatternExtra, strBuf.szBuffer, strBuf.Length(), 0, 0, NULL, 0) >= 0;
 	} else {
 		TCHAR *Table = (FCaseSensitive) ? NULL : UpCaseTable;
 		bResult = BMHSearch(strBuf.szBuffer, strBuf.Length(), FTextUpcase.data(), FTextUpcase.size(), Table) >= 0;
 	}
-#endif
 
 	return (bResult != 0) != (FSInverse != 0);
 }
 
-bool GrepBuffer(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems, const char *szBuffer, int FileSize) {
-	const char *szBufEnd = szBuffer;
+bool GrepBuffer(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems, const TCHAR *szBuffer, int FileSize) {
+	const TCHAR *szBufEnd = szBuffer;
 
 	deque<sBufferedLine> arrStringBuffer;
 	int nFoundCount = 0;
@@ -148,7 +140,67 @@ void GrepFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 	if (FAdvanced && FASearchHead && (FileSize > (int)FASearchHeadLimit)) FileSize=FASearchHeadLimit;
 	if ((FSearchAs == SA_PLAINTEXT) && (FileSize < FText.length())) return;
 
-	GrepBuffer(FindData, PanelItems, mapFile, FileSize);
+	vector<TCHAR> arrData;
+	eLikeUnicode nDetect = LikeUnicode(mapFile, FileSize);
+	if (nDetect != UNI_NONE) {
+		if (FromUnicodeSkipDetect(mapFile, FileSize, arrData, nDetect)) {
+			if (!arrData.empty() && GrepBuffer(FindData, PanelItems, &arrData[0], arrData.size())) return;
+		}
+#ifdef TRY_ENCODINGS_WITH_BOM
+		if (!FAllCharTables) return;
+#else
+		return;
+#endif
+	}
+
+#ifdef UNICODE
+	string strData(mapFile, FileSize);
+	wstring wstrData = DefToUnicode(strData);
+	if (GrepBuffer(FindData, PanelItems, wstrData.data(), wstrData.length())) return;
+#else
+	if (GrepBuffer(FindData, PanelItems, mapFile, FileSize)) return;
+#endif
+
+	if (!FAllCharTables) return;
+
+#ifdef UNICODE
+	for (cp_set::iterator it = g_setAllCPs.begin(); it != g_setAllCPs.end(); it++) {
+		UINT nCP = *it;
+		if (nCP == (g_bDefaultOEM ? GetOEMCP() : GetACP())) continue;
+		if ((nCP == CP_UNICODE) || (nCP == CP_REVERSEBOM)) continue;
+
+		wstring wstrData = StrToUnicode(strData, nCP);
+		if (!wstrData.empty() && GrepBuffer(FindData, PanelItems, wstrData.data(), wstrData.length())) return;
+	}
+#else
+	vector<char> SaveBuf(FileSize);
+	for (size_t I=0; I < XLatTables.size(); I++) {
+		memmove(&SaveBuf[0], mapFile, FileSize);
+		XLatBuffer((BYTE *)&SaveBuf[0], FileSize, I);
+		if (GrepBuffer(FindData, PanelItems, &SaveBuf[0], FileSize)) return;
+	}
+#endif
+
+	if ((nDetect != UNI_LE) && FromUnicodeLE(mapFile, FileSize, arrData)
+#ifdef UNICODE
+		&& (g_setAllCPs.find(CP_UNICODE) != g_setAllCPs.end())
+#endif
+		) {
+		if ((arrData.size() > 0) && GrepBuffer(FindData, PanelItems, &arrData[0], arrData.size())) return;
+	}
+	if ((nDetect != UNI_BE) && FromUnicodeBE(mapFile, FileSize, arrData)
+#ifdef UNICODE
+		&& (g_setAllCPs.find(CP_REVERSEBOM) != g_setAllCPs.end())
+#endif
+		) {
+		if ((arrData.size() > 0) && GrepBuffer(FindData, PanelItems, &arrData[0], arrData.size())) return;
+	}
+#ifndef UNICODE
+	if ((nDetect != UNI_UTF8) && FromUTF8(mapFile, FileSize, arrData)) {
+		if ((arrData.size() > 0) && GrepBuffer(FindData, PanelItems, &arrData[0], arrData.size())) return;
+	}
+#endif
+
 }
 
 bool PrepareFileGrepPattern() {
@@ -195,7 +247,7 @@ bool GrepPrompt(BOOL bPlugin) {
 	Dialog.Add(new CFarCheckBoxItem(5,17,0,MGrepEditor,&FGOpenInEditor));
 
 	Dialog.Add(new CFarTextItem(5,19,0,MSearchIn));
-	Dialog.Add(new CFarComboBoxItem(15,19,60,0,new CFarListData(g_WhereToSearch, false),(int *)&FSearchIn));
+	Dialog.Add(new CFarComboBoxItem(15,19,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearch, false),(int *)&FSearchIn));
 
 	Dialog.AddButtons(MOk,MCancel);
 	Dialog.Add(new CFarButtonItem(60,10,0,0,MBtnPresets));
@@ -277,7 +329,7 @@ OperationResult FileGrep(BOOL ShowDialog) {
 			StartupInfo.Editor(strFileName.c_str(), NULL, 0, 0, -1, -1,
 				EF_NONMODAL|EF_IMMEDIATERETURN|EF_ENABLE_F6| (FGOutputToFile ? 0 : EF_DELETEONLYFILEONCLOSE), 0, 1
 #ifdef UNICODE
-				, CP_AUTODETECT
+				, CP_UNICODE
 #endif
 				);
 		}

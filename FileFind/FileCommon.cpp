@@ -504,7 +504,8 @@ BOOL ConfirmFile(int Title,const TCHAR *FileName) {
 	return FALSE;
 }
 
-void SkipNoCRLF(const char *&Buffer,int *Size) {
+template<class CHAR>
+void SkipNoCRLF(const CHAR *&Buffer,int *Size) {
 	if (Size) {
 		while ((*Size)&&(*Buffer!=0x0D)&&(*Buffer!=0x0A)) {Buffer++;(*Size)--;}
 	} else {
@@ -512,7 +513,8 @@ void SkipNoCRLF(const char *&Buffer,int *Size) {
 	}
 }
 
-void SkipCRLF(const char *&Buffer,int *Size) {
+template<class CHAR>
+void SkipCRLF(const CHAR *&Buffer,int *Size) {
 	if (Size) {
 		if ((*Size)&&(*Buffer==0x0D)) {Buffer++;(*Size)--;}
 		if ((*Size)&&(*Buffer==0x0A)) {Buffer++;(*Size)--;}
@@ -522,10 +524,18 @@ void SkipCRLF(const char *&Buffer,int *Size) {
 	}
 }
 
-void SkipWholeLine(const char *&Buffer,int *Size) {
+template<class CHAR>
+void SkipWholeLine(const CHAR *&Buffer,int *Size) {
 	SkipNoCRLF(Buffer,Size);
 	SkipCRLF(Buffer,Size);
 }
+
+template void SkipNoCRLF<char>(const char *&Buffer,int *Size);
+template void SkipCRLF<char>(const char *&Buffer,int *Size);
+template void SkipWholeLine<char>(const char *&Buffer,int *Size);
+template void SkipNoCRLF<wchar_t>(const wchar_t *&Buffer,int *Size);
+template void SkipCRLF<wchar_t>(const wchar_t *&Buffer,int *Size);
+template void SkipWholeLine<wchar_t>(const wchar_t *&Buffer,int *Size);
 
 wchar_t LE(const char *Buffer) {
 	return (wchar_t)(Buffer[0] + (Buffer[1] << 8));
