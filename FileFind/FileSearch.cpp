@@ -141,7 +141,7 @@ BOOL FindTextInBuffer(const char *Buffer, int Size, tstring &Text) {
 	for (cp_set::iterator it = g_setAllCPs.begin(); it != g_setAllCPs.end(); it++) {
 		UINT nCP = *it;
 		if (nCP == (g_bDefaultOEM ? GetOEMCP() : GetACP())) continue;
-		if ((nCP == CP_UNICODE) || (nCP == CP_REVERSEBOM)) continue;
+		if ((nCP == CP_UNICODE) || (nCP == CP_REVERSEBOM) || (nCP == CP_UTF8)) continue;
 
 		string strTextUpcase = StrFromUnicode(TextUpcase, nCP);
 		if (StrToUnicode(strTextUpcase, nCP) != TextUpcase) continue;
@@ -175,11 +175,13 @@ BOOL FindTextInBuffer(const char *Buffer, int Size, tstring &Text) {
 		) {
 		if ((arrData.size() > 0) && FindTextInBufferWithTable(&arrData[0], arrData.size(), TextUpcase, Table)) return TRUE;
 	}
-#ifndef UNICODE
-	if (FromUTF8(Buffer, Size, arrData)) {
+	if (FromUTF8(Buffer, Size, arrData)
+#ifdef UNICODE
+		&& (g_setAllCPs.find(CP_UTF8) != g_setAllCPs.end())
+#endif
+		) {
 		if ((arrData.size() > 0) && FindTextInBufferWithTable(&arrData[0], arrData.size(), TextUpcase, Table)) return TRUE;
 	}
-#endif
 
 	return FALSE;
 }
@@ -387,6 +389,7 @@ BOOL FindMemoryMapped(TCHAR *FileName,BOOL (*Searcher)(const char *,int)) {
 
 	DWORD FileSize = mapFile.Size();
 	if (FAdvanced && FASearchHead && (FileSize>FASearchHeadLimit)) FileSize=FASearchHeadLimit;
+	if ((FSearchAs == SA_PLAINTEXT) && (FileSize < FText.length())) return FALSE;
 	return Searcher(mapFile, FileSize);
 }
 
