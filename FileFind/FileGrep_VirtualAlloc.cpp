@@ -53,7 +53,7 @@ bool GrepBuffer(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems, const T
 	int nLastMatched = -1;
 
 	int nContextLines = FGAddContext ? FGContextLines : 0;
-	while (FileSize) {
+	while (FileSize > 0) {
 		szBuffer = szBufEnd;
 		SkipNoCRLF(szBufEnd, &FileSize);
 
@@ -122,6 +122,126 @@ bool GrepBuffer(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems, const T
 	return nFoundCount > 0;
 }
 
+class CEncoder {
+public:
+	virtual float SizeIncr() = 0;
+	virtual void Encode(const char *szSource, DWORD dwSize, char *szTarget) = 0;
+};
+
+#define BLOCK_SIZE	65536
+
+class CDelayedEncoder {
+public:
+	CDelayedEncoder(const char *szData, DWORD dwSize, CEncoder &pEncoder) : m_szData(szData), m_dwSize(dwSize), m_pEncoder(pEncoder) {
+		GetSystemInfo(&m_Info);
+
+		m_dwBufferSize = (DWORD)(m_dwSize*m_pEncoder.SizeIncr());
+		m_szBuffer = (char *)VirtualAlloc(NULL, m_dwBufferSize, MEM_RESERVE, PAGE_READWRITE);
+
+		if (m_dwBufferSize >= BLOCK_SIZE)
+			ResizeBuffer(BLOCK_SIZE-1);
+		else if (m_dwBufferSize > 0)
+			ResizeBuffer(m_dwBufferSize-1);
+
+		m_dwCommitRead = 0;
+		m_dwCommitWrite = 0;
+	}
+
+	~CDelayedEncoder() {
+		VirtualFree(m_szBuffer, 0, MEM_RELEASE);
+	}
+
+	operator const char * () { return m_szBuffer; }
+	DWORD Size() { return m_dwBufferSize; }
+
+	int ExcFilter(const _EXCEPTION_POINTERS *pExcInfo) {
+		if (pExcInfo->ExceptionRecord->ExceptionCode != EXCEPTION_ACCESS_VIOLATION)
+			return EXCEPTION_EXECUTE_HANDLER;
+
+		const char *szAddress = (const char *)pExcInfo->ExceptionRecord->ExceptionInformation[1];
+		if ((szAddress < m_szBuffer+m_dwCommitWrite) || (szAddress >= m_szBuffer+m_dwBufferSize))
+			return EXCEPTION_EXECUTE_HANDLER;
+
+		DWORD dwCommitSize = szAddress-m_szBuffer+1;
+		ResizeBuffer(dwCommitSize);
+
+		return EXCEPTION_CONTINUE_EXECUTION;
+	}
+
+protected:
+	bool ResizeBuffer(DWORD dwCommitSize) {
+		//	Round up to page size
+		dwCommitSize = ((dwCommitSize+BLOCK_SIZE-1)/BLOCK_SIZE)*BLOCK_SIZE;
+		if (dwCommitSize > m_dwBufferSize) dwCommitSize = m_dwBufferSize;
+		dwCommitSize = ((dwCommitSize+m_Info.dwPageSize-1)/m_Info.dwPageSize)*m_Info.dwPageSize;
+
+		//	Allocate
+		if (VirtualAlloc(m_szBuffer, dwCommitSize, MEM_COMMIT, PAGE_READWRITE) ==  NULL)
+			return false;
+
+		//	Encode
+		DWORD dwEncodeSize = dwCommitSize;
+		if (dwEncodeSize > m_dwBufferSize) dwEncodeSize = m_dwBufferSize;
+		m_pEncoder.Encode(
+			m_szData+m_dwCommitRead,
+			(DWORD)(dwEncodeSize/m_pEncoder.SizeIncr()-m_dwCommitRead),
+			m_szBuffer+m_dwCommitWrite);
+		m_dwCommitRead  = (DWORD)(dwEncodeSize/m_pEncoder.SizeIncr());
+		m_dwCommitWrite = dwEncodeSize;
+
+		return true;
+	}
+
+	const char *m_szData;
+	DWORD m_dwSize;
+
+	char *m_szBuffer;
+	DWORD m_dwBufferSize;
+
+	DWORD m_dwCommitRead, m_dwCommitWrite;
+
+	SYSTEM_INFO m_Info;
+	CEncoder &m_pEncoder;
+};
+
+class CNoEncoder : public CEncoder {
+public:
+	virtual float SizeIncr() { return 1; }
+	virtual void Encode(const char *szSource, DWORD dwSize, char *szTarget) {
+		memmove(szTarget, szSource, dwSize);
+	}
+};
+
+class CToUnicodeEncoder : public CEncoder {
+public:
+	CToUnicodeEncoder(UINT nCP) : m_nCP(nCP) {}
+	virtual float SizeIncr() { return 2; }
+	virtual void Encode(const char *szSource, DWORD dwSize, char *szTarget) {
+		MultiByteToWideChar(m_nCP, 0, szSource, dwSize, (LPWSTR)szTarget, dwSize);
+	}
+protected:
+	UINT m_nCP;
+};
+
+class CFromUnicodeEncoder : public CEncoder {
+public:
+	CFromUnicodeEncoder(UINT nCP) : m_nCP(nCP) {}
+	virtual float SizeIncr() { return 1/2; }
+	virtual void Encode(const char *szSource, DWORD dwSize, char *szTarget) {
+		WideCharToMultiByte(m_nCP, 0, (LPCWSTR)szSource, dwSize, szTarget, dwSize, NULL, NULL);
+	}
+protected:
+	UINT m_nCP;
+};
+
+bool RunGrepBuffer(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems, CDelayedEncoder &Encoder) {
+	__try {
+		return GrepBuffer(FindData, PanelItems, (const TCHAR *)(const char *)Encoder, Encoder.Size()/sizeof(TCHAR));
+	} __except (Encoder.ExcFilter(GetExceptionInformation())) {
+		return false;
+	}
+}
+
 void GrepFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 	if (FText.empty()) {
 		AddFile(FindData, PanelItems);
@@ -154,9 +274,8 @@ void GrepFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 	}
 
 #ifdef UNICODE
-	string strData(mapFile, FileSize);
-	wstring wstrData = DefToUnicode(strData);
-	if (GrepBuffer(FindData, PanelItems, wstrData.data(), wstrData.length())) return;
+	CDelayedEncoder Encoder(mapFile, FileSize, CToUnicodeEncoder(g_bDefaultOEM ? CP_OEMCP : CP_ACP));
+	if (RunGrepBuffer(FindData, PanelItems, Encoder)) return;
 #else
 	if (GrepBuffer(FindData, PanelItems, mapFile, FileSize)) return;
 #endif
@@ -167,10 +286,10 @@ void GrepFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 	for (cp_set::iterator it = g_setAllCPs.begin(); it != g_setAllCPs.end(); it++) {
 		UINT nCP = *it;
 		if (nCP == (g_bDefaultOEM ? GetOEMCP() : GetACP())) continue;
-		if ((nCP == CP_UNICODE) || (nCP == CP_REVERSEBOM)) continue;
+		if ((nCP == CP_UNICODE) || (nCP == CP_REVERSEBOM) || (nCP == CP_UTF8)) continue;
 
-		wstring wstrData = StrToUnicode(strData, nCP);
-		if (!wstrData.empty() && GrepBuffer(FindData, PanelItems, wstrData.data(), wstrData.length())) return;
+		CDelayedEncoder Encoder(mapFile, FileSize, CToUnicodeEncoder(nCP));
+		if (RunGrepBuffer(FindData, PanelItems, Encoder)) return;
 	}
 #else
 	vector<char> SaveBuf(FileSize);
@@ -195,11 +314,13 @@ void GrepFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 		) {
 		if ((arrData.size() > 0) && GrepBuffer(FindData, PanelItems, &arrData[0], arrData.size())) return;
 	}
-#ifndef UNICODE
-	if ((nDetect != UNI_UTF8) && FromUTF8(mapFile, FileSize, arrData)) {
+	if ((nDetect != UNI_UTF8) && FromUTF8(mapFile, FileSize, arrData)
+#ifdef UNICODE
+		&& (g_setAllCPs.find(CP_UTF8) != g_setAllCPs.end())
+#endif
+		) {
 		if ((arrData.size() > 0) && GrepBuffer(FindData, PanelItems, &arrData[0], arrData.size())) return;
 	}
-#endif
 
 }
 
