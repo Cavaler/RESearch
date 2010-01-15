@@ -24,11 +24,17 @@ void AddGrepLine(const TCHAR *szLine, bool bEOL = true) {
 	if (bEOL) WriteFile(g_hOutput, _T("\r\n"), 2, &dwWritten, NULL);
 }
 
+void AddGrepLine(const tstring &szLine, bool bEOL = true) {
+	DWORD dwWritten;
+	WriteFile(g_hOutput, szLine.data(), szLine.size()*sizeof(TCHAR), &dwWritten, NULL);
+	if (bEOL) WriteFile(g_hOutput, _T("\r\n"), 2, &dwWritten, NULL);
+}
+
 void AddGrepResultLine(const sBufferedLine &Line, int nLineNumber) {
 	if (FGAddLineNumbers) {
-		AddGrepLine(FormatStr(_T("%d:"), nLineNumber).c_str(), false);
+		AddGrepLine(FormatStr(_T("%d:"), nLineNumber), false);
 	}
-	AddGrepLine(tstring(Line.szBuffer, Line.szBufEnd).c_str());
+	AddGrepLine(tstring(Line.szBuffer, Line.szBufEnd));
 }
 
 bool GrepLineFound(const sBufferedLine &strBuf) {
@@ -154,7 +160,7 @@ void GrepFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 	}
 
 #ifdef UNICODE
-	string strData(mapFile, FileSize);
+	hack_string strData(mapFile, FileSize);
 	wstring wstrData = DefToUnicode(strData);
 	if (GrepBuffer(FindData, PanelItems, wstrData.data(), wstrData.length())) return;
 #else

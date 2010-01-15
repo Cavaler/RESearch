@@ -408,4 +408,22 @@ EXTERN CBatchActionCollection	*g_pPanelBatches;
 EXTERN const unsigned char *OEMCharTables VALUE(NULL);
 EXTERN const unsigned char *ANSICharTables VALUE(NULL);
 
+class hack_string : public string {
+public:
+	hack_string(const char *szData, size_t nSize);
+	~hack_string();
+};
+
+class hack_wstring : public wstring {
+public:
+	hack_wstring(const wchar_t *szData, size_t nSize);
+	~hack_wstring();
+};
+
+#ifdef UNICODE
+typedef hack_wstring hack_tstring;
+#else
+typedef hack_string hack_tstring;
+#endif
+
 #endif
