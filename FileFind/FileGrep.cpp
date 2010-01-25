@@ -142,7 +142,7 @@ void GrepFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 		return;
 	}
 
-	int FileSize = mapFile.Size();
+	DWORD FileSize = mapFile.Size();
 	if (FAdvanced && FASearchHead && (FileSize > (int)FASearchHeadLimit)) FileSize=FASearchHeadLimit;
 	if ((FSearchAs == SA_PLAINTEXT) && (FileSize < FText.length())) return;
 
