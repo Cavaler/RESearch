@@ -110,7 +110,6 @@ BOOL ProcessPlainTextBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindD
 	int Count = 0;
 
 #ifdef UNICODE
-	string OEMTextUpcase = DefFromUnicode(FTextUpcase);
 	char *Table=(FCaseSensitive) ? NULL : GetUpCaseTable(-1);
 #else
 	char *Table=(FCaseSensitive) ? NULL : UpCaseTable;
@@ -118,7 +117,7 @@ BOOL ProcessPlainTextBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindD
 
 	while (Current+FText.size()<=Buffer+BufLen) {
 #ifdef UNICODE
-		int nPosition = BMHSearchA(Current, Buffer+BufLen-Current, OEMTextUpcase.data(), OEMTextUpcase.size(), Table);
+		int nPosition = BMHSearchA(Current, Buffer+BufLen-Current, FOEMTextUpcase.data(), FOEMTextUpcase.size(), Table);
 #else
 		int nPosition = BMHSearch(Current, Buffer+BufLen-Current, FTextUpcase.data(), FTextUpcase.size(), Table);
 #endif

@@ -69,6 +69,7 @@ EXTERN pcre *FPattern;
 EXTERN pcre_extra *FPatternExtra;
 EXTERN vector<tstring> FSWords;
 #ifdef UNICODE
+EXTERN string FOEMTextUpcase;
 EXTERN bool FCanUseDefCP;
 #endif
 

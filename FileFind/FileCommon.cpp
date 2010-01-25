@@ -148,11 +148,15 @@ int FPreparePattern(bool bAcceptEmpty) {
 	}
 #ifdef UNICODE
 	FCanUseDefCP = CanUseCP(g_bDefaultOEM ? CP_OEMCP : CP_ACP, FText);
+	FOEMTextUpcase = DefFromUnicode(FTextUpcase);
 #endif
 
 	switch (FSearchAs) {
 	case SA_PLAINTEXT:
 		PrepareBMHSearch(FTextUpcase.data(), FTextUpcase.length());
+#ifdef UNICODE
+		PrepareBMHSearchA(FOEMTextUpcase.data(), FOEMTextUpcase.size());
+#endif
 		return TRUE;
 
 	case SA_MULTITEXT:
