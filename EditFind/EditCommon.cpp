@@ -192,7 +192,7 @@ void FillLineBuffer(size_t FirstLine, size_t LastLine) {
 
 			g_LineOffsets.push_back(g_LineBuffer.size());
 			g_LineBuffer.insert(g_LineBuffer.end(), String.StringText, String.StringText+String.StringLength);
-			g_LineBuffer.insert(g_LineBuffer.end(), '\n');
+			if (String.StringEOL != NULL && (String.StringEOL[0] != 0)) g_LineBuffer.insert(g_LineBuffer.end(), '\n');
 
 			if (g_LineBuffer.size() >= SeveralLinesKB*1024u) break;
 		}
