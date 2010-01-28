@@ -94,7 +94,7 @@ void FCleanup(BOOL PatternOnly) {
 	if (FPatternExtra) {pcre_free(FPatternExtra);FPatternExtra=NULL;}
 	if (FMaskPattern) {pcre_free(FMaskPattern);FMaskPattern=NULL;}
 	if (FMaskPatternExtra) {pcre_free(FMaskPatternExtra);FMaskPatternExtra=NULL;}
-	if (FMaskSet) {delete FMaskSet;FMaskPatternExtra=NULL;}
+	if (FMaskSet) {delete FMaskSet;FMaskSet=NULL;}
 	if (FASystemFoldersMask) {delete FASystemFoldersMask;FASystemFoldersMask=NULL;}
 
 	if (!PatternOnly) {
