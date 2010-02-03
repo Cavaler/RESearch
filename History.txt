@@ -10,6 +10,11 @@ Planned:
 	* Disabling all special chars in Replace without Regexps
 	+ Do not decode whole file while searching/grep, use VirtualAlloc's etc
 
+Version 7.00 beta 4 (03.02.2010)
+	- Fixed finding nonexistent \n at the end of file in Editor
+    - More hotkeys fixed (HaRT, farman)
+    - Possible crash when tunring off [X] Mask as regexp
+
 Version 7.00 beta 3 (25.01.2010)
 	- Processing of files with null symbols is now correct
 Unicode version:
