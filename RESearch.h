@@ -100,6 +100,7 @@ enum eStringTable {
 	MAsRegExp,
 	MText,
 	MCaseSensitive,
+	MCaseSensitiveS,
 	MPlainText,
 	MRegExp,
 	MSeveralLineRegExp,
@@ -243,6 +244,11 @@ enum eStringTable {
 
 	MInvalidNumber,
 
+	MRename,
+	MRenameSelected,
+	MSelect,
+	MUnselect,
+	MFlipSelection,
 	MRepeating,
 
 	MSearchFor,

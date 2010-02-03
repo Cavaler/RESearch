@@ -405,9 +405,9 @@ HANDLE OpenPluginFromFileMenu(int Item, BOOL ShowDialog) {
 			Result = FileGrep(ShowDialog);
 			if (Result != OR_CANCEL) SynchronizeWithFile(false);
 			break;
-		case 4:ChangeSelection(MMenuSelect);break;
-		case 5:ChangeSelection(MMenuUnselect);break;
-		case 6:ChangeSelection(MMenuFlipSelection);break;
+		case 4:ChangeSelection(MSelect);break;
+		case 5:ChangeSelection(MUnselect);break;
+		case 6:ChangeSelection(MFlipSelection);break;
 		case 8:
 			Result=RenameFiles(g_PanelItems,ShowDialog);
 			break;

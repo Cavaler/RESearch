@@ -65,13 +65,13 @@ void ChangeSelection(int How) {
 	for (int I=0;I<PInfo.ItemsNumber;I++) {
 		if (Mask(FarFileName(PInfo.PanelItems[I].FindData))) {
 			switch (How) {
-			case MMenuSelect:
+			case MSelect:
 				PInfo.PanelItems[I].Flags|=PPIF_SELECTED;
 				break;
-			case MMenuUnselect:
+			case MUnselect:
 				PInfo.PanelItems[I].Flags&=~PPIF_SELECTED;
 				break;
-			case MMenuFlipSelection:
+			case MFlipSelection:
 				PInfo.PanelItems[I].Flags^=PPIF_SELECTED;
 				break;
 			}
@@ -236,7 +236,7 @@ void RenameFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 
 BOOL RenameFilesPrompt() {
 	CFarDialog Dialog(76,19,_T("FileRenameDlg"));
-	Dialog.AddFrame(MMenuRename);
+	Dialog.AddFrame(MRename);
 
 	Dialog.Add(new CFarCheckBoxItem(25,2,0,MAsRegExp,&FMaskAsRegExp));
 	Dialog.Add(new CFarCheckBoxItem(52,2,0,MCaseSensitive,&FACaseSensitive));
@@ -249,7 +249,7 @@ BOOL RenameFilesPrompt() {
 	Dialog.Add(new CFarEditItem(5,7,70,DIF_HISTORY,_T("ReplaceText"), ReplaceText));
 
 	Dialog.Add(new CFarCheckBoxItem(25,4,0,MRegExp,(BOOL *)&FSearchAs));
-	Dialog.Add(new CFarCheckBoxItem(52,4,0,MCaseSensitive,&FCaseSensitive));
+	Dialog.Add(new CFarCheckBoxItem(52,4,0,MCaseSensitiveS,&FCaseSensitive));
 	Dialog.Add(new CFarCheckBoxItem(25,6,0,MRepeating,&FRepeating));
 	Dialog.Add(new CFarTextItem(5,8,DIF_BOXCOLOR|DIF_SEPARATOR,_T("")));
 
@@ -357,7 +357,7 @@ BOOL PerformRenameSelectedFiles(CPanelInfo &PInfo, panelitem_vector &PanelItems)
 
 BOOL RenameSelectedFilesPrompt() {
 	CFarDialog Dialog(76, 13, _T("SelectedFileRenameDlg"));
-	Dialog.AddFrame(MMenuRename);
+	Dialog.AddFrame(MRenameSelected);
 
 	Dialog.Add(new CFarCheckBoxItem(25,2,0,MRegExp,(BOOL *)&FSearchAs));
 	Dialog.Add(new CFarCheckBoxItem(50,2,0,MCaseSensitive,&FCaseSensitive));
@@ -653,7 +653,7 @@ BOOL CRnPresetCollection::EditPreset(CPreset *pPreset) {
 
 BOOL CQRPresetCollection::EditPreset(CPreset *pPreset) {
 	CFarDialog Dialog(76,15,_T("QRPresetDlg"));
-	Dialog.AddFrame(MFRPreset);
+	Dialog.AddFrame(MQRPreset);
 
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
 	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,_T("RESearch.PresetName"), pPreset->Name()));
