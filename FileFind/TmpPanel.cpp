@@ -68,7 +68,10 @@ void CTemporaryPanel::GetOpenPluginInfo(OpenPluginInfo *Info) {
 
 	Info->PanelModesArray=NULL;
 	Info->PanelModesNumber=0;
-	Info->StartPanelMode='4';
+
+	Info->StartPanelMode=TPPanelMode+'0';
+	Info->StartSortMode=TPSortMode;
+	Info->StartSortOrder=TPSortOrder;
 
 	memset(&KeyBar,0,sizeof(KeyBar));
 	KeyBar.Titles[7-1]=(LPTSTR)GetMsg(MF7);
@@ -216,5 +219,13 @@ int CTemporaryPanel::ProcessKey(int Key,unsigned int ControlState) {
 }
 
 void CTemporaryPanel::ClosePlugin() {
+	CPanelInfo PInfo;
+	if (PInfo.GetInfo(false)) {
+		TPPanelMode = PInfo.ViewMode;
+		TPSortMode  = PInfo.SortMode;
+		TPSortOrder = (PInfo.Flags & PFLAGS_REVERSESORTORDER) ? 1 : 0;
+		WriteRegistry();
+	}
+
 	if (LastTempPanel == this) m_bActive = false; else delete this;
 }
