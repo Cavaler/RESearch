@@ -299,8 +299,15 @@ int ShowFileMenu() {
 
 	g_pPanelBatches->FillMenuItems(MenuItems);
 
-	return StartupInfo.Menu(StartupInfo.ModuleNumber,-1,-1,0,FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT,GetMsg(MMenuHeader),
+	static int nLastSelection = 0;
+	if (nLastSelection >= (int)MenuItems.size()) nLastSelection = 0;
+	MenuItems[nLastSelection].Selected = TRUE;
+
+	int nResult = StartupInfo.Menu(StartupInfo.ModuleNumber,-1,-1,0,FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT,GetMsg(MMenuHeader),
 		NULL,_T("FileMenu"),NULL,NULL,&MenuItems[0],MenuItems.size());
+
+	if (nResult >= 0) nLastSelection = nResult;
+	return nResult;
 }
 
 int ShowEditorMenu() {
@@ -328,8 +335,15 @@ int ShowEditorMenu() {
 
 	g_pEditorBatches->FillMenuItems(MenuItems);
 
-	return StartupInfo.Menu(StartupInfo.ModuleNumber,-1,-1,0,FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT,GetMsg(MMenuHeader),
+	static int nLastSelection = 0;
+	if (nLastSelection >= (int)MenuItems.size()) nLastSelection = 0;
+	MenuItems[nLastSelection].Selected = TRUE;
+
+	int nResult = StartupInfo.Menu(StartupInfo.ModuleNumber,-1,-1,0,FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT,GetMsg(MMenuHeader),
 		NULL,_T("EditorMenu"),NULL,NULL,&MenuItems[0],MenuItems.size());
+
+	if (nResult >= 0) nLastSelection = nResult;
+	return nResult;
 }
 
 int ShowViewerMenu() {
@@ -344,8 +358,15 @@ int ShowViewerMenu() {
 	MenuItems.push_back(CFarMenuItem(true));
 	VSPresets->FillMenuItems(MenuItems);
 
-	return StartupInfo.Menu(StartupInfo.ModuleNumber,-1,-1,0,FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT,GetMsg(MMenuHeader),
+	static int nLastSelection = 0;
+	if (nLastSelection >= (int)MenuItems.size()) nLastSelection = 0;
+	MenuItems[nLastSelection].Selected = TRUE;
+
+	int nResult = StartupInfo.Menu(StartupInfo.ModuleNumber,-1,-1,0,FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT,GetMsg(MMenuHeader),
 		NULL,_T("EditorMenu"),NULL,NULL,&MenuItems[0],MenuItems.size());
+
+	if (nResult >= 0) nLastSelection = nResult;
+	return nResult;
 }
 
 OperationResult OpenPluginFromFilePreset(int Item) {
