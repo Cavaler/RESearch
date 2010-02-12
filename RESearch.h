@@ -197,6 +197,7 @@ enum eStringTable {
 	MMaxInThreadLength,
 	MThreadStackMB,
 	MShowUsageWarnings,
+	MUseEscapesInPlainText,
 
 	MDefaultCP,
 	MDefaultOEM,
@@ -241,6 +242,7 @@ enum eStringTable {
 	MAnyText,
 	MFindSelection,
 	MAutoFindInSelection,
+	MUseRealEOL,
 
 	MInvalidNumber,
 

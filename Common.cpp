@@ -86,7 +86,7 @@ bool CheckUsage(const tstring &strText, bool bRegExp, bool bSeveralLine) {
 		}
 	}
 
-	if (bSeveralLine) {
+	if (bSeveralLine && !g_bUseRealEOL) {
 		if ((strText.find(_T("\\r\\n")) != string::npos) || (strText.find(_T("\r\n")) != string::npos)) {
 			int nResult = Message(FMSG_WARNING, NULL, 5, 2,
 				GetMsg(MWarning), GetMsg(MWarnRNInSeveralLine), GetMsg(MWarnContinue), GetMsg(MOk), GetMsg(MCancel));

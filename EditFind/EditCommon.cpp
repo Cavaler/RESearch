@@ -176,7 +176,10 @@ void FillLineBuffer(size_t FirstLine, size_t LastLine) {
 			for (size_t nOff = 1; nOff < g_LineOffsets.size(); nOff++) g_LineOffsets[nOff] += String.StringLength+1;
 
 			NewBuffer.insert(NewBuffer.begin(), String.StringText, String.StringText+String.StringLength);
-			NewBuffer.insert(NewBuffer.begin()+String.StringLength, '\n');
+			if (g_bUseRealEOL)
+				NewBuffer.insert(NewBuffer.begin()+String.StringLength, String.StringEOL, _tcschr(String.StringEOL, 0));
+			else
+				NewBuffer.insert(NewBuffer.begin()+String.StringLength, '\n');
 
 			g_FirstLine = Position.CurLine;
 			if (g_LineBuffer.size()+NewBuffer.size() >= SeveralLinesKB*1024u) break;
@@ -192,14 +195,21 @@ void FillLineBuffer(size_t FirstLine, size_t LastLine) {
 
 			g_LineOffsets.push_back(g_LineBuffer.size());
 			g_LineBuffer.insert(g_LineBuffer.end(), String.StringText, String.StringText+String.StringLength);
-			if (String.StringEOL != NULL && (String.StringEOL[0] != 0)) g_LineBuffer.insert(g_LineBuffer.end(), '\n');
+			if (String.StringEOL != NULL && (String.StringEOL[0] != 0)) {
+				if (g_bUseRealEOL)
+					g_LineBuffer.insert(g_LineBuffer.end(), String.StringEOL, _tcschr(String.StringEOL, 0));
+				else
+					g_LineBuffer.insert(g_LineBuffer.end(), '\n');
+			}
 
 			if (g_LineBuffer.size() >= SeveralLinesKB*1024u) break;
 		}
 	}
 
-	if ((FirstLine == LastLine) && !g_LineBuffer.empty() && (g_LineBuffer.back() == '\n'))
-		g_LineBuffer.erase(g_LineBuffer.end()-1);
+	if (FirstLine == LastLine) {
+		while (!g_LineBuffer.empty() && ((g_LineBuffer.back() == '\r') || (g_LineBuffer.back() == '\n')))
+			g_LineBuffer.erase(g_LineBuffer.end()-1);
+	}
 }
 
 BOOL SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,BOOL NeedMatch) {

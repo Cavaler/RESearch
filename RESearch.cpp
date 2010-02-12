@@ -753,7 +753,7 @@ int ConfigureCP() {
 #endif
 
 void ConfigureCommon() {
-	CFarDialog Dialog(60,17,_T("CommonConfig"));
+	CFarDialog Dialog(60,18,_T("CommonConfig"));
 	Dialog.AddFrame(MCommonSettings);
 
 	Dialog.Add(new CFarTextItem(5,3,0,MSeveralLinesIs));
@@ -771,6 +771,7 @@ void ConfigureCommon() {
 	Dialog.Add(new CFarEditItem(34,9,40,0,NULL,(int &)g_nThreadStackMB,new CFarIntegerRangeValidator(0,1024)));
 
 	Dialog.Add(new CFarCheckBoxItem(5,11,0,MShowUsageWarnings,&g_bShowUsageWarnings));
+	Dialog.Add(new CFarCheckBoxItem(5,12,0,MUseEscapesInPlainText,&g_bEscapesInPlainText));
 
 	Dialog.AddButtons(MOk,MCancel);
 	Dialog.Display(-1);
@@ -836,7 +837,7 @@ void ConfigureFile() {
 }
 
 void ConfigureEditor() {
-	CFarDialog Dialog(60,22,_T("EditorConfig"));
+	CFarDialog Dialog(60,24,_T("EditorConfig"));
 	Dialog.AddFrame(MEditorSearchSettings);
 
 	Dialog.Add(new CFarTextItem(5,3,0,MShowPositionOffset));
@@ -858,6 +859,8 @@ void ConfigureEditor() {
 
 	Dialog.Add(new CFarCheckBoxItem(7,15,0,MFindSelection,&EFindSelection));
 	Dialog.Add(new CFarCheckBoxItem(5,16,0,MAutoFindInSelection,&EAutoFindInSelection));
+	
+	Dialog.Add(new CFarCheckBoxItem(5,18,0,MUseRealEOL,&g_bUseRealEOL));
 
 	Dialog.AddButtons(MOk,MCancel);
 	Dialog.Display(-1);

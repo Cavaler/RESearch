@@ -140,6 +140,7 @@ MUseSeparateThread	"&Use separate thread for regexp match"	"&Использовать отдель
 MMaxInThreadLength	"For &lines longer than:"				"Для строк &длиннее:"
 MThreadStackMB		"&Thread stack, in MB:"					"Стек потока, в MB:"
 MShowUsageWarnings	"Show &warnings on common mistakes"		"&Предупреждения о неправильном использовании"
+MUseEscapesInPlainText	"Use &escapes in plain-text replace"	"Использовать &эскейпы при plain text замене"
 
 MDefaultCP			"&Default codepage:"					"&Кодировка по умолчанию:"
 MDefaultOEM			"&OEM"
@@ -184,6 +185,7 @@ MWordOnly			"&Words only"						"Т&олько слова"
 MAnyText			"&Any text"							"Любой &текст"
 MFindSelection		"Pick up &selection"				"Искать &выделенный текст"
 MAutoFindInSelection	"Turn '&In selection' on automatically"	"Включать поиск 'в в&ыделенном' автоматически"
+MUseRealEOL			"&Use real end-of-line sequences"	"Использовать &реальные концы строк"
 
 MInvalidNumber		"Value not integer or not in range %d..%d"	"Неправильное число или не в границах %d..%d"
 
