@@ -62,7 +62,7 @@ void UpdateStrings(HANDLE hDlg, sREData *pData) {
 	if (pcre_exec(re, NULL, strSource.c_str(), strSource.length(), 0, 0, &arrMatch[0], nMatch*3) < 0) return;
 
 	tstring strReplace = GetDialogText(hDlg, 6);
-	tstring strResult = CreateReplaceString(strSource.c_str(), &arrMatch[0], nMatch, strReplace.c_str(), _T("\n"), NULL, -1);
+	tstring strResult = CreateReplaceString(strSource.c_str(), &arrMatch[0], nMatch, strReplace.c_str(), _T("\n"), NULL, -1, TRUE);
 	StartupInfo.SendDlgMessage(hDlg, DM_SETTEXTPTR, 8, (LONG_PTR)strResult.data());
 }
 
@@ -393,9 +393,9 @@ BOOL ReplaceInText(int FirstLine, int StartPos, int LastLine, int EndPos) {
 		BOOL ZeroMatch = (MatchFirstLine == MatchLastLine)&&(MatchStartPos == MatchEndPos);
 
 #ifdef UNICODE
-		tstring Replace = CreateReplaceString(MatchedLine, Match, MatchCount, ERReplace.c_str(),_T("\n"), Numbers,(EREvaluate ? EREvaluateScript : -1));
+		tstring Replace = CreateReplaceString(MatchedLine, Match, MatchCount, ERReplace.c_str(),_T("\n"), Numbers,(EREvaluate ? EREvaluateScript : -1), ERegExp);
 #else
-		string Replace_O2E = CreateReplaceString(MatchedLine, Match, MatchCount, ERReplace_O2E.c_str(),"\n", Numbers,(EREvaluate ? EREvaluateScript : -1));
+		string Replace_O2E = CreateReplaceString(MatchedLine, Match, MatchCount, ERReplace_O2E.c_str(),"\n", Numbers,(EREvaluate ? EREvaluateScript : -1), ERegExp);
 #endif
 		if (g_bInterrupted) {	// Script failed
 			break;
@@ -441,9 +441,9 @@ BOOL ReplaceInTextByLine(int FirstLine, int StartPos, int LastLine, int EndPos, 
 			int Numbers[3] = {MatchFirstLine, MatchFirstLine-ReplaceStartLine, ReplaceNumber};
 
 #ifdef UNICODE
-			tstring Replace = CreateReplaceString(MatchedLine, Match, MatchCount, ERReplace.c_str(), _T("\n"), Numbers,(EREvaluate ? EREvaluateScript : -1));
+			tstring Replace = CreateReplaceString(MatchedLine, Match, MatchCount, ERReplace.c_str(), _T("\n"), Numbers,(EREvaluate ? EREvaluateScript : -1), ERegExp);
 #else
-			string Replace_O2E = CreateReplaceString(MatchedLine, Match, MatchCount, ERReplace_O2E.c_str(), "\n", Numbers,(EREvaluate ? EREvaluateScript : -1));
+			string Replace_O2E = CreateReplaceString(MatchedLine, Match, MatchCount, ERReplace_O2E.c_str(), "\n", Numbers,(EREvaluate ? EREvaluateScript : -1), ERegExp);
 #endif
 			if (g_bInterrupted) {	// Script failed
 				break;

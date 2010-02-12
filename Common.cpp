@@ -279,9 +279,12 @@ static BOOL ExpandParameter(const CHAR *Matched, cstring &String, const cstring 
 	return TRUE;
 }
 
-static cstring CreateReplaceString(const CHAR *Matched,int *Match,int Count,const CHAR *Replace,const CHAR *EOL,int *Numbers,int Engine) {
+static cstring CreateReplaceString(const CHAR *Matched,int *Match,int Count,const CHAR *Replace,const CHAR *EOL,int *Numbers,int Engine, BOOL bRegExp) {
 	if ((Engine >= 0) && (Engine < (int)m_arrEngines.size()))
 		return EvaluateReplaceString(Matched, Match, Count, Replace, EOL, Numbers, Engine);
+
+	if (!bRegExp && !g_bEscapesInPlainText)
+		return Replace;
 
 	cstring String;
 	OneCaseConvert=CaseConvert=CCV_NONE;
@@ -405,14 +408,14 @@ template<> static wchar_t * CStringOperations<wchar_t>::_T2(char *sz, wchar_t *w
 
 //////////////////////////////////////////////////////////////////////////
 
-tstring CreateReplaceString(const TCHAR *Matched,int *Match,int Count,const TCHAR *Replace,const TCHAR *EOL,int *Numbers,int Engine) {
-	return CStringOperations<TCHAR>::CreateReplaceString(Matched, Match, Count, Replace, EOL, Numbers, Engine);
+tstring CreateReplaceString(const TCHAR *Matched,int *Match,int Count,const TCHAR *Replace,const TCHAR *EOL,int *Numbers,int Engine, BOOL bRegExp) {
+	return CStringOperations<TCHAR>::CreateReplaceString(Matched, Match, Count, Replace, EOL, Numbers, Engine, bRegExp);
 }
 
 #ifdef UNICODE
 
-string CreateReplaceString(const char *Matched,int *Match,int Count,const char *Replace,const char *EOL,int *Numbers,int Engine) {
-	return CStringOperations<char>::CreateReplaceString(Matched, Match, Count, Replace, EOL, Numbers, Engine);
+string CreateReplaceString(const char *Matched,int *Match,int Count,const char *Replace,const char *EOL,int *Numbers,int Engine, BOOL bRegExp) {
+	return CStringOperations<char>::CreateReplaceString(Matched, Match, Count, Replace, EOL, Numbers, Engine, bRegExp);
 }
 
 string EvaluateReplaceString(const char *Matched,int *Match,int Count,const char *Replace,const char *EOL,int *Numbers,int Engine) {

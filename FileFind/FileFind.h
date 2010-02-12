@@ -61,6 +61,7 @@ EXTERN CFAPresetCollection *FAPresets;
 EXTERN BOOL FUTF8 VALUE(FALSE);
 EXTERN BOOL FAdvanced VALUE(FALSE);
 EXTERN int  FAdvancedID VALUE(0);
+EXTERN bool FRegExp;
 
 // Internals
 

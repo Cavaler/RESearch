@@ -146,7 +146,7 @@ void RenameFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 	FileNumber++;
 	while (FindRename(FileName,Match,MatchCount,MatchStart,MatchLength)) {
 		int Numbers[3]={FileNumber,FileNumber,ReplaceNumber};
-		tstring NewSubName=CreateReplaceString(FileName,Match,MatchCount,FRReplace.c_str(),_T(""),Numbers,-1);
+		tstring NewSubName=CreateReplaceString(FileName,Match,MatchCount,FRReplace.c_str(),_T(""),Numbers,-1, FSearchAs==SA_REGEXP);
 
 		_tcsncpy(NewName,FileName,MatchStart);
 		_tcscpy(NewName+MatchStart,NewSubName.c_str());

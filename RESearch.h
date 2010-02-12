@@ -335,9 +335,9 @@ int  ConfigureSeveralLines();
 
 bool CheckUsage(const tstring &strText, bool bRegExp, bool bSeveralLine);
 BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const tstring &Text,int CaseSensitive,BOOL bUTF8=FALSE,const unsigned char *pTables=NULL);
-tstring CreateReplaceString(const TCHAR *Matched,int *Match,int Count,const TCHAR *Replace,const TCHAR *EOL,int *Numbers,int Engine);
+tstring CreateReplaceString(const TCHAR *Matched,int *Match,int Count,const TCHAR *Replace,const TCHAR *EOL,int *Numbers,int Engine, BOOL bRegExp);
 #ifdef UNICODE
-string CreateReplaceString(const char *Matched,int *Match,int Count,const char *Replace,const char *EOL,int *Numbers,int Engine);
+string CreateReplaceString(const char *Matched,int *Match,int Count,const char *Replace,const char *EOL,int *Numbers,int Engine, BOOL bRegExp);
 #endif
 tstring EvaluateReplaceString(const TCHAR *Matched,int *Match,int Count,const TCHAR *Replace,const TCHAR *EOL,int *Numbers,int Engine);
 
