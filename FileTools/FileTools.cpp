@@ -88,7 +88,6 @@ void ChangeSelection(int How) {
 }
 
 BOOL ConfirmRename(const TCHAR *From,const TCHAR *To) {
-	if (!ConfirmFile(MMenuRename,From)) return FALSE;
 	if (g_bInterrupted) return FALSE;
 	if (!FRConfirmLineThisFile) return TRUE;
 
@@ -154,6 +153,7 @@ void RenameFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 		MatchStart += NewSubName.length();
 		if (Match) delete[] Match;
 
+		if (!ConfirmFile(MMenuRename,FileName)) break;
 		if (ConfirmRename(FileName,NewName)) {
 			memmove(NewName+(FileName-FindData->cFileName),NewName,(_tcslen(NewName)+1)*sizeof(TCHAR));
 			_tcsncpy(NewName,FindData->cFileName,FileName-FindData->cFileName);
@@ -368,7 +368,6 @@ BOOL RenameSelectedFilesPrompt() {
 	Dialog.Add(new CFarEditItem(5,5,70,DIF_HISTORY,_T("ReplaceText"), ReplaceText));
 	Dialog.Add(new CFarCheckBoxItem(25,4,0,MRepeating,&FRepeating));
 
-//	Dialog.Add(new CFarCheckBoxItem(5,7,0,MConfirmFile,&FRConfirmFile));
 	Dialog.Add(new CFarCheckBoxItem(5,7,0,MConfirmLine,&FRConfirmLine));
 	Dialog.AddButtons(MOk,MCancel);
 	Dialog.Add(new CFarButtonItem(60,6,0,0,MBtnPresets));
@@ -380,7 +379,6 @@ BOOL RenameSelectedFilesPrompt() {
 	int ExitCode;
 	SearchText=FText;
 	ReplaceText=FRReplace;
-	FRConfirmFile = FALSE;
 	do {
 		switch (ExitCode=Dialog.Display(2, -3, -1)) {
 		case 0:
@@ -410,7 +408,7 @@ OperationResult RenameSelectedFiles(panelitem_vector &PanelItems, BOOL ShowDialo
 	}
 
 	PanelItems.clear();
-	FRConfirmFileThisRun=FRConfirmFile;
+	FRConfirmFileThisRun=FALSE;
 	FRConfirmLineThisRun=FRConfirmLine;
 	FTAskOverwrite = FTAskCreatePath = true;
 
