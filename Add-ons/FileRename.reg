@@ -1,0 +1,11 @@
+REGEDIT4
+
+[HKEY_CURRENT_USER\Software\Far\KeyMacros\Shell\AltF6]
+"Sequence"="F11 s m"
+"DisableOutput"=dword:00000001
+"Description"="RESelectedFileRename"
+
+[HKEY_CURRENT_USER\Software\Far\KeyMacros\Shell\CtrlAltF6]
+"Sequence"="F11 s n"
+"DisableOutput"=dword:00000001
+"Description"="REFileRename"

@@ -1,0 +1,9 @@
+REGEDIT4
+
+[HKEY_CURRENT_USER\Software\Far\KeyMacros\Shell\AltF7]
+"Sequence"="F11 s s"
+"Description"="Regular Expression Search"
+
+[HKEY_CURRENT_USER\Software\Far\KeyMacros\Shell\ShiftF7]
+"Sequence"="F11 s r"
+"Description"="Regular Expression Replace"

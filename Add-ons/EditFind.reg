@@ -1,0 +1,21 @@
+REGEDIT4
+
+[HKEY_CURRENT_USER\Software\Far\KeyMacros\Editor\F7]
+"Sequence"="F11 s s"
+"DisableOutput"=dword:00000001
+"Description"="REEditSearch"
+
+[HKEY_CURRENT_USER\Software\Far\KeyMacros\Editor\CtrlF7]
+"Sequence"="F11 s r"
+"DisableOutput"=dword:00000001
+"Description"="REEditReplace"
+
+[HKEY_CURRENT_USER\Software\Far\KeyMacros\Editor\AltF7]
+"Sequence"="F11 s f"
+"DisableOutput"=dword:00000001
+"Description"="REEditFilter"
+
+[HKEY_CURRENT_USER\Software\Far\KeyMacros\Editor\ShiftF7]
+"Sequence"="F11 s a"
+"DisableOutput"=dword:00000001
+"Description"="RESearchAgain"

@@ -1,0 +1,11 @@
+REGEDIT4
+
+[HKEY_CURRENT_USER\Software\Far\KeyMacros\Viewer\F7]
+"Sequence"="F11 s s"
+"DisableOutput"=dword:00000001
+"Description"="REViewSearch"
+
+[HKEY_CURRENT_USER\Software\Far\KeyMacros\Viewer\ShiftF7]
+"Sequence"="F11 s a"
+"DisableOutput"=dword:00000001
+"Description"="RESearchAgain"
