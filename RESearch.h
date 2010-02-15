@@ -252,6 +252,7 @@ enum eStringTable {
 	MUnselect,
 	MFlipSelection,
 	MRepeating,
+	MLeaveSelection,
 
 	MSearchFor,
 	MReplaceWith,

@@ -195,6 +195,7 @@ MSelect				"Select files"						"Выделить файлы"
 MUnselect			"Unselect files"					"Снять выделение"
 MFlipSelection		"Flip selection"					"Обратить выделение"
 MRepeating			"R&epeating replace"				"Многократная замена"
+MLeaveSelection		"Preserve &selection"				"Сохранить в&ыделение"
 
 MSearchFor			"&Search for:"						"Искать &текст:"
 MReplaceWith		"Replace w&ith:"					"Заменить &на:"

@@ -136,6 +136,7 @@ void RenameFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 	int *Match;
 	BOOL Modified=FALSE;
 	TCHAR NewName[MAX_PATH];
+
 	TCHAR *FileName=_tcsrchr(FindData->cFileName,'\\');
 	if (FileName) FileName++; else FileName=FindData->cFileName;
 
@@ -330,17 +331,22 @@ OperationResult RenameFilesExecutor() {
 }
 
 BOOL PerformRenameSelectedFiles(CPanelInfo &PInfo, panelitem_vector &PanelItems) {
-	FileNumber=-1;g_bInterrupted=FALSE;
+	FileNumber=-1;
+	g_bInterrupted=FALSE;
 
+	BOOL bRestoreSelection = FRLeaveSelection;
 	if ((PInfo.SelectedItemsNumber==0)&&(PInfo.ItemsNumber>0)&&
 		(_tcscmp(FarFileName(PInfo.PanelItems[PInfo.CurrentItem].FindData),_T(".."))==0)) {
 
+		bRestoreSelection = FALSE;
 		for (int I=0;I<PInfo.ItemsNumber;I++) {
 			if (I==PInfo.CurrentItem) continue;
 			if (g_bInterrupted) break;
 			RenameFile(&FFDtoWFD(PInfo.PanelItems[I].FindData),PanelItems);
 		}
 	} else {
+		if ((PInfo.SelectedItemsNumber == 1) && ((PInfo.SelectedItems[0].Flags & PPIF_SELECTED) == 0))
+			bRestoreSelection = FALSE;
 		for (int I=0;I<PInfo.SelectedItemsNumber;I++) {
 			if (g_bInterrupted) break;
 			RenameFile(&FFDtoWFD(PInfo.SelectedItems[I].FindData),PanelItems);
@@ -352,11 +358,25 @@ BOOL PerformRenameSelectedFiles(CPanelInfo &PInfo, panelitem_vector &PanelItems)
 #else
 	StartupInfo.Control(INVALID_HANDLE_VALUE, FCTL_UPDATEPANEL, NULL);
 #endif
+	if (bRestoreSelection) {
+		CPanelInfo PNewInfo;
+		PNewInfo.GetInfo(false);
+
+		for (size_t nFile = 0; nFile < PanelItems.size(); nFile++) {
+			for (int nItem = 0; nItem < PNewInfo.ItemsNumber; nItem++) {
+				if (_tcscmp(FarFileName(PanelItems[nFile].FindData), FarFileName(PNewInfo.PanelItems[nItem].FindData)) == 0) {
+					PNewInfo.PanelItems[nItem].Flags |= PPIF_SELECTED;
+					break;
+				}
+			}
+		}
+		SetPanelSelection(PNewInfo, false, true);
+	}
 	return TRUE;
 }
 
 BOOL RenameSelectedFilesPrompt() {
-	CFarDialog Dialog(76, 13, _T("SelectedFileRenameDlg"));
+	CFarDialog Dialog(76, 14, _T("SelectedFileRenameDlg"));
 	Dialog.AddFrame(MRenameSelected);
 
 	Dialog.Add(new CFarCheckBoxItem(25,2,0,MRegExp,(BOOL *)&FSearchAs));
@@ -369,6 +389,7 @@ BOOL RenameSelectedFilesPrompt() {
 	Dialog.Add(new CFarCheckBoxItem(25,4,0,MRepeating,&FRepeating));
 
 	Dialog.Add(new CFarCheckBoxItem(5,7,0,MConfirmLine,&FRConfirmLine));
+	Dialog.Add(new CFarCheckBoxItem(5,8,0,MLeaveSelection,&FRLeaveSelection));
 	Dialog.AddButtons(MOk,MCancel);
 	Dialog.Add(new CFarButtonItem(60,6,0,0,MBtnPresets));
 	Dialog.SetFocus(4);
@@ -431,6 +452,8 @@ OperationResult QuickRenameFilesExecutor() {
 
 	return PerformRenameSelectedFiles(PInfo, g_PanelItems) ? OR_OK : OR_CANCEL;
 }
+
+//////////////////////////////////////////////////////////////////////////
 
 void StripCommonPart(vector<tstring> &arrFileNames) {
 	int nCommon = -1;
