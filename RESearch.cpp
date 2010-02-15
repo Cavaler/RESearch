@@ -825,19 +825,20 @@ void ConfigureFile() {
 }
 
 void ConfigureRenumbering() {
-	CFarDialog Dialog(70, 15, _T("RenumberConfig"));
+	CFarDialog Dialog(70, 16, _T("RenumberConfig"));
 
 	Dialog.AddFrame(MRenumberSettings);
-	Dialog.Add(new CFarCheckBoxItem(5,3,0,MStripFromBeginning, g_bFRStripCommon));
+	Dialog.Add(new CFarCheckBoxItem(5,3,0,MStripFromBeginning, g_bStripRegExp));
 	Dialog.Add(new CFarEditItem(42,3,61,DIF_HISTORY,_T("RESearch.Strip"), g_strStrip));
-	Dialog.Add(new CFarTextItem(5,5,0,MPrefix));
-	Dialog.Add(new CFarEditItem(30,5,42,DIF_HISTORY,_T("RESearch.Prefix"), g_strPrefix));
-	Dialog.Add(new CFarTextItem(5,6,0,MPostfix));
-	Dialog.Add(new CFarEditItem(30,6,42,DIF_HISTORY,_T("RESearch.Postfix"), g_strPostfix));
-	Dialog.Add(new CFarTextItem(5,8,0,MStartFrom));
-	Dialog.Add(new CFarEditItem(30,8,38,0, NULL, (int &)g_nStartWith,new CFarIntegerRangeValidator(0,0x7FFFFFFF)));
-	Dialog.Add(new CFarTextItem(5,9,0,MWidth));
-	Dialog.Add(new CFarEditItem(30,9,38,0, NULL, (int &)g_nWidth,new CFarIntegerRangeValidator(0,MAX_PATH)));
+	Dialog.Add(new CFarCheckBoxItem(5,3,0,MStripCommonPart, g_bStripCommon));
+	Dialog.Add(new CFarTextItem(5,6,0,MPrefix));
+	Dialog.Add(new CFarEditItem(30,6,42,DIF_HISTORY,_T("RESearch.Prefix"), g_strPrefix));
+	Dialog.Add(new CFarTextItem(5,7,0,MPostfix));
+	Dialog.Add(new CFarEditItem(30,7,42,DIF_HISTORY,_T("RESearch.Postfix"), g_strPostfix));
+	Dialog.Add(new CFarTextItem(5,9,0,MStartFrom));
+	Dialog.Add(new CFarEditItem(30,9,38,0, NULL, (int &)g_nStartWith,new CFarIntegerRangeValidator(0,0x7FFFFFFF)));
+	Dialog.Add(new CFarTextItem(5,10,0,MWidth));
+	Dialog.Add(new CFarEditItem(30,10,38,0, NULL, (int &)g_nWidth,new CFarIntegerRangeValidator(0,MAX_PATH)));
 	Dialog.AddButtons(MOk,MCancel);
 
 	Dialog.Display(-1);

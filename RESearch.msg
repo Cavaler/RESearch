@@ -167,8 +167,9 @@ MSkipSystemFolders	"Skip preconfig&ured system folders:"	"Пропускать заданные си
 
 MRenumberSettings	"Renumbering settings"				"Перенумерование"
 MStripFromBeginning	"RegExp to &strip from beginning:"	"RegExp, &убираемый с начала:"
+MStripCommonPart	"Strip &common part from beginning"	"Удалять &общую часть с начала"
 MPrefix				"&Prefix to number:"				"&Префикс перед номером:"
-MPostfix			"P&ostfix after number:"			"П&остфикс после номера:"
+MPostfix			"P&ostfix after number:"			"По&стфикс после номера:"
 MStartFrom			"&Start number from:"				"&Нумеровать с:"
 MWidth				"&Digits in number:"				"&Цифр в номере:"
 

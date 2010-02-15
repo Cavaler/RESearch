@@ -478,27 +478,30 @@ void ProcessNames(vector<tstring> &arrFileNames, vector<tstring> &arrProcessedNa
 
 	vector<tstring> arrStripped = arrFileNames;
 
-	if (g_bFRStripCommon) StripCommonPart(arrStripped);
-	for (size_t nItem = 0; nItem < arrStripped.size(); nItem++) {
-		if (!arrStripped[nItem].empty()) {
-			// Preserving extensions!
-			size_t nExt = arrStripped[nItem].rfind('.');
-			if (nExt != tstring::npos) {
-				tstring strReplacing = arrStripped[nItem].substr(0, nExt);
+	if (g_bStripCommon) StripCommonPart(arrStripped);
 
-				vector<tstring> arrMatches;
-				if (reStrip.Match(strReplacing, PCRE_ANCHORED, &arrMatches)) {
-					arrStripped[nItem] = strReplacing.substr(arrMatches[0].length()) + arrStripped[nItem].substr(nExt);
-				}
-			} else {
-				vector<tstring> arrMatches;
-				if (reStrip.Match(arrStripped[nItem], PCRE_ANCHORED, &arrMatches)) {
-					arrStripped[nItem] = arrStripped[nItem].substr(arrMatches[0].length());
+	if (g_bStripRegExp) {
+		for (size_t nItem = 0; nItem < arrStripped.size(); nItem++) {
+			if (!arrStripped[nItem].empty()) {
+				// Preserving extensions!
+				size_t nExt = arrStripped[nItem].rfind('.');
+				if (nExt != tstring::npos) {
+					tstring strReplacing = arrStripped[nItem].substr(0, nExt);
+
+					vector<tstring> arrMatches;
+					if (reStrip.Match(strReplacing, PCRE_ANCHORED, &arrMatches)) {
+						arrStripped[nItem] = strReplacing.substr(arrMatches[0].length()) + arrStripped[nItem].substr(nExt);
+					}
+				} else {
+					vector<tstring> arrMatches;
+					if (reStrip.Match(arrStripped[nItem], PCRE_ANCHORED, &arrMatches)) {
+						arrStripped[nItem] = arrStripped[nItem].substr(arrMatches[0].length());
+					}
 				}
 			}
 		}
+		if (g_bStripCommon) StripCommonPart(arrStripped);
 	}
-	if (g_bFRStripCommon) StripCommonPart(arrStripped);
 
 	for (size_t nItem = 0; nItem < arrStripped.size(); nItem++) {
 		tstring strName = arrStripped[nItem];
@@ -638,7 +641,7 @@ OperationResult RenumberFiles() {
 			nPosition = nOK;
 			break;
 		case 15:
-			g_bFRStripCommon = !g_bFRStripCommon;
+			g_bStripCommon = !g_bStripCommon;
 			break;
 		case 16:
 			ConfigureRenumbering();

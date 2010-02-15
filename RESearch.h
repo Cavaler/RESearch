@@ -224,6 +224,7 @@ enum eStringTable {
 
 	MRenumberSettings,
 	MStripFromBeginning,
+	MStripCommonPart,
 	MPrefix,
 	MPostfix,
 	MStartFrom,

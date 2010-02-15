@@ -205,12 +205,14 @@ $ #Renumbering settings#
 
 Setting options for ~Renumber files~@Renumber@ command.
 
-    #RegExp to strip from beginning#  Any string matching this regexp will be stripped from
+    #RegExp to strip from beginning#   Any string matching this regexp will be stripped from
 beginning of a filename
-    #Prefix to number#               String to add before number in a filename
-    #Postfix after number#           String to add after number in a filename
-    #Start number from#              Self-explanatory
-    #Digits in number#               Number is left-padded with zeroes to at least this width
+    #Strip common part from beginning# If set, strip part of the name which all files have
+identical (both before and after regexp)
+    #Prefix to number#                 String to add before number in a filename
+    #Postfix after number#             String to add after number in a filename
+    #Start number from#                Self-explanatory
+    #Digits in number#               N  umber is left-padded with zeroes to at least this width
 @EditorConfig
 $ #Editor settings#
   #Found text horizontal offset:# Where does line with text found in editor appears.
