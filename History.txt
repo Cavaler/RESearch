@@ -7,13 +7,25 @@ Regular Expression Search and Replace
 
 Planned:
 	* dialogprocs for disabling unneeded elements
-	* Disabling all special chars in Replace without Regexps
 	+ Do not decode whole file while searching/grep, use VirtualAlloc's etc
+	+ Preview rename changes
+	+ Undo rename
+	- Gray out 'show last results' if there aren't any (requires FMENU_USEEXT)
+
+
+Version 7.01 (15.02.2010)
+	* Remember last operation and highlight it first in menu
+	* Save TmpPanel view/sort mode between instances
+	* New option: [X] Use real EOLs in editor
+	* New option: [X] Use escapes in plain-text replace
+	- Some confirmation issues with rename fixed
+	* Renumbering options moved to separate dialog, can be called by F4
+	* '[X] Preserve selection' for 'Renumber' and 'Rename selected files'
 
 Version 7.00 beta 4 (03.02.2010)
 	- Fixed finding nonexistent \n at the end of file in Editor
-    - More hotkeys fixed (HaRT, farman)
-    - Possible crash when tunring off [X] Mask as regexp
+	- More hotkeys fixed (HaRT, farman)
+	- Possible crash when tunring off [X] Mask as regexp
 
 Version 7.00 beta 3 (25.01.2010)
 	- Processing of files with null symbols is now correct
