@@ -779,9 +779,9 @@ void ConfigureCommon() {
 
 void ConfigureFile() {
 #ifdef UNICODE
-	CFarDialog Dialog(70, 26, _T("FileConfig"));
+	CFarDialog Dialog(70, 19, _T("FileConfig"));
 #else
-	CFarDialog Dialog(70, 23, _T("FileConfig"));
+	CFarDialog Dialog(70, 16, _T("FileConfig"));
 #endif
 	Dialog.AddFrame(MFileSearchSettings);
 
@@ -795,27 +795,15 @@ void ConfigureFile() {
 	Dialog.Add(new CFarRadioButtonItem(37,5,0,MAsk,(int *)&FRReplaceReadonly,RR_ASK));
 	Dialog.Add(new CFarRadioButtonItem(37,6,0,MAlways,(int *)&FRReplaceReadonly,RR_ALWAYS));
 
-	Dialog.Add(new CFarBoxItem(FALSE, 5,9,64,15,DIF_LEFTTEXT,MRenumberOptions));
-	Dialog.Add(new CFarTextItem(7,10,0,MStripFromBeginning));
-	Dialog.Add(new CFarEditItem(40,10,61,DIF_HISTORY,_T("RESearch.Strip"), g_strStrip));
-	Dialog.Add(new CFarTextItem(7,11,0,MPrefix));
-	Dialog.Add(new CFarEditItem(32,11,42,DIF_HISTORY,_T("RESearch.Prefix"), g_strPrefix));
-	Dialog.Add(new CFarTextItem(7,12,0,MPostfix));
-	Dialog.Add(new CFarEditItem(32,12,42,DIF_HISTORY,_T("RESearch.Postfix"), g_strPostfix));
-	Dialog.Add(new CFarTextItem(7,13,0,MStartFrom));
-	Dialog.Add(new CFarEditItem(32,13,38,0, NULL, (int &)g_nStartWith,new CFarIntegerRangeValidator(0,0x7FFFFFFF)));
-	Dialog.Add(new CFarTextItem(7,14,0,MWidth));
-	Dialog.Add(new CFarEditItem(32,14,38,0, NULL, (int &)g_nWidth,new CFarIntegerRangeValidator(0,MAX_PATH)));
-
-	Dialog.Add(new CFarCheckBoxItem(5,16,0,MSkipSystemFolders,&FASkipSystemFolders));
-	Dialog.Add(new CFarEditItem(9, 17, 45, DIF_HISTORY,_T("RESearch.SystemFolders"), FASystemFolders));
+	Dialog.Add(new CFarCheckBoxItem(5, 9, 0, MSkipSystemFolders,&FASkipSystemFolders));
+	Dialog.Add(new CFarEditItem(9, 10, 45, DIF_HISTORY,_T("RESearch.SystemFolders"), FASystemFolders));
 
 #ifdef UNICODE
-	Dialog.Add(new CFarTextItem(5,19,0,MDefaultCP));
-	Dialog.Add(new CFarRadioButtonItem(35,19,0,MDefaultOEM,&g_bDefaultOEM,TRUE));
-	Dialog.Add(new CFarRadioButtonItem(45,19,0,MDefaultANSI,&g_bDefaultOEM,FALSE));
-	Dialog.Add(new CFarTextItem(5,20,0,MAllCPInclude));
-	Dialog.Add(new CFarButtonItem(35,20,0,FALSE,MAllCPSelect));
+	Dialog.Add(new CFarTextItem(5,12,0,MDefaultCP));
+	Dialog.Add(new CFarRadioButtonItem(35,12,0,MDefaultOEM,&g_bDefaultOEM,TRUE));
+	Dialog.Add(new CFarRadioButtonItem(45,12,0,MDefaultANSI,&g_bDefaultOEM,FALSE));
+	Dialog.Add(new CFarTextItem(5,13,0,MAllCPInclude));
+	Dialog.Add(new CFarButtonItem(35,13,0,FALSE,MAllCPSelect));
 
 	Dialog.AddButtons(MOk,MCancel);
 	do {
@@ -834,6 +822,25 @@ void ConfigureFile() {
 	Dialog.AddButtons(MOk,MCancel);
 	Dialog.Display(-1);
 #endif
+}
+
+void ConfigureRenumbering() {
+	CFarDialog Dialog(70, 15, _T("RenumberConfig"));
+
+	Dialog.AddFrame(MRenumberSettings);
+	Dialog.Add(new CFarCheckBoxItem(5,3,0,MStripFromBeginning, g_bFRStripCommon));
+	Dialog.Add(new CFarEditItem(42,3,61,DIF_HISTORY,_T("RESearch.Strip"), g_strStrip));
+	Dialog.Add(new CFarTextItem(5,5,0,MPrefix));
+	Dialog.Add(new CFarEditItem(30,5,42,DIF_HISTORY,_T("RESearch.Prefix"), g_strPrefix));
+	Dialog.Add(new CFarTextItem(5,6,0,MPostfix));
+	Dialog.Add(new CFarEditItem(30,6,42,DIF_HISTORY,_T("RESearch.Postfix"), g_strPostfix));
+	Dialog.Add(new CFarTextItem(5,8,0,MStartFrom));
+	Dialog.Add(new CFarEditItem(30,8,38,0, NULL, (int &)g_nStartWith,new CFarIntegerRangeValidator(0,0x7FFFFFFF)));
+	Dialog.Add(new CFarTextItem(5,9,0,MWidth));
+	Dialog.Add(new CFarEditItem(30,9,38,0, NULL, (int &)g_nWidth,new CFarIntegerRangeValidator(0,MAX_PATH)));
+	Dialog.AddButtons(MOk,MCancel);
+
+	Dialog.Display(-1);
 }
 
 void ConfigureEditor() {
@@ -867,13 +874,19 @@ void ConfigureEditor() {
 }
 
 int WINAPI FAR_EXPORT(Configure)(int ItemNumber) {
-	const TCHAR *ppszItems[]={GetMsg(MCommonSettings),GetMsg(MFileSearchSettings),GetMsg(MEditorSearchSettings)};
+	const TCHAR *ppszItems[]={
+		GetMsg(MCommonSettings),
+		GetMsg(MFileSearchSettings),
+		GetMsg(MRenumberSettings),
+		GetMsg(MEditorSearchSettings)
+	};
 	int iResult = 0;
 	do {
-		switch (iResult = ChooseMenu(3,ppszItems,GetMsg(MRESearch),NULL,_T("Config"),iResult)) {
+		switch (iResult = ChooseMenu(4,ppszItems,GetMsg(MRESearch),NULL,_T("Config"),iResult)) {
 		case 0:ConfigureCommon();break;
 		case 1:ConfigureFile();break;
-		case 2:ConfigureEditor();break;
+		case 2:ConfigureRenumbering();break;
+		case 3:ConfigureEditor();break;
 		default:WriteRegistry();return TRUE;
 		}
 	} while (TRUE);

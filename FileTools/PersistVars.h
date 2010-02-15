@@ -1,5 +1,6 @@
 #include <PersistVariables.h>
 
+PERSIST_bool_VARIABLE(g_bFRStripCommon, true)
 PERSIST_STRING_VARIABLE(g_strStrip, _T("^\\d+\\s*([-.]\\s*)?"))
 PERSIST_STRING_VARIABLE(g_strPrefix, _T(""))
 PERSIST_STRING_VARIABLE(g_strPostfix, _T(" - "))

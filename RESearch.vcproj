@@ -113,6 +113,8 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				Description=""
+				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration
@@ -516,6 +518,8 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				Description=""
+				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration
@@ -2006,10 +2010,50 @@
 		<File
 			RelativePath="RESearchEng.hlf"
 			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCustomBuildTool"
+					Description="Copying $(InputFileName)..."
+					CommandLine="xcopy /r /y $(InputFileName) &quot;$(TargetDir)&quot;"
+					Outputs="$(TargetDir)\$(InputFileName)"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Debug Unicode|Win32"
+				>
+				<Tool
+					Name="VCCustomBuildTool"
+					Description="Copying $(InputFileName)..."
+					CommandLine="xcopy /r /y $(InputFileName) &quot;$(TargetDir)&quot;"
+					Outputs="$(TargetDir)\$(InputFileName)"
+				/>
+			</FileConfiguration>
 		</File>
 		<File
 			RelativePath="RESearchRus.hlf"
 			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCustomBuildTool"
+					Description="Copying $(InputFileName)..."
+					CommandLine="xcopy /r /y $(InputFileName) &quot;$(TargetDir)&quot;"
+					Outputs="$(TargetDir)\$(InputFileName)"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Debug Unicode|Win32"
+				>
+				<Tool
+					Name="VCCustomBuildTool"
+					Description="Copying $(InputFileName)..."
+					CommandLine="xcopy /r /y $(InputFileName) &quot;$(TargetDir)&quot;"
+					Outputs="$(TargetDir)\$(InputFileName)"
+				/>
+			</FileConfiguration>
 		</File>
 		<File
 			RelativePath=".\RESearchW.def"

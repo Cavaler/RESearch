@@ -16,7 +16,6 @@ int FileNumber;
 bool FTAskOverwrite;
 bool FTAskCreatePath;
 int g_nStartWithNow;
-bool g_bFRStripCommon;
 
 void FTReadRegistry(HKEY Key) {
 	#define DECLARE_PERSIST_LOAD Key
@@ -538,13 +537,12 @@ OperationResult RenumberFiles() {
 		VK_F2, VK_F7, (PKF_CONTROL<<16)|VK_UP, (PKF_CONTROL<<16)|VK_DOWN,
 		VK_ADD, (PKF_CONTROL<<16)|VK_ADD, (PKF_SHIFT<<16)|VK_ADD, (PKF_ALT<<16)|VK_ADD,
 		VK_SUBTRACT, (PKF_CONTROL<<16)|VK_SUBTRACT, (PKF_SHIFT<<16)|VK_SUBTRACT, (PKF_ALT<<16)|VK_SUBTRACT,
-		VK_F10, VK_INSERT, VK_DELETE, VK_F8, 0
+		VK_F10, VK_INSERT, VK_DELETE, VK_F8, VK_F4, 0
 	};
 
 	bool bOriginal = false;
 	int nPosition = 0;
 	int nOK = 0;
-	g_bFRStripCommon = true;
 	do {
 		vector<tstring> arrProcessedNames;
 		ProcessNames(arrFileNames, arrProcessedNames);
@@ -556,7 +554,7 @@ OperationResult RenumberFiles() {
 		if (nPosition >= nOK) nPosition++;
 
 		int nBreakKey = 0;
-		nPosition = ChooseMenu(arrNames, GetMsg(MRenumber), _T("F2, F7, Ctrl-\x18\x19, F10=Go"), _T("Renumber"),
+		nPosition = ChooseMenu(arrNames, GetMsg(MRenumber), _T("F2, F4, F7, Ctrl-\x18\x19, F10=Go"), _T("Renumber"),
 			nPosition, FMENU_WRAPMODE, BreakKeys, &nBreakKey);
 		if (nPosition >= nOK) nPosition--; else
 			if (nPosition < 0) nPosition = -2;		// -1 is not Esc
@@ -641,6 +639,9 @@ OperationResult RenumberFiles() {
 			break;
 		case 15:
 			g_bFRStripCommon = !g_bFRStripCommon;
+			break;
+		case 16:
+			ConfigureRenumbering();
 			break;
 		}
 	} while (true);

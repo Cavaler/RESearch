@@ -199,15 +199,18 @@ but only to beginning, e.g. "ab*cd" will match "ab123cd456"
     #Ask#                           Search them, and ask user to perform replace if needed
     #Always#                        Replace without additional questions
 
-  #Renumbering#                   Sets parameters for "File renumber" function
+  #Skip preconfigured system folders# Folders matching given masks will be always skipped
+@RenumberConfig
+$ #Renumbering settings#
+
+Setting options for ~Renumber files~@Renumber@ command.
+
     #RegExp to strip from beginning#  Any string matching this regexp will be stripped from
 beginning of a filename
     #Prefix to number#               String to add before number in a filename
     #Postfix after number#           String to add after number in a filename
     #Start number from#              Self-explanatory
     #Digits in number#               Number is left-padded with zeroes to at least this width
-
-  #Skip preconfigured system folders# Folders matching given masks will be always skipped
 @EditorConfig
 $ #Editor settings#
   #Found text horizontal offset:# Where does line with text found in editor appears.
@@ -652,6 +655,7 @@ should be (previously selected files will be moved to a separate area)
   #Ctrl-Up/Down#  Move file up/down
   #Gray +/-#      Change initial number up/down by 1
   #Ctrl- Gray+/-# Change initial number up/down by 10
+  #F4#            Call options dialog
   #F10#           Perform rename
   #Esc#           Cancel
 @FRenameError

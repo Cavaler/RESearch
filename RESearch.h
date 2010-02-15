@@ -220,13 +220,14 @@ enum eStringTable {
 	MNever,
 	MAsk,
 	MAlways,
-	MRenumberOptions,
+	MSkipSystemFolders,
+
+	MRenumberSettings,
 	MStripFromBeginning,
 	MPrefix,
 	MPostfix,
 	MStartFrom,
 	MWidth,
-	MSkipSystemFolders,
 
 	MEditorSearchSettings,
 	MShowPositionOffset,
@@ -332,6 +333,11 @@ HKEY OpenRegistry(const TCHAR *szSubKey=NULL, bool bCreate=true);
 void ReadRegistry();
 void WriteRegistry();
 void ReadActiveScripts();
+
+void ConfigureCommon();
+void ConfigureFile();
+void ConfigureRenumbering();
+void ConfigureEditor();
 int  ConfigureSeveralLines();
 
 bool CheckUsage(const tstring &strText, bool bRegExp, bool bSeveralLine);
