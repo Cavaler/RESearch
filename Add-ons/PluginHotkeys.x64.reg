@@ -1,0 +1,6 @@
+REGEDIT4
+
+[HKEY_CURRENT_USER\Software\Far\PluginHotkeys]
+
+[HKEY_CURRENT_USER\Software\Far\PluginHotkeys\Plugins/RESearch/RESearch x64.dll]
+"Hotkey"="s"

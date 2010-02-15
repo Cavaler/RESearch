@@ -1,0 +1,16 @@
+REGEDIT4
+
+[HKEY_CURRENT_USER\Software\Far2\KeyMacros\Shell\AltAdd]
+"Sequence"="F11 s l"
+"DisableOutput"=dword:00000001
+"Description"="REFileSelect"
+
+[HKEY_CURRENT_USER\Software\Far2\KeyMacros\Shell\AltSubtract]
+"Sequence"="F11 s u"
+"DisableOutput"=dword:00000001
+"Description"="REFileUnselect"
+
+[HKEY_CURRENT_USER\Software\Far2\KeyMacros\Shell\AltMultiply]
+"Sequence"="F11 s f"
+"DisableOutput"=dword:00000001
+"Description"="REFileFlipSelect"
