@@ -523,6 +523,27 @@ void PerformRename(vector<tstring> &arrFileNames, vector<tstring> &arrProcessedN
 		if (!arrFileNames[nItem].empty())
 			MoveFile(arrFileNames[nItem].c_str(), arrProcessedNames[nItem].c_str());
 	}
+
+#ifdef UNICODE
+	StartupInfo.Control(PANEL_ACTIVE, FCTL_UPDATEPANEL, 0, NULL);
+#else
+	StartupInfo.Control(INVALID_HANDLE_VALUE, FCTL_UPDATEPANEL, NULL);
+#endif
+
+	if (FRLeaveSelection) {
+		CPanelInfo PInfo;
+		PInfo.GetInfo(false);
+
+		for (size_t nFile = 0; nFile < arrProcessedNames.size(); nFile++) {
+			for (int nItem = 0; nItem < PInfo.ItemsNumber; nItem++) {
+				if (arrProcessedNames[nFile] ==  FarFileName(PInfo.PanelItems[nItem].FindData)) {
+					PInfo.PanelItems[nItem].Flags |= PPIF_SELECTED;
+					break;
+				}
+			}
+		}
+		SetPanelSelection(PInfo, false, true);
+	}
 }
 
 OperationResult RenumberFiles() {
@@ -644,10 +665,12 @@ OperationResult RenumberFiles() {
 			g_bStripCommon = !g_bStripCommon;
 			break;
 		case 16:
-			ConfigureRenumbering();
+			ConfigureRenumbering(true);
+			WriteRegistry();
 			break;
 		}
 	} while (true);
+
 	return OR_CANCEL;
 }
 

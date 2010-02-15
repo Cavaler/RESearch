@@ -337,7 +337,7 @@ void ReadActiveScripts();
 
 void ConfigureCommon();
 void ConfigureFile();
-void ConfigureRenumbering();
+void ConfigureRenumbering(bool bRuntime);
 void ConfigureEditor();
 int  ConfigureSeveralLines();
 

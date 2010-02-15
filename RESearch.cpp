@@ -436,8 +436,7 @@ HANDLE OpenPluginFromFileMenu(int Item, BOOL ShowDialog) {
 			Result=RenameSelectedFiles(g_PanelItems,ShowDialog);
 			break;
 		case 10:
-			RenumberFiles();
-			Result=OR_CANCEL;
+			Result=RenumberFiles();
 			break;
 		case 12:
 			UTF8Converter();
@@ -824,13 +823,13 @@ void ConfigureFile() {
 #endif
 }
 
-void ConfigureRenumbering() {
-	CFarDialog Dialog(70, 16, _T("RenumberConfig"));
+void ConfigureRenumbering(bool bRuntime) {
+	CFarDialog Dialog(70, bRuntime ? 18 : 16, _T("RenumberConfig"));
 
 	Dialog.AddFrame(MRenumberSettings);
 	Dialog.Add(new CFarCheckBoxItem(5,3,0,MStripFromBeginning, g_bStripRegExp));
 	Dialog.Add(new CFarEditItem(42,3,61,DIF_HISTORY,_T("RESearch.Strip"), g_strStrip));
-	Dialog.Add(new CFarCheckBoxItem(5,3,0,MStripCommonPart, g_bStripCommon));
+	Dialog.Add(new CFarCheckBoxItem(5,4,0,MStripCommonPart, g_bStripCommon));
 	Dialog.Add(new CFarTextItem(5,6,0,MPrefix));
 	Dialog.Add(new CFarEditItem(30,6,42,DIF_HISTORY,_T("RESearch.Prefix"), g_strPrefix));
 	Dialog.Add(new CFarTextItem(5,7,0,MPostfix));
@@ -839,6 +838,11 @@ void ConfigureRenumbering() {
 	Dialog.Add(new CFarEditItem(30,9,38,0, NULL, (int &)g_nStartWith,new CFarIntegerRangeValidator(0,0x7FFFFFFF)));
 	Dialog.Add(new CFarTextItem(5,10,0,MWidth));
 	Dialog.Add(new CFarEditItem(30,10,38,0, NULL, (int &)g_nWidth,new CFarIntegerRangeValidator(0,MAX_PATH)));
+
+	if (bRuntime) {
+		Dialog.Add(new CFarCheckBoxItem(5,12,0,MLeaveSelection,&FRLeaveSelection));
+	}
+
 	Dialog.AddButtons(MOk,MCancel);
 
 	Dialog.Display(-1);
@@ -886,7 +890,7 @@ int WINAPI FAR_EXPORT(Configure)(int ItemNumber) {
 		switch (iResult = ChooseMenu(4,ppszItems,GetMsg(MRESearch),NULL,_T("Config"),iResult)) {
 		case 0:ConfigureCommon();break;
 		case 1:ConfigureFile();break;
-		case 2:ConfigureRenumbering();break;
+		case 2:ConfigureRenumbering(false);break;
 		case 3:ConfigureEditor();break;
 		default:WriteRegistry();return TRUE;
 		}
