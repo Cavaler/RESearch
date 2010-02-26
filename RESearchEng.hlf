@@ -166,19 +166,26 @@ a small UTF-8 encoder/decoder is present.
   For more information on UTF-8 support in regexps, see ~PCRE 4.1 library~@PCRE@ documentation.
 @CommonConfig
 $ #Common settings#
-  #'Several' lines means#         When searching using Several Line RegExp, this number
-of lines (or bytes) will be matched simultaneously.
+  #'Several' lines means#             When searching using Several Line RegExp,
+                                    this number of lines (or bytes) will be
+                                    matched simultaneously.
 
-  #Dot matches newline also#      If checked, dot (#.#) will match newline in
-several-line searches, so #a.*b# can match several-line fragment.
+  #Dot matches newline also#          If checked, dot (#.#) will match newline in
+                                    several-line searches, so #a.*b# can match 
+                                    several-line fragment.
 
-  #Use separate thread for regexp match#
+  #Use separate thread#               In the case of very large source strings,
+  #for regexp match#                  regexp engine can run out of stack space,
+                                    resulting in a crash. Enable this option to resolve
+                                    such situation.
 
-  #Show warnings on common mistakes#
+  #Show warnings on common mistakes#  Such as using '\n' in plain-text search
 
-  #Use escapes in plain-text replace#
+  #Use escapes in plain-text replace# If checked, even in plain-text mode some special
+                                    symbols (such as \n or $L) are recognized.
 
-  #Ignore identical replaces#
+  #Ignore identical replaces#         If checked, you won't be prompted to replace
+                                    some found text with the very same text again.
 
 @FileConfig
 $ #Panel search settings#
