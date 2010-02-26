@@ -141,6 +141,7 @@ MMaxInThreadLength	"For &lines longer than:"				"Для строк &длиннее:"
 MThreadStackMB		"&Thread stack, in MB:"					"Стек потока, в MB:"
 MShowUsageWarnings	"Show &warnings on common mistakes"		"&Предупреждения о неправильном использовании"
 MUseEscapesInPlainText	"Use &escapes in plain-text replace"	"Использовать &эскейпы при plain text замене"
+MIgnoreIdentReplace	"Ignore &identical replaces"			"Игнорировать &идентичную замену"
 
 MDefaultCP			"&Default codepage:"					"&Кодировка по умолчанию:"
 MDefaultOEM			"&OEM"

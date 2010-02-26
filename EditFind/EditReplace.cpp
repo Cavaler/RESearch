@@ -291,18 +291,9 @@ eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &
 	EditorSelect Select = {BTYPE_STREAM, FirstLine, StartPos, EndPos-StartPos, LastLine-FirstLine + 1};
 
 	EctlSetPosition(&Position);
-	if (!NoAsking) {
-		if ((Select.BlockWidth == 0)&&(Select.BlockHeight == 1)) {
-			Select.BlockWidth++;
-			if (Select.BlockStartPos>0) {Select.BlockStartPos--;Select.BlockWidth++;}
-		}
-
-		StartupInfo.EditorControl(ECTL_SELECT, &Select);
-		StartupInfo.EditorControl(ECTL_REDRAW, NULL);
-	}
 
 	int Result;
-	if (NoAsking) Result = 0; else {
+	if (!NoAsking) {
 		int Width = 0;
 		if (FirstLine != LastLine) {
 			TCHAR *NewOriginal = Original + StartPos;
@@ -317,7 +308,12 @@ eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &
 				}
 			}
 			Width += EndPos;
-		} else Width = EndPos-StartPos;
+		} else {
+			Width = EndPos-StartPos;
+		}
+
+		if (g_bIgnoreIdentReplace && (tstring(Original+StartPos, Width) == Replace))
+			return RR_SKIP;
 
 		vector<tstring> arrFound;
 		TCHAR Save = Original[StartPos + Width];
@@ -345,6 +341,15 @@ eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &
 			H = (L-9)/2;
 		}
 
+		//	Moved here - so that it is skipped upon IgnoreIdentReplace
+		if ((Select.BlockWidth == 0) && (Select.BlockHeight == 1)) {
+			Select.BlockWidth++;
+			if (Select.BlockStartPos>0) {Select.BlockStartPos--;Select.BlockWidth++;}
+		}
+		StartupInfo.EditorControl(ECTL_SELECT, &Select);
+		StartupInfo.EditorControl(ECTL_REDRAW, NULL);
+
+
 		CFarDialog Dialog(-1, H + 1, Len + 8, H + 8+TotalCount, _T("ERAskReplace"));
 		Dialog.AddFrame(MREReplace);
 		Dialog.Add(new CFarTextItem(-1, 2, 0, MAskReplace));
@@ -358,7 +363,10 @@ eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &
 		Dialog.Add(new CFarButtonItem(0, 5 + TotalCount, DIF_CENTERGROUP|DIF_NOBRACKETS, FALSE, MSkip));
 		Dialog.Add(new CFarButtonItem(0, 5 + TotalCount, DIF_CENTERGROUP|DIF_NOBRACKETS, FALSE, MCancel));
 		Result = Dialog.Display(4,-4,-3,-2,-1);
-	}	//	!NoAsking
+
+	} else {	//	!NoAsking
+		Result = 0;
+	}
 
 	switch (Result) {
 	case 1:

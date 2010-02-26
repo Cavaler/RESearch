@@ -752,7 +752,7 @@ int ConfigureCP() {
 #endif
 
 void ConfigureCommon() {
-	CFarDialog Dialog(60,18,_T("CommonConfig"));
+	CFarDialog Dialog(60,19,_T("CommonConfig"));
 	Dialog.AddFrame(MCommonSettings);
 
 	Dialog.Add(new CFarTextItem(5,3,0,MSeveralLinesIs));
@@ -771,6 +771,7 @@ void ConfigureCommon() {
 
 	Dialog.Add(new CFarCheckBoxItem(5,11,0,MShowUsageWarnings,&g_bShowUsageWarnings));
 	Dialog.Add(new CFarCheckBoxItem(5,12,0,MUseEscapesInPlainText,&g_bEscapesInPlainText));
+	Dialog.Add(new CFarCheckBoxItem(5,13,0,MIgnoreIdentReplace,&g_bIgnoreIdentReplace));
 
 	Dialog.AddButtons(MOk,MCancel);
 	Dialog.Display(-1);

@@ -198,6 +198,7 @@ enum eStringTable {
 	MThreadStackMB,
 	MShowUsageWarnings,
 	MUseEscapesInPlainText,
+	MIgnoreIdentReplace,
 
 	MDefaultCP,
 	MDefaultOEM,

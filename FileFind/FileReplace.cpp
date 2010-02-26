@@ -75,16 +75,18 @@ BOOL DoReplace(HANDLE &hFile,const char *&Found,int FoundLen,const char *Replace
 
 	if (!WriteBuffer(hFile,Skip,SkipLen,FindData->cFileName)) return FALSE;
 
-	char *szFound=(char *)malloc(FoundLen+1);
-	strncpy(szFound,Found,FoundLen);szFound[FoundLen]=0;
+	bool bIgnore = g_bIgnoreIdentReplace &&
+		(FoundLen == ReplaceLength) && (memcmp(Found, Replace, FoundLen) == 0);
 
-	if (ConfirmReplacement(szFound,Replace,FindData->cFileName)) {
+	if (!bIgnore && ConfirmReplacement(string(Found, FoundLen).c_str(),Replace,FindData->cFileName)) {
 		if (!WriteBuffer(hFile,Replace,ReplaceLength,FindData->cFileName)) return FALSE;
 		Count++;
 	} else {
 		if (!WriteBuffer(hFile,Found,FoundLen,FindData->cFileName)) return FALSE;
 	}
-	Skip=Found+FoundLen;Found+=(FoundLen)?FoundLen:1;
+
+	Skip = Found+FoundLen;
+	Found += (FoundLen)?FoundLen:1;
 	return TRUE;
 }
 

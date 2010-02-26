@@ -167,13 +167,19 @@ a small UTF-8 encoder/decoder is present.
 @CommonConfig
 $ #Common settings#
   #'Several' lines means#         When searching using Several Line RegExp, this number
-of lines will be matched simultaneously.
-
-  #Allow empty matches#           If checked, regexps will be allowed to match an
-empty line, e.g. a single '^' will match zero-length text at the beginning of the line.
+of lines (or bytes) will be matched simultaneously.
 
   #Dot matches newline also#      If checked, dot (#.#) will match newline in
 several-line searches, so #a.*b# can match several-line fragment.
+
+  #Use separate thread for regexp match#
+
+  #Show warnings on common mistakes#
+
+  #Use escapes in plain-text replace#
+
+  #Ignore identical replaces#
+
 @FileConfig
 $ #Panel search settings#
   #Read at once maximum# n #KB#     When replacing multiple files, if file size is less
