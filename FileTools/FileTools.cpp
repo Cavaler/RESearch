@@ -151,7 +151,7 @@ void RenameFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 		_tcsncpy(NewName,FileName,MatchStart);
 		_tcscpy(NewName+MatchStart,NewSubName.c_str());
 		_tcscat(NewName,FileName+MatchStart+MatchLength);
-		MatchStart += NewSubName.length();
+		MatchStart += (NewSubName.empty()) ? 1 : NewSubName.length();
 		if (Match) delete[] Match;
 
 		if (!ConfirmFile(MMenuRename,FileName)) break;
@@ -334,6 +334,9 @@ BOOL PerformRenameSelectedFiles(CPanelInfo &PInfo, panelitem_vector &PanelItems)
 	FileNumber=-1;
 	g_bInterrupted=FALSE;
 
+	//	To allow 'Restore selection' of _unmodified_ files
+	vector<tstring> arrOrigNames;
+
 	BOOL bRestoreSelection = FRLeaveSelection;
 	if ((PInfo.SelectedItemsNumber==0)&&(PInfo.ItemsNumber>0)&&
 		(_tcscmp(FarFileName(PInfo.PanelItems[PInfo.CurrentItem].FindData),_T(".."))==0)) {
@@ -342,6 +345,7 @@ BOOL PerformRenameSelectedFiles(CPanelInfo &PInfo, panelitem_vector &PanelItems)
 		for (int I=0;I<PInfo.ItemsNumber;I++) {
 			if (I==PInfo.CurrentItem) continue;
 			if (g_bInterrupted) break;
+			arrOrigNames.push_back(FarFileName(PInfo.PanelItems[I].FindData));
 			RenameFile(&FFDtoWFD(PInfo.PanelItems[I].FindData),PanelItems);
 		}
 	} else {
@@ -349,6 +353,7 @@ BOOL PerformRenameSelectedFiles(CPanelInfo &PInfo, panelitem_vector &PanelItems)
 			bRestoreSelection = FALSE;
 		for (int I=0;I<PInfo.SelectedItemsNumber;I++) {
 			if (g_bInterrupted) break;
+			arrOrigNames.push_back(FarFileName(PInfo.SelectedItems[I].FindData));
 			RenameFile(&FFDtoWFD(PInfo.SelectedItems[I].FindData),PanelItems);
 		}
 	}
@@ -363,12 +368,14 @@ BOOL PerformRenameSelectedFiles(CPanelInfo &PInfo, panelitem_vector &PanelItems)
 		PNewInfo.GetInfo(false);
 
 		for (size_t nFile = 0; nFile < PanelItems.size(); nFile++) {
-			for (int nItem = 0; nItem < PNewInfo.ItemsNumber; nItem++) {
-				if (_tcscmp(FarFileName(PanelItems[nFile].FindData), FarFileName(PNewInfo.PanelItems[nItem].FindData)) == 0) {
-					PNewInfo.PanelItems[nItem].Flags |= PPIF_SELECTED;
-					break;
-				}
-			}
+			int nItem = PNewInfo.Find(FarFileName(PanelItems[nFile].FindData));
+			if (nItem >= 0)
+				PNewInfo.PanelItems[nItem].Flags |= PPIF_SELECTED;
+		}
+		for (size_t nFile = 0; nFile < arrOrigNames.size(); nFile++) {
+			int nItem = PNewInfo.Find(arrOrigNames[nFile].c_str());
+			if (nItem >= 0)
+				PNewInfo.PanelItems[nItem].Flags |= PPIF_SELECTED;
 		}
 		SetPanelSelection(PNewInfo, false, true);
 	}
@@ -536,12 +543,9 @@ void PerformRename(vector<tstring> &arrFileNames, vector<tstring> &arrProcessedN
 		PInfo.GetInfo(false);
 
 		for (size_t nFile = 0; nFile < arrProcessedNames.size(); nFile++) {
-			for (int nItem = 0; nItem < PInfo.ItemsNumber; nItem++) {
-				if (arrProcessedNames[nFile] ==  FarFileName(PInfo.PanelItems[nItem].FindData)) {
-					PInfo.PanelItems[nItem].Flags |= PPIF_SELECTED;
-					break;
-				}
-			}
+			int nItem = PInfo.Find(arrProcessedNames[nFile].c_str());
+			if (nItem >= 0)
+				PInfo.PanelItems[nItem].Flags |= PPIF_SELECTED;
 		}
 		SetPanelSelection(PInfo, false, true);
 	}
