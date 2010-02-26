@@ -89,6 +89,7 @@ void ChangeSelection(int How) {
 BOOL ConfirmRename(const TCHAR *From,const TCHAR *To) {
 	if (g_bInterrupted) return FALSE;
 	if (!FRConfirmLineThisFile) return TRUE;
+	if (_tcscmp(From, To) == 0) return TRUE;
 
 	const TCHAR *Lines[]={
 		GetMsg(MMenuRename),GetMsg(MAskRename),From,GetMsg(MAskTo),To,
