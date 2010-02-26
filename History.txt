@@ -9,9 +9,14 @@ Planned:
 	* dialogprocs for disabling unneeded elements
 	+ Do not decode whole file while searching/grep, use VirtualAlloc's etc
 	+ Preview rename changes
-	+ Undo rename
 	- Gray out 'show last results' if there aren't any (requires FMENU_USEEXT)
 
+Version 7.02 (26.02.2010)
+	* New option: [X] Ignore identical replaces
+	- Fixed 'Preserve Selection' for unmodified files
+	* Actual rename done only once even with repeating rename
+	* Show both original and final name with [X] Confirm file and [ ] Confirm each replacement
+	+ 'Undo last rename files' command
 
 Version 7.01 (15.02.2010)
 	* Remember last operation and highlight it first in menu
