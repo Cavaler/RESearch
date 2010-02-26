@@ -86,6 +86,23 @@ void ChangeSelection(int How) {
 #endif
 }
 
+BOOL ConfirmWholeFileRename(const TCHAR *From, const TCHAR *To) {
+	if (g_bInterrupted) return FALSE;
+	if (FileConfirmed) return TRUE;
+
+	const TCHAR *Lines[]={
+		GetMsg(MMenuRename),GetMsg(MAskRename),From,GetMsg(MAskTo),To,
+		GetMsg(MOk),GetMsg(MAll),GetMsg(MSkip),GetMsg(MCancel)
+	};
+	switch (StartupInfo.Message(StartupInfo.ModuleNumber,0,_T("FRAskRename"),Lines,9,4)) {
+	case 1:FRConfirmFileThisRun=FALSE;
+	case 0:return (FileConfirmed=TRUE);
+	case -1:
+	case 3:g_bInterrupted=TRUE;
+	}
+	return FALSE;
+}
+
 BOOL ConfirmRename(const TCHAR *From,const TCHAR *To) {
 	if (g_bInterrupted) return FALSE;
 	if (!FRConfirmLineThisFile) return TRUE;
@@ -106,7 +123,7 @@ BOOL ConfirmRename(const TCHAR *From,const TCHAR *To) {
 	return FALSE;
 }
 
-BOOL FindRename(TCHAR *FileName,int *&Match,int &MatchCount,int &MatchStart,int &MatchLength) {
+BOOL FindRename(const TCHAR *FileName,int *&Match,int &MatchCount,int &MatchStart,int &MatchLength) {
 	if (FSearchAs==SA_REGEXP) {
 		MatchCount=pcre_info(FPattern,NULL,NULL)+1;
 		Match=new int[MatchCount*3];
@@ -134,105 +151,109 @@ BOOL FindRename(TCHAR *FileName,int *&Match,int &MatchCount,int &MatchStart,int 
 void RenameFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 	int MatchCount,MatchStart=0,MatchLength,ReplaceNumber=0;
 	int *Match;
-	BOOL Modified=FALSE;
-	TCHAR NewName[MAX_PATH];
 
-	TCHAR *FileName=_tcsrchr(FindData->cFileName,'\\');
-	if (FileName) FileName++; else FileName=FindData->cFileName;
+	tstring strPath, strOriginalName, strCurrentName;
+
+	TCHAR *szSlash=_tcsrchr(FindData->cFileName,'\\');
+	if (szSlash) {
+		strPath = tstring(FindData->cFileName, szSlash - FindData->cFileName);
+		strOriginalName = szSlash+1;
+	} else {
+		strOriginalName = FindData->cFileName;
+	}
+	strCurrentName = strOriginalName;
 
 	FRConfirmLineThisFile=FRConfirmLineThisRun;
 	FileConfirmed=!FRConfirmFileThisRun;
 
 	FileNumber++;
-	while (FindRename(FileName,Match,MatchCount,MatchStart,MatchLength)) {
-		int Numbers[3]={FileNumber,FileNumber,ReplaceNumber};
-		tstring NewSubName=CreateReplaceString(FileName,Match,MatchCount,FRReplace.c_str(),_T(""),Numbers,-1, FSearchAs==SA_REGEXP);
 
-		_tcsncpy(NewName,FileName,MatchStart);
-		_tcscpy(NewName+MatchStart,NewSubName.c_str());
-		_tcscat(NewName,FileName+MatchStart+MatchLength);
-		MatchStart += (NewSubName.empty()) ? 1 : NewSubName.length();
+	bool bOnlyGlobalConfirm = !FRConfirmLineThisFile;
+
+	while (FindRename(strCurrentName.c_str(),Match,MatchCount,MatchStart,MatchLength)) {
+		int Numbers[3]={FileNumber,FileNumber,ReplaceNumber};
+		tstring strNewSubName = CreateReplaceString(strCurrentName.c_str(),Match,MatchCount,FRReplace.c_str(),_T(""),Numbers,-1, FSearchAs==SA_REGEXP);
+
+		tstring strNewName = tstring(strCurrentName.c_str(), MatchStart) + strNewSubName + (strCurrentName.c_str()+MatchStart+MatchLength);
+
+		MatchStart += (strNewSubName.empty()) ? 1 : strNewSubName.length();
 		if (Match) delete[] Match;
 
-		if (!ConfirmFile(MMenuRename,FileName)) break;
-		if (ConfirmRename(FileName,NewName)) {
-			memmove(NewName+(FileName-FindData->cFileName),NewName,(_tcslen(NewName)+1)*sizeof(TCHAR));
-			_tcsncpy(NewName,FindData->cFileName,FileName-FindData->cFileName);
-			if (MoveFile(FindData->cFileName,NewName)) {
-				_tcscpy(FileName,NewName+(FileName-FindData->cFileName));
-				Modified=TRUE;ReplaceNumber++;
-				if (!FRepeating) break;
-			} else {
-				DWORD Error = GetLastError();
-				switch (Error) {
-				case ERROR_ALREADY_EXISTS:
-					if (FTAskOverwrite) {
-						const TCHAR *Lines[]={GetMsg(MMenuRename),GetMsg(MFile),NewName,
-							GetMsg(MAskOverwrite),FindData->cFileName,GetMsg(MOk),GetMsg(MAll),GetMsg(MSkip),GetMsg(MCancel)};
-						switch (StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("FRenameOverwrite"),Lines,9,4)) {
-						case 1:
-							FTAskOverwrite=false;
-						case 0:
-							break;
-						case 3:
-							g_bInterrupted=TRUE;
-						case 2:
-							return;
-						}
-					}
+		BOOL bConfirm = TRUE;
 
-					if (DeleteFile(NewName)) {
-						if (MoveFile(FindData->cFileName,NewName)) {
-							_tcscpy(FileName,NewName+(FileName-FindData->cFileName));
-							Modified=TRUE;ReplaceNumber++;
-							Error = ERROR_SUCCESS;
-							break;
-						}
-					}
-					Error=GetLastError();
+		if (!bOnlyGlobalConfirm) {
+			if (!ConfirmFile(MMenuRename,strOriginalName.c_str())) break;
+
+			bConfirm = ConfirmRename(strCurrentName.c_str(), strNewName.c_str());
+		}
+
+		if (bConfirm) strCurrentName = strNewName;
+
+		ReplaceNumber++;
+		if (!FRepeating) break;
+	}
+
+	if (strOriginalName == strCurrentName) return;
+	if (bOnlyGlobalConfirm && !ConfirmWholeFileRename(strOriginalName.c_str(), strCurrentName.c_str())) return;
+
+	strCurrentName = strPath + strCurrentName;
+
+	if (!MoveFile(FindData->cFileName, strCurrentName.c_str())) {
+		DWORD Error = GetLastError();
+		switch (Error) {
+		case ERROR_ALREADY_EXISTS:
+			if (FTAskOverwrite) {
+				const TCHAR *Lines[]={GetMsg(MMenuRename),GetMsg(MFile),strCurrentName.c_str(),
+					GetMsg(MAskOverwrite),FindData->cFileName,GetMsg(MOk),GetMsg(MAll),GetMsg(MSkip),GetMsg(MCancel)};
+				switch (StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("FRenameOverwrite"),Lines,9,4)) {
+				case 1:
+					FTAskOverwrite=false;
+				case 0:
 					break;
-
-				case ERROR_PATH_NOT_FOUND:
-					if (FTAskCreatePath) {
-						const TCHAR *Lines[]={GetMsg(MMenuRename),GetMsg(MFile),NewName,
-							GetMsg(MAskCreatePath),GetMsg(MOk),GetMsg(MAll),GetMsg(MSkip),GetMsg(MCancel)};
-						switch (StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("FRenameCreatePath"),Lines,8,4)) {
-						case 1:
-							FTAskCreatePath=false;
-						case 0:
-							break;
-						case 3:
-							g_bInterrupted=TRUE;
-						case 2:
-							return;
-						}
-					}
-
-					if (CreateDirectoriesForFile(NewName)) {
-						if (MoveFile(FindData->cFileName,NewName)) {
-							_tcscpy(FileName,NewName+(FileName-FindData->cFileName));
-							Modified=TRUE;ReplaceNumber++;
-							Error = ERROR_SUCCESS;
-							break;
-						}
-					}
-					Error=GetLastError();
-				}
-
-				if (Error != ERROR_SUCCESS) {
-					const TCHAR *Lines[]={GetMsg(MMenuRename),GetMsg(MRenameError),FindData->cFileName,
-						GetMsg(MAskTo),NewName,GetMsg(MOk),GetMsg(MCancel)};
-					if (StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("FRenameError"),Lines,7,2)==1) g_bInterrupted=TRUE;
+				case 3:
+					g_bInterrupted=TRUE;
+				case 2:
 					return;
-				} else {
-					if (!FRepeating) break;
-					continue;
 				}
 			}
+
+			if (MoveFileEx(FindData->cFileName, strCurrentName.c_str(), MOVEFILE_REPLACE_EXISTING))
+				Error = ERROR_SUCCESS;
+			else
+				Error = GetLastError();
+			break;
+
+		case ERROR_PATH_NOT_FOUND:
+			if (FTAskCreatePath) {
+				const TCHAR *Lines[]={GetMsg(MMenuRename),GetMsg(MFile),strCurrentName.c_str(),
+					GetMsg(MAskCreatePath),GetMsg(MOk),GetMsg(MAll),GetMsg(MSkip),GetMsg(MCancel)};
+				switch (StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("FRenameCreatePath"),Lines,8,4)) {
+				case 1:
+					FTAskCreatePath=false;
+				case 0:
+					break;
+				case 3:
+					g_bInterrupted=TRUE;
+				case 2:
+					return;
+				}
+			}
+
+			if (CreateDirectoriesForFile(strCurrentName.c_str()) && MoveFile(FindData->cFileName,strCurrentName.c_str()))
+				Error = ERROR_SUCCESS;
+			else
+				Error = GetLastError();
 		}
-		if (g_bInterrupted) return;
+
+		if (Error != ERROR_SUCCESS) {
+			const TCHAR *Lines[]={GetMsg(MMenuRename),GetMsg(MRenameError),FindData->cFileName,
+				GetMsg(MAskTo),strCurrentName.c_str(),GetMsg(MOk),GetMsg(MCancel)};
+			if (StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("FRenameError"),Lines,7,2)==1) g_bInterrupted=TRUE;
+			return;
+		}
 	}
-	if (Modified) AddFile(FindData, PanelItems);
+
+	AddFile(FindData, PanelItems);
 }
 
 BOOL RenameFilesPrompt() {
