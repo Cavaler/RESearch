@@ -35,6 +35,7 @@ void ChangeSelection(int How);
 OperationResult RenameFiles(panelitem_vector &PanelItems,BOOL ShowDialog);
 OperationResult RenameSelectedFiles(panelitem_vector &PanelItems,BOOL ShowDialog);
 OperationResult RenumberFiles();
+OperationResult UndoRenameFiles();
 
 OperationResult RenameFilesExecutor();
 OperationResult QuickRenameFilesExecutor();

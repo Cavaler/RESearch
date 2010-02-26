@@ -17,6 +17,9 @@ bool FTAskOverwrite;
 bool FTAskCreatePath;
 int g_nStartWithNow;
 
+//	Not a map to enforce reverse rename sequence
+vector<pair<tstring, tstring>> m_arrLastRename;
+
 void FTReadRegistry(HKEY Key) {
 	#define DECLARE_PERSIST_LOAD Key
 	#include "PersistVars.h"
@@ -253,6 +256,7 @@ void RenameFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 		}
 	}
 
+	m_arrLastRename.push_back(make_pair(tstring(FindData->cFileName), strCurrentName));
 	AddFile(FindData, PanelItems);
 }
 
@@ -325,7 +329,9 @@ OperationResult RenameFiles(panelitem_vector &PanelItems, BOOL ShowDialog) {
 	FRConfirmFileThisRun=FRConfirmFile;
 	FRConfirmLineThisRun=FRConfirmLine;
 	FTAskOverwrite = FTAskCreatePath = true;
-	FileNumber=-1;g_bInterrupted=FALSE;
+	FileNumber=-1;
+	g_bInterrupted=FALSE;
+	m_arrLastRename.clear();
 
 	if (ScanDirectories(PanelItems, RenameFile)) {
 		if (!FROpenModified) return OR_OK; else
@@ -339,7 +345,9 @@ OperationResult RenameFilesExecutor() {
 	FRReplace=ReplaceText;
 	if (!FPreparePattern(false)) return OR_FAILED;
 	FTAskOverwrite = FTAskCreatePath = true;
-	FileNumber=-1;g_bInterrupted=FALSE;
+	FileNumber=-1;
+	g_bInterrupted=FALSE;
+	m_arrLastRename.clear();
 
 	FRConfirmFileThisRun = FALSE;	//FRConfirmFile;
 	FRConfirmLineThisRun = FALSE;	//FRConfirmLine;
@@ -354,6 +362,7 @@ OperationResult RenameFilesExecutor() {
 BOOL PerformRenameSelectedFiles(CPanelInfo &PInfo, panelitem_vector &PanelItems) {
 	FileNumber=-1;
 	g_bInterrupted=FALSE;
+	m_arrLastRename.clear();
 
 	//	To allow 'Restore selection' of _unmodified_ files
 	vector<tstring> arrOrigNames;
@@ -547,10 +556,18 @@ void ProcessNames(vector<tstring> &arrFileNames, vector<tstring> &arrProcessedNa
 	}
 }
 
-void PerformRename(vector<tstring> &arrFileNames, vector<tstring> &arrProcessedNames) {
+void PerformRenumber(vector<tstring> &arrFileNames, vector<tstring> &arrProcessedNames, LPCTSTR szCurDir) {
+	m_arrLastRename.clear();
+
 	for (size_t nItem = 0; nItem < arrFileNames.size(); nItem++) {
-		if (!arrFileNames[nItem].empty())
-			MoveFile(arrFileNames[nItem].c_str(), arrProcessedNames[nItem].c_str());
+		if (!arrFileNames[nItem].empty() && (arrFileNames[nItem] != arrProcessedNames[nItem])) {
+			tstring strSrc = szCurDir + arrFileNames[nItem];
+			tstring strTgt = szCurDir + arrProcessedNames[nItem];
+
+			if (MoveFile(strSrc.c_str(), strTgt.c_str())) {
+				m_arrLastRename.push_back(make_pair(strSrc, strTgt));
+			}
+		}
 	}
 
 #ifdef UNICODE
@@ -674,7 +691,7 @@ OperationResult RenumberFiles() {
 			if (g_nStartWithNow > 1000) g_nStartWithNow -= 1000; else g_nStartWithNow = 0;
 			break;
 		case 12:
-			PerformRename(arrFileNames, arrProcessedNames);
+			PerformRenumber(arrFileNames, arrProcessedNames, AddSlash(tstring(PInfo.CurDir)).c_str());
 			return OR_OK;
 		case 13:
 			arrFileNames.insert(arrFileNames.begin()+nOK, _T(""));
@@ -696,6 +713,28 @@ OperationResult RenumberFiles() {
 			break;
 		}
 	} while (true);
+
+	return OR_CANCEL;
+}
+
+OperationResult UndoRenameFiles() {
+	FRConfirmFileThisRun = TRUE;
+
+	for (int nFile = m_arrLastRename.size()-1; nFile >= 0; nFile--) {
+		FileConfirmed = !FRConfirmFileThisRun;
+
+		if (ConfirmWholeFileRename(m_arrLastRename[nFile].second.c_str(), m_arrLastRename[nFile].first.c_str()))
+			MoveFile(m_arrLastRename[nFile].second.c_str(), m_arrLastRename[nFile].first.c_str());
+
+		if (g_bInterrupted) break;
+	}
+	m_arrLastRename.clear();
+
+#ifdef UNICODE
+	StartupInfo.Control(PANEL_ACTIVE, FCTL_UPDATEPANEL, 0, NULL);
+#else
+	StartupInfo.Control(INVALID_HANDLE_VALUE, FCTL_UPDATEPANEL, NULL);
+#endif
 
 	return OR_CANCEL;
 }

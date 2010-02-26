@@ -79,6 +79,7 @@ enum eStringTable {
 	MMenuRename,
 	MMenuRenameSelected,
 	MMenuRenumber,
+	MMenuUndoRename,
 	MMenuSelect,
 	MMenuUnselect,
 	MMenuFlipSelection,

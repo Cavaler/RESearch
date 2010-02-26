@@ -283,6 +283,7 @@ int ShowFileMenu() {
 	MenuItems.push_back(CFarMenuItem(MMenuRename));
 	MenuItems.push_back(CFarMenuItem(MMenuRenameSelected));
 	MenuItems.push_back(CFarMenuItem(MMenuRenumber));
+	MenuItems.push_back(CFarMenuItem(MMenuUndoRename));
 	MenuItems.push_back(CFarMenuItem(true));
 	MenuItems.push_back(CFarMenuItem(MMenuUTF8Converter));
 	MenuItems.push_back(CFarMenuItem(MMenuShowLastResults));
@@ -438,11 +439,14 @@ HANDLE OpenPluginFromFileMenu(int Item, BOOL ShowDialog) {
 		case 10:
 			Result=RenumberFiles();
 			break;
-		case 12:
+		case 11:
+			Result=UndoRenameFiles();
+			break;
+		case 13:
 			UTF8Converter();
 			Result=OR_CANCEL;
 			break;
-		case 13:
+		case 14:
 			if (LastTempPanel) {
 				LastTempPanel->m_bActive = true;
 				return (HANDLE)LastTempPanel;
@@ -451,8 +455,8 @@ HANDLE OpenPluginFromFileMenu(int Item, BOOL ShowDialog) {
 				break;
 			}
 	}
-	if (Item >= 15) {
-		Item -= 15;
+	if (Item >= 16) {
+		Item -= 16;
 		Result = OpenPluginFromFilePreset(Item);
 	}
 
