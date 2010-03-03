@@ -39,18 +39,8 @@ struct sREData {
 	int      nCurrentPart;
 };
 
-tstring GetDialogText(HANDLE hDlg, int nItem) {
-#ifdef UNICODE
-	return (const wchar_t *)StartupInfo.SendDlgMessage(hDlg, DM_GETCONSTTEXTPTR, nItem, 0);
-#else
-	FarDialogItem Item;
-	StartupInfo.SendDlgMessage(hDlg, DM_GETDLGITEM, nItem, (LONG_PTR)&Item);
-	return Item.Data;
-#endif
-}
-
 void UpdateStrings(HANDLE hDlg, sREData *pData) {
-	tstring strSource = GetDialogText(hDlg, 2);
+	tstring strSource = GetDlgItemText(hDlg, 2);
 	tstring strRE = BuildRE(strSource, pData->mapParts);
 	StartupInfo.SendDlgMessage(hDlg, DM_SETTEXTPTR, 4, (LONG_PTR)strRE.data());
 
@@ -61,7 +51,7 @@ void UpdateStrings(HANDLE hDlg, sREData *pData) {
 	vector<int> arrMatch(nMatch*3);
 	if (pcre_exec(re, NULL, strSource.c_str(), strSource.length(), 0, 0, &arrMatch[0], nMatch*3) < 0) return;
 
-	tstring strReplace = GetDialogText(hDlg, 6);
+	tstring strReplace = GetDlgItemText(hDlg, 6);
 	tstring strResult = CreateReplaceString(strSource.c_str(), &arrMatch[0], nMatch, strReplace.c_str(), _T("\n"), NULL, -1, TRUE);
 	StartupInfo.SendDlgMessage(hDlg, DM_SETTEXTPTR, 8, (LONG_PTR)strResult.data());
 }
