@@ -113,7 +113,6 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				Description=""
 				CommandLine=""
 			/>
 		</Configuration>
@@ -518,7 +517,6 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				Description=""
 				CommandLine=""
 			/>
 		</Configuration>
@@ -1144,6 +1142,14 @@
 		<Filter
 			Name="FileFind Sources"
 			>
+			<File
+				RelativePath=".\FileFind\EncodedFile.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FileFind\EncodedFile.h"
+				>
+			</File>
 			<File
 				RelativePath="FileFind\FileCommon.cpp"
 				>
@@ -2016,7 +2022,7 @@
 				<Tool
 					Name="VCCustomBuildTool"
 					Description="Copying $(InputFileName)..."
-					CommandLine="xcopy /r /y $(InputFileName) &quot;$(TargetDir)&quot;"
+					CommandLine="xcopy /r /y $(InputFileName) &quot;$(TargetDir)&quot;&#x0D;&#x0A;"
 					Outputs="$(TargetDir)\$(InputFileName)"
 				/>
 			</FileConfiguration>
@@ -2026,7 +2032,7 @@
 				<Tool
 					Name="VCCustomBuildTool"
 					Description="Copying $(InputFileName)..."
-					CommandLine="xcopy /r /y $(InputFileName) &quot;$(TargetDir)&quot;"
+					CommandLine="xcopy /r /y $(InputFileName) &quot;$(TargetDir)&quot;&#x0D;&#x0A;"
 					Outputs="$(TargetDir)\$(InputFileName)"
 				/>
 			</FileConfiguration>
@@ -2040,7 +2046,7 @@
 				<Tool
 					Name="VCCustomBuildTool"
 					Description="Copying $(InputFileName)..."
-					CommandLine="xcopy /r /y $(InputFileName) &quot;$(TargetDir)&quot;"
+					CommandLine="xcopy /r /y $(InputFileName) &quot;$(TargetDir)&quot;&#x0D;&#x0A;"
 					Outputs="$(TargetDir)\$(InputFileName)"
 				/>
 			</FileConfiguration>
@@ -2050,7 +2056,7 @@
 				<Tool
 					Name="VCCustomBuildTool"
 					Description="Copying $(InputFileName)..."
-					CommandLine="xcopy /r /y $(InputFileName) &quot;$(TargetDir)&quot;"
+					CommandLine="xcopy /r /y $(InputFileName) &quot;$(TargetDir)&quot;&#x0D;&#x0A;"
 					Outputs="$(TargetDir)\$(InputFileName)"
 				/>
 			</FileConfiguration>
