@@ -1,7 +1,7 @@
 #ifndef __ENCODEDFILE_H
 #define __ENCODEDFILE_H
 
-class CEncoder {
+class CDecoder {
 public:
 	virtual float SizeIncr() = 0;
 	virtual void Encode(const char *szSource, DWORD dwSize, char *szTarget) = 0;
@@ -9,10 +9,10 @@ public:
 
 #define BLOCK_SIZE	65536
 
-class CDelayedEncoder {
+class CDelayedDecoder {
 public:
-	CDelayedEncoder(const char *szData, DWORD dwSize, CEncoder &pEncoder);
-	~CDelayedEncoder();
+	CDelayedDecoder(const char *szData, DWORD dwSize, CDecoder &pDecoder);
+	~CDelayedDecoder();
 
 	operator const char * ();
 	DWORD Size();
@@ -31,31 +31,40 @@ protected:
 	DWORD m_dwCommitRead, m_dwCommitWrite;
 
 	SYSTEM_INFO m_Info;
-	CEncoder &m_pEncoder;
+	CDecoder &m_pDecoder;
 };
 
-class CNoEncoder : public CEncoder {
+class CNoDecoder : public CDecoder {
 public:
 	virtual float SizeIncr();
 	virtual void Encode(const char *szSource, DWORD dwSize, char *szTarget);
 };
 
-class CToUnicodeEncoder : public CEncoder {
+class CToUnicodeDecoder : public CDecoder {
 public:
-	CToUnicodeEncoder(UINT nCP);
+	CToUnicodeDecoder(UINT nCP);
+	virtual float SizeIncr();
+	virtual void Encode(const char *szSource, DWORD dwSize, char *szTarget);
+protected:
+	UINT m_nCP;
+};
+
+class CFromUnicodeDecoder : public CDecoder {
+public:
+	CFromUnicodeDecoder(UINT nCP);
 	virtual float SizeIncr();
 	virtual void Encode(const char *szSource, DWORD dwSize, char *szTarget);
 protected:
 	UINT m_nCP;
 };
 
-class CFromUnicodeEncoder : public CEncoder {
+class CTableDecoder : public CDecoder {
 public:
-	CFromUnicodeEncoder(UINT nCP);
+	CTableDecoder(TCHAR *szTable);
 	virtual float SizeIncr();
 	virtual void Encode(const char *szSource, DWORD dwSize, char *szTarget);
 protected:
-	UINT m_nCP;
+	TCHAR *m_szTable;
 };
 
 #endif

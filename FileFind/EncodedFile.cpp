@@ -2,10 +2,10 @@
 #include "..\RESearch.h"
 #include "EncodedFile.h"
 
-CDelayedEncoder::CDelayedEncoder(const char *szData, DWORD dwSize, CEncoder &pEncoder) : m_szData(szData), m_dwSize(dwSize), m_pEncoder(pEncoder) {
+CDelayedDecoder::CDelayedDecoder(const char *szData, DWORD dwSize, CDecoder &pDecoder) : m_szData(szData), m_dwSize(dwSize), m_pDecoder(pDecoder) {
 	GetSystemInfo(&m_Info);
 
-	m_dwBufferSize = (DWORD)(m_dwSize*m_pEncoder.SizeIncr());
+	m_dwBufferSize = (DWORD)(m_dwSize*m_pDecoder.SizeIncr());
 	m_szBuffer = (char *)VirtualAlloc(NULL, m_dwBufferSize, MEM_RESERVE, PAGE_READWRITE);
 
 	if (m_dwBufferSize >= BLOCK_SIZE)
@@ -17,19 +17,19 @@ CDelayedEncoder::CDelayedEncoder(const char *szData, DWORD dwSize, CEncoder &pEn
 	m_dwCommitWrite = 0;
 }
 
-CDelayedEncoder::~CDelayedEncoder() {
+CDelayedDecoder::~CDelayedDecoder() {
 	VirtualFree(m_szBuffer, 0, MEM_RELEASE);
 }
 
-CDelayedEncoder::operator const char * () {
+CDelayedDecoder::operator const char * () {
 	return m_szBuffer;
 }
 
-DWORD CDelayedEncoder::Size() {
+DWORD CDelayedDecoder::Size() {
 	return m_dwBufferSize;
 }
 
-int CDelayedEncoder::ExcFilter(const _EXCEPTION_POINTERS *pExcInfo) {
+int CDelayedDecoder::ExcFilter(const _EXCEPTION_POINTERS *pExcInfo) {
 	if (pExcInfo->ExceptionRecord->ExceptionCode != EXCEPTION_ACCESS_VIOLATION)
 		return EXCEPTION_EXECUTE_HANDLER;
 
@@ -43,7 +43,7 @@ int CDelayedEncoder::ExcFilter(const _EXCEPTION_POINTERS *pExcInfo) {
 	return EXCEPTION_CONTINUE_EXECUTION;
 }
 
-bool CDelayedEncoder::ResizeBuffer(DWORD dwCommitSize) {
+bool CDelayedDecoder::ResizeBuffer(DWORD dwCommitSize) {
 	//	Round up to page size
 	dwCommitSize = ((dwCommitSize+BLOCK_SIZE-1)/BLOCK_SIZE)*BLOCK_SIZE;
 	if (dwCommitSize > m_dwBufferSize) dwCommitSize = m_dwBufferSize;
@@ -56,11 +56,11 @@ bool CDelayedEncoder::ResizeBuffer(DWORD dwCommitSize) {
 	//	Encode
 	DWORD dwEncodeSize = dwCommitSize;
 	if (dwEncodeSize > m_dwBufferSize) dwEncodeSize = m_dwBufferSize;
-	m_pEncoder.Encode(
+	m_pDecoder.Encode(
 		m_szData+m_dwCommitRead,
-		(DWORD)(dwEncodeSize/m_pEncoder.SizeIncr()-m_dwCommitRead),
+		(DWORD)(dwEncodeSize/m_pDecoder.SizeIncr()-m_dwCommitRead),
 		m_szBuffer+m_dwCommitWrite);
-	m_dwCommitRead  = (DWORD)(dwEncodeSize/m_pEncoder.SizeIncr());
+	m_dwCommitRead  = (DWORD)(dwEncodeSize/m_pDecoder.SizeIncr());
 	m_dwCommitWrite = dwEncodeSize;
 
 	return true;
@@ -68,48 +68,76 @@ bool CDelayedEncoder::ResizeBuffer(DWORD dwCommitSize) {
 
 //////////////////////////////////////////////////////////////////////////
 
-float CNoEncoder::SizeIncr() {
+float CNoDecoder::SizeIncr() {
 	return 1;
 }
 
-void CNoEncoder::Encode(const char *szSource, DWORD dwSize, char *szTarget) {
+void CNoDecoder::Encode(const char *szSource, DWORD dwSize, char *szTarget) {
 	memmove(szTarget, szSource, dwSize);
 }
 
 //////////////////////////////////////////////////////////////////////////
 
-CToUnicodeEncoder::CToUnicodeEncoder(UINT nCP)
+CToUnicodeDecoder::CToUnicodeDecoder(UINT nCP)
 : m_nCP(nCP)
 {
 }
 
-float CToUnicodeEncoder::SizeIncr() {
+float CToUnicodeDecoder::SizeIncr() {
 	return 2;
 }
 
-void CToUnicodeEncoder::Encode(const char *szSource, DWORD dwSize, char *szTarget) {
+void CToUnicodeDecoder::Encode(const char *szSource, DWORD dwSize, char *szTarget) {
 	MultiByteToWideChar(m_nCP, 0, szSource, dwSize, (LPWSTR)szTarget, dwSize);
 }
 
 //////////////////////////////////////////////////////////////////////////
 
-CFromUnicodeEncoder::CFromUnicodeEncoder(UINT nCP)
+CFromUnicodeDecoder::CFromUnicodeDecoder(UINT nCP)
 : m_nCP(nCP)
 {
 }
 
-float CFromUnicodeEncoder::SizeIncr() {
+float CFromUnicodeDecoder::SizeIncr() {
 	return 1/2;
 }
 
-void CFromUnicodeEncoder::Encode(const char *szSource, DWORD dwSize, char *szTarget) {
+void CFromUnicodeDecoder::Encode(const char *szSource, DWORD dwSize, char *szTarget) {
 	WideCharToMultiByte(m_nCP, 0, (LPCWSTR)szSource, dwSize, szTarget, dwSize, NULL, NULL);
 }
 
-bool RunGrepBuffer(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems, CDelayedEncoder &Encoder) {
+//////////////////////////////////////////////////////////////////////////
+
+CTableDecoder::CTableDecoder(TCHAR *szTable)
+: m_szTable(szTable)
+{
+}
+
+float CTableDecoder::SizeIncr() {
+	return 1;
+}
+
+void CTableDecoder::Encode(const char *szSource, DWORD dwSize, char *szTarget)
+{
+#ifdef UNICODE
+	const wchar_t *wszSource = (const wchar_t *)szSource;
+	wchar_t *wszTarget = (wchar_t *)szTarget;
+	for (DWORD nChar = 0; nChar < dwSize/2; nChar++) {
+		*(wszTarget++) = m_szTable[(USHORT)wszSource[nChar]);
+	}
+#else
+	for (DWORD nChar = 0; nChar < dwSize; nChar++)
+		*(szTarget++) = m_szTable[(BYTE)szSource[nChar]];
+#endif
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+template<class ret>
+ret RunDecoder(CDelayedDecoder &Decoder, ret (*Processor)(const TCHAR *, DWORD)) {
 	__try {
-//		return GrepBuffer(FindData, PanelItems, (const TCHAR *)(const char *)Encoder, Encoder.Size()/sizeof(TCHAR));
-	} __except (Encoder.ExcFilter(GetExceptionInformation())) {
+		return Processor((const TCHAR *)(const char *)Decoder, Decoder.Size()/sizeof(TCHAR));
+	} __except (Decoder.ExcFilter(GetExceptionInformation())) {
 		return false;
 	}
 }
