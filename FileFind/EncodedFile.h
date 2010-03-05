@@ -94,9 +94,9 @@ public:
 	CEncodedFile(BYTE *pData, DWORD dwSize);
 	bool Valid();
 
-	void SetSourceUnicode(bool bLE = true);
+	void SetSourceUnicode(bool bLE = true, DWORD dwSkip = 0);
 	void SetSourceDetect(eLikeUnicode nDetect);
-	void SetSourceUTF8();
+	void SetSourceUTF8(DWORD dwSkip = 0);
 	void SetSourceCP(UINT nCP);
 #ifndef UNICODE
 	void SetSourceTable(BYTE *szTable);
@@ -137,7 +137,7 @@ protected:
 
 	CDelayedDecoder	*m_pDD;
 	CDecoder		*m_pDec;
-	void SetDecoder(CDecoder *pDec);
+	void SetDecoder(CDecoder *pDec, DWORD dwSkip = 0);
 	void ClearDecoders();
 
 	vector<CHAR>	m_arrBuffered;

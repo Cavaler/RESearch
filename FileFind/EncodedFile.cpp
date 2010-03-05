@@ -7,13 +7,13 @@ CDelayedDecoder::CDelayedDecoder(const char *szData, DWORD dwSize, CDecoder &pDe
 	m_dwBufferSize = (DWORD)(m_dwSize*m_pDecoder.SizeIncr());
 	m_szBuffer = (char *)VirtualAlloc(NULL, m_dwBufferSize, MEM_RESERVE, PAGE_READWRITE);
 
+	m_dwCommitRead = 0;
+	m_dwCommitWrite = 0;
+
 	if (m_dwBufferSize >= BLOCK_SIZE)
 		ResizeBuffer(BLOCK_SIZE-1);
 	else if (m_dwBufferSize > 0)
 		ResizeBuffer(m_dwBufferSize-1);
-
-	m_dwCommitRead = 0;
-	m_dwCommitWrite = 0;
 }
 
 CDelayedDecoder::~CDelayedDecoder() {
@@ -98,7 +98,7 @@ CFromUnicodeDecoder::CFromUnicodeDecoder(UINT nCP, bool bLE)
 }
 
 float CFromUnicodeDecoder::SizeIncr() {
-	return 1/2;
+	return 1.0/2.0;
 }
 
 void CFromUnicodeDecoder::Encode(const char *szSource, DWORD dwSize, char *szTarget) {
@@ -198,36 +198,39 @@ template<class CHAR> bool CEncodedFile<CHAR>::Valid() {
 	return m_pData != NULL;
 }
 
-template<class CHAR> void CEncodedFile<CHAR>::SetSourceUnicode(bool bLE) {
+template<class CHAR> void CEncodedFile<CHAR>::SetSourceUnicode(bool bLE, DWORD dwSkip) {
 	ClearDecoders();
 	if (Unicode) {
 		if (bLE) {
-			m_pDecodedData  = m_pData;
-			m_dwDecodedSize = m_dwSize/sizeof(CHAR);
+			m_pDecodedData  = m_pData + dwSkip;
+			m_dwDecodedSize = (m_dwSize - dwSkip)/sizeof(CHAR);
 		} else {
-			SetDecoder(new CByteSwapDecoder());
+			SetDecoder(new CByteSwapDecoder(), dwSkip);
 		}
 	} else {
-		SetDecoder(new CFromUnicodeDecoder(CP_OEMCP, bLE));
+		SetDecoder(new CFromUnicodeDecoder(CP_OEMCP, bLE), dwSkip);
 	}
 }
 
 template<class CHAR> void CEncodedFile<CHAR>::SetSourceDetect(eLikeUnicode nDetect) {
 	switch (nDetect) {
 	case UNI_LE:
-		SetSourceUnicode(true);
+		SetSourceUnicode(true, 2);
 		break;
 	case UNI_BE:
-		SetSourceUnicode(false);
+		SetSourceUnicode(false, 2);
+		break;
+	case UNI_UTF8:
+		SetSourceUTF8(3);
 		break;
 	default:
 		ClearDecoders();
 	}
 }
 
-template<class CHAR> void CEncodedFile<CHAR>::SetSourceUTF8() {
+template<class CHAR> void CEncodedFile<CHAR>::SetSourceUTF8(DWORD dwSkip) {
 	ClearDecoders();
-	FromUTF8((const char *)m_pData, m_dwSize, m_arrBuffered);
+	FromUTF8((const char *)m_pData + dwSkip, m_dwSize - dwSkip, m_arrBuffered);
 
 	if (m_arrBuffered.size() > 0) {
 		m_pDecodedData  = (const BYTE *)&m_arrBuffered[0];
@@ -256,9 +259,9 @@ template<class CHAR> void CEncodedFile<CHAR>::SetSourceTable(BYTE *szTable) {
 }
 #endif
 
-template<class CHAR> void CEncodedFile<CHAR>::SetDecoder(CDecoder *pDec) {
+template<class CHAR> void CEncodedFile<CHAR>::SetDecoder(CDecoder *pDec, DWORD dwSkip) {
 	m_pDec = pDec;
-	m_pDD = new CDelayedDecoder((const char *)m_pData, m_dwSize, *m_pDec);
+	m_pDD = new CDelayedDecoder((const char *)m_pData + dwSkip, m_dwSize - dwSkip, *m_pDec);
 	m_pDecodedData  = (const BYTE *)(const char *)*m_pDD;
 	m_dwDecodedSize = m_pDD->Size()/sizeof(CHAR);
 }
