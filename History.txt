@@ -7,9 +7,11 @@ Regular Expression Search and Replace
 
 Planned:
 	* dialogprocs for disabling unneeded elements
-	+ Do not decode whole file while searching/grep, use VirtualAlloc's etc
 	+ Preview rename changes
 	- Gray out 'show last results' if there aren't any (requires FMENU_USEEXT)
+
+Version 7.10
+	! File search routines rewritten, using on-demand file decoding
 
 Version 7.02 (26.02.2010)
 	* New option: [X] Ignore identical replaces
