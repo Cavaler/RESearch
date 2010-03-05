@@ -146,11 +146,17 @@ void GrepFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 	if (FAdvanced && FASearchHead && (FileSize > (int)FASearchHeadLimit)) FileSize=FASearchHeadLimit;
 	if ((FSearchAs == SA_PLAINTEXT) && (FileSize < FText.length())) return;
 
+
+	CEncodedFileT encFile(mapFile, FileSize);
+
+	//	1 - Autodetect
+
 	vector<TCHAR> arrData;
 	eLikeUnicode nDetect = LikeUnicode(mapFile, FileSize);
 	if (nDetect != UNI_NONE) {
-		if (FromUnicodeSkipDetect(mapFile, FileSize, arrData, nDetect)) {
-			if (!arrData.empty() && GrepBuffer(FindData, PanelItems, &arrData[0], arrData.size())) return;
+		encFile.SetSourceDetect(nDetect);
+		if (encFile.Size() > 0) {
+			if (encFile.Run<WIN32_FIND_DATA *, panelitem_vector &>(GrepBuffer, FindData, PanelItems)) return;
 		}
 #ifdef TRY_ENCODINGS_WITH_BOM
 		if (!FAllCharTables) return;
@@ -159,51 +165,54 @@ void GrepFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 #endif
 	}
 
-#ifdef UNICODE
-	hack_string strData(mapFile, FileSize);
-	wstring wstrData = DefToUnicode(strData);
-	if (GrepBuffer(FindData, PanelItems, wstrData.data(), wstrData.length())) return;
-#else
-	if (GrepBuffer(FindData, PanelItems, mapFile, FileSize)) return;
-#endif
+	//	2 - OEM / Default
+
+	encFile.SetSourceCP(GetDefCP());
+	if (encFile.Run<WIN32_FIND_DATA *, panelitem_vector &>(GrepBuffer, FindData, PanelItems)) return;
 
 	if (!FAllCharTables) return;
+
+	//	3 - Tables
 
 #ifdef UNICODE
 	for (cp_set::iterator it = g_setAllCPs.begin(); it != g_setAllCPs.end(); it++) {
 		UINT nCP = *it;
-		if (nCP == (g_bDefaultOEM ? GetOEMCP() : GetACP())) continue;
+		if (IsDefCP(nCP)) continue;
 		if ((nCP == CP_UNICODE) || (nCP == CP_REVERSEBOM)) continue;
 
-		wstring wstrData = StrToUnicode(strData, nCP);
-		if (!wstrData.empty() && GrepBuffer(FindData, PanelItems, wstrData.data(), wstrData.length())) return;
+		encFile.SetSourceCP(nCP);
+		if (encFile.Run<WIN32_FIND_DATA *, panelitem_vector &>(GrepBuffer, FindData, PanelItems)) return;
 	}
 #else
-	vector<char> SaveBuf(FileSize);
-	for (size_t I=0; I < XLatTables.size(); I++) {
-		memmove(&SaveBuf[0], mapFile, FileSize);
-		XLatBuffer((BYTE *)&SaveBuf[0], FileSize, I);
-		if (GrepBuffer(FindData, PanelItems, &SaveBuf[0], FileSize)) return;
+	for (size_t nTable=0; nTable < XLatTables.size(); nTable++) {
+		encFile.SetSourceTable(XLatTables[nTable].DecodeTable);
+		if (encFile.Run<WIN32_FIND_DATA *, panelitem_vector &>(GrepBuffer, FindData, PanelItems)) return;
 	}
 #endif
 
-	if ((nDetect != UNI_LE) && FromUnicodeLE(mapFile, FileSize, arrData)
+	//	4 - Unicode
+
+	if ((nDetect != UNI_LE)
 #ifdef UNICODE
 		&& (g_setAllCPs.find(CP_UNICODE) != g_setAllCPs.end())
 #endif
-		) {
-		if ((arrData.size() > 0) && GrepBuffer(FindData, PanelItems, &arrData[0], arrData.size())) return;
+	) {
+		encFile.SetSourceUnicode(true);
+		if (encFile.Run<WIN32_FIND_DATA *, panelitem_vector &>(GrepBuffer, FindData, PanelItems)) return;
 	}
-	if ((nDetect != UNI_BE) && FromUnicodeBE(mapFile, FileSize, arrData)
+
+	if ((nDetect != UNI_BE)
 #ifdef UNICODE
 		&& (g_setAllCPs.find(CP_REVERSEBOM) != g_setAllCPs.end())
 #endif
-		) {
-		if ((arrData.size() > 0) && GrepBuffer(FindData, PanelItems, &arrData[0], arrData.size())) return;
+	) {
+		encFile.SetSourceUnicode(false);
+		if (encFile.Run<WIN32_FIND_DATA *, panelitem_vector &>(GrepBuffer, FindData, PanelItems)) return;
 	}
 #ifndef UNICODE
-	if ((nDetect != UNI_UTF8) && FromUTF8(mapFile, FileSize, arrData)) {
-		if ((arrData.size() > 0) && GrepBuffer(FindData, PanelItems, &arrData[0], arrData.size())) return;
+	if (nDetect != UNI_UTF8) {
+		encFile.SetSourceUTF8();
+		if (encFile.Run<WIN32_FIND_DATA *, panelitem_vector &>(GrepBuffer, FindData, PanelItems)) return;
 	}
 #endif
 
