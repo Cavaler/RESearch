@@ -374,6 +374,8 @@ void PrepareLocaleStuff();
 tstring UpCaseString(const tstring &strText);
 void UTF8Converter(tstring strInit = _T(""));
 
+UINT GetDefCP();
+UINT IsDefCP(UINT nCP);
 #ifdef UNICODE
 wstring DefToUnicode(const string &strDef);
 string  DefFromUnicode(const wstring &strUnicode);

@@ -939,6 +939,16 @@ hack_wstring::~hack_wstring() {
 
 #ifdef UNICODE
 
+UINT GetDefCP() {
+	return (g_bDefaultOEM) ? GetOEMCP() : GetACP();
+}
+
+UINT IsDefCP(UINT nCP) {
+	return (g_bDefaultOEM) ?
+		((nCP == CP_OEMCP) || (nCP == GetOEMCP())) :
+		((nCP == CP_ACP)   || (nCP == GetACP()));
+}
+
 wstring DefToUnicode(const string &strDef) {
 	return (g_bDefaultOEM) ? OEMToUnicode(strDef) : ANSIToUnicode(strDef);
 }
@@ -949,6 +959,16 @@ string DefFromUnicode(const wstring &strUnicode) {
 
 bool CanUseCP(UINT nCP, const wstring &strUnicode) {
 	return StrToUnicode(StrFromUnicode(strUnicode, nCP), nCP) == strUnicode;
+}
+
+#else
+
+UINT GetDefCP() {
+	return CP_OEMCP;
+}
+
+UINT IsDefCP(UINT nCP) {
+	return (nCP == CP_OEMCP) || (nCP == GetOEMCP());
 }
 
 #endif

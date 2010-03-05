@@ -38,15 +38,9 @@ bool FromUnicodeBE(const char *Buffer, int Size, vector<TCHAR> &arrData) {
 	return true;
 }
 
-bool FromUTF8(const char *Buffer, int Size, vector<TCHAR> &arrData) {
+bool FromUTF8(const char *Buffer, int Size, vector<char> &arrData) {
 	if (Size == 0) {arrData.clear(); return true;}
 
-#ifdef UNICODE
-	arrData.resize(Size);
-	int nResult = MultiByteToWideChar(CP_UTF8, 0, Buffer, Size, &arrData[0], arrData.size());
-	if (nResult <= 0) return false;
-	arrData.resize(nResult);
-#else
 	vector<wchar_t> arrWData(Size);
 	int nResult = MultiByteToWideChar(CP_UTF8, 0, Buffer, Size, &arrWData[0], arrWData.size());
 	if (nResult <= 0) return false;
@@ -55,7 +49,17 @@ bool FromUTF8(const char *Buffer, int Size, vector<TCHAR> &arrData) {
 	nResult = WideCharToMultiByte(CP_OEMCP, 0, &arrWData[0], nResult, &arrData[0], nResult, NULL, NULL);
 	if (nResult <= 0) return false;
 	arrData.resize(nResult);
-#endif
+
+	return true;
+}
+
+bool FromUTF8(const char *Buffer, int Size, vector<wchar_t> &arrData) {
+	if (Size == 0) {arrData.clear(); return true;}
+
+	arrData.resize(Size);
+	int nResult = MultiByteToWideChar(CP_UTF8, 0, Buffer, Size, &arrData[0], arrData.size());
+	if (nResult <= 0) return false;
+	arrData.resize(nResult);
 
 	return true;
 }
