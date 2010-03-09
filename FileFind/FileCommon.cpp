@@ -92,6 +92,10 @@ void FWriteRegistry(HKEY Key) {
 void FCleanup(BOOL PatternOnly) {
 	if (FPattern) {pcre_free(FPattern);FPattern=NULL;}
 	if (FPatternExtra) {pcre_free(FPatternExtra);FPatternExtra=NULL;}
+#ifdef UNICODE
+	if (FPatternA) {pcre_free(FPatternA);FPatternA=NULL;}
+	if (FPatternExtraA) {pcre_free(FPatternExtraA);FPatternExtraA=NULL;}
+#endif
 	if (FMaskPattern) {pcre_free(FMaskPattern);FMaskPattern=NULL;}
 	if (FMaskPatternExtra) {pcre_free(FMaskPatternExtra);FMaskPatternExtra=NULL;}
 	if (FMaskSet) {delete FMaskSet;FMaskSet=NULL;}
@@ -177,7 +181,11 @@ int FPreparePattern(bool bAcceptEmpty) {
 	case SA_SEVERALLINE:
 	case SA_MULTILINE:
 		if (FText.empty()) return TRUE;
-		return PreparePattern(&FPattern, &FPatternExtra, FText, FCaseSensitive, FUTF8, OEMCharTables);
+		return PreparePattern(&FPattern, &FPatternExtra, FText, FCaseSensitive, FUTF8, OEMCharTables)
+#ifdef UNICODE
+			&& PreparePattern(&FPatternA, &FPatternExtraA, DefFromUnicode(FText), FCaseSensitive, FUTF8, OEMCharTables)
+#endif
+			;
 	default:
 		return FALSE;
 	}

@@ -150,7 +150,7 @@ BOOL ProcessRegExpBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindData
 		int Start=0;
 		Buffer=BufEnd;
 		SkipNoCRLF(BufEnd,&BufLen);
-		while ((BufEnd!=Buffer)&&do_pcre_execA(FPattern,FPatternExtra,Buffer,BufEnd-Buffer,Start,0,Match,MatchCount*3)>=0) {
+		while ((BufEnd!=Buffer)&&do_pcre_execA(FPatternA,FPatternExtraA,Buffer,BufEnd-Buffer,Start,0,Match,MatchCount*3)>=0) {
 #ifdef UNICODE
 			string Replace=CreateReplaceString(Buffer,Match,MatchCount,DefFromUnicode(FRReplace).c_str(),"\n",NULL,-1, FRegExp);
 #else
@@ -187,7 +187,7 @@ BOOL ReplaceSeveralLineBuffer(HANDLE &hFile,const char *&Buffer,const char *BufE
 
 	SkipWholeLine(LineEnd,&LineLen);
 
-	while ((Buffer < BufEnd) && do_pcre_execA(FPattern,FPatternExtra,Buffer,BufEnd-Buffer,Start,0,Match,MatchCount*3)>=0) {
+	while ((Buffer < BufEnd) && do_pcre_execA(FPatternA,FPatternExtraA,Buffer,BufEnd-Buffer,Start,0,Match,MatchCount*3)>=0) {
 		const char *NewBuffer=Buffer+Match[0];
 		if (NewBuffer>=LineEnd) break;
 #ifdef UNICODE

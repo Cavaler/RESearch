@@ -122,6 +122,34 @@ BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const tstring &Text
 	}
 }
 
+#ifdef UNICODE
+BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,int CaseSensitive,BOOL bUTF8,const unsigned char *pTables) {
+	if (Text.empty()) return FALSE;		// WAS: Not needed if empty NOW: what is search for nothing?
+	const char *ErrPtr;
+	int ErrOffset;
+	int iFlags=PCRE_MULTILINE;
+	if (DotMatchesNewline) iFlags |= PCRE_DOTALL;
+	if (!CaseSensitive) iFlags |= PCRE_CASELESS;
+	if (bUTF8) iFlags |= PCRE_UTF8;
+
+	*Pattern=pcre_compile(Text.c_str(),iFlags,&ErrPtr,&ErrOffset,pTables);
+	if (!(*Pattern)) {
+		tstring ErrPos(Text.length(),' ');
+		tstring strErrPtr = OEMToUnicode(ErrPtr);
+		tstring strText = OEMToUnicode(Text);
+		const TCHAR *Lines[]={GetMsg(MRegExpError),strErrPtr.c_str(),_T("\x01"),strText.c_str(),ErrPos.c_str(),GetMsg(MOk)};
+		ErrPos[ErrOffset]='^';
+		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("RegExpError"),Lines,6,1);
+		return FALSE;
+	} else {
+		if (PatternExtra) {
+			*PatternExtra=pcre_study(*Pattern,0,&ErrPtr);
+		}
+		return TRUE;
+	}
+}
+#endif
+
 enum ECaseConvert {CCV_NONE,CCV_UPPER,CCV_LOWER,CCV_FLIP};
 ECaseConvert CaseConvert;
 ECaseConvert OneCaseConvert;

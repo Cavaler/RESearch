@@ -72,6 +72,8 @@ EXTERN vector<tstring> FSWords;
 #ifdef UNICODE
 EXTERN string FOEMTextUpcase;
 EXTERN bool FCanUseDefCP;
+EXTERN pcre *FPatternA;
+EXTERN pcre_extra *FPatternExtraA;
 #endif
 
 EXTERN pcre *FMaskPattern VALUE(NULL);
