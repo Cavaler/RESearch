@@ -159,7 +159,7 @@ void RenameFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 
 	TCHAR *szSlash=_tcsrchr(FindData->cFileName,'\\');
 	if (szSlash) {
-		strPath = tstring(FindData->cFileName, szSlash - FindData->cFileName);
+		strPath = tstring(FindData->cFileName, szSlash - FindData->cFileName + 1);
 		strOriginalName = szSlash+1;
 	} else {
 		strOriginalName = FindData->cFileName;
