@@ -10,8 +10,11 @@ Planned:
 	+ Preview rename changes
 	- Gray out 'show last results' if there aren't any (requires FMENU_USEEXT)
 
-Version 7.10
-	! File search routines rewritten, using on-demand file decoding
+Version 7.03 (09.03.2010)
+	! Grep is using on-demand file decoding. To be extended to Search/Replace...
+	- Fixed moving files to upper folder while doing File Rename
+Unicode version:
+	- Fixed (?) RegExp Replace in panels
 
 Version 7.02 (26.02.2010)
 	* New option: [X] Ignore identical replaces
