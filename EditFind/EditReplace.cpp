@@ -315,7 +315,7 @@ eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &
 		QuoteStrings(Replace.c_str(), arrReplaced, EdInfo.WindowSizeX-12);
 
 		int L, H, TotalCount = arrFound.size() + arrReplaced.size();					// Calculate dialog width
-		size_t Len = 30;
+		size_t Len = 40;
 		for (size_t I = 0; I<arrFound.size();I++)
 			if (arrFound[I].length()>Len) Len = arrFound[I].length();
 
@@ -338,7 +338,6 @@ eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &
 		}
 		StartupInfo.EditorControl(ECTL_SELECT, &Select);
 		StartupInfo.EditorControl(ECTL_REDRAW, NULL);
-
 
 		CFarDialog Dialog(-1, H + 1, Len + 8, H + 8+TotalCount, _T("ERAskReplace"));
 		Dialog.AddFrame(MREReplace);
