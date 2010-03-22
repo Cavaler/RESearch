@@ -154,7 +154,7 @@ BOOL EditorSearch() {
 	Dialog.Add(new CFarCheckBoxItem(30,6,0,_T(""),&EUTF8));
 	Dialog.Add(new CFarButtonItem(34,6,0,0,MUTF8));
 	Dialog.Add(new CFarCheckBoxItem(5,7,0,MReverseSearch,&EReverse));
-	if (EdInfo.BlockType!=BTYPE_NONE) Dialog.Add(new CFarCheckBoxItem(30,7,0,MInSelection,&EInSelection));
+	Dialog.Add(new CFarCheckBoxItem(30,7,(EdInfo.BlockType!=BTYPE_NONE)?0:DIF_DISABLE,MInSelection,&EInSelection));
 	Dialog.AddButtons(MOk, MShowAll); Dialog.AddButton(MCancel);
 	Dialog.Add(new CFarButtonItem(60,5,0,0,MBtnPresets));
 
