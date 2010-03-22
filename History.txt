@@ -10,6 +10,12 @@ Planned:
 	+ Preview rename changes
 	- Gray out 'show last results' if there aren't any (requires FMENU_USEEXT)
 
+Version 7.04 (22.03.2010)
+	- Spaces at the end of file masks are now ignored
+	- Fixed Replace dialog width
+	- Fixed \s in Unicode or UTF8 mode
+	* "[X] In selection" is disabled, not hidden, when not applicable
+
 Version 7.03 (09.03.2010)
 	! Grep is using on-demand file decoding. To be extended to Search/Replace...
 	- Fixed moving files to upper folder while doing File Rename
