@@ -40,7 +40,6 @@ void EWriteRegistry(HKEY Key) {
 }
 
 BOOL SearchIn(const TCHAR *Line,int Start,int Length,int *MatchStart,int *MatchLength,BOOL NeedMatch) {
-	if (Length==0) return FALSE;
 	if (ERegExp) {
 		MatchCount=pcre_info(EPattern,NULL,NULL)+1;
 		Match=new int[MatchCount*3];
@@ -73,7 +72,7 @@ BOOL SearchInLine(const TCHAR *Line,int Length,int Start,int End,int *MatchStart
 	if (Start>Length) return FALSE;
 	if (Start==-1) Start=0;
 	if ((End==-1)||(End>Length)) Len=Length-Start; else Len=End-Start;
-	if (Len<=0) return FALSE;
+	if (Len<0) return FALSE;
 
 #ifdef UNICODE
 	return SearchIn(Line,Start,Len,MatchStart,MatchLength,NeedMatch);
@@ -227,7 +226,7 @@ BOOL SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,BOOL Ne
 
 			int CurLastLine = min(LastLine+SeveralLines-1, LastLine);
 			FillLineBuffer(Line, CurLastLine);
-			Lines = (!g_LineBuffer.empty()) ? &g_LineBuffer[0] : NULL;
+			Lines = (!g_LineBuffer.empty()) ? &g_LineBuffer[0] : _T("");
 			LinesLength = g_LineBuffer.size();
 
 			if (CurLastLine == LastLine) {
@@ -253,7 +252,7 @@ BOOL SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,BOOL Ne
 			if (Interrupted256(Line)) return FALSE;
 
 			FillLineBuffer(Line, min(LastLine, Line+SeveralLines-1));
-			Lines = (!g_LineBuffer.empty()) ? &g_LineBuffer[0] : NULL;
+			Lines = (!g_LineBuffer.empty()) ? &g_LineBuffer[0] : _T("");
 			LinesLength = g_LineBuffer.size();
 			FirstLineLength = (g_LineOffsets.size() <= 1) ? LinesLength : g_LineOffsets[1]-1;
 
