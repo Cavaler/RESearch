@@ -188,7 +188,8 @@ public:
 	bool m_bActive;
 private:
 	vector<CPluginPanelItem> m_arrItems;
-	tstring m_strFolder;
+	tstring m_strBaseFolder;
+	tstring m_strCurFolder;
 	KeyBarTitles KeyBar;
 
 	void UpdateList();

@@ -34,7 +34,7 @@ void WINAPI FAR_EXPORT(ClosePlugin)(HANDLE hPlugin) {
 // CTemporaryPanel
 
 CTemporaryPanel::CTemporaryPanel(panelitem_vector &PanelItems,TCHAR *CalledFolder)
-: m_arrItems(PanelItems),m_strFolder(CalledFolder),m_bActive(true)
+: m_arrItems(PanelItems),m_strBaseFolder(CalledFolder),m_bActive(true)
 {
 	for (size_t I=0; I<m_arrItems.size(); I++) {
 		m_arrItems[I].UserData = (DWORD)new TempUserData();
@@ -51,13 +51,24 @@ CTemporaryPanel::~CTemporaryPanel() {
 }
 
 void CTemporaryPanel::GetOpenPluginInfo(OpenPluginInfo *Info) {
-	static char CurrentDir[MAX_PATH];
+	static TCHAR CurrentDir[MAX_PATH];
+
+	CPanelInfo PInfo;
+	PInfo.GetInfo((HANDLE)this);
+	if (PInfo.CurrentItem > 0) {
+		m_strCurFolder = PInfo.PanelItems[PInfo.CurrentItem].FindData.cFileName;
+		size_t nPos = m_strCurFolder.rfind('\\');
+		if (nPos != tstring::npos) m_strCurFolder.erase(nPos);
+	} else {
+		m_strCurFolder = m_strBaseFolder;
+	}
+
 	Info->StructSize=sizeof(*Info);
 	Info->Flags=OPIF_USEFILTER|OPIF_USESORTGROUPS|OPIF_USEHIGHLIGHTING|
 				OPIF_ADDDOTS|OPIF_SHOWRIGHTALIGNNAMES|
 				OPIF_REALNAMES;
 	Info->HostFile=NULL;
-	Info->CurDir=_T("");
+	Info->CurDir = m_strCurFolder.c_str();
 
 	Info->Format=GetMsg(MSearchResults);
 	Info->PanelTitle=GetMsg(MSearchResults);
@@ -107,24 +118,21 @@ int CTemporaryPanel::GetFindData(PluginPanelItem **PanelItem,int *ItemsNumber,in
 int CTemporaryPanel::_SetDirectory(TCHAR *Name,int OpMode) {
 	if ((OpMode&OPM_FIND) || (_tcscmp(Name,_T("\\"))==0)) return FALSE;
 
+	if (_tcscmp(Name, _T("..")) != 0)
+		m_strCurFolder = Name;
+
 #ifdef UNICODE
-	StartupInfo.Control((HANDLE)this, FCTL_CLOSEPLUGIN, 0, (LONG_PTR)Name);
+	StartupInfo.Control((HANDLE)this, FCTL_CLOSEPLUGIN, 0, (LONG_PTR)m_strCurFolder.c_str());
+//	StartupInfo.Control(PANEL_ACTIVE, FCTL_UPDATEPANEL, 0, NULL);
 #else
-	StartupInfo.Control((HANDLE)this, FCTL_CLOSEPLUGIN, Name);
+	StartupInfo.Control((HANDLE)this, FCTL_CLOSEPLUGIN, (void *)m_strCurFolder.c_str());
+//	StartupInfo.Control(INVALID_HANDLE_VALUE, FCTL_UPDATEPANEL,  NULL);
 #endif
+
 	return TRUE;
 }
 
 int CTemporaryPanel::PutFiles(PluginPanelItem *AddItems,int AddNumber,int Move,int OpMode) {
-/*	Items=(PluginPanelItem *)realloc(Items,(Count+AddNumber)*sizeof(PluginPanelItem));
-	for (int I=0;I<AddNumber;I++) {
-		char PathBuffer[MAX_PATH];
-		Items[I+Count]=AddItems[I];
-		GetFullPathName(Items[I+Count].FindData.cFileName,MAX_PATH,PathBuffer,NULL);
-		strcpy(Items[I+Count].FindData.cFileName,PathBuffer);
-		Items[I+Count].UserData = (DWORD)new TempUserData();
-	}
-	Count+=AddNumber;UpdateList();*/
 	return TRUE;
 }
 
@@ -203,15 +211,6 @@ int CTemporaryPanel::ProcessKey(int Key,unsigned int ControlState) {
 			StartupInfo.Control((HANDLE)this,FCTL_UPDATEANOTHERPANEL,NULL);
 			StartupInfo.Control((HANDLE)this,FCTL_REDRAWANOTHERPANEL,NULL);
 		}
-#endif
-		return TRUE;
-	}
-
-	if ((ControlState==0)&&(Key==KEY_BS)) {
-#ifdef UNICODE
-		StartupInfo.Control((HANDLE)this,FCTL_CLOSEPLUGIN,0, (LONG_PTR)m_strFolder.c_str());
-#else
-		StartupInfo.Control((HANDLE)this,FCTL_CLOSEPLUGIN,(void *)m_strFolder.c_str());
 #endif
 		return TRUE;
 	}
