@@ -161,7 +161,9 @@ void DoReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, const ts
 	EctlSetPosition(&Position);
 	EctlGetString(&GetString);
 	tstring strGetString = ToString(GetString);
+
 	tstring DefEOL = GetString.StringEOL;
+	tstring EndEOL = DefEOL;
 
 	// Creating full replace line
 	int OriginalEndLength;
@@ -178,14 +180,15 @@ void DoReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, const ts
 		EctlSetPosition(&Position);
 		EctlGetString(&GetString);
 		tstring strGetString2 = ToString(GetString);
+		EndEOL = GetString.StringEOL;
 
 		OriginalEndLength = GetString.StringLength-EndPos;
 
 		NewString = strGetString.substr(0, StartPos) + Replace + strGetString2.substr(EndPos);
 
-		StartupInfo.EditorControl(ECTL_DELETESTRING, NULL);
 		Position.CurLine = FirstLine;
 		EctlSetPosition(&Position);
+		StartupInfo.EditorControl(ECTL_DELETESTRING, NULL);
 	}
 
 	RefreshEditorInfo();
@@ -218,7 +221,7 @@ void DoReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, const ts
 	}
 
 	SetString.StringLength = NewString.length();
-	SetString.StringEOL = DefEOL.c_str();
+	SetString.StringEOL = EndEOL.empty() ? NULL : EndEOL.c_str();
 	EctlSetString(&SetString);
 
 	if (EInSelection) {
