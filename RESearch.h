@@ -343,6 +343,30 @@ void ConfigureRenumbering(bool bRuntime);
 void ConfigureEditor();
 int  ConfigureSeveralLines();
 
+class CREParameters {
+public:
+	CREParameters();
+
+	void Clear();
+	void AddENumbers(int nL, int nN, int nR);
+	void AddFNumbers(int nF, int nR);
+	void AddRE(pcre *re, const TCHAR *szString);
+
+	vector<int> m_arrMatch;
+	int *Match() { return m_arrMatch.empty() ? NULL : &m_arrMatch[0]; }
+	int  Count() { return m_arrMatch.size(); }
+
+	tstring GetParam(int nNumber);
+	tstring GetParam(const tstring &strName);
+	void FillStartLength(int *MatchStart,int *MatchLength);
+
+	map<tstring, tstring> m_mapStrParam;
+protected:
+	pcre *m_re;
+	const TCHAR *m_szString;
+};
+EXTERN CREParameters REParam;
+
 bool CheckUsage(const tstring &strText, bool bRegExp, bool bSeveralLine);
 BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const tstring &Text,int CaseSensitive,BOOL bUTF8=FALSE,const unsigned char *pTables=NULL);
 tstring CreateReplaceString(const TCHAR *Matched,int *Match,int Count,const TCHAR *Replace,const TCHAR *EOL,int *Numbers,int Engine, BOOL bRegExp);
