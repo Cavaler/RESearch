@@ -2,6 +2,9 @@
 #define __STRINGTEMPLATES_H
 
 template<class CHAR>
+class CREParameters;
+
+template<class CHAR>
 class CStringOperations {
 public:
 	typedef basic_string<CHAR> cstring;
@@ -19,6 +22,9 @@ public:
 	static bool GetNumber(const cstring &str, int &nValue);
 	static BOOL ExpandParameter(const CHAR *Matched, cstring &String, const cstring &Param, int *Match, int Count, int *Numbers);
 	static cstring CreateReplaceString(const CHAR *Matched,int *Match,int Count,const CHAR *Replace,const CHAR *EOL,int *Numbers,int Engine, BOOL bRegExp);
+
+	static cstring ExpandParameter(const CHAR *&Replace, CREParameters<CHAR> &Param);
+	static cstring CreateReplaceString(const CHAR *Matched, const CHAR *Replace, const CHAR *EOL, int Engine, CREParameters<CHAR> &Param);
 };
 
 #define _T2(sz) __T2(sz, L ## sz)
@@ -41,11 +47,12 @@ public:
 	int  Count() { return m_arrMatch.size(); }
 
 	cstring GetParam(int nNumber);
-	cstring GetParam(const cstring &strName);
+	cstring GetParam(const cstring &strName, bool bCheckNumber = false);
 	void FillStartLength(int *MatchStart, int *MatchLength);
 
+public:
 	map<cstring, cstring> m_mapStrParam;
-protected:
+
 	pcre *m_re;
 	const CHAR *m_szString;
 };
