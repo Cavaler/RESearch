@@ -227,65 +227,6 @@ tstring CreateReplaceString(const TCHAR *Matched,int *Match,int Count,const TCHA
 	return CStringOperations<TCHAR>::CreateReplaceString(Matched, Match, Count, Replace, EOL, Numbers, Engine, bRegExp);
 }
 
-CREParameters::CREParameters()
-: m_re(NULL), m_szString(NULL)
-{
-}
-
-void CREParameters::Clear() {
-	m_mapStrParam.clear();
-	m_re = NULL;
-	m_szString = NULL;
-}
-
-void CREParameters::AddENumbers(int nL, int nN, int nR) {
-	TCHAR szNumber[16];
-	m_mapStrParam[_T("L")] = _ttoa(nL, szNumber, 10);
-	m_mapStrParam[_T("N")] = _ttoa(nN, szNumber, 10);
-	m_mapStrParam[_T("R")] = _ttoa(nR, szNumber, 10);
-}
-
-void CREParameters::AddFNumbers(int nF, int nR) {
-	TCHAR szNumber[16];
-	m_mapStrParam[_T("F")] = _ttoa(nF, szNumber, 10);
-	m_mapStrParam[_T("R")] = _ttoa(nR, szNumber, 10);
-}
-
-void CREParameters::AddRE(pcre *re, const TCHAR *szString) {
-	m_re = re;
-	m_szString = szString;
-
-	m_arrMatch.resize((pcre_info(re, NULL, NULL)+1)*3);
-}
-
-tstring CREParameters::GetParam(int nNumber) {
-	if ((nNumber < 0) || (nNumber >= Count()/3)) return tstring();
-
-	return tstring(m_szString+m_arrMatch[nNumber*3], m_arrMatch[nNumber*3+1]-m_arrMatch[nNumber*3]);
-}
-
-tstring CREParameters::GetParam(const tstring &strName) {
-	map<tstring, tstring>::iterator it = m_mapStrParam.find(strName);
-	if (it != m_mapStrParam.end()) return it->second;
-
-	if (m_re == NULL) return tstring();
-
-	const TCHAR *szSubStr;
-	int nLen = pcre_get_named_substring(m_re, m_szString, Match(), Count(), strName.c_str(), &szSubStr);
-
-	tstring strSubStr(szSubStr, nLen);
-	pcre_free((void *)szSubStr);
-
-	m_mapStrParam[strName] = strSubStr;
-	return strSubStr;
-}
-
-void CREParameters::FillStartLength(int *MatchStart,int *MatchLength)
-{
-	if (MatchStart) *MatchStart = m_arrMatch[0];
-	if (MatchLength) *MatchLength = m_arrMatch[1]-m_arrMatch[0];
-}
-
 #ifdef UNICODE
 
 string CreateReplaceString(const char *Matched,int *Match,int Count,const char *Replace,const char *EOL,int *Numbers,int Engine, BOOL bRegExp) {

@@ -49,7 +49,7 @@ BOOL CStringOperations<CHAR>::ExpandParameter(const CHAR *Matched, cstring &Stri
 					if (Param.length() >= nPos+1) MinLen = Param.length() - nPos - 1;
 
 					CHAR sz[16];
-					csprintf_s(sz, 16, _T2("%0*d", L"%0*d"), MinLen, nMatch + nAdd);
+					csprintf_s(sz, 16, _T2("%0*d"), MinLen, nMatch + nAdd);
 					strMatch = sz;
 				} else {
 					strMatch += Param.substr(nPos);
@@ -73,7 +73,7 @@ BOOL CStringOperations<CHAR>::ExpandParameter(const CHAR *Matched, cstring &Stri
 	default:return FALSE;
 	}
 	CHAR S[16];
-	csprintf_s(S, 16, _T2("%0*d", L"%0*d"), MinLen, Number);
+	csprintf_s(S, 16, _T2("%0*d"), MinLen, Number);
 	AddString(String, S, cstrlen(S));
 	return TRUE;
 }
@@ -204,10 +204,84 @@ template<> static int CStringOperations<wchar_t>::csprintf_s(wchar_t *sz, size_t
 	return vswprintf_s(sz, count, szFormat, vaList);
 }
 
-template<> static char    * CStringOperations<char>   ::_T2(char *sz, wchar_t *wsz) { return  sz; }
-template<> static wchar_t * CStringOperations<wchar_t>::_T2(char *sz, wchar_t *wsz) { return wsz; }
+template<> static char    * CStringOperations<char>   ::__T2(char *sz, wchar_t *wsz) { return  sz; }
+template<> static wchar_t * CStringOperations<wchar_t>::__T2(char *sz, wchar_t *wsz) { return wsz; }
 
 template class CStringOperations<char>;
 #ifdef UNICODE
 template class CStringOperations<wchar_t>;
+#endif
+
+//////////////////////////////////////////////////////////////////////////
+
+template<class CHAR>
+CREParameters<CHAR>::CREParameters()
+: m_re(NULL), m_szString(NULL)
+{
+}
+
+template<class CHAR>
+void CREParameters<CHAR>::Clear() {
+	m_mapStrParam.clear();
+	m_re = NULL;
+	m_szString = NULL;
+}
+
+template<class CHAR>
+void CREParameters<CHAR>::AddENumbers(int nL, int nN, int nR) {
+	CHAR szNumber[16];
+	m_mapStrParam[CSO::_T2("L")] = CSO::ctoa(nL, szNumber);
+	m_mapStrParam[CSO::_T2("N")] = CSO::ctoa(nN, szNumber);
+	m_mapStrParam[CSO::_T2("R")] = CSO::ctoa(nR, szNumber);
+}
+
+template<class CHAR>
+void CREParameters<CHAR>::AddFNumbers(int nF, int nR) {
+	CHAR szNumber[16];
+	m_mapStrParam[CSO::_T2("F")] = CSO::ctoa(nF, szNumber);
+	m_mapStrParam[CSO::_T2("R")] = CSO::ctoa(nR, szNumber);
+}
+
+template<class CHAR>
+void CREParameters<CHAR>::AddRE(pcre *re, const CHAR *szString) {
+	m_re = re;
+	m_szString = szString;
+
+	m_arrMatch.resize((pcre_info(re, NULL, NULL)+1)*3);
+}
+
+template<class CHAR>
+typename CREParameters<CHAR>::cstring CREParameters<CHAR>::GetParam(int nNumber) {
+	if ((nNumber < 0) || (nNumber >= Count()/3)) return cstring();
+
+	return cstring(m_szString+m_arrMatch[nNumber*3], m_arrMatch[nNumber*3+1]-m_arrMatch[nNumber*3]);
+}
+
+template<class CHAR>
+typename CREParameters<CHAR>::cstring CREParameters<CHAR>::GetParam(const cstring &strName) {
+	map<cstring, cstring>::iterator it = m_mapStrParam.find(strName);
+	if (it != m_mapStrParam.end()) return it->second;
+
+	if (m_re == NULL) return cstring();
+
+	const CHAR *szSubStr;
+	int nLen = pcre_get_named_substring(m_re, m_szString, Match(), Count(), strName.c_str(), &szSubStr);
+
+	cstring strSubStr(szSubStr, nLen);
+	pcre_free((void *)szSubStr);
+
+	m_mapStrParam[strName] = strSubStr;
+	return strSubStr;
+}
+
+template<class CHAR>
+void CREParameters<CHAR>::FillStartLength(int *MatchStart, int *MatchLength)
+{
+	if (MatchStart) *MatchStart = m_arrMatch[0];
+	if (MatchLength) *MatchLength = m_arrMatch[1]-m_arrMatch[0];
+}
+
+template class CREParameters<char>;
+#ifdef UNICODE
+template class CREParameters<wchar_t>;
 #endif
