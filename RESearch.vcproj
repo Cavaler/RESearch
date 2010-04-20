@@ -1458,6 +1458,10 @@
 				RelativePath=".\StdAfx.h"
 				>
 			</File>
+			<File
+				RelativePath=".\StringTemplates.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Source Files"
@@ -1793,6 +1797,10 @@
 						UsePrecompiledHeader="1"
 					/>
 				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\StringTemplates.cpp"
+				>
 			</File>
 		</Filter>
 		<File
