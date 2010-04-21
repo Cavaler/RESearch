@@ -62,10 +62,6 @@ EXTERN tstring ETextUpcase;
 EXTERN pcre *EPattern VALUE(NULL);
 EXTERN pcre_extra *EPatternExtra VALUE(NULL);
 EXTERN const unsigned char *ECharacterTables VALUE(NULL);
-EXTERN int *Match VALUE(NULL);
-EXTERN int MatchCount VALUE(0);
-EXTERN TCHAR *MatchedLine VALUE(NULL);
-EXTERN int MatchedLineLength VALUE(0);
 EXTERN int SelStartLine,SelStartPos,SelEndLine,SelEndPos,SelType;
 
 EXTERN EditorInfo EdInfo;
@@ -121,7 +117,6 @@ void OEMToEditor(string &String);
 void SynchronizeWithFile(bool bReplace);
 void EReadRegistry(HKEY Key);
 void EWriteRegistry(HKEY Key);
-void DeleteMatchInfo();
 void ECleanup(BOOL PatternOnly);
 
 extern "C" const unsigned char *far_maketables(struct CharTableSet *pTable);

@@ -82,8 +82,8 @@ template<class CHAR>
 typename CStringOperations<CHAR>::cstring
 CStringOperations<CHAR>::CreateReplaceString(const CHAR *Matched,int *Match,int Count,const CHAR *Replace,const CHAR *EOL,int *Numbers,int Engine, BOOL bRegExp)
 {
-	if ((Engine >= 0) && (Engine < (int)m_arrEngines.size()))
-		return EvaluateReplaceString(Matched, Match, Count, Replace, EOL, Numbers, Engine);
+//	if ((Engine >= 0) && (Engine < (int)m_arrEngines.size()))
+//		return EvaluateReplaceString(Matched, Match, Count, Replace, EOL, Numbers, Engine);
 
 	if (!bRegExp && !g_bEscapesInPlainText)
 		return Replace;
@@ -164,10 +164,10 @@ CStringOperations<CHAR>::CreateReplaceString(const CHAR *Matched,int *Match,int 
 
 template<class CHAR>
 typename CStringOperations<CHAR>::cstring
-CStringOperations<CHAR>::CreateReplaceString(const CHAR *Matched, const CHAR *Replace, const CHAR *EOL, int Engine, CREParameters<CHAR> &Param)
+CStringOperations<CHAR>::CreateReplaceString(const CHAR *Replace, const CHAR *EOL, int Engine, CREParameters<CHAR> &Param)
 {
-//	if ((Engine >= 0) && (Engine < (int)m_arrEngines.size()))
-//		return EvaluateReplaceString(Matched, Match, Count, Replace, EOL, Numbers, Engine);
+	if ((Engine >= 0) && (Engine < (int)m_arrEngines.size()))
+		return EvaluateReplaceString(Param, Replace, EOL, Engine);
 
 	if (!Param.m_re && !g_bEscapesInPlainText)
 		return Replace;
@@ -364,10 +364,13 @@ void CREParameters<CHAR>::AddFNumbers(int nF, int nR) {
 }
 
 template<class CHAR>
-void CREParameters<CHAR>::AddRE(pcre *re, const CHAR *szString) {
-	m_re = re;
+void CREParameters<CHAR>::AddSource(const CHAR *szString) {
 	m_szString = szString;
+}
 
+template<class CHAR>
+void CREParameters<CHAR>::AddRE(pcre *re) {
+	m_re = re;
 	m_arrMatch.resize((pcre_info(re, NULL, NULL)+1)*3);
 }
 
@@ -379,7 +382,8 @@ typename CREParameters<CHAR>::cstring CREParameters<CHAR>::GetParam(int nNumber)
 }
 
 template<class CHAR>
-typename CREParameters<CHAR>::cstring CREParameters<CHAR>::GetParam(const cstring &strName, bool bCheckNumber) {
+typename CREParameters<CHAR>::cstring
+CREParameters<CHAR>::GetParam(const cstring &strName, bool bCheckNumber) {
 	int nNumber;
 	if (bCheckNumber && CSO::GetNumber(strName, nNumber))
 		return GetParam(nNumber);
@@ -404,6 +408,13 @@ void CREParameters<CHAR>::FillStartLength(int *MatchStart, int *MatchLength)
 {
 	if (MatchStart) *MatchStart = m_arrMatch[0];
 	if (MatchLength) *MatchLength = m_arrMatch[1]-m_arrMatch[0];
+}
+
+template<class CHAR>
+typename CREParameters<CHAR>::cstring
+CREParameters<CHAR>::Original()
+{
+	return cstring(m_szString, m_arrMatch[1]);
 }
 
 template class CREParameters<char>;

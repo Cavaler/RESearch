@@ -15,6 +15,7 @@ import "ocidl.idl";
 	nonextensible
 ] interface IReplaceParameters : IUnknown {
 	[id(1)] HRESULT match([in]long lPos, [out,retval]BSTR *pbstrMatch);
+	[id(7)] HRESULT named([in]BSTR strParam, [out,retval]BSTR *pbstrMatch);
 	[id(2),propget] HRESULT eol([out,retval]BSTR *pbstrEOL);
 	[id(3),propget] HRESULT l([out,retval]long *pValue);
 	[id(4),propget] HRESULT n([out,retval]long *pValue);

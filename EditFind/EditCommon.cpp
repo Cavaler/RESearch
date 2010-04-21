@@ -40,21 +40,18 @@ void EWriteRegistry(HKEY Key) {
 }
 
 BOOL SearchIn(const TCHAR *Line,int Start,int Length,int *MatchStart,int *MatchLength,BOOL NeedMatch) {
+	REParam.Clear();
+	REParam.AddSource(Line);
+
 	if (ERegExp) {
-		MatchCount=pcre_info(EPattern,NULL,NULL)+1;
-		Match=new int[MatchCount*3];
-		if (pcre_exec(EPattern,EPatternExtra,Line,Start+Length,Start,0,Match,MatchCount*3)>=0) {
-//			if ((Match[0]!=Match[1])/*||AllowEmptyMatch*/) {
-				if (MatchStart) *MatchStart=Match[0];
-				if (MatchLength) *MatchLength=Match[1]-Match[0];
-				if (!NeedMatch) {delete[] Match;Match=NULL;}
-				return TRUE;
-//			}
+		REParam.AddRE(EPattern);
+
+		if (pcre_exec(EPattern,EPatternExtra,Line,Start+Length,Start,0,REParam.Match(),REParam.Count())>=0) {
+			REParam.FillStartLength(MatchStart, MatchLength);
+			return TRUE;
 		}
-		if (!NeedMatch) {delete[] Match;Match=NULL;}
 	} else {
 		TCHAR *Table = ECaseSensitive ? NULL : UpCaseTable;
-		Match=NULL;
 		int Position=(EReverse)?ReverseBMHSearch(Line+Start,Length,ETextUpcase.data(),ETextUpcase.length(),Table)
 									  :BMHSearch(Line+Start,Length,ETextUpcase.data(),ETextUpcase.length(),Table);
 		if (Position>=0) {
@@ -238,10 +235,6 @@ BOOL SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,BOOL Ne
 
 			if (SearchInLine(Lines, LinesLength, (Line==FirstLine) ? StartPos : 0, -1, &MatchStart, &MatchLength, NeedMatch)) {
 				Relative2Absolute(Line, Lines, MatchStart, MatchLength, FirstLine, StartPos, LastLine, EndPos);
-				if (NeedMatch) {
-					MatchedLine=Lines;
-					MatchedLineLength=LinesLength;
-				}
 				return TRUE;
 			}
 		}
@@ -267,10 +260,6 @@ BOOL SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,BOOL Ne
 			if (SearchInLine(Lines,LinesLength,(Line==FirstLine)?StartPos:0,-1,&MatchStart,&MatchLength,NeedMatch)) {
 				if (MatchStart<=FirstLineLength) {
 					Relative2Absolute(Line,Lines,MatchStart,MatchLength,FirstLine,StartPos,LastLine,EndPos);
-					if (NeedMatch) {
-						MatchedLine=Lines;
-						MatchedLineLength=LinesLength;
-					}
 					return TRUE;
 				}
 			}
@@ -388,19 +377,11 @@ BOOL EPreparePattern(tstring &SearchText) {
 	}
 }
 
-void DeleteMatchInfo() {
-	if (Match) {delete[] Match;Match=NULL;}
-	MatchCount=0;
-	MatchedLine=NULL;
-}
-
 void ECleanup(BOOL PatternOnly) {
 	if (EPattern) {pcre_free(EPattern);EPattern=NULL;}
 	if (EPatternExtra) {pcre_free(EPatternExtra);EPatternExtra=NULL;}
 
 	if (!PatternOnly) {
-		DeleteMatchInfo();
-
 		delete ESPresets;
 		delete ERPresets;
 		delete EFPresets;

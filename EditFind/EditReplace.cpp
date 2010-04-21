@@ -250,10 +250,8 @@ void QuoteString(const TCHAR *Source, int Length, vector<tstring> &arrQuoted, in
 	tstring str;
 
 	if (Length>MaxWidth) {
-//		str = _T("\"") + tstring(Source, (MaxWidth-5)/2) + _T("...") + tstring(Source + Length-(MaxWidth-5)/2) + _T("\"");
 		str = tstring(Source, (MaxWidth-5)/2) + _T("...") + tstring(Source + Length-(MaxWidth-5)/2);
 	} else {
-//		str = _T("\"") + tstring(Source, Length) + _T("\"");
 		str = tstring(Source, Length);
 	}
 	arrQuoted.push_back(str);
@@ -271,9 +269,9 @@ void QuoteStrings(const TCHAR *Source, vector<tstring> &arrQuoted, int MaxWidth)
 }
 
 #ifdef UNICODE
-eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &EndPos, TCHAR *Original, const tstring &Replace) {
+eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &EndPos, const TCHAR *Original, const tstring &Replace) {
 #else
-eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &EndPos, TCHAR *Original, const tstring &Replace, const tstring &Replace_O2E) {
+eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &EndPos, const TCHAR *Original, const tstring &Replace, const tstring &Replace_O2E) {
 #endif
 	RefreshEditorInfo();
 
@@ -289,9 +287,9 @@ eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &
 	if (!NoAsking) {
 		int Width = 0;
 		if (FirstLine != LastLine) {
-			TCHAR *NewOriginal = Original + StartPos;
+			const TCHAR *NewOriginal = Original + StartPos;
 			for (int I = 0; I < LastLine-FirstLine; I++) {
-				TCHAR *CR = _tcschr(NewOriginal, '\n');
+				const TCHAR *CR = _tcschr(NewOriginal, '\n');
 				if (CR) {
 					Width += (CR-NewOriginal) + 1;
 					NewOriginal = CR + 1;
@@ -309,10 +307,7 @@ eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &
 			return RR_SKIP;
 
 		vector<tstring> arrFound;
-		TCHAR Save = Original[StartPos + Width];
-		Original[StartPos + Width] = 0;
-		QuoteStrings(Original + StartPos, arrFound, EdInfo.WindowSizeX-12);
-		Original[StartPos + Width] = Save;
+		QuoteStrings(tstring(Original + StartPos, Width).c_str(), arrFound, EdInfo.WindowSizeX-12);
 
 		vector<tstring> arrReplaced;
 		QuoteStrings(Replace.c_str(), arrReplaced, EdInfo.WindowSizeX-12);
@@ -327,7 +322,7 @@ eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &
 
 		if ((int)Len > EdInfo.WindowSizeX-2) Len = EdInfo.WindowSizeX-2;
 
-		L = Position.CurLine-Position.TopScreenLine;		// Calclulate dialog position
+		L = Position.CurLine-Position.TopScreenLine;		// Calculate dialog position
 		if (L<1 + EdInfo.WindowSizeY/2) {
 			H = (EdInfo.WindowSizeY + L-9)/2;
 		} else {
@@ -388,29 +383,29 @@ BOOL ReplaceInText(int FirstLine, int StartPos, int LastLine, int EndPos) {
 		// Assuming that MatchedLine starts from the needed line
 		RefreshEditorInfo();
 
-		int Numbers[3] = {MatchFirstLine, MatchFirstLine-ReplaceStartLine, ReplaceNumber};
 		int FoundLastLine = MatchLastLine;
 		BOOL ZeroMatch = (MatchFirstLine == MatchLastLine)&&(MatchStartPos == MatchEndPos);
 
+		REParam.AddENumbers(MatchFirstLine, MatchFirstLine-ReplaceStartLine, ReplaceNumber);
 #ifdef UNICODE
-		tstring Replace = CreateReplaceString(MatchedLine, Match, MatchCount, ERReplace.c_str(),_T("\n"), Numbers,(EREvaluate ? EREvaluateScript : -1), ERegExp);
+		tstring Replace = CStringOperations<TCHAR>::CreateReplaceString(ERReplace.c_str(),_T("\n"), (EREvaluate ? EREvaluateScript : -1), REParam);
 #else
-		string Replace_O2E = CreateReplaceString(MatchedLine, Match, MatchCount, ERReplace_O2E.c_str(),"\n", Numbers,(EREvaluate ? EREvaluateScript : -1), ERegExp);
+		string Replace_O2E = CStringOperations<TCHAR>::CreateReplaceString(ERReplace_O2E.c_str(),"\n", (EREvaluate ? EREvaluateScript : -1), REParam);
 #endif
 		if (g_bInterrupted) {	// Script failed
 			break;
 		}
 
 #ifdef UNICODE
-		eReplaceResult Result = EditorReplaceOK(MatchFirstLine, MatchStartPos, MatchLastLine, MatchEndPos, MatchedLine, Replace);
+		eReplaceResult Result = EditorReplaceOK(MatchFirstLine, MatchStartPos, MatchLastLine, MatchEndPos, REParam.m_szString, Replace);
 #else
 		string Replace = Replace_O2E;
 		EditorToOEM(Replace);
-		EditorToOEM(MatchedLine, MatchedLineLength);
+		tstring Original = REParam.Original();
+		EditorToOEM(Original);
 
-		eReplaceResult Result = EditorReplaceOK(MatchFirstLine, MatchStartPos, MatchLastLine, MatchEndPos, MatchedLine, Replace, Replace_O2E);
+		eReplaceResult Result = EditorReplaceOK(MatchFirstLine, MatchStartPos, MatchLastLine, MatchEndPos, Original.c_str(), Replace, Replace_O2E);
 #endif
-		DeleteMatchInfo();
 
 		if (Result == RR_CANCEL) return TRUE;
 		if (!EReverse) LastLine += MatchLastLine-FoundLastLine;
@@ -438,12 +433,11 @@ BOOL ReplaceInTextByLine(int FirstLine, int StartPos, int LastLine, int EndPos, 
 			// Assuming that MatchedLine starts from the needed line
 			RefreshEditorInfo();
 
-			int Numbers[3] = {MatchFirstLine, MatchFirstLine-ReplaceStartLine, ReplaceNumber};
-
+			REParam.AddENumbers(MatchFirstLine, MatchFirstLine-ReplaceStartLine, ReplaceNumber);
 #ifdef UNICODE
-			tstring Replace = CreateReplaceString(MatchedLine, Match, MatchCount, ERReplace.c_str(), _T("\n"), Numbers,(EREvaluate ? EREvaluateScript : -1), ERegExp);
+			tstring Replace = CStringOperations<TCHAR>::CreateReplaceString(ERReplace.c_str(),_T("\n"), (EREvaluate ? EREvaluateScript : -1), REParam);
 #else
-			string Replace_O2E = CreateReplaceString(MatchedLine, Match, MatchCount, ERReplace_O2E.c_str(), "\n", Numbers,(EREvaluate ? EREvaluateScript : -1), ERegExp);
+			string Replace_O2E = CStringOperations<TCHAR>::CreateReplaceString(ERReplace_O2E.c_str(),"\n", (EREvaluate ? EREvaluateScript : -1), REParam);
 #endif
 			if (g_bInterrupted) {	// Script failed
 				break;
@@ -452,18 +446,18 @@ BOOL ReplaceInTextByLine(int FirstLine, int StartPos, int LastLine, int EndPos, 
 #ifndef UNICODE
 			string Replace = Replace_O2E;
 			EditorToOEM(Replace);
-			EditorToOEM(MatchedLine, MatchedLineLength);
+			tstring Original = REParam.Original();
+			EditorToOEM(Original);
 #endif
 
 			int TailLength = MatchEndPos-FoundEndPos;
 			int FoundLastLine = MatchLastLine;
 			BOOL ZeroMatch = (FoundStartPos == FoundEndPos);
 #ifdef UNICODE
-			eReplaceResult Result = EditorReplaceOK(MatchFirstLine, FoundStartPos, MatchLastLine, FoundEndPos, MatchedLine, Replace);
+			eReplaceResult Result = EditorReplaceOK(MatchFirstLine, FoundStartPos, MatchLastLine, FoundEndPos, REParam.m_szString, Replace);
 #else
-			eReplaceResult Result = EditorReplaceOK(MatchFirstLine, FoundStartPos, MatchLastLine, FoundEndPos, MatchedLine, Replace, Replace_O2E);
+			eReplaceResult Result = EditorReplaceOK(MatchFirstLine, FoundStartPos, MatchLastLine, FoundEndPos, Original.c_str(), Replace, Replace_O2E);
 #endif
-			DeleteMatchInfo();
 
 			if (Result == RR_CANCEL) return TRUE;
 			if (!EReverse) LastLine += MatchLastLine-FoundLastLine;
@@ -643,7 +637,9 @@ BOOL EditorReplace() {
 	OEMToEditor(ERReplace_O2E);
 #endif
 
-	NoAsking = (ExitCode == 1);ReplaceStartLine = -1;ReplaceNumber = 0;
+	NoAsking = (ExitCode == 1);
+	ReplaceStartLine = -1;
+	ReplaceNumber = 0;
 	g_bInterrupted = FALSE;
 	if (!EText.empty()) EditorReplaceAgain();
 	return TRUE;

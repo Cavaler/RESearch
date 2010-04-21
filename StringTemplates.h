@@ -24,7 +24,7 @@ public:
 	static cstring CreateReplaceString(const CHAR *Matched,int *Match,int Count,const CHAR *Replace,const CHAR *EOL,int *Numbers,int Engine, BOOL bRegExp);
 
 	static cstring ExpandParameter(const CHAR *&Replace, CREParameters<CHAR> &Param);
-	static cstring CreateReplaceString(const CHAR *Matched, const CHAR *Replace, const CHAR *EOL, int Engine, CREParameters<CHAR> &Param);
+	static cstring CreateReplaceString(const CHAR *Replace, const CHAR *EOL, int Engine, CREParameters<CHAR> &Param);
 };
 
 #define _T2(sz) __T2(sz, L ## sz)
@@ -40,7 +40,8 @@ public:
 	void Clear();
 	void AddENumbers(int nL, int nN, int nR);
 	void AddFNumbers(int nF, int nR);
-	void AddRE(pcre *re, const CHAR *szString);
+	void AddSource(const CHAR *szString);
+	void AddRE(pcre *re);
 
 	vector<int> m_arrMatch;
 	int *Match() { return m_arrMatch.empty() ? NULL : &m_arrMatch[0]; }
@@ -48,7 +49,9 @@ public:
 
 	cstring GetParam(int nNumber);
 	cstring GetParam(const cstring &strName, bool bCheckNumber = false);
+
 	void FillStartLength(int *MatchStart, int *MatchLength);
+	cstring Original();
 
 public:
 	map<cstring, cstring> m_mapStrParam;

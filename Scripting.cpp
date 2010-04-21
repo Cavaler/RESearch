@@ -63,14 +63,10 @@ void EnumActiveScripts() {
 
 class CReplaceParameters : public IReplaceParameters {
 public:
-	CReplaceParameters(const TCHAR *Matched, int *Match, int Count, const TCHAR *EOL, int *Numbers)
+	CReplaceParameters(CREParameters<TCHAR> &Param, const TCHAR *EOL)
 		: m_nCounter(0)
-		, m_szMatched(Matched)
-		, m_pMatch(Match)
-		, m_nCount(Count)
+		, m_Param(Param)
 		, m_szEOL(EOL)
-		, m_pNumbers(Numbers)
-		, m_pOuter(NULL)
 	{
 	}
 
@@ -103,8 +99,12 @@ public:
 
 	// IReplaceParameters methods
 	STDMETHOD(match)(long lPos, BSTR *pbstrMatch) {
-		if ((lPos < 0) || (lPos >= m_nCount)) return E_INVALIDARG;
-		*pbstrMatch = _bstr_t(tstring(m_szMatched + m_pMatch[lPos*2], m_pMatch[lPos*2+1] - m_pMatch[lPos*2]).c_str()).Detach();
+		*pbstrMatch = _bstr_t(m_Param.GetParam(lPos).c_str()).Detach();
+		return S_OK;
+	}
+
+	STDMETHOD(named)(BSTR strParam, BSTR *pbstrMatch) {
+		*pbstrMatch = _bstr_t(m_Param.GetParam((LPCTSTR)_bstr_t(strParam)).c_str()).Detach();
 		return S_OK;
 	}
 
@@ -114,17 +114,17 @@ public:
 	}
 
 	STDMETHOD(get_l)(long *pValue) {
-		*pValue = m_pNumbers[0];
+		*pValue = _ttoi(m_Param.GetParam(_T("L")).c_str());
 		return S_OK;
 	}
 
 	STDMETHOD(get_n)(long *pValue) {
-		*pValue = m_pNumbers[1];
+		*pValue = _ttoi(m_Param.GetParam(_T("N")).c_str());
 		return S_OK;
 	}
 
 	STDMETHOD(get_r)(long *pValue) {
-		*pValue = m_pNumbers[2];
+		*pValue = _ttoi(m_Param.GetParam(_T("R")).c_str());
 		return S_OK;
 	}
 
@@ -135,11 +135,9 @@ public:
 
 private:
 	ULONG m_nCounter;
-	const TCHAR *m_szMatched;
-	int *m_pMatch;
-	int m_nCount;
+
+	CREParameters<TCHAR> &m_Param;
 	const TCHAR *m_szEOL;
-	int *m_pNumbers;
 	tstring m_strResult;
 
 	IDispatch *m_pOuter;
@@ -265,7 +263,7 @@ private:
 	IDispatch *m_pDispatch;
 };
 
-tstring EvaluateReplaceString(const TCHAR *Matched,int *Match,int Count,const TCHAR *Replace,const TCHAR *EOL,int *Numbers,int Engine) {
+tstring EvaluateReplaceString(CREParameters<TCHAR> &Param, const TCHAR *Replace, const TCHAR *EOL, int Engine) {
 	EXCEPINFO ExcepInfo;
 	HRESULT hResult;
 
@@ -279,7 +277,7 @@ tstring EvaluateReplaceString(const TCHAR *Matched,int *Match,int Count,const TC
 		return _T("");
 	}
 
-	CReplaceParameters *pParams = new CReplaceParameters(Matched, Match, Count, EOL, Numbers);
+	CReplaceParameters *pParams = new CReplaceParameters(Param, EOL);
 	pParams->AddRef();
 	CReplaceScriptSite *pSite = new CReplaceScriptSite(pParams);
 	pSite->AddRef();

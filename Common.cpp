@@ -233,13 +233,8 @@ string CreateReplaceString(const char *Matched,int *Match,int Count,const char *
 	return CStringOperations<char>::CreateReplaceString(Matched, Match, Count, Replace, EOL, Numbers, Engine, bRegExp);
 }
 
-string EvaluateReplaceString(const char *Matched,int *Match,int Count,const char *Replace,const char *EOL,int *Numbers,int Engine) {
-	wstring strEval = EvaluateReplaceString(
-		OEMToUnicode(Matched).c_str(), Match, Count,
-		OEMToUnicode(Replace).c_str(),
-		OEMToUnicode(EOL).c_str(), Numbers, Engine);
-
-	return OEMFromUnicode(strEval);
+string EvaluateReplaceString(CREParameters<CHAR> &Param, const CHAR *Replace, const CHAR *EOL, int Engine) {
+	return string();
 }
 
 void BuildUpCaseTable(UINT nCP, char *pTable) {
