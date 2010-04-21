@@ -85,6 +85,7 @@ BOOL DoFileReplace(HANDLE &hFile,const char *&Found,int FoundLen,const char *Rep
 		ReplaceNumber++;
 	} else {
 		if (!WriteBuffer(hFile,Found,FoundLen,FindData->cFileName)) return FALSE;
+		if (bIgnore) ReplaceNumber++;
 	}
 
 	Skip = Found+FoundLen;
