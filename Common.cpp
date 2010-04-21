@@ -223,15 +223,7 @@ TCHAR ConvertCase(TCHAR C) {
 
 //////////////////////////////////////////////////////////////////////////
 
-tstring CreateReplaceString(const TCHAR *Matched,int *Match,int Count,const TCHAR *Replace,const TCHAR *EOL,int *Numbers,int Engine, BOOL bRegExp) {
-	return CSO::CreateReplaceString(Matched, Match, Count, Replace, EOL, Numbers, Engine, bRegExp);
-}
-
 #ifdef UNICODE
-
-string CreateReplaceString(const char *Matched,int *Match,int Count,const char *Replace,const char *EOL,int *Numbers,int Engine, BOOL bRegExp) {
-	return CSOA::CreateReplaceString(Matched, Match, Count, Replace, EOL, Numbers, Engine, bRegExp);
-}
 
 string EvaluateReplaceString(CREParameters<CHAR> &Param, const CHAR *Replace, const CHAR *EOL, int Engine) {
 	return string();
