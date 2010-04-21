@@ -212,12 +212,9 @@ CREParameters<CHAR>::GetParam(const cstring &strName, bool bCheckNumber) {
 
 	if (m_re == NULL) return cstring();
 
-	const CHAR *szSubStr;
-	int nLen = pcre_get_named_substring(m_re, m_szString, Match(), Count(), strName.c_str(), &szSubStr);
+	nNumber = pcre_get_stringnumber(m_re, strName.c_str());
 
-	cstring strSubStr(szSubStr, nLen);
-	pcre_free((void *)szSubStr);
-
+	cstring strSubStr = GetParam(nNumber);
 	m_mapStrParam[strName] = strSubStr;
 	return strSubStr;
 }
