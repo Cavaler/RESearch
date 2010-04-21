@@ -12,7 +12,6 @@ CParameterSet g_QRParamSet(QuickRenameFilesExecutor, 4, 2,
 	"TextAsRegExp", &FSearchAs, "Repeating", &FRepeating
 	);
 
-int FileNumber;
 bool FTAskOverwrite;
 bool FTAskCreatePath;
 int g_nStartWithNow;

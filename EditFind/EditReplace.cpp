@@ -2,12 +2,12 @@
 #include "..\RESearch.h"
 
 BOOL NoAsking;
-int  ReplaceStartLine, FindNumber, ReplaceNumber;
+int  ReplaceStartLine;
 enum eReplaceResult {RR_OK, RR_SKIP, RR_CANCEL};
 
 int LastReplaceLine, LastReplacePos;
 
-void DoReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, const tstring &Replace) {
+void DoEditReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, const tstring &Replace) {
 	EditorSetPosition Position = {-1,-1,-1,-1,-1,-1};
 	EditorGetString GetString = {-1};
 	int I;
@@ -233,9 +233,9 @@ eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &
 		StartupInfo.EditorControl(ECTL_SELECT, &Select);
 	case 0:
 #ifdef UNICODE
-		DoReplace(FirstLine, StartPos, LastLine, EndPos, Replace);
+		DoEditReplace(FirstLine, StartPos, LastLine, EndPos, Replace);
 #else
-		DoReplace(FirstLine, StartPos, LastLine, EndPos, Replace_O2E);
+		DoEditReplace(FirstLine, StartPos, LastLine, EndPos, Replace_O2E);
 #endif
 		ReplaceNumber++;
 		return RR_OK;

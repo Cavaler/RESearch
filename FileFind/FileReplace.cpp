@@ -58,7 +58,7 @@ BOOL WriteBuffer(HANDLE hFile,const void *Buffer,DWORD BufLen,const TCHAR *FileN
 	} else return TRUE;
 }
 
-BOOL DoReplace(HANDLE &hFile,const char *&Found,int FoundLen,const char *Replace,int ReplaceLength,const char *&Skip,int SkipLen,WIN32_FIND_DATA *FindData,int &Count) {
+BOOL DoFileReplace(HANDLE &hFile,const char *&Found,int FoundLen,const char *Replace,int ReplaceLength,const char *&Skip,int SkipLen,WIN32_FIND_DATA *FindData) {
 	if (hFile==INVALID_HANDLE_VALUE) {
 		if (!ConfirmFile(MREReplace,FindData->cFileName)) return FALSE;
 		if (FindData->dwFileAttributes&FILE_ATTRIBUTE_READONLY) {
@@ -82,7 +82,7 @@ BOOL DoReplace(HANDLE &hFile,const char *&Found,int FoundLen,const char *Replace
 
 	if (!bIgnore && ConfirmReplacement(string(Found, FoundLen).c_str(),Replace,FindData->cFileName)) {
 		if (!WriteBuffer(hFile,Replace,ReplaceLength,FindData->cFileName)) return FALSE;
-		Count++;
+		ReplaceNumber++;
 	} else {
 		if (!WriteBuffer(hFile,Found,FoundLen,FindData->cFileName)) return FALSE;
 	}
@@ -92,9 +92,9 @@ BOOL DoReplace(HANDLE &hFile,const char *&Found,int FoundLen,const char *Replace
 	return TRUE;
 }
 
-BOOL FinishReplace(HANDLE hFile,const char *&Skip,int SkipLen,WIN32_FIND_DATA *FindData,int Count) {
+BOOL FinishReplace(HANDLE hFile,const char *&Skip,int SkipLen,WIN32_FIND_DATA *FindData) {
 	if (hFile!=INVALID_HANDLE_VALUE) {
-		if (Count == 0) {
+		if (ReplaceNumber == 0) {
 			CloseHandle(hFile);
 			return FALSE;
 		}
@@ -111,7 +111,6 @@ BOOL ProcessPlainTextBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindD
 	const char *Current=Buffer;
 	const char *Skip=Buffer;
 	HANDLE hFile=INVALID_HANDLE_VALUE;
-	int Count = 0;
 
 #ifdef UNICODE
 	char *Table=(FCaseSensitive) ? NULL : GetUpCaseTable(-1);
@@ -131,15 +130,17 @@ BOOL ProcessPlainTextBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindD
 		Current += nPosition;
 
 		REParamA.AddSource(Current);
+		REParamA.AddFNumbers(FileNumber, FindNumber, ReplaceNumber);
 #ifdef UNICODE
 		string Replace = CSOA::CreateReplaceString(FOEMReplace.c_str(), "\n", -1, REParamA);
 #else
 		string Replace = CSOA::CreateReplaceString(FRReplace.c_str(), "\n", -1, REParamA);
 #endif
-		if (!DoReplace(hFile,Current,FText.size(),Replace.c_str(),Replace.length(),Skip,Current-Skip,FindData,Count)) break;
+		if (!DoFileReplace(hFile,Current,FText.size(),Replace.c_str(),Replace.length(),Skip,Current-Skip,FindData)) break;
+		FindNumber++;
 	}
 
-	return FinishReplace(hFile,Skip,Buffer+BufLen-Skip,FindData,Count);
+	return FinishReplace(hFile,Skip,Buffer+BufLen-Skip,FindData);
 }
 
 BOOL ProcessRegExpBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindData) {
@@ -147,7 +148,6 @@ BOOL ProcessRegExpBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindData
 	const char *Skip=Buffer;
 	HANDLE hFile=INVALID_HANDLE_VALUE;
 	BOOL Error=FALSE;
-	int Count = 0;
 
 	REParamA.Clear();
 	REParamA.AddRE(FPatternA);
@@ -159,23 +159,25 @@ BOOL ProcessRegExpBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindData
 		while ((BufEnd!=Buffer)&&do_pcre_execA(FPatternA,FPatternExtraA,Buffer,BufEnd-Buffer,Start,0,REParamA.Match(),REParamA.Count())>=0) {
 
 			REParamA.AddSource(Buffer);
+			REParamA.AddFNumbers(FileNumber, FindNumber, ReplaceNumber);
 #ifdef UNICODE
 			string Replace = CSOA::CreateReplaceString(FOEMReplace.c_str(), "\n", -1, REParamA);
 #else
 			string Replace = CSOA::CreateReplaceString(FRReplace.c_str(), "\n", -1, REParamA);
 #endif
 			const char *NewBuffer = Buffer + REParamA.m_arrMatch[0];
-			if (!DoReplace(hFile,NewBuffer,REParamA.m_arrMatch[1]-REParamA.m_arrMatch[0],Replace.c_str(),Replace.length(),Skip,NewBuffer-Skip,FindData,Count)) {
+			if (!DoFileReplace(hFile,NewBuffer,REParamA.m_arrMatch[1]-REParamA.m_arrMatch[0],Replace.c_str(),Replace.length(),Skip,NewBuffer-Skip,FindData)) {
 				Error=TRUE;break;
 			}
 			Start=NewBuffer-Buffer;
+			FindNumber++;
 		}
 		SkipCRLF(BufEnd,&BufLen);
 
 		if (hFile == INVALID_HANDLE_VALUE) g_nFoundLine++;	// Yet looking for first match
 	} while (BufLen&&(!Error));
 
-	return FinishReplace(hFile,Skip,BufEnd-Skip,FindData,Count);
+	return FinishReplace(hFile,Skip,BufEnd-Skip,FindData);
 }
 
 int CountLinesIn(const char *Buffer,int Len) {
@@ -187,7 +189,7 @@ int CountLinesIn(const char *Buffer,int Len) {
 }
 
 BOOL ReplaceSeveralLineBuffer(HANDLE &hFile,const char *&Buffer,const char *BufEnd,
-							  const char *&Skip, int &LinesIn,WIN32_FIND_DATA *FindData, int &Count) {
+							  const char *&Skip, int &LinesIn,WIN32_FIND_DATA *FindData) {
 	int Start=0;
 	const char *LineEnd=Buffer;
 	int LineLen=BufEnd-Buffer;
@@ -199,21 +201,22 @@ BOOL ReplaceSeveralLineBuffer(HANDLE &hFile,const char *&Buffer,const char *BufE
 		if (NewBuffer>=LineEnd) break;
 
 		REParamA.AddSource(Buffer);
+		REParamA.AddFNumbers(FileNumber, FindNumber, ReplaceNumber);
 #ifdef UNICODE
 		string Replace = CSOA::CreateReplaceString(FOEMReplace.c_str(), "\n", -1, REParamA);
 #else
 		string Replace = CSOA::CreateReplaceString(FRReplace.c_str(), "\n", -1, REParamA);
 #endif
-		if (!DoReplace(hFile,NewBuffer,REParamA.m_arrMatch[1]-REParamA.m_arrMatch[0],Replace.c_str(),Replace.length(),Skip,NewBuffer-Skip,FindData,Count)) {
+		if (!DoFileReplace(hFile,NewBuffer,REParamA.m_arrMatch[1]-REParamA.m_arrMatch[0],Replace.c_str(),Replace.length(),Skip,NewBuffer-Skip,FindData)) {
 			return FALSE;
 		}
-//		Start=NewBuffer-Buffer;
 		Buffer = Skip;
 		LineEnd=Buffer;
 		int LineLen=BufEnd-Buffer;
 		SkipWholeLine(LineEnd,&LineLen);
 
 		Start = 0;
+		FindNumber++;
 	}
 	Buffer=LineEnd;
 	if (hFile == INVALID_HANDLE_VALUE) g_nFoundLine++;	// Yet looking for first match
@@ -226,10 +229,7 @@ BOOL ProcessSeveralLineBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *Fin
 	const char *Skip=Buffer;
 	HANDLE hFile=INVALID_HANDLE_VALUE;
 	int LinesIn=0;
-	int MatchCount=pcre_info(FPattern,NULL,NULL)+1;
-	int *Match=new int[MatchCount*3];
 	BOOL Error=FALSE;
-	int Count = 0;
 
 	REParamA.Clear();
 	REParamA.AddRE(FPatternA);
@@ -238,21 +238,21 @@ BOOL ProcessSeveralLineBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *Fin
 		SkipWholeLine(BufEnd,&BufLen);
 		LinesIn++;
 		if ((LinesIn==SeveralLines) || ((BufEnd-Buffer) >= SeveralLinesKB*1024)) {
-			if (!ReplaceSeveralLineBuffer(hFile,Buffer,BufEnd,Skip,LinesIn,FindData,Count)) {Error=TRUE;break;};
+			if (!ReplaceSeveralLineBuffer(hFile,Buffer,BufEnd,Skip,LinesIn,FindData)) {Error=TRUE;break;};
 		}
 	} while (BufLen);
 
 	while (Buffer<BufEnd) {
-		if (!ReplaceSeveralLineBuffer(hFile,Buffer,BufEnd,Skip,LinesIn,FindData,Count)) {Error=TRUE;break;};
+		if (!ReplaceSeveralLineBuffer(hFile,Buffer,BufEnd,Skip,LinesIn,FindData)) {Error=TRUE;break;};
 	}
 
-	delete[] Match;
-	return FinishReplace(hFile,Skip,BufEnd-Skip,FindData,Count);
+	return FinishReplace(hFile,Skip,BufEnd-Skip,FindData);
 }
 
 BOOL ProcessBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindData) {
 	FRConfirmLineThisFile = FRConfirmLineThisRun;
 	FileConfirmed = !FRConfirmFileThisRun;
+	FindNumber = ReplaceNumber = 0;
 #ifndef UNICODE
 	m_pReplaceTable = NULL;
 #endif
@@ -277,6 +277,8 @@ void ReplaceFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 
 	if (FindData->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) return;
 	if ((FRReplaceReadonly == RR_NEVER) && (FindData->dwFileAttributes&FILE_ATTRIBUTE_READONLY)) return;
+
+	FileNumber++;
 
 	int nTry = 0;
 	do {
@@ -432,6 +434,7 @@ OperationResult FileReplace(panelitem_vector &PanelItems, BOOL ShowDialog, BOOL 
 	FRConfirmFileThisRun=FRConfirmFile;
 	FRConfirmReadonlyThisRun = (FRReplaceReadonly != RR_ALWAYS);
 	FRConfirmLineThisRun=FRConfirmLine;
+	FileNumber = -1;	// Easier to increment
 	if (ScanDirectories(PanelItems, ReplaceFile)) {
 		if (!FROpenModified) return OR_OK; else
 			return (PanelItems.empty()) ? (bSilent ? OR_OK : NoFilesFound()) : OR_PANEL;

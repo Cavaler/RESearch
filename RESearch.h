@@ -77,6 +77,9 @@ TCHAR ConvertCase(TCHAR C);
 #include "StringTemplates.h"
 
 EXTERN CREParameters<TCHAR> REParam;
+EXTERN int FileNumber;
+EXTERN int FindNumber;
+EXTERN int ReplaceNumber;
 
 bool CheckUsage(const tstring &strText, bool bRegExp, bool bSeveralLine);
 BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const tstring &Text,int CaseSensitive,BOOL bUTF8=FALSE,const unsigned char *pTables=NULL);
