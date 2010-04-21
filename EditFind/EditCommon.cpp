@@ -339,14 +339,14 @@ BOOL EPreparePattern(tstring &SearchText) {
 	if (!CheckUsage(SearchText, ERegExp!=0, ESeveralLine!=0)) return FALSE;
 
 	if (ERegExp) {
-		if (ECharacterTables && (ECharacterTables != ANSICharTables) && (ECharacterTables != OEMCharTables))
-			pcre_free((void *)ECharacterTables);
-
 		RefreshEditorInfo();
 
 #ifdef UNICODE
-		ECharacterTables = NULL;
+		BOOL Result = PreparePattern(&EPattern,&EPatternExtra,SearchText,ECaseSensitive,EUTF8,NULL);
 #else
+		if (ECharacterTables && (ECharacterTables != ANSICharTables) && (ECharacterTables != OEMCharTables))
+			pcre_free((void *)ECharacterTables);
+
 		if (EdInfo.TableNum != -1) {
 			CharTableSet TableSet;
 			StartupInfo.CharTable(EdInfo.TableNum, (char *)&TableSet, sizeof(TableSet));
@@ -359,11 +359,7 @@ BOOL EPreparePattern(tstring &SearchText) {
 			setlocale(LC_ALL, FormatStr(_T(".%d"), GetOEMCP()).c_str());
 			ECharacterTables = OEMCharTables;
 		}
-#endif
 
-#ifdef UNICODE
-		BOOL Result = PreparePattern(&EPattern,&EPatternExtra,SearchText,ECaseSensitive,EUTF8,ECharacterTables);
-#else
 		char *OEMLine = _strdup(SearchText.c_str());
 		OEMToEditor(OEMLine, SearchText.size());
 		BOOL Result = PreparePattern(&EPattern,&EPatternExtra,OEMLine,ECaseSensitive,EUTF8,ECharacterTables);

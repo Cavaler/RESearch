@@ -272,6 +272,11 @@ void PrepareLocaleStuff() {
 
 	UpCaseTables[GetOEMCP()] = GetUpCaseTable(CP_OEMCP);
 	UpCaseTables[GetACP()]   = GetUpCaseTable(CP_ACP);
+
+	setlocale(LC_ALL, FormatStrA(".%d", GetDefCP()).c_str());
+	OEMCharTables = pcre_maketables();
+	setlocale(LC_ALL, FormatStrA(".%d", GetACP()).c_str());
+	ANSICharTables = pcre_maketables();
 }
 
 tstring UpCaseString(const tstring &strText) {
@@ -769,6 +774,10 @@ string DefFromUnicode(const wstring &strUnicode) {
 
 bool CanUseCP(UINT nCP, const wstring &strUnicode) {
 	return StrToUnicode(StrFromUnicode(strUnicode, nCP), nCP) == strUnicode;
+}
+
+const unsigned char *DefCharTables() {
+	return (g_bDefaultOEM) ? OEMCharTables : ANSICharTables;
 }
 
 #else

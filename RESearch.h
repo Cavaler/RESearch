@@ -97,8 +97,6 @@ void ShowHResultError(int nError, HRESULT hResult, const TCHAR *szHelp = NULL);
 
 #ifdef UNICODE
 EXTERN TCHAR UpCaseTable[65537];
-//EXTERN char UpCaseTableOEM[256];
-//EXTERN char UpCaseTableANSI[256];
 void BuildUpCaseTable(UINT nCP, char *pTable);
 char *GetUpCaseTable(int nCP);
 typedef map<UINT, char *> upcase_map;
@@ -117,6 +115,7 @@ UINT IsDefCP(UINT nCP);
 #ifdef UNICODE
 wstring DefToUnicode(const string &strDef);
 string  DefFromUnicode(const wstring &strUnicode);
+const unsigned char *DefCharTables();
 bool    CanUseCP(UINT nCP, const wstring &strUnicode);
 #endif
 

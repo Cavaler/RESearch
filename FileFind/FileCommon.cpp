@@ -153,6 +153,7 @@ int FPreparePattern(bool bAcceptEmpty) {
 #ifdef UNICODE
 	FCanUseDefCP = CanUseCP(g_bDefaultOEM ? CP_OEMCP : CP_ACP, FText);
 	FOEMTextUpcase = DefFromUnicode(FTextUpcase);
+	FOEMReplace = DefFromUnicode(FRReplace);
 #endif
 
 	switch (FSearchAs) {
@@ -181,9 +182,9 @@ int FPreparePattern(bool bAcceptEmpty) {
 	case SA_SEVERALLINE:
 	case SA_MULTILINE:
 		if (FText.empty()) return TRUE;
-		return PreparePattern(&FPattern, &FPatternExtra, FText, FCaseSensitive, FUTF8, OEMCharTables)
+		return PreparePattern(&FPattern, &FPatternExtra, FText, FCaseSensitive, FUTF8, NULL)
 #ifdef UNICODE
-			&& PreparePattern(&FPatternA, &FPatternExtraA, DefFromUnicode(FText), FCaseSensitive, FUTF8, OEMCharTables)
+			&& PreparePattern(&FPatternA, &FPatternExtraA, DefFromUnicode(FText), FCaseSensitive, FUTF8, DefCharTables())
 #endif
 			;
 	default:
