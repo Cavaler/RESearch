@@ -147,6 +147,7 @@ int do_pcre_execA(const pcre *external_re, const pcre_extra *extra_data,
 #define FPatternExtraA FPatternExtra
 #endif
 
+bool RunREBuilder(tstring &strSearch, tstring &strReplace);
 void RunExternalEditor(tstring &strText);
 
 inline bool Interrupted256(int nValue) {

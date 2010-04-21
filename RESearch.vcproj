@@ -1543,6 +1543,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\REBuilder.cpp"
+				>
+			</File>
+			<File
 				RelativePath="RESearch.cpp"
 				>
 				<FileConfiguration
