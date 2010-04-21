@@ -1451,6 +1451,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\RESearch_msg.h"
+				>
+			</File>
+			<File
 				RelativePath="resource.h"
 				>
 			</File>
@@ -1803,6 +1807,296 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="Resource Files"
+			>
+			<File
+				RelativePath="RESearch.def"
+				>
+				<FileConfiguration
+					Name="Debug Unicode|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug Unicode|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release Unicode|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release Unicode|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="RESearch.msg"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Compiling language file $(InputPath)..."
+						CommandLine="$(COMSPEC) /c ..\MakeLng.bat RESearch RESearch_msg.h&#x0D;&#x0A;echo Copying resulting language files...&#x0D;&#x0A;copy *.lng &quot;$(FAR_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;"
+						Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Compiling language file $(InputPath)..."
+						CommandLine="$(COMSPEC) /c ..\MakeLng.bat&#x0D;&#x0A;echo Copying resulting language files...&#x0D;&#x0A;copy *.lng &quot;$(FAR_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;"
+						Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Compiling language file $(InputPath)..."
+						CommandLine="$(COMSPEC) /c ..\MakeLng.bat RESearch RESearch_msg.h&#x0D;&#x0A;echo Copying resulting language files...&#x0D;&#x0A;copy *.lng &quot;$(FAR_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;"
+						Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Compiling language file $(InputPath)..."
+						CommandLine="$(COMSPEC) /c ..\MakeLng.bat&#x0D;&#x0A;echo Copying resulting language files...&#x0D;&#x0A;copy *.lng &quot;$(FAR_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;"
+						Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug Unicode|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Compiling language file $(InputPath)..."
+						CommandLine="$(COMSPEC) /c ..\MakeLng.bat RESearch RESearch_msg.h&#x0D;&#x0A;echo Copying resulting language files...&#x0D;&#x0A;copy *.lng &quot;$(FAR2_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;"
+						Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug Unicode|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Compiling language file $(InputPath)..."
+						CommandLine="$(COMSPEC) /c ..\MakeLng.bat&#x0D;&#x0A;echo Copying resulting language files...&#x0D;&#x0A;copy *.lng &quot;$(FAR2_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;"
+						Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release Unicode|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Compiling language file $(InputPath)..."
+						CommandLine="$(COMSPEC) /c ..\MakeLng.bat RESearch RESearch_msg.h&#x0D;&#x0A;echo Copying resulting language files...&#x0D;&#x0A;copy *.lng &quot;$(FAR2_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;"
+						Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release Unicode|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Compiling language file $(InputPath)..."
+						CommandLine="$(COMSPEC) /c ..\MakeLng.bat&#x0D;&#x0A;echo Copying resulting language files...&#x0D;&#x0A;copy *.lng &quot;$(FAR2_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;"
+						Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="RESearch.rc"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCResourceCompilerTool"
+						PreprocessorDefinitions=""
+						AdditionalIncludeDirectories="$(OUTDIR)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCResourceCompilerTool"
+						PreprocessorDefinitions=""
+						AdditionalIncludeDirectories="$(OUTDIR)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCResourceCompilerTool"
+						PreprocessorDefinitions=""
+						AdditionalIncludeDirectories="$(OUTDIR)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCResourceCompilerTool"
+						PreprocessorDefinitions=""
+						AdditionalIncludeDirectories="$(OUTDIR)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug Unicode|Win32"
+					>
+					<Tool
+						Name="VCResourceCompilerTool"
+						PreprocessorDefinitions=""
+						AdditionalIncludeDirectories="$(OUTDIR)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug Unicode|x64"
+					>
+					<Tool
+						Name="VCResourceCompilerTool"
+						PreprocessorDefinitions=""
+						AdditionalIncludeDirectories="$(OUTDIR)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release Unicode|Win32"
+					>
+					<Tool
+						Name="VCResourceCompilerTool"
+						PreprocessorDefinitions=""
+						AdditionalIncludeDirectories="$(OUTDIR)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release Unicode|x64"
+					>
+					<Tool
+						Name="VCResourceCompilerTool"
+						PreprocessorDefinitions=""
+						AdditionalIncludeDirectories="$(OUTDIR)"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="RESearchEng.hlf"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying $(InputFileName)..."
+						CommandLine="xcopy /r /y $(InputFileName) &quot;$(TargetDir)&quot;&#x0D;&#x0A;"
+						Outputs="$(TargetDir)\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug Unicode|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying $(InputFileName)..."
+						CommandLine="xcopy /r /y $(InputFileName) &quot;$(TargetDir)&quot;&#x0D;&#x0A;"
+						Outputs="$(TargetDir)\$(InputFileName)"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="RESearchRus.hlf"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying $(InputFileName)..."
+						CommandLine="xcopy /r /y $(InputFileName) &quot;$(TargetDir)&quot;&#x0D;&#x0A;"
+						Outputs="$(TargetDir)\$(InputFileName)"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug Unicode|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Copying $(InputFileName)..."
+						CommandLine="xcopy /r /y $(InputFileName) &quot;$(TargetDir)&quot;&#x0D;&#x0A;"
+						Outputs="$(TargetDir)\$(InputFileName)"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\RESearchW.def"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+			</File>
+		</Filter>
 		<File
 			RelativePath="File_Id.Diz"
 			>
@@ -1816,294 +2110,8 @@
 			>
 		</File>
 		<File
-			RelativePath="RESearch.def"
-			>
-			<FileConfiguration
-				Name="Debug Unicode|Win32"
-				ExcludedFromBuild="true"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Debug Unicode|x64"
-				ExcludedFromBuild="true"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release Unicode|Win32"
-				ExcludedFromBuild="true"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release Unicode|x64"
-				ExcludedFromBuild="true"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-				/>
-			</FileConfiguration>
-		</File>
-		<File
-			RelativePath="RESearch.msg"
-			>
-			<FileConfiguration
-				Name="Debug|Win32"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-					Description="Compiling language file $(InputPath)..."
-					CommandLine="$(COMSPEC) /c ..\MakeLng.bat&#x0D;&#x0A;echo Copying resulting language files...&#x0D;&#x0A;copy *.lng &quot;$(FAR_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;"
-					Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Debug|x64"
-				ExcludedFromBuild="true"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-					Description="Compiling language file $(InputPath)..."
-					CommandLine="$(COMSPEC) /c ..\MakeLng.bat&#x0D;&#x0A;echo Copying resulting language files...&#x0D;&#x0A;copy *.lng &quot;$(FAR_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;"
-					Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release|Win32"
-				ExcludedFromBuild="true"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-					Description="Compiling language file $(InputPath)..."
-					CommandLine="$(COMSPEC) /c ..\MakeLng.bat&#x0D;&#x0A;echo Copying resulting language files...&#x0D;&#x0A;copy *.lng &quot;$(FAR_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;"
-					Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release|x64"
-				ExcludedFromBuild="true"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-					Description="Compiling language file $(InputPath)..."
-					CommandLine="$(COMSPEC) /c ..\MakeLng.bat&#x0D;&#x0A;echo Copying resulting language files...&#x0D;&#x0A;copy *.lng &quot;$(FAR_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;"
-					Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Debug Unicode|Win32"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-					Description="Compiling language file $(InputPath)..."
-					CommandLine="$(COMSPEC) /c ..\MakeLng.bat&#x0D;&#x0A;echo Copying resulting language files...&#x0D;&#x0A;copy *.lng &quot;$(FAR2_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;"
-					Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Debug Unicode|x64"
-				ExcludedFromBuild="true"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-					Description="Compiling language file $(InputPath)..."
-					CommandLine="$(COMSPEC) /c ..\MakeLng.bat&#x0D;&#x0A;echo Copying resulting language files...&#x0D;&#x0A;copy *.lng &quot;$(FAR2_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;"
-					Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release Unicode|Win32"
-				ExcludedFromBuild="true"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-					Description="Compiling language file $(InputPath)..."
-					CommandLine="$(COMSPEC) /c ..\MakeLng.bat&#x0D;&#x0A;echo Copying resulting language files...&#x0D;&#x0A;copy *.lng &quot;$(FAR2_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;"
-					Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release Unicode|x64"
-				ExcludedFromBuild="true"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-					Description="Compiling language file $(InputPath)..."
-					CommandLine="$(COMSPEC) /c ..\MakeLng.bat&#x0D;&#x0A;echo Copying resulting language files...&#x0D;&#x0A;copy *.lng &quot;$(FAR2_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;"
-					Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
-				/>
-			</FileConfiguration>
-		</File>
-		<File
-			RelativePath="RESearch.rc"
-			>
-			<FileConfiguration
-				Name="Debug|Win32"
-				>
-				<Tool
-					Name="VCResourceCompilerTool"
-					PreprocessorDefinitions=""
-					AdditionalIncludeDirectories="$(OUTDIR)"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Debug|x64"
-				>
-				<Tool
-					Name="VCResourceCompilerTool"
-					PreprocessorDefinitions=""
-					AdditionalIncludeDirectories="$(OUTDIR)"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release|Win32"
-				>
-				<Tool
-					Name="VCResourceCompilerTool"
-					PreprocessorDefinitions=""
-					AdditionalIncludeDirectories="$(OUTDIR)"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release|x64"
-				>
-				<Tool
-					Name="VCResourceCompilerTool"
-					PreprocessorDefinitions=""
-					AdditionalIncludeDirectories="$(OUTDIR)"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Debug Unicode|Win32"
-				>
-				<Tool
-					Name="VCResourceCompilerTool"
-					PreprocessorDefinitions=""
-					AdditionalIncludeDirectories="$(OUTDIR)"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Debug Unicode|x64"
-				>
-				<Tool
-					Name="VCResourceCompilerTool"
-					PreprocessorDefinitions=""
-					AdditionalIncludeDirectories="$(OUTDIR)"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release Unicode|Win32"
-				>
-				<Tool
-					Name="VCResourceCompilerTool"
-					PreprocessorDefinitions=""
-					AdditionalIncludeDirectories="$(OUTDIR)"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release Unicode|x64"
-				>
-				<Tool
-					Name="VCResourceCompilerTool"
-					PreprocessorDefinitions=""
-					AdditionalIncludeDirectories="$(OUTDIR)"
-				/>
-			</FileConfiguration>
-		</File>
-		<File
 			RelativePath=".\RESearch.tlb"
 			>
-		</File>
-		<File
-			RelativePath="RESearchEng.hlf"
-			>
-			<FileConfiguration
-				Name="Debug|Win32"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-					Description="Copying $(InputFileName)..."
-					CommandLine="xcopy /r /y $(InputFileName) &quot;$(TargetDir)&quot;&#x0D;&#x0A;"
-					Outputs="$(TargetDir)\$(InputFileName)"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Debug Unicode|Win32"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-					Description="Copying $(InputFileName)..."
-					CommandLine="xcopy /r /y $(InputFileName) &quot;$(TargetDir)&quot;&#x0D;&#x0A;"
-					Outputs="$(TargetDir)\$(InputFileName)"
-				/>
-			</FileConfiguration>
-		</File>
-		<File
-			RelativePath="RESearchRus.hlf"
-			>
-			<FileConfiguration
-				Name="Debug|Win32"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-					Description="Copying $(InputFileName)..."
-					CommandLine="xcopy /r /y $(InputFileName) &quot;$(TargetDir)&quot;&#x0D;&#x0A;"
-					Outputs="$(TargetDir)\$(InputFileName)"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Debug Unicode|Win32"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-					Description="Copying $(InputFileName)..."
-					CommandLine="xcopy /r /y $(InputFileName) &quot;$(TargetDir)&quot;&#x0D;&#x0A;"
-					Outputs="$(TargetDir)\$(InputFileName)"
-				/>
-			</FileConfiguration>
-		</File>
-		<File
-			RelativePath=".\RESearchW.def"
-			>
-			<FileConfiguration
-				Name="Debug|Win32"
-				ExcludedFromBuild="true"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Debug|x64"
-				ExcludedFromBuild="true"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release|Win32"
-				ExcludedFromBuild="true"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release|x64"
-				ExcludedFromBuild="true"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-				/>
-			</FileConfiguration>
 		</File>
 	</Files>
 	<Globals>
