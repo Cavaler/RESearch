@@ -193,6 +193,8 @@ private:
 	tstring m_strCurFolder;
 	KeyBarTitles KeyBar;
 
+	CFarPanelMode m_Mode;
+
 	void UpdateList();
 };
 EXTERN CTemporaryPanel *LastTempPanel VALUE(NULL);

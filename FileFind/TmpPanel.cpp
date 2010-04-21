@@ -42,6 +42,8 @@ CTemporaryPanel::CTemporaryPanel(panelitem_vector &PanelItems,TCHAR *CalledFolde
 
 	if (LastTempPanel && !LastTempPanel->m_bActive) delete LastTempPanel;
 	LastTempPanel = this;
+
+	m_Mode.Assign(INVALID_HANDLE_VALUE);
 }
 
 CTemporaryPanel::~CTemporaryPanel() {
@@ -227,4 +229,6 @@ void CTemporaryPanel::ClosePlugin() {
 	}
 
 	if (LastTempPanel == this) m_bActive = false; else delete this;
+
+	m_Mode.Apply(INVALID_HANDLE_VALUE);
 }
