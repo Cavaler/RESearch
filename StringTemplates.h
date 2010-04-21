@@ -9,11 +9,8 @@ class CStringOperations : public CStringT<CHAR> {
 public:
 	static void AddChar(cstring &String, CHAR c);
 	static void AddString(cstring &String, const CHAR *Add, int Len);
-	static int GetDelta(CHAR *&String);
 
 	static bool GetNumber(const cstring &str, int &nValue);
-	static BOOL ExpandParameter(const CHAR *Matched, cstring &String, const cstring &Param, int *Match, int Count, int *Numbers);
-	static cstring CreateReplaceString(const CHAR *Matched,int *Match,int Count,const CHAR *Replace,const CHAR *EOL,int *Numbers,int Engine, BOOL bRegExp);
 
 	static cstring ExpandParameter(const CHAR *&Replace, CREParameters<CHAR> &Param);
 	static cstring CreateReplaceString(const CHAR *Replace, const CHAR *EOL, int Engine, CREParameters<CHAR> &Param);
