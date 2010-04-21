@@ -343,7 +343,6 @@ void ConfigureRenumbering(bool bRuntime);
 void ConfigureEditor();
 int  ConfigureSeveralLines();
 
-enum ECaseConvert {CCV_NONE,CCV_UPPER,CCV_LOWER,CCV_FLIP};
 EXTERN ECaseConvert CaseConvert;
 EXTERN ECaseConvert OneCaseConvert;
 #ifdef UNICODE

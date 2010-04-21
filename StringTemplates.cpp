@@ -3,12 +3,12 @@
 
 template<class CHAR>
 void CStringOperations<CHAR>::AddChar(cstring &String, CHAR c) {
-	String += (CHAR)ConvertCase(c);
+	String += (CHAR)::ConvertCase(c);
 }
  
 template<class CHAR>
 void CStringOperations<CHAR>::AddString(cstring &String, const CHAR *Add, int Len) {
-	for (int I=0;I<Len;I++) String += (CHAR)ConvertCase(Add[I]);
+	for (int I=0;I<Len;I++) String += (CHAR)::ConvertCase(Add[I]);
 }
 
 template<class CHAR>
@@ -144,7 +144,7 @@ CStringOperations<CHAR>::CreateReplaceString(const CHAR *Matched,int *Match,int 
 			int I=2;
 			if (Replace[1]=='{') {
 				while (Replace[I]&&(Replace[I]!='}')) I++;
-				TCHAR Save=Replace[I];
+				CHAR Save=Replace[I];
 				ExpandParameter(Matched,String,cstring(Replace+2,I-2),Match,Count,Numbers);
 				Replace+=I;
 				break;
@@ -226,7 +226,7 @@ CStringOperations<CHAR>::CreateReplaceString(const CHAR *Replace, const CHAR *EO
 			}
 			break;
 		case '$':
-			String += ExpandParameter(Replace, REParam);
+			String += ExpandParameter(Replace, Param);
 		default:
 			AddChar(String, *Replace);
 		}
@@ -240,11 +240,11 @@ typename CStringOperations<CHAR>::cstring
 CStringOperations<CHAR>::ExpandParameter(const CHAR *&Replace, CREParameters<CHAR> &Param)
 {
 	vector<cstring> arrMatch;
-	if (CRegExp::Match(Replace+1, _T2("\\{([^}]+)\\}"), 0, 0, &arrMatch)) {
+	if (CRegExpT<CHAR>::Match(Replace+1, _T2("\\{([^}]+)\\}"), 0, 0, &arrMatch)) {
 		cstring strParam = arrMatch[1];
 		Replace = Replace + strParam.length()+3;
 
-		if (CRegExp::Match(strParam, _T2("(.*?)((\\+|-)\\d+)"), 0, 0, &arrMatch)) {
+		if (CRegExpT<CHAR>::Match(strParam, _T2("(.*?)((\\+|-)\\d+)"), 0, 0, &arrMatch)) {
 			strParam = arrMatch[1];
 			int nAdd = ctoi(arrMatch[2].c_str());
 			size_t nAlign = arrMatch[2].length()-1;
@@ -260,7 +260,7 @@ CStringOperations<CHAR>::ExpandParameter(const CHAR *&Replace, CREParameters<CHA
 				return strValue + arrMatch[2];
 			}
 
-		} else if (CRegExp::Match(strParam, _T2("(.*?)((<|>)(\\d+))"), 0, 0, &arrMatch)) {
+		} else if (CRegExpT<CHAR>::Match(strParam, _T2("(.*?)((<|>)(\\d+))"), 0, 0, &arrMatch)) {
 			strParam = arrMatch[1];
 			CHAR cAlign = arrMatch[3][0];
 			size_t nAlign = ctoi(arrMatch[4].c_str());
@@ -271,7 +271,7 @@ CStringOperations<CHAR>::ExpandParameter(const CHAR *&Replace, CREParameters<CHA
 		} else {
 			return Param.GetParam(strParam, true);
 		}
-	} else if (CRegExp::Match(Replace+1, _T2("\\d+|[LNRF]"), 0, 0, &arrMatch)) {
+	} else if (CRegExpT<CHAR>::Match(Replace+1, _T2("\\d+|[LNRF]"), 0, 0, &arrMatch)) {
 		cstring strParam = arrMatch[0];
 		Replace = Replace + strParam.length()+1;
 
@@ -281,52 +281,14 @@ CStringOperations<CHAR>::ExpandParameter(const CHAR *&Replace, CREParameters<CHA
 	return cstring();
 }
 
-template<> static bool CStringOperations<char>   ::GetNumber(const cstring &str, int &nValue) {
-	static CRegExp reNumber(_T("^[-+]?\\d+$"));
-#ifdef UNICODE
-	if (reNumber.Match(OEMToUnicode(str))) {
-#else
+template<class CHAR>
+bool CStringOperations<CHAR>   ::GetNumber(const cstring &str, int &nValue) {
+	static CRegExpT<CHAR> reNumber(_T2("^[-+]?\\d+$"));
 	if (reNumber.Match(str)) {
-#endif
 		nValue = ctoi(str.c_str());
 		return true;
 	} else return false;
 }
-
-template<> static bool CStringOperations<wchar_t>::GetNumber(const cstring &str, int &nValue) {
-	static CRegExp reNumber(_T("^[-+]?\\d+$"));
-#ifdef UNICODE
-	if (reNumber.Match(str)) {
-#else
-	if (reNumber.Match(OEMFromUnicode(str))) {
-#endif
-		nValue = ctoi(str.c_str());
-		return true;
-	} else return false;
-}
-
-template<> static int CStringOperations<char>   ::ctoi(const char    *sz) { return  atoi(sz); }
-template<> static int CStringOperations<wchar_t>::ctoi(const wchar_t *sz) { return _wtoi(sz); }
-
-template<> static char *    CStringOperations<char>   ::ctoa(int n, char    *sz) { return _itoa(n, sz, 10); }
-template<> static wchar_t * CStringOperations<wchar_t>::ctoa(int n, wchar_t *sz) { return _itow(n, sz, 10); }
-
-template<> static int CStringOperations<char>   ::cstrlen(const char   *sz)  { return strlen(sz); }
-template<> static int CStringOperations<wchar_t>::cstrlen(const wchar_t *sz) { return wcslen(sz); }
-
-template<> static int CStringOperations<char>   ::csprintf_s(char    *sz, size_t count, const char    *szFormat, ...) {
-	va_list vaList;
-	va_start(vaList, szFormat);
-	return vsprintf_s(sz, count, szFormat, vaList);
-}
-template<> static int CStringOperations<wchar_t>::csprintf_s(wchar_t *sz, size_t count, const wchar_t *szFormat, ...) {
-	va_list vaList;
-	va_start(vaList, szFormat);
-	return vswprintf_s(sz, count, szFormat, vaList);
-}
-
-template<> static char    * CStringOperations<char>   ::__T2(char *sz, wchar_t *wsz) { return  sz; }
-template<> static wchar_t * CStringOperations<wchar_t>::__T2(char *sz, wchar_t *wsz) { return wsz; }
 
 template class CStringOperations<char>;
 #ifdef UNICODE
