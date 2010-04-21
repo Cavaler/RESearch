@@ -28,8 +28,8 @@ public:
 	CREParameters();
 
 	void Clear();
-	void AddENumbers(int nL, int nN, int nR);
-	void AddFNumbers(int nF, int nR);
+	void AddENumbers(int nL, int nN, int nS, int nR);
+	void AddFNumbers(int nF, int nS, int nR);
 	void AddSource(const CHAR *szString);
 	void AddRE(pcre *re);
 

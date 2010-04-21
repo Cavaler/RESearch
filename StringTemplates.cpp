@@ -225,8 +225,13 @@ CStringOperations<CHAR>::CreateReplaceString(const CHAR *Replace, const CHAR *EO
 			AddChar(String, *Replace);
 			}
 			break;
-		case '$':
-			String += ExpandParameter(Replace, Param);
+		case '$':{
+			cstring strParam = ExpandParameter(Replace, Param);
+			AddString(String, strParam.c_str(), strParam.length());
+
+			//	Not a break - to skip Replace++
+			continue;
+				 }
 		default:
 			AddChar(String, *Replace);
 		}
@@ -271,13 +276,14 @@ CStringOperations<CHAR>::ExpandParameter(const CHAR *&Replace, CREParameters<CHA
 		} else {
 			return Param.GetParam(strParam, true);
 		}
-	} else if (CRegExpT<CHAR>::Match(Replace+1, _T2("\\d+|[LNRF]"), 0, 0, &arrMatch)) {
+	} else if (CRegExpT<CHAR>::Match(Replace+1, _T2("\\d+|[A-Z]"), 0, 0, &arrMatch)) {
 		cstring strParam = arrMatch[0];
 		Replace = Replace + strParam.length()+1;
 
 		return Param.GetParam(strParam, true);
 	}
 
+	Replace++;
 	return cstring();
 }
 
@@ -311,17 +317,19 @@ void CREParameters<CHAR>::Clear() {
 }
 
 template<class CHAR>
-void CREParameters<CHAR>::AddENumbers(int nL, int nN, int nR) {
+void CREParameters<CHAR>::AddENumbers(int nL, int nN, int nS, int nR) {
 	CHAR szNumber[16];
 	m_mapStrParam[CSO::_T2("L")] = CSO::ctoa(nL, szNumber);
 	m_mapStrParam[CSO::_T2("N")] = CSO::ctoa(nN, szNumber);
+	m_mapStrParam[CSO::_T2("S")] = CSO::ctoa(nS, szNumber);
 	m_mapStrParam[CSO::_T2("R")] = CSO::ctoa(nR, szNumber);
 }
 
 template<class CHAR>
-void CREParameters<CHAR>::AddFNumbers(int nF, int nR) {
+void CREParameters<CHAR>::AddFNumbers(int nF, int nS, int nR) {
 	CHAR szNumber[16];
 	m_mapStrParam[CSO::_T2("F")] = CSO::ctoa(nF, szNumber);
+	m_mapStrParam[CSO::_T2("S")] = CSO::ctoa(nS, szNumber);
 	m_mapStrParam[CSO::_T2("R")] = CSO::ctoa(nR, szNumber);
 }
 

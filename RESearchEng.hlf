@@ -128,14 +128,17 @@ $ #Replacement text#
     When replacing in editor:
     $L      - current line number (from 0)
     $N      - current line number, counted from start of replacing (from 0)
+    $S      - current find number (from 0)
     $R      - current replacement number (from 0)
     
     When replacing in files:
     $F      - current file number (from 0)
+    $S      - current find number (from 0)
     $R      - current replacement number (from 0)
     
     When renaming files:
     $F      - current file number (from 0)
+    $S      - current find number (from 0)
     $R      - current replacement number (from 0)
 
     #NOTE#: Parameter references (subpatterns or special variables) can be extended by

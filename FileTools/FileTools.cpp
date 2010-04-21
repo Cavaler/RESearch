@@ -126,22 +126,21 @@ BOOL ConfirmRename(const TCHAR *From,const TCHAR *To) {
 	return FALSE;
 }
 
-BOOL FindRename(const TCHAR *FileName,int *&Match,int &MatchCount,int &MatchStart,int &MatchLength) {
+BOOL FindRename(const TCHAR *FileName, int &MatchStart, int &MatchLength) {
+	REParam.AddSource(FileName);
+
 	if (FSearchAs==SA_REGEXP) {
-		MatchCount=pcre_info(FPattern,NULL,NULL)+1;
-		Match=new int[MatchCount*3];
-		if (do_pcre_exec(FPattern,FPatternExtra,FileName,_tcslen(FileName),MatchStart,0,Match,MatchCount*3)>=0) {
-			MatchStart=Match[0];
-			MatchLength=Match[1]-Match[0];
+		REParam.AddRE(FPattern);
+
+		if (do_pcre_exec(FPattern,FPatternExtra,FileName,_tcslen(FileName),MatchStart,0,REParam.Match(),REParam.Count())>=0) {
+			REParam.FillStartLength(&MatchStart, &MatchLength);
 			return TRUE;
 		}
-		delete[] Match;
 	} else {
 		int NewMatchStart;
 		TCHAR *Table = FCaseSensitive ? NULL : UpCaseTable;
 		NewMatchStart=BMHSearch(FileName+MatchStart,_tcslen(FileName)-MatchStart,FTextUpcase.data(),FTextUpcase.size(),Table);
 
-		Match=NULL;MatchCount=0;
 		if (NewMatchStart>=0) {
 			MatchStart+=NewMatchStart;
 			MatchLength=FText.size();
@@ -152,8 +151,8 @@ BOOL FindRename(const TCHAR *FileName,int *&Match,int &MatchCount,int &MatchStar
 }
 
 void RenameFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
-	int MatchCount,MatchStart=0,MatchLength,ReplaceNumber=0;
-	int *Match;
+	int MatchStart = 0, MatchLength;
+	int FindNumber = 0, ReplaceNumber = 0;
 
 	tstring strPath, strOriginalName, strCurrentName;
 
@@ -173,14 +172,15 @@ void RenameFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 
 	bool bOnlyGlobalConfirm = !FRConfirmLineThisFile;
 
-	while (FindRename(strCurrentName.c_str(),Match,MatchCount,MatchStart,MatchLength)) {
-		int Numbers[3]={FileNumber,FileNumber,ReplaceNumber};
-		tstring strNewSubName = CreateReplaceString(strCurrentName.c_str(),Match,MatchCount,FRReplace.c_str(),_T(""),Numbers,-1, FSearchAs==SA_REGEXP);
+	while (FindRename(strCurrentName.c_str(), MatchStart, MatchLength)) {
+		REParam.AddFNumbers(FileNumber, FindNumber, ReplaceNumber);
 
-		tstring strNewName = tstring(strCurrentName.c_str(), MatchStart) + strNewSubName + (strCurrentName.c_str()+MatchStart+MatchLength);
+		tstring strNewSubName = CStringOperations<TCHAR>::CreateReplaceString(
+			FRReplace.c_str(), _T(""), -1, REParam);
+
+		tstring strNewName = strCurrentName.substr(0, MatchStart) + strNewSubName + strCurrentName.substr(MatchStart + MatchLength);
 
 		MatchStart += (strNewSubName.empty()) ? 1 : strNewSubName.length();
-		if (Match) delete[] Match;
 
 		BOOL bConfirm = TRUE;
 
@@ -190,9 +190,12 @@ void RenameFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 			bConfirm = ConfirmRename(strCurrentName.c_str(), strNewName.c_str());
 		}
 
-		if (bConfirm) strCurrentName = strNewName;
+		if (bConfirm) {
+			strCurrentName = strNewName;
+			ReplaceNumber++;
+		}
+		FindNumber++;
 
-		ReplaceNumber++;
 		if (!FRepeating) break;
 	}
 
