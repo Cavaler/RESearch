@@ -82,11 +82,14 @@ as much as possible to as few as possible.
     NOTE: {,3} does #not# match from 0 to 3. It matches exact string '{,3}'
 (since Perl documentation says so).
 
-    #()#      groups patterns into one and makes matched part referrable as #\nn# from the
-following part of pattern and as #$nn# from replacing string (!). #nn# is simply the number
+    #()#        groups patterns into one and makes matched part referrable as #\nn# from the
+following part of pattern and as #$nn# from replacing string. #nn# is simply the number
 of opening bracket in pattern, counted from 1.
     NOTE: to separate match number #nn# from subsequent digits #mm#, you can use form
 #${nn}mm# in replacement. In pattern, you can group it: #(\nn)mm#
+
+   #(?<name> )# same as above, but with the possibility to reference by name, via #${name}# in replace or:
+   #\k<name># or #\g{name}# in search.
 
     To make any special character match itself, precede it with '\'.
 
@@ -114,8 +117,13 @@ $ #Replacement text#
     \E      - end case modification.
     \xnn    - symbol with hexadecimal code nn (can be 1 or 2 characters).
     \nnn    - symbol with octal code nnn (can be 1 to 3 characters).
-    When searching as regular expression, also #$nn# or #${nn}# is replaced with given
-group in regular expression (counted from 1). $0 is replaced with whole matched portion.
+
+    #NOTE#: Single-char and multiple-char case modification can be combined, i.e. '\u\L$0\E'
+(or '\L\u$0\E') will be replaced with whole matched string capitalized.
+
+    For RegExp search only:
+    $nn     - captured subpattern number nn. $0 is a whole matched portion.
+    ${name} - captured named subpattern.
 
     When replacing in editor:
     $L      - current line number (from 0)
@@ -123,20 +131,20 @@ group in regular expression (counted from 1). $0 is replaced with whole matched 
     $R      - current replacement number (from 0)
     
     When replacing in files:
-    	Currently none additional
+    $F      - current file number (from 0)
+    $R      - current replacement number (from 0)
     
     When renaming files:
-    $L, $N  - current file number (from 0)
+    $F      - current file number (from 0)
     $R      - current replacement number (from 0)
 
+    #NOTE#: Parameter references (subpatterns or special variables) can be extended by
+using the following forms:
+    ${X+/-nnn} - add nn to the value of parameter (if it is numeric) and align it with zeros
+up to the length of nnn (so you can do ${X+0000} if you need).
+    ${X</>nnn} - align parameter with spaces to the left or right up to nnn characters.
+
     Also standard C-like metacharacters: \a, \b, \e, \f, \n, \r, \t, \v are recognized.
-
-    #NOTE#: Single-char and multiple-char case modification can be combined, i.e. '\u\L$0\E'
-(or '\L\u$0\E') will be replaced with whole matched string capitalized.
-
-    #NOTE#: $nn, $L, $N, $R can be extended by using the following form: ${L+/-nnn}.
-In this case #nnnn# (may be negative as well) is added to a number to be inserted, and its
-length is used for right-aligning the resulting number with zeros (so you can do ${L+0000}).
 @RegularReplaceScripting
 $ #Using scripting#
     To allow a user to achieve a much greater level of flexibility in replacing text, RESearch
