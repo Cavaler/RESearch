@@ -19,6 +19,10 @@ public:
 	static cstring CreateReplaceString(const CHAR *Replace, const CHAR *EOL, int Engine, CREParameters<CHAR> &Param);
 };
 
+typedef CStringOperations<TCHAR>    CSO;
+typedef CStringOperations<char>     CSOA;
+typedef CStringOperations<wchar_t>  CSOW;
+
 template<class CHAR>
 class CREParameters {
 public:

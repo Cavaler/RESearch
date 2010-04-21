@@ -261,9 +261,9 @@ BOOL ReplaceInText(int FirstLine, int StartPos, int LastLine, int EndPos) {
 
 		REParam.AddENumbers(MatchFirstLine, MatchFirstLine-ReplaceStartLine, FindNumber, ReplaceNumber);
 #ifdef UNICODE
-		tstring Replace = CStringOperations<TCHAR>::CreateReplaceString(ERReplace.c_str(),_T("\n"), (EREvaluate ? EREvaluateScript : -1), REParam);
+		tstring Replace = CSO::CreateReplaceString(ERReplace.c_str(),_T("\n"), (EREvaluate ? EREvaluateScript : -1), REParam);
 #else
-		string Replace_O2E = CStringOperations<TCHAR>::CreateReplaceString(ERReplace_O2E.c_str(),"\n", (EREvaluate ? EREvaluateScript : -1), REParam);
+		string Replace_O2E = CSO::CreateReplaceString(ERReplace_O2E.c_str(),"\n", (EREvaluate ? EREvaluateScript : -1), REParam);
 #endif
 		if (g_bInterrupted) return FALSE;	// Script failed
 
@@ -309,9 +309,9 @@ BOOL ReplaceInTextByLine(int FirstLine, int StartPos, int LastLine, int EndPos, 
 
 			REParam.AddENumbers(MatchFirstLine, MatchFirstLine-ReplaceStartLine, FindNumber, ReplaceNumber);
 #ifdef UNICODE
-			tstring Replace = CStringOperations<TCHAR>::CreateReplaceString(ERReplace.c_str(),_T("\n"), (EREvaluate ? EREvaluateScript : -1), REParam);
+			tstring Replace = CSO::CreateReplaceString(ERReplace.c_str(),_T("\n"), (EREvaluate ? EREvaluateScript : -1), REParam);
 #else
-			string Replace_O2E = CStringOperations<TCHAR>::CreateReplaceString(ERReplace_O2E.c_str(),"\n", (EREvaluate ? EREvaluateScript : -1), REParam);
+			string Replace_O2E = CSO::CreateReplaceString(ERReplace_O2E.c_str(),"\n", (EREvaluate ? EREvaluateScript : -1), REParam);
 #endif
 			if (g_bInterrupted) return FALSE;	// Script failed
 

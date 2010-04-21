@@ -249,7 +249,8 @@ BOOL FindRegExpInBuffer(const char *Buffer,int Size,tstring &Text) {
 	pcre_extra *PatternExtra;
 	if (PreparePattern(&Pattern, &PatternExtra, Text, FCaseSensitive, FALSE, OEMCharTables)) {
 		BOOL Return = FindExamineEncoding(Buffer, Size, FindRegExpWithEncoding);
-		pcre_free(Pattern);pcre_free(PatternExtra);
+		pcre_free(Pattern);
+		pcre_free(PatternExtra);
 		return Return;
 	} else {g_bInterrupted=TRUE;return FALSE;}
 }

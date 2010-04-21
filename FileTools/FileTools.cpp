@@ -127,6 +127,7 @@ BOOL ConfirmRename(const TCHAR *From,const TCHAR *To) {
 }
 
 BOOL FindRename(const TCHAR *FileName, int &MatchStart, int &MatchLength) {
+	REParam.Clear();
 	REParam.AddSource(FileName);
 
 	if (FSearchAs==SA_REGEXP) {
@@ -175,8 +176,7 @@ void RenameFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 	while (FindRename(strCurrentName.c_str(), MatchStart, MatchLength)) {
 		REParam.AddFNumbers(FileNumber, FindNumber, ReplaceNumber);
 
-		tstring strNewSubName = CStringOperations<TCHAR>::CreateReplaceString(
-			FRReplace.c_str(), _T(""), -1, REParam);
+		tstring strNewSubName = CSO::CreateReplaceString(FRReplace.c_str(), _T(""), -1, REParam);
 
 		tstring strNewName = strCurrentName.substr(0, MatchStart) + strNewSubName + strCurrentName.substr(MatchStart + MatchLength);
 

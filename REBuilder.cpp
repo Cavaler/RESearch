@@ -48,7 +48,7 @@ void UpdateStrings(HANDLE hDlg, sREData *pData) {
 	if (pcre_exec(re, NULL, strSource.c_str(), strSource.length(), 0, 0, REParam.Match(), REParam.Count()) < 0) return;
 
 	tstring strReplace = GetDlgItemText(hDlg, 6);
-	tstring strResult = CStringOperations<TCHAR>::CreateReplaceString(strReplace.c_str(), _T("\n"), -1, REParam);
+	tstring strResult = CSO::CreateReplaceString(strReplace.c_str(), _T("\n"), -1, REParam);
 	StartupInfo.SendDlgMessage(hDlg, DM_SETTEXTPTR, 8, (LONG_PTR)strResult.data());
 }
 
