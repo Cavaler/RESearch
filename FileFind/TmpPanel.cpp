@@ -56,7 +56,7 @@ void CTemporaryPanel::GetOpenPluginInfo(OpenPluginInfo *Info) {
 	CPanelInfo PInfo;
 	PInfo.GetInfo((HANDLE)this);
 	if (PInfo.CurrentItem > 0) {
-		m_strCurFolder = PInfo.PanelItems[PInfo.CurrentItem].FindData.cFileName;
+		m_strCurFolder = FarFileName(PInfo.PanelItems[PInfo.CurrentItem].FindData);
 		size_t nPos = m_strCurFolder.rfind('\\');
 		if (nPos != tstring::npos) m_strCurFolder.erase(nPos);
 	} else {
