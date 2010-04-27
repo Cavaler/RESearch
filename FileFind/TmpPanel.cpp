@@ -53,24 +53,12 @@ CTemporaryPanel::~CTemporaryPanel() {
 }
 
 void CTemporaryPanel::GetOpenPluginInfo(OpenPluginInfo *Info) {
-	static TCHAR CurrentDir[MAX_PATH];
-
-	CPanelInfo PInfo;
-	PInfo.GetInfo((HANDLE)this);
-	if (PInfo.CurrentItem > 0) {
-		m_strCurFolder = FarFileName(PInfo.PanelItems[PInfo.CurrentItem].FindData);
-		size_t nPos = m_strCurFolder.rfind('\\');
-		if (nPos != tstring::npos) m_strCurFolder.erase(nPos);
-	} else {
-		m_strCurFolder = m_strBaseFolder;
-	}
-
 	Info->StructSize=sizeof(*Info);
 	Info->Flags=OPIF_USEFILTER|OPIF_USESORTGROUPS|OPIF_USEHIGHLIGHTING|
 				OPIF_ADDDOTS|OPIF_SHOWRIGHTALIGNNAMES|
 				OPIF_REALNAMES;
 	Info->HostFile=NULL;
-	Info->CurDir = m_strCurFolder.c_str();
+	Info->CurDir = _T("");
 
 	Info->Format=GetMsg(MSearchResults);
 	Info->PanelTitle=GetMsg(MSearchResults);
@@ -118,17 +106,14 @@ int CTemporaryPanel::GetFindData(PluginPanelItem **PanelItem,int *ItemsNumber,in
 }
 
 int CTemporaryPanel::_SetDirectory(TCHAR *Name,int OpMode) {
-	if ((OpMode&OPM_FIND) || (_tcscmp(Name,_T("\\"))==0)) return FALSE;
+//	We don't get here upon '..', Ctrl-PgUp or Ctrl-\
 
-	if (_tcscmp(Name, _T("..")) != 0)
-		m_strCurFolder = Name;
+	if (OpMode&OPM_FIND) return FALSE;
 
 #ifdef UNICODE
-	StartupInfo.Control((HANDLE)this, FCTL_CLOSEPLUGIN, 0, (LONG_PTR)m_strCurFolder.c_str());
-//	StartupInfo.Control(PANEL_ACTIVE, FCTL_UPDATEPANEL, 0, NULL);
+	StartupInfo.Control((HANDLE)this, FCTL_CLOSEPLUGIN, 0, (LONG_PTR)Name);
 #else
-	StartupInfo.Control((HANDLE)this, FCTL_CLOSEPLUGIN, (void *)m_strCurFolder.c_str());
-//	StartupInfo.Control(INVALID_HANDLE_VALUE, FCTL_UPDATEPANEL,  NULL);
+	StartupInfo.Control((HANDLE)this, FCTL_CLOSEPLUGIN, (void *)Name);
 #endif
 
 	return TRUE;

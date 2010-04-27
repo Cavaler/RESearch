@@ -190,7 +190,6 @@ public:
 private:
 	vector<CPluginPanelItem> m_arrItems;
 	tstring m_strBaseFolder;
-	tstring m_strCurFolder;
 	KeyBarTitles KeyBar;
 
 	CFarPanelMode m_Mode;
