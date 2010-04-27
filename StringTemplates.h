@@ -31,7 +31,7 @@ public:
 	void Clear();
 	void AddENumbers(int nL, int nN, int nS, int nR);
 	void AddFNumbers(int nF, int nS, int nR);
-	void AddSource(const CHAR *szString);
+	void AddSource(const CHAR *szString, size_t nLength);
 	void AddRE(pcre *re);
 
 	vector<int> m_arrMatch;
@@ -49,6 +49,7 @@ public:
 
 	pcre *m_re;
 	const CHAR *m_szString;
+	size_t m_nLength;
 };
 
 #endif

@@ -183,8 +183,9 @@ void CREParameters<CHAR>::AddFNumbers(int nF, int nS, int nR) {
 }
 
 template<class CHAR>
-void CREParameters<CHAR>::AddSource(const CHAR *szString) {
+void CREParameters<CHAR>::AddSource(const CHAR *szString, size_t nLength) {
 	m_szString = szString;
+	m_nLength = nLength;
 }
 
 template<class CHAR>
@@ -230,7 +231,7 @@ template<class CHAR>
 typename CREParameters<CHAR>::cstring
 CREParameters<CHAR>::Original()
 {
-	return cstring(m_szString, m_arrMatch[1]);
+	return cstring(m_szString, m_arrMatch.empty() ? m_nLength : m_arrMatch[1]);
 }
 
 template class CREParameters<char>;

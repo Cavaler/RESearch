@@ -127,7 +127,7 @@ BOOL ConfirmRename(const TCHAR *From,const TCHAR *To) {
 
 BOOL FindRename(const TCHAR *FileName, int &MatchStart, int &MatchLength) {
 	REParam.Clear();
-	REParam.AddSource(FileName);
+	REParam.AddSource(FileName, _tcslen(FileName));
 
 	if (FSearchAs==SA_REGEXP) {
 		REParam.AddRE(FPattern);

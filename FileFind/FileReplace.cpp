@@ -130,7 +130,7 @@ BOOL ProcessPlainTextBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindD
 		if (nPosition < 0) break;
 		Current += nPosition;
 
-		REParamA.AddSource(Current);
+		REParamA.AddSource(Current, Buffer+BufLen-Current);
 		REParamA.AddFNumbers(FileNumber, FindNumber, ReplaceNumber);
 #ifdef UNICODE
 		string Replace = CSOA::CreateReplaceString(FOEMReplace.c_str(), "\n", -1, REParamA);
@@ -159,7 +159,7 @@ BOOL ProcessRegExpBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindData
 		SkipNoCRLF(BufEnd,&BufLen);
 		while ((BufEnd!=Buffer)&&do_pcre_execA(FPatternA,FPatternExtraA,Buffer,BufEnd-Buffer,Start,0,REParamA.Match(),REParamA.Count())>=0) {
 
-			REParamA.AddSource(Buffer);
+			REParamA.AddSource(Buffer,BufEnd-Buffer);
 			REParamA.AddFNumbers(FileNumber, FindNumber, ReplaceNumber);
 #ifdef UNICODE
 			string Replace = CSOA::CreateReplaceString(FOEMReplace.c_str(), "\n", -1, REParamA);
@@ -201,7 +201,7 @@ BOOL ReplaceSeveralLineBuffer(HANDLE &hFile,const char *&Buffer,const char *BufE
 		const char *NewBuffer=Buffer+REParamA.m_arrMatch[0];
 		if (NewBuffer>=LineEnd) break;
 
-		REParamA.AddSource(Buffer);
+		REParamA.AddSource(Buffer,BufEnd-Buffer);
 		REParamA.AddFNumbers(FileNumber, FindNumber, ReplaceNumber);
 #ifdef UNICODE
 		string Replace = CSOA::CreateReplaceString(FOEMReplace.c_str(), "\n", -1, REParamA);

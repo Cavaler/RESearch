@@ -42,7 +42,7 @@ void UpdateStrings(HANDLE hDlg, sREData *pData) {
 	if (!PreparePattern(&re, NULL, strRE, ECaseSensitive)) return;
 
 	REParam.Clear();
-	REParam.AddSource(strSource.c_str());
+	REParam.AddSource(strSource.c_str(), strSource.length());
 	REParam.AddRE(re);
 
 	if (pcre_exec(re, NULL, strSource.c_str(), strSource.length(), 0, 0, REParam.Match(), REParam.Count()) < 0) return;

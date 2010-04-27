@@ -41,7 +41,7 @@ void EWriteRegistry(HKEY Key) {
 
 BOOL SearchIn(const TCHAR *Line,int Start,int Length,int *MatchStart,int *MatchLength,BOOL NeedMatch) {
 	REParam.Clear();
-	REParam.AddSource(Line);
+	REParam.AddSource(Line, Length);
 
 	if (ERegExp) {
 		REParam.AddRE(EPattern);
