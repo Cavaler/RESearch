@@ -10,6 +10,10 @@ Planned:
 	+ Preview rename changes
 	- Gray out 'show last results' if there aren't any (requires FMENU_USEEXT)
 
+Version 7.11 (27.04.2010)
+	- Fixed crash with plain-text replace in editor
+	- TmpPanel reverted to old behaviour (everything worked in 2.0 well, and bug in 1.75 itself)
+
 Version 7.10 (21.04.2010)
 	- FMENU_SHOWAMPERSAND for 'List all' in Editor
 	- It is now possible to find empty lines in single-line regexp mode
