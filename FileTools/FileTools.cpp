@@ -61,10 +61,8 @@ void ChangeSelection(int How) {
 	CPanelInfo PInfo;
 	PInfo.GetInfo(false);
 
-	CFarMaskSet Mask(FMask.c_str());
-
 	for (int I=0;I<PInfo.ItemsNumber;I++) {
-		if (Mask(FarFileName(PInfo.PanelItems[I].FindData))) {
+		if (MultipleMasksApply(FarFileName(PInfo.PanelItems[I].FindData))) {
 			switch (How) {
 			case MSelect:
 				PInfo.PanelItems[I].Flags|=PPIF_SELECTED;
