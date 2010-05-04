@@ -2,6 +2,7 @@
 #include "..\RESearch.h"
 
 CREParameters<char> REParamA;
+PSECURITY_DESCRIPTOR g_pSD = NULL;
 
 BOOL ConfirmFileReadonly(TCHAR *FileName) {
 	if (!FRConfirmReadonlyThisRun) return TRUE;
@@ -65,8 +66,19 @@ BOOL DoFileReplace(HANDLE &hFile,const char *&Found,int FoundLen,const char *Rep
 			if (!ConfirmFileReadonly(FindData->cFileName)) return FALSE;
 			SetFileAttributes(FindData->cFileName,FindData->dwFileAttributes&~FILE_ATTRIBUTE_READONLY);
 		}
-		hFile=CreateFile(FindData->cFileName,GENERIC_WRITE,0,NULL,CREATE_ALWAYS,
-			FindData->dwFileAttributes,INVALID_HANDLE_VALUE);
+
+		SECURITY_ATTRIBUTES Sec;
+		Sec.nLength = sizeof(Sec);
+		Sec.bInheritHandle = false;
+		Sec.lpSecurityDescriptor = g_pSD;
+
+		hFile=CreateFile(FindData->cFileName, GENERIC_READ|GENERIC_WRITE, 0, &Sec, CREATE_ALWAYS,
+			FindData->dwFileAttributes, INVALID_HANDLE_VALUE);
+
+		//	Cannot set via attributes
+		USHORT fmt = (FindData->dwFileAttributes & FILE_ATTRIBUTE_COMPRESSED) ? COMPRESSION_FORMAT_DEFAULT : COMPRESSION_FORMAT_NONE;
+		DWORD dwReturned;
+		DeviceIoControl(hFile, FSCTL_SET_COMPRESSION, &fmt, sizeof(fmt), NULL, 0, &dwReturned, NULL);
 
 		if (hFile==INVALID_HANDLE_VALUE) {
 			const TCHAR *Lines[]={GetMsg(MREReplace),GetMsg(MFileOpenError),FindData->cFileName,GetMsg(MOk)};
@@ -101,11 +113,14 @@ BOOL FinishReplace(HANDLE hFile,const char *&Skip,int SkipLen,WIN32_FIND_DATA *F
 		}
 
 		WriteBuffer(hFile,Skip,SkipLen,FindData->cFileName);
+
+		SetFileTime(hFile, &FindData->ftCreationTime, NULL, NULL);
 		CloseHandle(hFile);
-		if (FindData->dwFileAttributes&FILE_ATTRIBUTE_READONLY)
-			SetFileAttributes(FindData->cFileName,FindData->dwFileAttributes);
+
 		return TRUE;
-	} else return FALSE;
+	} else {
+		return FALSE;
+	}
 }
 
 BOOL ProcessPlainTextBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindData) {
@@ -313,6 +328,15 @@ void ReplaceFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 
 	CFileMapping mapFile;
 	if (mapFile.Open(strBackupFileName.c_str())) {
+
+		if (!g_pSD != NULL)
+			LocalFree(g_pSD);
+
+		if (GetNamedSecurityInfo(strBackupFileName.c_str(), SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION | GROUP_SECURITY_INFORMATION | DACL_SECURITY_INFORMATION,
+			NULL, NULL, NULL, NULL, &g_pSD) != ERROR_SUCCESS) {
+				g_pSD = NULL;
+		}
+
 		if (ProcessBuffer(mapFile, FindData->nFileSizeLow, FindData)) {
 			mapFile.Close();
 			if (!FRSaveOriginal) DeleteFile(strBackupFileName.c_str());

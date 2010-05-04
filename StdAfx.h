@@ -9,6 +9,9 @@
 #include <activscp.h>
 #include <comcat.h>
 #include <ctype.h>
+#include <aclapi.h>
+#include <winioctl.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
