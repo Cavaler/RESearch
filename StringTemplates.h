@@ -36,7 +36,7 @@ public:
 
 	vector<int> m_arrMatch;
 	int *Match() { return m_arrMatch.empty() ? NULL : &m_arrMatch[0]; }
-	int  Count() { return m_arrMatch.size(); }
+	int  Count() { return (int)m_arrMatch.size(); }
 
 	cstring GetParam(int nNumber);
 	cstring GetParam(const cstring &strName, bool bCheckNumber = false);
