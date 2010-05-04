@@ -13,7 +13,6 @@ Planned:
 Version 7.12 (04.05.2010)
 	- RegExp masks in "Select/Unselect" work again
 	+ Correctly preserving file ACLs, attributes and creation time upon replace
-	  NOTE: NTFS streams are still lost.
 
 Version 7.11 (27.04.2010)
 	- Fixed crash with plain-text replace in editor
