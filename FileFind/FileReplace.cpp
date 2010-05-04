@@ -2,7 +2,9 @@
 #include "..\RESearch.h"
 
 CREParameters<char> REParamA;
-PSECURITY_DESCRIPTOR g_pSD = NULL;
+
+tstring g_strNewFileName;
+tstring g_strBackupFileName;
 
 BOOL ConfirmFileReadonly(TCHAR *FileName) {
 	if (!FRConfirmReadonlyThisRun) return TRUE;
@@ -64,24 +66,13 @@ BOOL DoFileReplace(HANDLE &hFile,const char *&Found,int FoundLen,const char *Rep
 		if (!ConfirmFile(MREReplace,FindData->cFileName)) return FALSE;
 		if (FindData->dwFileAttributes&FILE_ATTRIBUTE_READONLY) {
 			if (!ConfirmFileReadonly(FindData->cFileName)) return FALSE;
-			SetFileAttributes(FindData->cFileName,FindData->dwFileAttributes&~FILE_ATTRIBUTE_READONLY);
 		}
 
-		SECURITY_ATTRIBUTES Sec;
-		Sec.nLength = sizeof(Sec);
-		Sec.bInheritHandle = false;
-		Sec.lpSecurityDescriptor = g_pSD;
-
-		hFile=CreateFile(FindData->cFileName, GENERIC_READ|GENERIC_WRITE, 0, &Sec, CREATE_ALWAYS,
+		hFile = CreateFile(g_strNewFileName.c_str(), GENERIC_READ|GENERIC_WRITE, 0, NULL, CREATE_ALWAYS,
 			FindData->dwFileAttributes, INVALID_HANDLE_VALUE);
 
-		//	Cannot set via attributes
-		USHORT fmt = (FindData->dwFileAttributes & FILE_ATTRIBUTE_COMPRESSED) ? COMPRESSION_FORMAT_DEFAULT : COMPRESSION_FORMAT_NONE;
-		DWORD dwReturned;
-		DeviceIoControl(hFile, FSCTL_SET_COMPRESSION, &fmt, sizeof(fmt), NULL, 0, &dwReturned, NULL);
-
 		if (hFile==INVALID_HANDLE_VALUE) {
-			const TCHAR *Lines[]={GetMsg(MREReplace),GetMsg(MFileOpenError),FindData->cFileName,GetMsg(MOk)};
+			const TCHAR *Lines[]={GetMsg(MREReplace), GetMsg(MFileOpenError), g_strNewFileName.c_str(), GetMsg(MOk)};
 			StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("FRCreateError"),Lines,4,1);
 			return FALSE;
 		}
@@ -285,8 +276,21 @@ char *AddExtension(char *FileName,char *Extension) {
 	return strcat(strcpy(New,FileName),Extension);
 }
 
-void ReplaceFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
-	tstring strBackupFileName;
+tstring GetUniqueFileName(const TCHAR *szCurrent, const TCHAR *szExt) {
+	int nTry = 0;
+	do {
+		tstring strName = szCurrent;
+		if (nTry > 0) strName += FormatStr(_T(".%d"), nTry);
+		strName += szExt;
+		if (GetFileAttributes(strName.c_str()) == INVALID_FILE_ATTRIBUTES) {
+			if (GetLastError() == ERROR_FILE_NOT_FOUND) return strName;
+			return tstring();
+		}
+		nTry++;
+	} while (true);
+}
+
+void ReplaceSingleFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 	BOOL ReturnValue=FALSE;
 
 	InitFoundPosition();
@@ -296,55 +300,26 @@ void ReplaceFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 
 	FileNumber++;
 
-	int nTry = 0;
-	do {
-		strBackupFileName = FindData->cFileName;
-		if (nTry > 0) {
-			TCHAR szNum[8];
-			_stprintf_s(szNum, 8, _T(".%02d"), nTry);
-			strBackupFileName += szNum;
-		}
-		strBackupFileName += _T(".bak");
-
-		if (FRSaveOriginal && FROverwriteBackup) {
-			if (MoveFileEx(FindData->cFileName, strBackupFileName.c_str(), MOVEFILE_REPLACE_EXISTING)) {
-				break;
-			}
-		} else {
-			if (MoveFile(FindData->cFileName, strBackupFileName.c_str())) {
-				break;
-			} else {
-				if (GetLastError() == ERROR_ALREADY_EXISTS) {
-					nTry++;
-					continue;
-				}
-			}
-		}
-
-		const TCHAR *Lines[]={GetMsg(MREReplace),GetMsg(MFileCreateError),strBackupFileName.c_str(),GetMsg(MOk)};
-		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("FRBackupError"),Lines,4,1);
-		return;
-	} while (true);
+	g_strBackupFileName = (FROverwriteBackup)
+		? tstring(FindData->cFileName) + _T(".bak")
+		: GetUniqueFileName(FindData->cFileName, _T(".bak"));
+	g_strNewFileName = GetUniqueFileName(FindData->cFileName, _T(".new"));
 
 	CFileMapping mapFile;
-	if (mapFile.Open(strBackupFileName.c_str())) {
+	if (mapFile.Open(FindData->cFileName)) {
+		BOOL bProcess = ProcessBuffer(mapFile, FindData->nFileSizeLow, FindData);
+		mapFile.Close();
 
-		if (!g_pSD != NULL)
-			LocalFree(g_pSD);
+		if (bProcess) {
+			if (!ReplaceFile(FindData->cFileName, g_strNewFileName.c_str(),
+				(FRSaveOriginal) ? g_strBackupFileName.c_str() : NULL,
+				REPLACEFILE_IGNORE_MERGE_ERRORS, NULL, NULL)) {
 
-		if (GetNamedSecurityInfo(strBackupFileName.c_str(), SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION | GROUP_SECURITY_INFORMATION | DACL_SECURITY_INFORMATION,
-			NULL, NULL, NULL, NULL, &g_pSD) != ERROR_SUCCESS) {
-				g_pSD = NULL;
-		}
+				const TCHAR *Lines[]={GetMsg(MREReplace),GetMsg(MFileBackupError),FindData->cFileName,GetMsg(MOk)};
+				StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING|FMSG_ERRORTYPE,_T("FRBackupError"),Lines,4,1);
+			}
 
-		if (ProcessBuffer(mapFile, FindData->nFileSizeLow, FindData)) {
-			mapFile.Close();
-			if (!FRSaveOriginal) DeleteFile(strBackupFileName.c_str());
 			AddFile(FindData, PanelItems);
-		} else {
-			mapFile.Close();
-			DeleteFile(FindData->cFileName);
-			MoveFile(strBackupFileName.c_str(),FindData->cFileName);
 		}
 	} else {
 		const TCHAR *Lines[]={GetMsg(MREReplace),GetMsg(MFileOpenError),FindData->cFileName,GetMsg(MOk)};
@@ -460,7 +435,7 @@ OperationResult FileReplace(panelitem_vector &PanelItems, BOOL ShowDialog, BOOL 
 	FRConfirmReadonlyThisRun = (FRReplaceReadonly != RR_ALWAYS);
 	FRConfirmLineThisRun=FRConfirmLine;
 	FileNumber = -1;	// Easier to increment
-	if (ScanDirectories(PanelItems, ReplaceFile)) {
+	if (ScanDirectories(PanelItems, ReplaceSingleFile)) {
 		if (!FROpenModified) return OR_OK; else
 			return (PanelItems.empty()) ? (bSilent ? OR_OK : NoFilesFound()) : OR_PANEL;
 	} else return OR_FAILED;
