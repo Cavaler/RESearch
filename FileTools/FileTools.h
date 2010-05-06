@@ -27,6 +27,11 @@ extern CParameterSet g_QRParamSet;
 EXTERN CRnPresetCollection *RnPresets;
 EXTERN CQRPresetCollection *QRPresets;
 
+typedef pair<tstring, tstring> rename_pair;
+typedef vector<rename_pair> rename_vector;
+//	Not a map to enforce reverse rename sequence
+EXTERN rename_vector m_arrLastRename;
+
 void FTReadRegistry(HKEY Key);
 void FTWriteRegistry(HKEY Key);
 void FTCleanup(BOOL PatternOnly);

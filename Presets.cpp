@@ -479,7 +479,7 @@ void CBatchAction::Execute() {
 }
 
 CFarMenuItem CBatchAction::GetMenuItem() {
-	return CFarMenuItem(m_strName);
+	return CFarMenuItem(GetMsg(MMenuBatch) + m_strName);
 }
 
 //////////////////////////////////////////////////////////////////////////

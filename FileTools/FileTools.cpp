@@ -16,13 +16,7 @@ bool FTAskOverwrite;
 bool FTAskCreatePath;
 int g_nStartWithNow;
 
-typedef pair<tstring, tstring> rename_pair;
-typedef vector<rename_pair> rename_vector;
-
 rename_vector m_arrPendingRename;
-
-//	Not a map to enforce reverse rename sequence
-rename_vector m_arrLastRename;
 
 void FTReadRegistry(HKEY Key) {
 	#define DECLARE_PERSIST_LOAD Key

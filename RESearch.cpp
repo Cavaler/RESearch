@@ -304,8 +304,15 @@ int ShowFileMenu() {
 	if (nLastSelection >= (int)MenuItems.size()) nLastSelection = 0;
 	MenuItems[nLastSelection].Selected = TRUE;
 
-	int nResult = StartupInfo.Menu(StartupInfo.ModuleNumber,-1,-1,0,FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT,GetMsg(MMenuHeader),
-		NULL,_T("FileMenu"),NULL,NULL,&MenuItems[0],MenuItems.size());
+	vector<CFarMenuItemEx> MenuItemsEx;
+	UpgradeMenuItemVector(MenuItems, MenuItemsEx);
+	
+	if (m_arrLastRename.empty()) MenuItemsEx[11].Flags |= MIF_DISABLE;
+	if (LastTempPanel == NULL) MenuItemsEx[14].Flags |= MIF_DISABLE;
+
+	int nResult = StartupInfo.Menu(StartupInfo.ModuleNumber, -1, -1, 0, FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT|FMENU_USEEXT,
+		GetMsg(MMenuHeader), NULL, _T("FileMenu"), NULL, NULL,
+		(const FarMenuItem *)&MenuItemsEx[0], MenuItems.size());
 
 	if (nResult >= 0) nLastSelection = nResult;
 	return nResult;
@@ -340,8 +347,13 @@ int ShowEditorMenu() {
 	if (nLastSelection >= (int)MenuItems.size()) nLastSelection = 0;
 	MenuItems[nLastSelection].Selected = TRUE;
 
-	int nResult = StartupInfo.Menu(StartupInfo.ModuleNumber,-1,-1,0,FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT,GetMsg(MMenuHeader),
-		NULL,_T("EditorMenu"),NULL,NULL,&MenuItems[0],MenuItems.size());
+	vector<CFarMenuItemEx> MenuItemsEx;
+	UpgradeMenuItemVector(MenuItems, MenuItemsEx);
+	if (!EditorListAllHasResults()) MenuItemsEx[9].Flags |= MIF_DISABLE;
+
+	int nResult = StartupInfo.Menu(StartupInfo.ModuleNumber, -1, -1, 0, FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT|FMENU_USEEXT,
+		GetMsg(MMenuHeader), NULL, _T("EditorMenu"), NULL, NULL,
+		(const FarMenuItem *)&MenuItemsEx[0], MenuItems.size());
 
 	if (nResult >= 0) nLastSelection = nResult;
 	return nResult;

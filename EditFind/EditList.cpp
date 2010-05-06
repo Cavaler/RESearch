@@ -63,6 +63,18 @@ BOOL EditorListAllAgain() {
 	return EditorListAllShowResults(true);
 }
 
+BOOL EditorListAllHasResults() {
+	RefreshEditorInfo();
+
+#ifdef UNICODE
+	sFindAllInfo &Info = FindAllInfos[CanonicalLCName(EditorFileName.c_str())];
+#else
+	sFindAllInfo &Info = FindAllInfos[CanonicalLCName(EdInfo.FileName)];
+#endif
+
+	return !Info.arrLines.empty();
+}
+
 BOOL EditorListAllShowResults(bool bImmediate) {
 	if (!bImmediate) RefreshEditorInfo();
 

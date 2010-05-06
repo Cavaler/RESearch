@@ -82,6 +82,8 @@ BOOL EditorTransliterate();
 BOOL EditorTransliterateAgain();
 BOOL EditorListAll();
 BOOL EditorListAllAgain();
+
+BOOL EditorListAllHasResults();
 BOOL EditorListAllShowResults(bool bImmediate);
 
 EXTERN BOOL EListAllFromPreset;
