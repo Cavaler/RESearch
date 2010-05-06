@@ -218,6 +218,15 @@ void AddFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 	PanelItems.push_back(Item);
 }
 
+void AddFile(const TCHAR *szFileName, panelitem_vector &PanelItems) {
+	WIN32_FIND_DATA FD;
+	HANDLE hFind = FindFirstFile(szFileName, &FD);
+	if (hFind != INVALID_HANDLE_VALUE) {
+		AddFile(&FD, PanelItems);
+		FindClose(hFind);
+	}
+}
+
 int AddSlashLen(TCHAR *Directory) {
 	int Len = _tcslen(Directory);
 	if ((Len == 0) || (Directory[Len-1] != '\\')) {_tcscat(Directory, _T("\\"));Len++;}
