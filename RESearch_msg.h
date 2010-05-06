@@ -200,6 +200,8 @@ enum eStringTable {
 	MFlipSelection,
 	MRepeating,
 	MLeaveSelection,
+	MPreviewRename,
+	MRenamePreview,
 
 	MSearchFor,
 	MReplaceWith,

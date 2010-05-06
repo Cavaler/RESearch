@@ -200,6 +200,8 @@ MUnselect			"Unselect files"					"Снять выделение"
 MFlipSelection		"Flip selection"					"Обратить выделение"
 MRepeating			"R&epeating replace"				"Многократная замена"
 MLeaveSelection		"Preserve &selection"				"Сохранить в&ыделение"
+MPreviewRename		"Pre&view rename results"			"Пред&варительно показать результат"
+MRenamePreview		"Rename results preview"			"Результаты переименования"
 
 MSearchFor			"&Search for:"						"Искать &текст:"
 MReplaceWith		"Replace w&ith:"					"Заменить &на:"

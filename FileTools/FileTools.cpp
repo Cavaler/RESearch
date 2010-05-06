@@ -16,8 +16,13 @@ bool FTAskOverwrite;
 bool FTAskCreatePath;
 int g_nStartWithNow;
 
+typedef pair<tstring, tstring> rename_pair;
+typedef vector<rename_pair> rename_vector;
+
+rename_vector m_arrPendingRename;
+
 //	Not a map to enforce reverse rename sequence
-vector<pair<tstring, tstring>> m_arrLastRename;
+rename_vector m_arrLastRename;
 
 void FTReadRegistry(HKEY Key) {
 	#define DECLARE_PERSIST_LOAD Key
@@ -148,6 +153,123 @@ BOOL FindRename(const TCHAR *FileName, int &MatchStart, int &MatchLength) {
 	return FALSE;
 }
 
+bool PerformSingleRename(rename_pair &Item) {
+	if (MoveFile(Item.first.c_str(), Item.second.c_str())) return true;
+
+	DWORD Error = GetLastError();
+	switch (Error) {
+	case ERROR_ALREADY_EXISTS:
+		if (FTAskOverwrite) {
+			const TCHAR *Lines[]={GetMsg(MMenuRename),GetMsg(MFile),Item.second.c_str(),
+				GetMsg(MAskOverwrite),Item.first.c_str(),GetMsg(MOk),GetMsg(MAll),GetMsg(MSkip),GetMsg(MCancel)};
+			switch (StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("FRenameOverwrite"),Lines,9,4)) {
+			case 1:
+				FTAskOverwrite=false;
+			case 0:
+				break;
+			case 3:
+				g_bInterrupted=TRUE;
+			case 2:
+				return false;
+			}
+		}
+
+		if (MoveFileEx(Item.first.c_str(), Item.second.c_str(), MOVEFILE_REPLACE_EXISTING))
+			Error = ERROR_SUCCESS;
+		else
+			Error = GetLastError();
+		break;
+
+	case ERROR_PATH_NOT_FOUND:
+		if (FTAskCreatePath) {
+			const TCHAR *Lines[]={GetMsg(MMenuRename),GetMsg(MFile),Item.second.c_str(),
+				GetMsg(MAskCreatePath),GetMsg(MOk),GetMsg(MAll),GetMsg(MSkip),GetMsg(MCancel)};
+			switch (StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("FRenameCreatePath"),Lines,8,4)) {
+			case 1:
+				FTAskCreatePath=false;
+			case 0:
+				break;
+			case 3:
+				g_bInterrupted=TRUE;
+			case 2:
+				return false;
+			}
+		}
+
+		if (CreateDirectoriesForFile(Item.second.c_str()) && MoveFile(Item.first.c_str(), Item.second.c_str()))
+			Error = ERROR_SUCCESS;
+		else
+			Error = GetLastError();
+	}
+
+	if (Error != ERROR_SUCCESS) {
+		const TCHAR *Lines[]={GetMsg(MMenuRename),GetMsg(MRenameError),Item.first.c_str(),
+			GetMsg(MAskTo),Item.second.c_str(),GetMsg(MOk),GetMsg(MCancel)};
+		if (StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("FRenameError"),Lines,7,2)==1) g_bInterrupted=TRUE;
+		return false;
+	}
+
+	return true;
+}
+
+bool PerformSingleRename(rename_pair &Item, panelitem_vector &PanelItems) {
+	if (PerformSingleRename(Item)) {
+		m_arrLastRename.push_back(Item);
+		AddFile(Item.second.c_str(), PanelItems);
+		return true;
+	} else
+		return false;
+}
+
+void PerformFinalRename(panelitem_vector &PanelItems) {
+	for (size_t nItem = 0; nItem < m_arrPendingRename.size(); nItem++) {
+		PerformSingleRename(m_arrPendingRename[nItem], PanelItems);
+	}
+}
+
+void RenamePreview(panelitem_vector &PanelItems) {
+	vector<tstring> arrItems;
+	int nBreakKey, nResult = 0;
+	int BreakKeys[] = {VK_INSERT, VK_DELETE, 0};
+
+	if (m_arrPendingRename.empty()) return;
+
+	do {
+		arrItems.clear();
+		for (size_t nItem = 0; nItem < m_arrPendingRename.size(); nItem++) {
+			rename_pair &Item = m_arrPendingRename[nItem];
+
+			arrItems.push_back(Item.first + _T(" => ") + Item.second);
+		}
+
+		nResult = ChooseMenu(arrItems, GetMsg(MRenamePreview), _T("Del, Enter, Esc"), _T("RenamePreview"), nResult, FMENU_WRAPMODE,
+			BreakKeys, &nBreakKey);
+
+		switch (nBreakKey) {
+		case -1:
+			if (nResult >= 0) {
+				PerformFinalRename(PanelItems);
+			} else {
+				g_bInterrupted = TRUE;
+			}
+			return;
+		case 0:
+			if (PerformSingleRename(m_arrPendingRename[nResult], PanelItems)) {
+				m_arrPendingRename.erase(m_arrPendingRename.begin() + nResult);
+			}
+			break;
+		case 1:
+			m_arrPendingRename.erase(m_arrPendingRename.begin() + nResult);
+			break;
+		}
+
+		if (m_arrPendingRename.empty()) {
+			g_bInterrupted = TRUE;
+			return;
+		}
+	} while (true);
+}
+
 void RenameFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 	int MatchStart = 0, MatchLength;
 	int FindNumber = 0, ReplaceNumber = 0;
@@ -201,67 +323,16 @@ void RenameFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 
 	strCurrentName = strPath + strCurrentName;
 
-	if (!MoveFile(FindData->cFileName, strCurrentName.c_str())) {
-		DWORD Error = GetLastError();
-		switch (Error) {
-		case ERROR_ALREADY_EXISTS:
-			if (FTAskOverwrite) {
-				const TCHAR *Lines[]={GetMsg(MMenuRename),GetMsg(MFile),strCurrentName.c_str(),
-					GetMsg(MAskOverwrite),FindData->cFileName,GetMsg(MOk),GetMsg(MAll),GetMsg(MSkip),GetMsg(MCancel)};
-				switch (StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("FRenameOverwrite"),Lines,9,4)) {
-				case 1:
-					FTAskOverwrite=false;
-				case 0:
-					break;
-				case 3:
-					g_bInterrupted=TRUE;
-				case 2:
-					return;
-				}
-			}
-
-			if (MoveFileEx(FindData->cFileName, strCurrentName.c_str(), MOVEFILE_REPLACE_EXISTING))
-				Error = ERROR_SUCCESS;
-			else
-				Error = GetLastError();
-			break;
-
-		case ERROR_PATH_NOT_FOUND:
-			if (FTAskCreatePath) {
-				const TCHAR *Lines[]={GetMsg(MMenuRename),GetMsg(MFile),strCurrentName.c_str(),
-					GetMsg(MAskCreatePath),GetMsg(MOk),GetMsg(MAll),GetMsg(MSkip),GetMsg(MCancel)};
-				switch (StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("FRenameCreatePath"),Lines,8,4)) {
-				case 1:
-					FTAskCreatePath=false;
-				case 0:
-					break;
-				case 3:
-					g_bInterrupted=TRUE;
-				case 2:
-					return;
-				}
-			}
-
-			if (CreateDirectoriesForFile(strCurrentName.c_str()) && MoveFile(FindData->cFileName,strCurrentName.c_str()))
-				Error = ERROR_SUCCESS;
-			else
-				Error = GetLastError();
-		}
-
-		if (Error != ERROR_SUCCESS) {
-			const TCHAR *Lines[]={GetMsg(MMenuRename),GetMsg(MRenameError),FindData->cFileName,
-				GetMsg(MAskTo),strCurrentName.c_str(),GetMsg(MOk),GetMsg(MCancel)};
-			if (StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("FRenameError"),Lines,7,2)==1) g_bInterrupted=TRUE;
-			return;
-		}
+	rename_pair Item(FindData->cFileName, strCurrentName);
+	if (FRPreviewRename) {
+		m_arrPendingRename.push_back(Item);
+	} else {
+		PerformSingleRename(Item, PanelItems);
 	}
-
-	m_arrLastRename.push_back(make_pair(tstring(FindData->cFileName), strCurrentName));
-	AddFile(FindData, PanelItems);
 }
 
 BOOL RenameFilesPrompt() {
-	CFarDialog Dialog(76,19,_T("FileRenameDlg"));
+	CFarDialog Dialog(76,20,_T("FileRenameDlg"));
 	Dialog.AddFrame(MRename);
 
 	Dialog.Add(new CFarCheckBoxItem(25,2,0,MAsRegExp,&FMaskAsRegExp));
@@ -285,6 +356,7 @@ BOOL RenameFilesPrompt() {
 	Dialog.Add(new CFarCheckBoxItem(5,11,0,MViewModified,&FROpenModified));
 	Dialog.Add(new CFarCheckBoxItem(5,12,0,MConfirmFile,&FRConfirmFile));
 	Dialog.Add(new CFarCheckBoxItem(5,13,0,MConfirmLine,&FRConfirmLine));
+	Dialog.Add(new CFarCheckBoxItem(5,14,0,MPreviewRename,&FRPreviewRename));
 	Dialog.AddButtons(MOk,MCancel);
 	Dialog.Add(new CFarButtonItem(60,9,0,0,MBtnPresets));
 	Dialog.SetFocus(4);
@@ -331,9 +403,12 @@ OperationResult RenameFiles(panelitem_vector &PanelItems, BOOL ShowDialog) {
 	FTAskOverwrite = FTAskCreatePath = true;
 	FileNumber=-1;
 	g_bInterrupted=FALSE;
+
+	m_arrPendingRename.clear();
 	m_arrLastRename.clear();
 
 	if (ScanDirectories(PanelItems, RenameFile)) {
+		if (FRPreviewRename) RenamePreview(PanelItems);
 		if (!FROpenModified) return OR_OK; else
 		return (PanelItems.empty()) ? NoFilesFound() : OR_PANEL;
 	} else return OR_FAILED;
@@ -347,10 +422,13 @@ OperationResult RenameFilesExecutor() {
 	FTAskOverwrite = FTAskCreatePath = true;
 	FileNumber=-1;
 	g_bInterrupted=FALSE;
+	
+	m_arrPendingRename.clear();
 	m_arrLastRename.clear();
 
 	FRConfirmFileThisRun = FALSE;	//FRConfirmFile;
 	FRConfirmLineThisRun = FALSE;	//FRConfirmLine;
+	FRPreviewRename = FALSE;
 
 	if (ScanDirectories(g_PanelItems, RenameFile)) {
 //		if (!FROpenModified) return OR_OK; else
@@ -362,6 +440,8 @@ OperationResult RenameFilesExecutor() {
 BOOL PerformRenameSelectedFiles(CPanelInfo &PInfo, panelitem_vector &PanelItems) {
 	FileNumber=-1;
 	g_bInterrupted=FALSE;
+
+	m_arrPendingRename.clear();
 	m_arrLastRename.clear();
 
 	//	To allow 'Restore selection' of _unmodified_ files
@@ -388,6 +468,8 @@ BOOL PerformRenameSelectedFiles(CPanelInfo &PInfo, panelitem_vector &PanelItems)
 		}
 	}
 
+	if (FRPreviewRename) RenamePreview(PanelItems);
+
 #ifdef UNICODE
 	StartupInfo.Control(PANEL_ACTIVE, FCTL_UPDATEPANEL, 0, NULL);
 #else
@@ -413,7 +495,7 @@ BOOL PerformRenameSelectedFiles(CPanelInfo &PInfo, panelitem_vector &PanelItems)
 }
 
 BOOL RenameSelectedFilesPrompt() {
-	CFarDialog Dialog(76, 14, _T("SelectedFileRenameDlg"));
+	CFarDialog Dialog(76, 15, _T("SelectedFileRenameDlg"));
 	Dialog.AddFrame(MRenameSelected);
 
 	Dialog.Add(new CFarCheckBoxItem(25,2,0,MRegExp,(BOOL *)&FSearchAs));
@@ -427,6 +509,7 @@ BOOL RenameSelectedFilesPrompt() {
 
 	Dialog.Add(new CFarCheckBoxItem(5,7,0,MConfirmLine,&FRConfirmLine));
 	Dialog.Add(new CFarCheckBoxItem(5,8,0,MLeaveSelection,&FRLeaveSelection));
+	Dialog.Add(new CFarCheckBoxItem(5,9,0,MPreviewRename,&FRPreviewRename));
 	Dialog.AddButtons(MOk,MCancel);
 	Dialog.Add(new CFarButtonItem(60,6,0,0,MBtnPresets));
 	Dialog.SetFocus(4);
@@ -471,7 +554,7 @@ OperationResult RenameSelectedFiles(panelitem_vector &PanelItems, BOOL ShowDialo
 	FTAskOverwrite = FTAskCreatePath = true;
 
 	PerformRenameSelectedFiles(PInfo, PanelItems);
-	return (PanelItems.empty()) ? NoFilesFound() : OR_OK;
+	return (PanelItems.empty() && !g_bInterrupted) ? NoFilesFound() : OR_OK;
 }
 
 OperationResult QuickRenameFilesExecutor() {
@@ -480,8 +563,9 @@ OperationResult QuickRenameFilesExecutor() {
 	if (!FPreparePattern(false)) return OR_FAILED;
 	FTAskOverwrite = FTAskCreatePath = true;
 
-	FRConfirmFileThisRun = FALSE;	//FRConfirmFile;
-	FRConfirmLineThisRun = FALSE;	//FRConfirmLine;
+	FRConfirmFileThisRun = FALSE;
+	FRConfirmLineThisRun = FALSE;
+	FRPreviewRename = FALSE;
 
 	CPanelInfo PInfo;
 	PInfo.GetInfo(false);
