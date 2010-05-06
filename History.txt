@@ -7,8 +7,11 @@ Regular Expression Search and Replace
 
 Planned:
 	* dialogprocs for disabling unneeded elements
-	+ Preview rename changes
-	- Gray out 'show last results' if there aren't any (requires FMENU_USEEXT)
+
+Version 7.13 (06.05.2010)
+	* "Preview rename results" in Rename and Rename Selected
+	- "List modified files" in Rename works correctly
+	- Disabling "Show last results" etc when there are no last results
 
 Version 7.12 (04.05.2010)
 	- RegExp masks in "Select/Unselect" work again
