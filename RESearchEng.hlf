@@ -648,27 +648,43 @@ File mask delimiter can be set in ~configuration dialog~@RECfg@.
 not as usual DOS mask.
 @FileRenameDlg
 $ #File Rename Dialog#
-With this dialog you can complicatedly rename files.
+With this dialog you can rename files.
 
-  #File mask(s)#          Specifies which files are to be renamed.
+  #File mask(s)#             Specifies which files are to be renamed.
 File mask delimiter can be set in ~configuration dialog~@RECfg@.
-  #As regular expression# If this option is set, mask will be treated as regular expression,
+  #As regular expression#    If this option is set, mask will be treated as regular expression,
 not as usual DOS mask.
 
-  #Containing text#       Specifies text to be found in file name.
-  #Regular expression#    If this option is set, above text will be treated as regular expression.
-  #Replace with#          Specifies text to replace one matched with above option.
-  #Repeating replace#     If this option is set, rename will not stop after first file rename
+  #Containing text#          Specifies text to be found in file name.
+  #Regular expression#       If this option is set, above text will be treated as regular expression.
+  #Replace with#             Specifies text to replace one matched with above option.
+  #Repeating replace#        If this option is set, rename will not stop after first file rename
 attempt, but try to apply pattern to new name again.
+  #List modified files#      A temporary panel with all renamed files will be shown.
+  #Confirm each file#        Plugin will confirm each file to be renamed.
+  #Confirm each replacement# Plugin will confirm each pattern match for each file.
+  #Preview rename results#   Allows ~previewing~@RenamePreview@ rename results before actual rename.
 @SelectedFileRenameDlg
 $ #Selected File Rename Dialog#
-With this dialog you can complicatedly rename selected files.
+With this dialog you can rename selected files.
 
-  #Containing text#       Specifies text to be found in file name.
-  #Regular expression#    If this option is set, above text will be treated as regular expression.
-  #Replace with#          Specifies text to replace one matched with above option.
-  #Repeating replace#     If this option is set, rename will not stop after first file rename
+  #Containing text#          Specifies text to be found in file name.
+  #Regular expression#       If this option is set, above text will be treated as regular expression.
+  #Replace with#             Specifies text to replace one matched with above option.
+  #Repeating replace#        If this option is set, rename will not stop after first file rename
 attempt, but try to apply pattern to new name again.
+  #Confirm each replacement# Plugin will confirm each pattern match for each file.
+  #Preserve selection#       File selection will be restored after the operation.
+  #Preview rename results#   Allows ~previewing~@RenamePreview@ rename results before actual rename.
+@RenamePreview
+$ #Rename results preview#
+Here you can preview results of the rename operation.
+
+  #Enter#    Perform renaming.
+  #Esc#      Cancel renaming.
+  #Insert#   Immediately rename selected file pair.
+  #Delete#   Remove selected file pair from rename.
+
 @Renumber
 $ #Renumber files#
 Most useful for renaming audio tracks in their order. You can use it in two ways: either

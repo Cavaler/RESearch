@@ -242,7 +242,7 @@ void RenamePreview(panelitem_vector &PanelItems) {
 			arrItems.push_back(Item.first + _T(" => ") + Item.second);
 		}
 
-		nResult = ChooseMenu(arrItems, GetMsg(MRenamePreview), _T("Del, Enter, Esc"), _T("RenamePreview"), nResult, FMENU_WRAPMODE,
+		nResult = ChooseMenu(arrItems, GetMsg(MRenamePreview), _T("Ins, Del, Enter, Esc"), _T("RenamePreview"), nResult, FMENU_WRAPMODE,
 			BreakKeys, &nBreakKey);
 
 		switch (nBreakKey) {
