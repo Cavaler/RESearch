@@ -241,7 +241,7 @@ int CPresetCollection::ShowMenu(bool bExecute, int nDefaultID) {
 			break;
 			  }
 		case 1:
-			if (nResult < (int)size()) {
+			if ((nResult >= 0) && (nResult < (int)size())) {
 				const TCHAR *Lines[]={_T("Delete"), GetMsg(MDeletePresetQuery),
 					at(nResult)->Name().c_str(), GetMsg(MOk), GetMsg(MCancel)};
 				if (StartupInfo.Message(StartupInfo.ModuleNumber, FMSG_WARNING, _T("DeletePreset"), Lines, 5, 2)==0) {
@@ -252,7 +252,7 @@ int CPresetCollection::ShowMenu(bool bExecute, int nDefaultID) {
 			}
 			break;
 		case 2:
-			if (nResult < (int)size()) {
+			if ((nResult >= 0) && (nResult < (int)size())) {
 				if (EditPreset(at(nResult))) Save();
 			}
 			break;
@@ -463,7 +463,7 @@ void CBatchAction::EditItems() {
 			}
 			break;
 		case 3:
-			if (nResult < (int)size()) {
+			if ((nResult >= 0) && (nResult < (int)size())) {
 				erase(begin() + nResult);
 			}
 			break;
