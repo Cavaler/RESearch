@@ -109,9 +109,10 @@ BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const tstring &Text
 
 	*Pattern=pcre_compile(Text.c_str(),iFlags,&ErrPtr,&ErrOffset,pTables);
 	if (!(*Pattern)) {
-		tstring ErrPos(Text.length(),' ');
-		const TCHAR *Lines[]={GetMsg(MRegExpError),ErrPtr,_T("\x01"),Text.c_str(),ErrPos.c_str(),GetMsg(MOk)};
+		tstring ErrPos(ErrOffset >= Text.length() ? ErrOffset+1 : Text.length(), ' ');
 		ErrPos[ErrOffset]='^';
+
+		const TCHAR *Lines[]={GetMsg(MRegExpError),ErrPtr,_T("\x01"),Text.c_str(),ErrPos.c_str(),GetMsg(MOk)};
 		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("RegExpError"),Lines,6,1);
 		return FALSE;
 	} else {
