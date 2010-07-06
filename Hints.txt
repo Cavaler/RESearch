@@ -1,25 +1,27 @@
 Some non-obvious aspects of RESearch usage are explained here.
 
 - Literals like '\n' DO NOT work in plain text search! Either use regexp, or enter needed
-symbol directly using Ctrl-Q.
+  symbol directly using Ctrl-Q.
 
 - '\n' and others do work in replace string even with plain-text search.
 
 - Single-line search in both editor and panels, both regexp and plaintext, is done
-by extracting lines from text sequentially, WITHOUT newline symbols - therefore to search for
-the word 'end' at the end of string, use regexp 'end$', not 'end\n'!
+  by extracting lines from text sequentially, WITHOUT newline symbols - therefore to search for
+  the word 'end' at the end of string, use regexp 'end$', not 'end\n'!
 
 - Several-line search in editor is done by internally concatenating lines with a single '\n',
-so it is to be used instead of '\r\n' always.
+  so it is to be used instead of '\r\n' always, UNLESS you turn on "[X] Use real EOLs in editor".
 
 - In Several/Multi-Line RegExp search from panels actual newline symbols are to be used,
-so '\r?\n' is good for most cases.
+  so '\r?\n' is good for most cases.
 
-- If '[ ] Dot matches newline also' is not set, you can use '\C' as 'Any symbol including newline'
+- If '[ ] Dot matches newline also' is not set, you can use '\C' as 'Absolutely any symbol,
+  including newline'
 
-- If zero-width string is found, characters surrounding it are highlighted
+- If zero-width string is found, characters surrounding it are highlighted.
 
-- If If UTF-16LE/BE or UTF-8 byte-order mark (BOM) is found in Search/Grep, no other encodings are tried!
+- If If UTF-16LE/BE or UTF-8 byte-order mark (BOM) is found in Search/Grep,
+  no other encodings are tried!
 
 - Without [ ] Use all character tables, search/grep from panel is performed:
   1. if BOM is found, that encoding is used
