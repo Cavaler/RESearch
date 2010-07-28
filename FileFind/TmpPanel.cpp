@@ -37,7 +37,8 @@ CTemporaryPanel::CTemporaryPanel(panelitem_vector &PanelItems,TCHAR *CalledFolde
 : m_arrItems(PanelItems),m_strBaseFolder(CalledFolder),m_bActive(true)
 {
 	for (size_t I=0; I<m_arrItems.size(); I++) {
-		m_arrItems[I].UserData = (DWORD)new TempUserData();
+		if (m_arrItems[I].UserData == 0)
+			m_arrItems[I].UserData = (DWORD)new TempUserData();
 	}
 
 	if (LastTempPanel && !LastTempPanel->m_bActive) delete LastTempPanel;
@@ -133,6 +134,8 @@ int CTemporaryPanel::ProcessKey(int Key,unsigned int ControlState) {
 
 			if ((Item.FindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0) {
 				TempUserData *pData = (TempUserData *)Item.UserData;
+				if (!pData || (pData->FoundLine < 0)) return FALSE;
+
 				StartupInfo.Editor(FarFileName(Item.FindData), NULL, 0, 0, -1, -1, EF_NONMODAL|EF_IMMEDIATERETURN|EF_ENABLE_F6,
 					pData ? pData->FoundLine : 0, pData ? pData->FoundColumn : 1
 #ifdef UNICODE
@@ -156,6 +159,8 @@ int CTemporaryPanel::ProcessKey(int Key,unsigned int ControlState) {
 
 			if ((Item.FindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0) {
 				TempUserData *pData = (TempUserData *)Item.UserData;
+				if (!pData || (pData->FoundLine < 0)) return FALSE;
+
 				StartupInfo.Editor(FarFileName(Item.FindData), NULL, 0, 0, -1, -1, EF_NONMODAL|EF_IMMEDIATERETURN|EF_ENABLE_F6,
 					pData ? pData->FoundLine+1 : 0, pData ? pData->FoundColumn : 1
 #ifdef UNICODE
