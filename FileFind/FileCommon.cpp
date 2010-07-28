@@ -213,7 +213,11 @@ void AddFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 	Item.Owner = NULL;
 	Item.CustomColumnData = NULL;
 	Item.CustomColumnNumber = 0;
-	Item.UserData = (DWORD)new TempUserData(g_nFoundLine, g_nFoundColumn);
+
+	if (!FText.empty())
+		Item.UserData = (DWORD)new TempUserData(g_nFoundLine, g_nFoundColumn);
+	else
+		Item.UserData = (DWORD)new TempUserData(-1, -1);
 
 	PanelItems.push_back(Item);
 }
