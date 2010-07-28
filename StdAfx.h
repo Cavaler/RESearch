@@ -38,10 +38,5 @@ public:
 #include <deque>
 using namespace std;
 
-//#undef _FAR_NO_NAMELESS_UNIONS
-//#include <FAR.h>
-//#include <FarDlg.h>
-#include <FarKeys.hpp>
-
 #include <Pavel.h>
 #include <CRegExp.h>
