@@ -78,11 +78,12 @@ BOOL SearchInLine(const TCHAR *Line,int Length,int Start,int End,int *MatchStart
 		return SearchIn(Line,Start,Len,MatchStart,MatchLength,NeedMatch);
 	} else {
 		if (EdInfo.AnsiMode || (EdInfo.TableNum != -1)) {
-			char *OEMLine=(char *)malloc(Length);
-			memmove(OEMLine,Line,Length);
-			EditorToOEM(OEMLine,Length);
-			int Result=SearchIn(OEMLine,Start,Len,MatchStart,MatchLength,NeedMatch);
-			free(OEMLine);
+			//	static - to allow REParam somewhere inside to store just a pointer, not a copy
+			//	NOT using a constructor!
+			static string OEMLine;
+			OEMLine = string(Line, Length);
+			EditorToOEM(OEMLine);
+			int Result=SearchIn(OEMLine.c_str(),Start,Len,MatchStart,MatchLength,NeedMatch);
 			return Result;
 		} else {
 			return SearchIn(Line, Start, Len, MatchStart, MatchLength, NeedMatch);
