@@ -433,11 +433,50 @@ BOOL EditorReplaceAgain() {
 	return FALSE;
 }
 
+//////////////////////////////////////////////////////////////////////////
+
+void UpdateERDialog(HANDLE hDlg, bool bCheckSel = true) {
+	if (EdInfo.BlockType == BTYPE_COLUMN) {
+		if (bCheckSel) {
+			if (IsDlgItemChecked(hDlg, 15)) {		//	EInSelection
+				CheckDlgItem(hDlg, 9, false);
+				EnableDlgItem(hDlg, 9, false);
+			} else {
+				EnableDlgItem(hDlg, 9, true);
+			}
+		} else {
+			if (IsDlgItemChecked(hDlg, 9)) {		//	ESeveralLines
+				CheckDlgItem(hDlg, 15, false);
+				EnableDlgItem(hDlg, 15, false);
+			} else {
+				EnableDlgItem(hDlg, 15, true);
+			}
+		}
+	}
+}
+
+long WINAPI EditorReplaceDialogProc(HANDLE hDlg, int nMsg, int nParam1, long lParam2) {
+	switch (nMsg) {
+	case DN_INITDIALOG:
+		UpdateERDialog(hDlg);
+		break;
+	case DN_BTNCLICK:
+		if (nParam1 == 9)
+			UpdateERDialog(hDlg, false);
+		else if (nParam1 == 15)
+			UpdateERDialog(hDlg, true);
+		break;
+	}
+	return StartupInfo.DefDlgProc(hDlg, nMsg, nParam1, lParam2);
+}
+
 BOOL EditorReplace() {
 	RefreshEditorInfo();
-	EInSelection = EAutoFindInSelection && (EdInfo.BlockType == BTYPE_STREAM);
+	EInSelection = EAutoFindInSelection && (EdInfo.BlockType != BTYPE_NONE);
 
 	CFarDialog Dialog(76, 17, _T("ReplaceDlg"));
+	Dialog.SetWindowProc(EditorReplaceDialogProc, 0);
+
 	Dialog.AddFrame(MREReplace);
 	Dialog.Add(new CFarTextItem(5, 2, 0, MSearchFor));
 	Dialog.Add(new CFarEditItem(5, 3, 65, DIF_HISTORY|DIF_VAREDIT,_T("SearchText"), SearchText));
@@ -458,7 +497,7 @@ BOOL EditorReplace() {
 	Dialog.Add(new CFarCheckBoxItem(30, 8, 0, _T(""), &EUTF8));
 	Dialog.Add(new CFarButtonItem(34, 8, 0, 0, MUTF8));
 	Dialog.Add(new CFarCheckBoxItem(5, 9, 0, MReverseSearch, &EReverse));
-	Dialog.Add(new CFarCheckBoxItem(30, 9, (EdInfo.BlockType != BTYPE_STREAM) ? 0 : DIF_DISABLE, MInSelection, &EInSelection));
+	Dialog.Add(new CFarCheckBoxItem(30, 9, (EdInfo.BlockType != BTYPE_NONE) ? 0 : DIF_DISABLE, MInSelection, &EInSelection));
 	Dialog.Add(new CFarCheckBoxItem(5, 10, 0, MRemoveEmpty, &ERRemoveEmpty));
 	Dialog.Add(new CFarCheckBoxItem(30, 10, 0, MRemoveNoMatch, &ERRemoveNoMatch));
 	Dialog.Add(new CFarCheckBoxItem(5, 11, 0, MEvaluateAsScript, &EREvaluate));

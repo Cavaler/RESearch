@@ -135,11 +135,50 @@ BOOL EditorSearchAgain() {
 	return FALSE;
 }
 
+//////////////////////////////////////////////////////////////////////////
+
+void UpdateESDialog(HANDLE hDlg, bool bCheckSel = true) {
+	if (EdInfo.BlockType == BTYPE_COLUMN) {
+		if (bCheckSel) {
+			if (IsDlgItemChecked(hDlg, 12)) {		//	EInSelection
+				CheckDlgItem(hDlg, 6, false);
+				EnableDlgItem(hDlg, 6, false);
+			} else {
+				EnableDlgItem(hDlg, 6, true);
+			}
+		} else {
+			if (IsDlgItemChecked(hDlg, 6)) {		//	ESeveralLines
+				CheckDlgItem(hDlg, 12, false);
+				EnableDlgItem(hDlg, 12, false);
+			} else {
+				EnableDlgItem(hDlg, 12, true);
+			}
+		}
+	}
+}
+
+long WINAPI EditorSearchDialogProc(HANDLE hDlg, int nMsg, int nParam1, long lParam2) {
+	switch (nMsg) {
+	case DN_INITDIALOG:
+		UpdateESDialog(hDlg);
+		break;
+	case DN_BTNCLICK:
+		if (nParam1 == 6)
+			UpdateESDialog(hDlg, false);
+		else if (nParam1 == 12)
+			UpdateESDialog(hDlg, true);
+		break;
+	}
+	return StartupInfo.DefDlgProc(hDlg, nMsg, nParam1, lParam2);
+}
+
 BOOL EditorSearch() {
 	RefreshEditorInfo();
-	EInSelection = EAutoFindInSelection && (EdInfo.BlockType == BTYPE_STREAM);
+	EInSelection = EAutoFindInSelection && (EdInfo.BlockType != BTYPE_NONE);
 
 	CFarDialog Dialog(76,13,_T("SearchDlg"));
+	Dialog.SetWindowProc(EditorSearchDialogProc, 0);
+
 	Dialog.AddFrame(MRESearch);
 	Dialog.Add(new CFarTextItem(5,2,0,MSearchFor));
 	Dialog.Add(new CFarEditItem(5,3,65,DIF_HISTORY|DIF_VAREDIT,_T("SearchText"),SearchText));
@@ -154,7 +193,7 @@ BOOL EditorSearch() {
 	Dialog.Add(new CFarCheckBoxItem(30,6,0,_T(""),&EUTF8));
 	Dialog.Add(new CFarButtonItem(34,6,0,0,MUTF8));
 	Dialog.Add(new CFarCheckBoxItem(5,7,0,MReverseSearch,&EReverse));
-	Dialog.Add(new CFarCheckBoxItem(30,7,(EdInfo.BlockType == BTYPE_STREAM) ? 0 : DIF_DISABLE, MInSelection, &EInSelection));
+	Dialog.Add(new CFarCheckBoxItem(30,7,(EdInfo.BlockType != BTYPE_NONE) ? 0 : DIF_DISABLE, MInSelection, &EInSelection));
 	Dialog.AddButtons(MOk, MShowAll); Dialog.AddButton(MCancel);
 	Dialog.Add(new CFarButtonItem(60,5,0,0,MBtnPresets));
 

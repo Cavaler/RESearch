@@ -17,7 +17,7 @@ Planned:
 
 Version 7.15 (26.10.2010)
 	- [X] Several lines cleared in Viewer
-	- [X] In selection disabled with vertical blcoks
+	- With vertical blocks: [X] In selection and [X] Several lines are mutually exclusive
     - Editor Search preset starts form current position
     - Current line display in editor updated
 Unicode version:
