@@ -431,7 +431,7 @@ BOOL EditorReplaceAgain() {
 
 BOOL EditorReplace() {
 	RefreshEditorInfo();
-	EInSelection = EAutoFindInSelection && (EdInfo.BlockType != BTYPE_NONE);
+	EInSelection = EAutoFindInSelection && (EdInfo.BlockType == BTYPE_STREAM);
 
 	CFarDialog Dialog(76, 17, _T("ReplaceDlg"));
 	Dialog.AddFrame(MREReplace);
@@ -454,7 +454,7 @@ BOOL EditorReplace() {
 	Dialog.Add(new CFarCheckBoxItem(30, 8, 0, _T(""), &EUTF8));
 	Dialog.Add(new CFarButtonItem(34, 8, 0, 0, MUTF8));
 	Dialog.Add(new CFarCheckBoxItem(5, 9, 0, MReverseSearch, &EReverse));
-	Dialog.Add(new CFarCheckBoxItem(30, 9, (EdInfo.BlockType!=BTYPE_NONE) ? 0 : DIF_DISABLE, MInSelection, &EInSelection));
+	Dialog.Add(new CFarCheckBoxItem(30, 9, (EdInfo.BlockType != BTYPE_STREAM) ? 0 : DIF_DISABLE, MInSelection, &EInSelection));
 	Dialog.Add(new CFarCheckBoxItem(5, 10, 0, MRemoveEmpty, &ERRemoveEmpty));
 	Dialog.Add(new CFarCheckBoxItem(30, 10, 0, MRemoveNoMatch, &ERRemoveNoMatch));
 	Dialog.Add(new CFarCheckBoxItem(5, 11, 0, MEvaluateAsScript, &EREvaluate));
