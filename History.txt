@@ -6,7 +6,28 @@ Regular Expression Search and Replace
  * Minor change
 
 Planned:
+	- Search in share-opened files
 	* dialogprocs for disabling unneeded elements
+    + Allow [X] Remove empty with [X] Several lines
+
+    * Custom dialog for search progress, only increase width
+
+    - Restoring position when opening for for view/edit from TmpPanel
+      now works only partially
+
+Version 7.15 (26.10.2010)
+	- [X] Several lines cleared in Viewer
+	- [X] In selection disabled with vertical blcoks
+    - Editor Search preset starts form current position
+    - Current line display in editor updated
+Unicode version:
+    * Replace/filter undoable as single operation
+    - Fixed running Editor from Replace dialog
+
+Version 7.14 (28.07.2010)
+	- Fixed crash when removing files from TmpPanel in Unicode version
+	- Fixed crash with displaying errors in RegExp beyond last symbol
+	- Fixed opening file for viewing from TmpPanel in Unicode version
 
 Version 7.13 (06.05.2010)
 	* "Preview rename results" in Rename and Rename Selected
