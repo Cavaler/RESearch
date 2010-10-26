@@ -7,6 +7,8 @@ BOOL EditorFilterAgain() {
 	EditorSetPosition Position={0,-1,-1,-1,-1,-1};
 	EditorGetString String={-1};
 
+	EditorStartUndo();
+
 	if (EReverse) {
 		for (Position.CurLine=EdInfo.CurLine; Position.CurLine>=0; Position.CurLine--) {
 			EctlSetPosition(&Position);
@@ -30,6 +32,8 @@ BOOL EditorFilterAgain() {
 			}
 		}
 	}
+
+	EditorEndUndo();
 
 	return TRUE;
 }

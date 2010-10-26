@@ -9,6 +9,8 @@ BOOL EditorTransliterateAgain() {
 	EditorGetString String = {-1};
 	EditorSetString SetString = {-1};
 
+	EditorStartUndo();
+
 	for (int nLine = 0; nLine < EdInfo.TotalLines; nLine++) {
 		Position.CurLine = nLine;
 		EctlSetPosition(&Position);
@@ -37,6 +39,8 @@ BOOL EditorTransliterateAgain() {
 	}
 
 	RestorePosition(StartEdInfo);
+
+	EditorEndUndo();
 
 	return TRUE;
 }

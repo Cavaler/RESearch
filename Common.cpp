@@ -519,6 +519,24 @@ void QuoteReplaceString(tstring &strText) {
 	}
 }
 
+void EditorStartUndo() {
+#ifdef UNICODE
+	EditorUndoRedo UR;
+	UR.Command = EUR_BEGIN;
+
+	StartupInfo.EditorControl(ECTL_UNDOREDO, &UR);
+#endif
+}
+
+void EditorEndUndo() {
+#ifdef UNICODE
+	EditorUndoRedo UR;
+	UR.Command = EUR_END;
+
+	StartupInfo.EditorControl(ECTL_UNDOREDO, &UR);
+#endif
+}
+
 void ShowErrorMsg(const TCHAR *sz1, const TCHAR *sz2, const TCHAR *szHelp) {
 	const TCHAR *Lines[]={GetMsg(MREReplace),sz1,sz2,GetMsg(MOk)};
 	StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,szHelp,Lines,4,1);

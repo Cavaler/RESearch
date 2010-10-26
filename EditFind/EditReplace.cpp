@@ -381,6 +381,8 @@ BOOL EditorReplaceAgain() {
 	PatchEditorInfo(EdInfo);
 	EctlForceSetPosition(NULL);
 
+	EditorStartUndo();
+
 	StartEdInfo = EdInfo;
 
 #ifndef UNICODE
@@ -423,6 +425,8 @@ BOOL EditorReplaceAgain() {
 		TopLine(LastReplaceLine, EdInfo.WindowSizeY, EdInfo.TotalLines,StartEdInfo.TopScreenLine),
 		LeftColumn(LastReplacePos, EdInfo.WindowSizeX),-1};
 	EctlForceSetPosition(&Position);
+
+	EditorEndUndo();
 
 	if (NoAsking||g_bInterrupted) return TRUE;
 	ShowErrorMsg(GetMsg(MCannotFind), EText.c_str(), _T("ECannotFind"));

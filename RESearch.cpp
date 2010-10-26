@@ -10,7 +10,9 @@ void WINAPI FAR_EXPORT(GetPluginInfo)(PluginInfo *Info) {
 	Info->StructSize=sizeof(PluginInfo);
 	Info->Flags=PF_EDITOR|PF_VIEWER|PF_FULLCMDLINE;
 	Info->DiskMenuStrings=NULL;
+#ifndef UNICODE
 	Info->DiskMenuNumbers=NULL;
+#endif
 	Info->DiskMenuStringsNumber=0;
 	Info->PluginMenuStrings=MenuStrings;
 	Info->PluginMenuStringsNumber=1;

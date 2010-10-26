@@ -132,6 +132,9 @@ int BMHSearchA(const char *Buffer,int BufferLength,const char *String,int String
 void QuoteRegExpString(tstring &strText);
 void QuoteReplaceString(tstring &strText);
 
+void EditorStartUndo();
+void EditorEndUndo();
+
 void StartREThread();
 void StopREThread();
 int do_pcre_exec(const pcre *external_re, const pcre_extra *extra_data,
