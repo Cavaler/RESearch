@@ -469,7 +469,7 @@ BOOL EditorReplace() {
 	Dialog.Add(new CFarButtonItem(0, 13, DIF_CENTERGROUP, FALSE, MAll));
 	Dialog.Add(new CFarButtonItem(0, 13, DIF_CENTERGROUP, FALSE, MCancel));
 	Dialog.Add(new CFarButtonItem(60, 7, 0, FALSE, MBtnPresets));
-	Dialog.Add(new CFarButtonItem(59, 8, 0, FALSE, MBtnREBuilder));
+	Dialog.Add(new CFarButtonItem(58, 8, 0, FALSE, MBtnREBuilder));
 
 	SearchText = PickupText();
 	if (SearchText.empty()) SearchText = EText;
