@@ -723,8 +723,14 @@ void RunExternalEditor(tstring &strText) {
 		GetTempFileName(szBuffer, _T("re"), 0, szName);
 
 		CFileMapping mapFile;
+#ifdef UNICODE
+		mapFile.Open(szName, true, strText.length()*2+2);
+		memmove((BYTE *)mapFile,   "\xFF\xFE", 2);
+		memmove(((BYTE *)mapFile)+2, strText.data(), strText.length()*2);
+#else
 		mapFile.Open(szName, true, strText.length());
 		memmove((BYTE *)mapFile, strText.data(), strText.length());
+#endif
 		mapFile.Close();
 
 #ifdef UNICODE
@@ -734,7 +740,11 @@ void RunExternalEditor(tstring &strText) {
 #endif
 
 		mapFile.Open(szName);
+#ifdef UNICODE
+		strText = tstring((LPCWSTR)mapFile+1, mapFile.Size()/2-1);
+#else
 		strText = tstring(mapFile, mapFile.Size());
+#endif
 		mapFile.Close();
 		DeleteFile(szName);
 	}
