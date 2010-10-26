@@ -455,7 +455,7 @@ void UpdateERDialog(HANDLE hDlg, bool bCheckSel = true) {
 	}
 }
 
-long WINAPI EditorReplaceDialogProc(HANDLE hDlg, int nMsg, int nParam1, long lParam2) {
+LONG_PTR WINAPI EditorReplaceDialogProc(HANDLE hDlg, int nMsg, int nParam1, LONG_PTR lParam2) {
 	switch (nMsg) {
 	case DN_INITDIALOG:
 		UpdateERDialog(hDlg);

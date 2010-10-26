@@ -8,21 +8,21 @@ Regular Expression Search and Replace
 Planned:
 	- Search in share-opened files
 	* dialogprocs for disabling unneeded elements
-    + Allow [X] Remove empty with [X] Several lines
+	+ Allow [X] Remove empty with [X] Several lines
 
-    * Custom dialog for search progress, only increase width
+	* Custom dialog for search progress, only increase width
 
-    - Restoring position when opening for for view/edit from TmpPanel
-      now works only partially
+	- Restoring position when opening for for view/edit from TmpPanel
+	  now works only partially
 
 Version 7.15 (26.10.2010)
 	- [X] Several lines cleared in Viewer
 	- With vertical blocks: [X] In selection and [X] Several lines are mutually exclusive
-    - Editor Search preset starts form current position
-    - Current line display in editor updated
+	- Editor Search preset starts form current position
+	- Current line display in editor updated
 Unicode version:
-    * Replace/filter undoable as single operation
-    - Fixed running Editor from Replace dialog
+	* Replace/filter undoable as single operation
+	- Fixed running Editor from Replace dialog
 
 Version 7.14 (28.07.2010)
 	- Fixed crash when removing files from TmpPanel in Unicode version
