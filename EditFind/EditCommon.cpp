@@ -416,11 +416,13 @@ void ShowCurrentLine(int CurLine,int TotalLines,int TotalColumns) {
 	if ((CurLine<LastLine) || (CurLine>=LastLine+1000) || (GetTickCount() > LastTickCount+1000)) {
 		int Position=(ClockPresent)?19:25;
 		if (TotalColumns>80) Position+=(TotalColumns-81);
-		Position+=23;
-
-		TCHAR LineStr[20];
-		_stprintf_s(LineStr,20,_T("%d/%d"),CurLine,TotalLines);
-		StartupInfo.Text(Position+12-_tcslen(LineStr),0,0x30,LineStr);
+#ifdef UNICODE
+		Position+=17;
+#else
+		Position+=22;
+#endif
+		tstring strText = FormatStr(_T("%13s"), FormatStr(_T("%d/%d"), CurLine, TotalLines).c_str());
+		StartupInfo.Text(Position, 0, 0x30, strText.c_str());
 		StartupInfo.Text(0,0,0x30,NULL);
 		LastLine=CurLine;
 		LastTickCount=GetTickCount();
