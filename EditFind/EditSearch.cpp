@@ -194,7 +194,9 @@ BOOL EditorSearch() {
 OperationResult EditorSearchExecutor() {
 	if (!EPreparePattern(SearchText)) return OR_FAILED;
 	EText = SearchText;
-	EditorSeekToBeginEnd();
+
+//	Search from current position is more handy
+//	EditorSeekToBeginEnd();
 
 	return (EListAllFromPreset) ?
 		EditorListAllAgain() ? OR_OK : OR_CANCEL :
