@@ -180,6 +180,9 @@ BOOL ViewerSearch() {
 	Dialog.Add(new CFarButtonItem(60,5,0,0,MBtnPresets));
 
 	SearchText = EText;
+	ESeveralLine = FALSE;
+	EReverse = FALSE;
+
 	int ExitCode;
 	do {
 		switch (ExitCode=Dialog.Display(4,-3,3,-1,-5)) {
