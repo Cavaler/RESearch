@@ -211,18 +211,18 @@ int CPresetCollection::ShowMenu(bool bExecute, int nDefaultID) {
 	int piBreakKeys[]={VK_INSERT, VK_DELETE, VK_F4, 0};
 	vector<tstring> arrItems;
 
+	int nResult = 0;
 	do {
-		int nDefault = 0;
 		arrItems.resize(size());
 		for (size_t nPreset = 0; nPreset < size(); nPreset++) {
 			CPreset *pPreset = at(nPreset);
 			arrItems[nPreset] = pPreset->Name();
-			if (pPreset->m_nID == nDefaultID) nDefault = nPreset;
+			if (pPreset->m_nID == nDefaultID) nResult = nPreset;
 		}
 
 		int nBreakKey;
 		tstring strTitle = FormatStr(_T("%s presets"), Name());
-		int nResult = ChooseMenu(arrItems, strTitle.c_str(), _T("Ins,Del,F4"), _T("Presets"), nDefault,
+		nResult = ChooseMenu(arrItems, strTitle.c_str(), _T("Ins,Del,F4"), _T("Presets"), nResult,
 			FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT, piBreakKeys, &nBreakKey);
 
 		switch (nBreakKey) {
@@ -423,8 +423,8 @@ bool CBatchAction::Edit() {
 void CBatchAction::EditItems() {
 	int piBreakKeys[]={VK_INSERT, (PKF_CONTROL<<16)|VK_UP, (PKF_CONTROL<<16)|VK_DOWN, VK_DELETE, 0};
 	vector<tstring> arrItems;
-	int nResult = 0;
 
+	int nResult = 0;
 	do {
 		arrItems.resize(size());
 		for (size_t nPreset = 0; nPreset < size(); nPreset++) {
@@ -510,13 +510,14 @@ void CBatchActionCollection::ShowMenu() {
 	int piBreakKeys[]={VK_INSERT, VK_DELETE, VK_F4, 0};
 	vector<tstring> arrItems;
 
+	int nResult = 0;
 	do {
 		arrItems.resize(size());
 		for (size_t nBatch = 0; nBatch < size(); nBatch++)
 			arrItems[nBatch] = at(nBatch)->m_strName;
 
 		int nBreakKey;
-		int nResult = ChooseMenu(arrItems, GetMsg(m_Type.m_nTitle), _T("Ins,Del,F4"), _T("Batches"), 0,
+		nResult = ChooseMenu(arrItems, GetMsg(m_Type.m_nTitle), _T("Ins,Del,F4"), _T("Batches"), nResult,
 			FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT, piBreakKeys, &nBreakKey);
 
 		switch (nBreakKey) {
