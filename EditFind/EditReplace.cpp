@@ -150,8 +150,6 @@ eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &
 		LeftColumn((EReverse)?StartPos:EndPos, EdInfo.WindowSizeX),-1};
 	EditorSelect Select = {BTYPE_STREAM, FirstLine, StartPos, EndPos-StartPos, LastLine-FirstLine + 1};
 
-	EctlSetPosition(&Position);
-
 	int Result;
 	if (!NoAsking) {
 		int Width = 0;
@@ -200,6 +198,8 @@ eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &
 			H = (L-9)/2;
 		}
 
+		EctlForceSetPosition(&Position);
+
 		//	Moved here - so that it is skipped upon IgnoreIdentReplace
 		if ((Select.BlockWidth == 0) && (Select.BlockHeight == 1)) {
 			Select.BlockWidth++;
@@ -223,6 +223,7 @@ eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &
 		Result = Dialog.Display(4,-4,-3,-2,-1);
 
 	} else {	//	!NoAsking
+		EctlSetPosition(&Position);
 		Result = 0;
 	}
 
