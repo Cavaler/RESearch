@@ -36,7 +36,7 @@ public:
 	OperationResult ExecutePreset();
 	virtual void Apply();
 	void FillMenuItem(CFarMenuItem &Item);
-	void Save(HKEY hKey);
+	void Save(HKEY hKey, int nIndex);
 
 	tstring &Name() {return m_mapStrings[""];}
 

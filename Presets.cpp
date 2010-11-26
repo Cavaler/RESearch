@@ -82,8 +82,8 @@ CPreset::CPreset(CParameterSet &ParamSet, const tstring &strName, HKEY hKey)
 		m_nID = 0;
 		return;
 	}
-	m_nID = _ttoi(strName.c_str());
 
+	QueryRegIntValue(hOwnKey, _T("ID"), &m_nID, _ttoi(strName.c_str()));
 	QueryRegBoolValue(hOwnKey, _T("AddToMenu"), &m_bAddToMenu, false);
 
 	DWORD dwIndex = 0;
@@ -140,8 +140,8 @@ void CPreset::FillMenuItem(CFarMenuItem &Item) {
 #endif
 }
 
-void CPreset::Save(HKEY hKey) {
-	CHKey hOwnKey = RegCreateSubkey(hKey, FormatStr(_T("%04d"), m_nID).c_str());
+void CPreset::Save(HKEY hKey, int nIndex) {
+	CHKey hOwnKey = RegCreateSubkey(hKey, FormatStr(_T("%04d"), nIndex).c_str());
 	if (!hOwnKey) return;
 
 	map<string, tstring>::iterator it1 = m_mapStrings.begin();
@@ -156,6 +156,7 @@ void CPreset::Save(HKEY hKey) {
 		it2++;
 	}
 
+	SetRegIntValue(hOwnKey, _T("ID"), m_nID);
 	SetRegBoolValue(hOwnKey, _T("AddToMenu"), m_bAddToMenu);
 }
 
@@ -204,11 +205,11 @@ void CPresetCollection::Save() {
 	} while (TRUE);
 
 	for (size_t nPreset=0; nPreset<size(); nPreset++)
-		at(nPreset)->Save(hKey);
+		at(nPreset)->Save(hKey, nPreset);
 }
 
 int CPresetCollection::ShowMenu(bool bExecute, int nDefaultID) {
-	int piBreakKeys[]={VK_INSERT, VK_DELETE, VK_F4, 0};
+	int piBreakKeys[]={VK_INSERT, VK_DELETE, VK_F4, (PKF_CONTROL<<16)|VK_UP, (PKF_CONTROL<<16)|VK_DOWN, 0};
 	vector<tstring> arrItems;
 
 	int nResult = 0;
@@ -222,14 +223,14 @@ int CPresetCollection::ShowMenu(bool bExecute, int nDefaultID) {
 
 		int nBreakKey;
 		tstring strTitle = FormatStr(_T("%s presets"), Name());
-		nResult = ChooseMenu(arrItems, strTitle.c_str(), _T("Ins,Del,F4"), _T("Presets"), nResult,
+		nResult = ChooseMenu(arrItems, strTitle.c_str(), _T("Ins,Del,F4,Ctrl-\x18\x19"), _T("Presets"), nResult,
 			FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT, piBreakKeys, &nBreakKey);
 
 		switch (nBreakKey) {
 		case -1:
 			if (bExecute && (nResult >= 0) && (nResult < (int)size())) at(nResult)->Apply();
 			return nResult;
-		case 0:{
+		case 0:{		//	VK_INSERT
 			CPreset *pPreset = NewPreset();
 			if (EditPreset(pPreset)) {
 				pPreset->m_nID = FindUnusedID();
@@ -240,7 +241,7 @@ int CPresetCollection::ShowMenu(bool bExecute, int nDefaultID) {
 			}
 			break;
 			  }
-		case 1:
+		case 1:			//	VK_DELETE
 			if ((nResult >= 0) && (nResult < (int)size())) {
 				const TCHAR *Lines[]={_T("Delete"), GetMsg(MDeletePresetQuery),
 					at(nResult)->Name().c_str(), GetMsg(MOk), GetMsg(MCancel)};
@@ -251,9 +252,27 @@ int CPresetCollection::ShowMenu(bool bExecute, int nDefaultID) {
 				}
 			}
 			break;
-		case 2:
+		case 2:			//	VK_F4
 			if ((nResult >= 0) && (nResult < (int)size())) {
 				if (EditPreset(at(nResult))) Save();
+			}
+			break;
+		case 3:			//	VK_CTRL_UP
+			if (nResult > 0) {
+				CPreset *pPreset = at(nResult-1);
+				at(nResult-1) = at(nResult);
+				at(nResult) = pPreset;
+				Save();
+				nResult--;
+			}
+			break;
+		case 4:			//	VK_CTRL_DOWN
+			if (nResult < size()-1) {
+				CPreset *pPreset = at(nResult+1);
+				at(nResult+1) = at(nResult);
+				at(nResult) = pPreset;
+				Save();
+				nResult++;
 			}
 			break;
 		}
