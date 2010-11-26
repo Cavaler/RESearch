@@ -7,13 +7,19 @@ Regular Expression Search and Replace
 
 Planned:
 	- Search in share-opened files
-	* dialogprocs for disabling unneeded elements
 	+ Allow [X] Remove empty with [X] Several lines
 
 	* Custom dialog for search progress, only increase width
 
 	- Restoring position when opening for for view/edit from TmpPanel
 	  now works only partially
+
+Version 7.20 (26.11.2010)
+	! PCRE 8.10 - Official implementation of \W etc via Unicode properties
+	+ "Options | Panel | Automatic search in editor" starts search if file
+	  opened for editing from own Temporary Panel
+	* Presets and batches can be reordered
+	* Minor usability fixes
 
 Version 7.15 (26.10.2010)
 	- [X] Several lines cleared in Viewer
