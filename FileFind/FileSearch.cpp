@@ -97,7 +97,7 @@ BOOL FindPlainText(const char *Buffer,int Size) {
 
 //////////////////////////////////////////////////////////////////////////
 
-BOOL FindPattern(pcre *Pattern, pcre_extra *PatternExtra, const char *Buffer, int Size, eLikeUnicode nUni) {
+BOOL FindPattern(pcre *Pattern, pcre_extra *PatternExtra, const char *Buffer, int Size, eLikeUnicode nUni, bool bNeedColumn) {
 	if (Size == 0) return FALSE;
 
 	vector<TCHAR> arrData;
@@ -118,7 +118,7 @@ BOOL FindPattern(pcre *Pattern, pcre_extra *PatternExtra, const char *Buffer, in
 	int nResult = do_pcre_exec(Pattern, PatternExtra, Buffer, Size, 0, 0, &arrMatch[0], arrMatch.size());
 #endif
 	if (nResult >= 0) {
-		g_nFoundColumn = arrMatch[0]+1;
+		if (bNeedColumn) g_nFoundColumn = arrMatch[0]+1;
 		return TRUE;
 	}
 
@@ -171,7 +171,7 @@ BOOL FindRegExpWithEncoding(const char *Buffer, int Size, eLikeUnicode nUni) {
 	do {
 		Buffer=BufEnd;
 		SkipNoCRLF(BufEnd, &Size, nUni);
-		if (FindPattern(FPattern, FPatternExtra, Buffer, BufEnd-Buffer, nUni)) return TRUE;
+		if (FindPattern(FPattern, FPatternExtra, Buffer, BufEnd-Buffer, nUni, true)) return TRUE;
 		SkipCRLF(BufEnd, &Size, nUni);
 		g_nFoundLine++;
 	} while (Size > nRest);
@@ -188,7 +188,7 @@ BOOL FindSeveralLineRegExpWithEncoding(const char *Buffer, int Size, eLikeUnicod
 		LinesIn++;
 		if (LinesIn == SeveralLines) {
 			Len=BufEnd-Buffer;
-			if (FindPattern(FPattern, FPatternExtra, Buffer, Len, nUni)) return TRUE;
+			if (FindPattern(FPattern, FPatternExtra, Buffer, Len, nUni, false)) return TRUE;
 			SkipWholeLine(Buffer, &Len, nUni);
 			g_nFoundLine++;
 			LinesIn--;
@@ -197,7 +197,7 @@ BOOL FindSeveralLineRegExpWithEncoding(const char *Buffer, int Size, eLikeUnicod
 
 	Len=BufEnd-Buffer;
 	while (Len) {
-		if (FindPattern(FPattern, FPatternExtra, Buffer, Len, nUni)) return TRUE;
+		if (FindPattern(FPattern, FPatternExtra, Buffer, Len, nUni, false)) return TRUE;
 		SkipWholeLine(Buffer, &Len, nUni);
 		g_nFoundLine++;
 	}
@@ -205,7 +205,7 @@ BOOL FindSeveralLineRegExpWithEncoding(const char *Buffer, int Size, eLikeUnicod
 }
 
 BOOL FindMultiLineRegExpWithEncoding(const char *Buffer, int Size, eLikeUnicode nUni) {
-	return FindPattern(FPattern, FPatternExtra, Buffer, Size, nUni);
+	return FindPattern(FPattern, FPatternExtra, Buffer, Size, nUni, false);
 }
 
 BOOL FindExamineEncoding(const char *Buffer, int Size, BOOL (*Searcher)(const char *, int, eLikeUnicode)) {
