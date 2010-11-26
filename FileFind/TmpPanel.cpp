@@ -167,6 +167,12 @@ int CTemporaryPanel::ProcessKey(int Key,unsigned int ControlState) {
 					, CP_AUTODETECT
 #endif
 					);
+
+				if (FSEditSrchAfterFile) {
+					EditorSearchAgain();
+					StartupInfo.EditorControl(ECTL_REDRAW, NULL);
+				}
+
 				return TRUE;
 			}
 		}

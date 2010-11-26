@@ -166,6 +166,7 @@ MNever				"N&ever"										"Не заменять"
 MAsk				"A&sk"											"Спросить"
 MAlways				"&Always"										"&Всегда"
 MSkipSystemFolders	"Skip preconfig&ured system folders:"	"Пропускать заданные системные каталоги:"
+MEditSrchAfterFile	"Au&tomatic search in editor"			"Автомати&ческий поиск в редакторе"
 
 MRenumberSettings	"Renumbering settings"				"Перенумерование"
 MStripFromBeginning	"RegExp to &strip from beginning:"	"RegExp, &убираемый с начала:"

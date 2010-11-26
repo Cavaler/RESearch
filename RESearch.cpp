@@ -812,9 +812,9 @@ void ConfigureCommon() {
 
 void ConfigureFile() {
 #ifdef UNICODE
-	CFarDialog Dialog(70, 19, _T("FileConfig"));
+	CFarDialog Dialog(70, 21, _T("FileConfig"));
 #else
-	CFarDialog Dialog(70, 16, _T("FileConfig"));
+	CFarDialog Dialog(70, 18, _T("FileConfig"));
 #endif
 	Dialog.AddFrame(MFileSearchSettings);
 
@@ -828,15 +828,16 @@ void ConfigureFile() {
 	Dialog.Add(new CFarRadioButtonItem(37,5,0,MAsk,(int *)&FRReplaceReadonly,RR_ASK));
 	Dialog.Add(new CFarRadioButtonItem(37,6,0,MAlways,(int *)&FRReplaceReadonly,RR_ALWAYS));
 
-	Dialog.Add(new CFarCheckBoxItem(5, 9, 0, MSkipSystemFolders,&FASkipSystemFolders));
+	Dialog.Add(new CFarCheckBoxItem(5, 9, 0, MSkipSystemFolders, &FASkipSystemFolders));
 	Dialog.Add(new CFarEditItem(9, 10, 45, DIF_HISTORY,_T("RESearch.SystemFolders"), FASystemFolders));
+	Dialog.Add(new CFarCheckBoxItem(5, 12, 0, MEditSrchAfterFile, &FSEditSrchAfterFile));
 
 #ifdef UNICODE
-	Dialog.Add(new CFarTextItem(5,12,0,MDefaultCP));
-	Dialog.Add(new CFarRadioButtonItem(35,12,0,MDefaultOEM,&g_bDefaultOEM,TRUE));
-	Dialog.Add(new CFarRadioButtonItem(45,12,0,MDefaultANSI,&g_bDefaultOEM,FALSE));
-	Dialog.Add(new CFarTextItem(5,13,0,MAllCPInclude));
-	Dialog.Add(new CFarButtonItem(35,13,0,FALSE,MAllCPSelect));
+	Dialog.Add(new CFarTextItem(5,14,0,MDefaultCP));
+	Dialog.Add(new CFarRadioButtonItem(35,14,0,MDefaultOEM,&g_bDefaultOEM,TRUE));
+	Dialog.Add(new CFarRadioButtonItem(45,14,0,MDefaultANSI,&g_bDefaultOEM,FALSE));
+	Dialog.Add(new CFarTextItem(5,15,0,MAllCPInclude));
+	Dialog.Add(new CFarButtonItem(35,15,0,FALSE,MAllCPSelect));
 
 	Dialog.AddButtons(MOk,MCancel);
 	do {
