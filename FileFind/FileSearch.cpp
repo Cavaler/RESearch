@@ -108,14 +108,19 @@ BOOL FindPattern(pcre *Pattern, pcre_extra *PatternExtra, const char *Buffer, in
 		return FALSE;
 	}
 
+	vector<int> arrMatch((pcre_info(Pattern, NULL, NULL)+1)*3);
 #ifdef UNICODE
 //	do_pcre_execA doesn't work since pattern is compiled as Unicode one
 	string strData(Buffer, Size);
 	wstring wstrData = DefToUnicode(strData);
-	if (do_pcre_exec(Pattern, PatternExtra, wstrData.data(), wstrData.size(), 0, 0, NULL, 0) >= 0) return TRUE;
+	int nResult = do_pcre_exec(Pattern, PatternExtra, wstrData.data(), wstrData.size(), 0, 0, &arrMatch[0], arrMatch.size());
 #else
-	if (do_pcre_exec(Pattern, PatternExtra, Buffer, Size, 0, 0, NULL, 0) >= 0) return TRUE;
+	int nResult = do_pcre_exec(Pattern, PatternExtra, Buffer, Size, 0, 0, &arrMatch[0], arrMatch.size());
 #endif
+	if (nResult >= 0) {
+		g_nFoundColumn = arrMatch[0]+1;
+		return TRUE;
+	}
 
 	if (!FAllCharTables) return FALSE;
 
