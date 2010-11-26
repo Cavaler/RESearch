@@ -102,7 +102,11 @@ BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const tstring &Text
 	if (Text.empty()) return FALSE;		// WAS: Not needed if empty NOW: what is search for nothing?
 	const TCHAR *ErrPtr;
 	int ErrOffset;
+#ifdef UNICODE
+	int iFlags=PCRE_MULTILINE|PCRE_UCP;
+#else
 	int iFlags=PCRE_MULTILINE;
+#endif
 	if (DotMatchesNewline) iFlags |= PCRE_DOTALL;
 	if (!CaseSensitive) iFlags |= PCRE_CASELESS;
 	if (bUTF8) iFlags |= PCRE_UTF8;
@@ -128,7 +132,7 @@ BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,
 	if (Text.empty()) return FALSE;		// WAS: Not needed if empty NOW: what is search for nothing?
 	const char *ErrPtr;
 	int ErrOffset;
-	int iFlags=PCRE_MULTILINE;
+	int iFlags=PCRE_MULTILINE|PCRE_UCP;
 	if (DotMatchesNewline) iFlags |= PCRE_DOTALL;
 	if (!CaseSensitive) iFlags |= PCRE_CASELESS;
 	if (bUTF8) iFlags |= PCRE_UTF8;
