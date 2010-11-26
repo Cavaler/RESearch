@@ -110,7 +110,7 @@ class CBatchAction : public vector<BatchActionIndex> {		// Collection index and 
 public:
 	CBatchAction(CBatchType &Type);
 	CBatchAction(CBatchType &Type, tstring strName, HKEY hKey);
-	void Save(HKEY hKey);
+	void Save(HKEY hKey, int nIndex);
 
 	bool Edit();
 	void EditItems();

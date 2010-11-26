@@ -234,7 +234,7 @@ int CPresetCollection::ShowMenu(bool bExecute, int nDefaultID) {
 			CPreset *pPreset = NewPreset();
 			if (EditPreset(pPreset)) {
 				pPreset->m_nID = FindUnusedID();
-				push_back(pPreset);
+				insert(begin()+nResult, pPreset);
 				Save();
 			} else {
 				delete pPreset;
@@ -267,7 +267,7 @@ int CPresetCollection::ShowMenu(bool bExecute, int nDefaultID) {
 			}
 			break;
 		case 4:			//	VK_CTRL_DOWN
-			if (nResult < size()-1) {
+			if (nResult < (int)size()-1) {
 				CPreset *pPreset = at(nResult+1);
 				at(nResult+1) = at(nResult);
 				at(nResult) = pPreset;
@@ -382,11 +382,12 @@ CBatchAction::CBatchAction(CBatchType &Type)
 }
 
 CBatchAction::CBatchAction(CBatchType &Type, tstring strName, HKEY hKey)
-: m_Type(Type), m_bAddToMenu(false), m_strName(strName)
+: m_Type(Type), m_bAddToMenu(false)
 {
-	CHKey hOwnKey = RegOpenSubkey(hKey, m_strName.c_str());
+	CHKey hOwnKey = RegOpenSubkey(hKey, strName.c_str());
 	if (!hOwnKey) return;
 
+	QueryRegStringValue(hOwnKey, _T("Name"), m_strName, strName);
 	QueryRegBoolValue(hOwnKey, _T("AddToMenu"), &m_bAddToMenu, false);
 
 	for (size_t nIndex = 0; ; nIndex++) {
@@ -401,10 +402,11 @@ CBatchAction::CBatchAction(CBatchType &Type, tstring strName, HKEY hKey)
 	}
 }
 
-void CBatchAction::Save(HKEY hKey) {
-	CHKey hOwnKey = RegCreateSubkey(hKey, m_strName.c_str());
+void CBatchAction::Save(HKEY hKey, int nIndex) {
+	CHKey hOwnKey = RegCreateSubkey(hKey, FormatStr(_T("%04d"), nIndex).c_str());
 	if (!hOwnKey) return;
 
+	SetRegStringValue(hOwnKey, _T("Name"), m_strName);
 	SetRegBoolValue(hOwnKey, _T("AddToMenu"), m_bAddToMenu);
 
 	RegDeleteAllSubkeys(hOwnKey);
@@ -521,12 +523,12 @@ void CBatchActionCollection::Save(HKEY hKey) {
 	RegDeleteAllSubkeys(hKey);
 
 	for (size_t nIndex = 0; nIndex < size(); nIndex++) {
-		at(nIndex)->Save(hKey);
+		at(nIndex)->Save(hKey, nIndex);
 	}
 }
 
 void CBatchActionCollection::ShowMenu() {
-	int piBreakKeys[]={VK_INSERT, VK_DELETE, VK_F4, 0};
+	int piBreakKeys[]={VK_INSERT, VK_DELETE, VK_F4, (PKF_CONTROL<<16)|VK_UP, (PKF_CONTROL<<16)|VK_DOWN, 0};
 	vector<tstring> arrItems;
 
 	int nResult = 0;
@@ -536,7 +538,7 @@ void CBatchActionCollection::ShowMenu() {
 			arrItems[nBatch] = at(nBatch)->m_strName;
 
 		int nBreakKey;
-		nResult = ChooseMenu(arrItems, GetMsg(m_Type.m_nTitle), _T("Ins,Del,F4"), _T("Batches"), nResult,
+		nResult = ChooseMenu(arrItems, GetMsg(m_Type.m_nTitle), _T("Ins,Del,F4,Ctrl-\x18\x19"), _T("Batches"), nResult,
 			FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT, piBreakKeys, &nBreakKey);
 
 		switch (nBreakKey) {
@@ -551,7 +553,7 @@ void CBatchActionCollection::ShowMenu() {
 			}
 
 			return;
-		case 0:{
+		case 0:{		//	VK_INSERT
 			CBatchAction *pBatch = new CBatchAction(m_Type);
 			if (pBatch->Edit()) {
 				push_back(pBatch);
@@ -561,7 +563,7 @@ void CBatchActionCollection::ShowMenu() {
 			}
 			break;
 			   }
-		case 1:
+		case 1:			//	VK_DELETE
 			if (nResult < (int)size()) {
 				const TCHAR *Lines[]={_T("Delete"), GetMsg(MDeleteBatchQuery),
 					at(nResult)->m_strName.c_str(), GetMsg(MOk), GetMsg(MCancel)};
@@ -572,10 +574,28 @@ void CBatchActionCollection::ShowMenu() {
 				}
 			}
 			break;
-		case 2:
+		case 2:			//	VK_F4
 			if (nResult < (int)size()) {
 				at(nResult)->Edit();
 				WriteRegistry();
+			}
+			break;
+		case 3:			//	VK_CTRL_UP
+			if (nResult > 0) {
+				CBatchAction *pBatch = at(nResult-1);
+				at(nResult-1) = at(nResult);
+				at(nResult) = pBatch;
+				WriteRegistry();
+				nResult--;
+			}
+			break;
+		case 4:			//	VK_CTRL_DOWN
+			if (nResult < (int)size()-1) {
+				CBatchAction *pBatch = at(nResult+1);
+				at(nResult+1) = at(nResult);
+				at(nResult) = pBatch;
+				WriteRegistry();
+				nResult++;
 			}
 			break;
 		}
