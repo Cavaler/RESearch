@@ -417,14 +417,18 @@ void FindIfClockPresent() {
 
 void ShowCurrentLine(int CurLine,int TotalLines,int TotalColumns) {
 	if ((CurLine<LastLine) || (CurLine>=LastLine+1000) || (GetTickCount() > LastTickCount+1000)) {
-		int Position=(ClockPresent)?19:25;
-		if (TotalColumns>80) Position+=(TotalColumns-81);
+		int Position = (ClockPresent) ? 19 : 25;
+		if (TotalColumns > 80) Position += (TotalColumns-81);
 #ifdef UNICODE
 		Position+=17;
 #else
 		Position+=22;
 #endif
-		tstring strText = FormatStr(_T("%13s"), FormatStr(_T("%d/%d"), CurLine, TotalLines).c_str());
+
+		tstring strTotal = FormatStr(_T("%d"), TotalLines);
+		int nWidth  = (strTotal.length() < 6) ? 13 : strTotal.length()*2+2;
+		tstring strText = FormatStr(_T("%*s"), nWidth, FormatStr(_T("%d/%d"), CurLine, TotalLines).c_str());
+
 		StartupInfo.Text(Position, 0, 0x30, strText.c_str());
 		StartupInfo.Text(0,0,0x30,NULL);
 		LastLine=CurLine;
