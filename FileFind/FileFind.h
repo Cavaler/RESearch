@@ -133,8 +133,8 @@ OperationResult NoFilesFound();
 void InitFoundPosition();
 
 BOOL MultipleMasksApply(const TCHAR *Filename);
-void AddFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems);
-void AddFile(const TCHAR *szFileName, panelitem_vector &PanelItems);
+void AddFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems, bool bSearch = false);
+void AddFile(const TCHAR *szFileName, panelitem_vector &PanelItems, bool bSearch = false);
 int  ScanDirectories(panelitem_vector &PanelItems,ProcessFileProc ProcessFile);
 int  FPrepareMaskPattern();
 int  FPreparePattern(bool bAcceptEmpty);
@@ -167,11 +167,14 @@ void SkipCRLF(const char *&Buffer,int *Size, eLikeUnicode nUni);
 void SkipWholeLine(const char *&Buffer,int *Size, eLikeUnicode nUni);
 
 struct TempUserData {
-	TempUserData() : FoundLine(0), FoundColumn(1), ToBeDeleted(false) {}
-	TempUserData(int nLine, int nColumn) : FoundLine(nLine), FoundColumn(nColumn), ToBeDeleted(false) {}
+	TempUserData()
+		: FoundLine(0), FoundColumn(1), NeedSearch(false), ToBeDeleted(false) {}
+	TempUserData(int nLine, int nColumn, bool bSearch)
+		: FoundLine(nLine), FoundColumn(nColumn), NeedSearch(bSearch), ToBeDeleted(false) {}
 
 	int		FoundLine;
 	int		FoundColumn;
+	bool	NeedSearch;
 	bool	ToBeDeleted;
 };
 

@@ -325,8 +325,9 @@ void SearchFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 	case SA_MULTIREGEXP		:IsFound=FindMemoryMapped(FindData->cFileName,FindMultiRegExp);break;
 	default:IsFound=FALSE;
 	}
+
 	// This is exclusive 'OR'...
-	if ((IsFound)?!FSInverse:FSInverse) AddFile(FindData, PanelItems);
+	if ((IsFound) ? !FSInverse : FSInverse) AddFile(FindData, PanelItems, true);
 }
 
 bool PrepareFileSearchPattern() {

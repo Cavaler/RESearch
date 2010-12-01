@@ -197,7 +197,7 @@ void InitFoundPosition() {
 	g_nFoundColumn = 1;
 }
 
-void AddFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
+void AddFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems, bool bSearch) {
 	CPluginPanelItem Item;
 
 #ifdef UNICODE
@@ -215,18 +215,18 @@ void AddFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 	Item.CustomColumnNumber = 0;
 
 	if (!FText.empty() && !FSInverse)
-		Item.UserData = (DWORD)new TempUserData(g_nFoundLine, g_nFoundColumn);
+		Item.UserData = (DWORD)new TempUserData(g_nFoundLine, g_nFoundColumn, bSearch);
 	else
-		Item.UserData = (DWORD)new TempUserData(-1, -1);
+		Item.UserData = (DWORD)new TempUserData(-1, -1, bSearch);
 
 	PanelItems.push_back(Item);
 }
 
-void AddFile(const TCHAR *szFileName, panelitem_vector &PanelItems) {
+void AddFile(const TCHAR *szFileName, panelitem_vector &PanelItems, bool bSearch) {
 	WIN32_FIND_DATA FD;
 	HANDLE hFind = FindFirstFile(szFileName, &FD);
 	if (hFind != INVALID_HANDLE_VALUE) {
-		AddFile(&FD, PanelItems);
+		AddFile(&FD, PanelItems, bSearch);
 		FindClose(hFind);
 	}
 }
