@@ -387,17 +387,20 @@ void ECleanup(BOOL PatternOnly) {
 }
 
 void SynchronizeWithFile(bool bReplace) {
-	if (FSearchAs<=SA_REGEXP) {
-		ERegExp=(FSearchAs==SA_REGEXP);
-		EText=FText;EPreparePattern(EText);
+	ECaseSensitive = FCaseSensitive;
+	EUTF8 = FUTF8;
+
+	if (FSearchAs <= SA_MULTILINE) {
+		ERegExp = (FSearchAs != SA_PLAINTEXT);
+		ESeveralLine = (FSearchAs == SA_SEVERALLINE) || (FSearchAs == SA_MULTILINE);
+		EText = FText;
+		EPreparePattern(EText);
 		if (bReplace) {
-			ERReplace=FRReplace;
-			LastAction=1;
+			ERReplace = FRReplace;
+			LastAction = 1;
 		} else
-			LastAction=0;
+			LastAction = 0;
 	}
-	ECaseSensitive=FCaseSensitive;
-	EUTF8=FUTF8;
 }
 
 int LastLine=0;
