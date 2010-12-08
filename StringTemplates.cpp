@@ -202,6 +202,15 @@ typename CREParameters<CHAR>::cstring CREParameters<CHAR>::GetParam(int nNumber)
 }
 
 template<class CHAR>
+int CREParameters<CHAR>::FindParam(const cstring &strName, bool bCheckNumber) {
+	int nNumber;
+	if (bCheckNumber && CSO::GetNumber(strName, nNumber))
+		return nNumber;
+
+	return pcre_get_stringnumber(m_re, strName.c_str());
+}
+
+template<class CHAR>
 typename CREParameters<CHAR>::cstring
 CREParameters<CHAR>::GetParam(const cstring &strName, bool bCheckNumber) {
 	int nNumber;

@@ -191,6 +191,10 @@ enum eStringTable {
 	MFindSelection,
 	MAutoFindInSelection,
 	MUseRealEOL,
+	MPositionCursor,
+	MCurPosStart,
+	MCurPosEnd,
+	MCurAtNamedRef,
 
 	MInvalidNumber,
 

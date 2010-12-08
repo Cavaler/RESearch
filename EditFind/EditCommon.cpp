@@ -39,7 +39,7 @@ void EWriteRegistry(HKEY Key) {
 	#include "PersistVars.h"
 }
 
-BOOL SearchIn(const TCHAR *Line,int Start,int Length,int *MatchStart,int *MatchLength,BOOL NeedMatch) {
+BOOL SearchIn(const TCHAR *Line,int Start,int Length,int *MatchStart,int *MatchLength) {
 	REParam.Clear();
 	REParam.AddSource(Line, Length);
 
@@ -63,7 +63,7 @@ BOOL SearchIn(const TCHAR *Line,int Start,int Length,int *MatchStart,int *MatchL
 	return FALSE;
 }
 
-BOOL SearchInLine(const TCHAR *Line,int Length,int Start,int End,int *MatchStart,int *MatchLength,BOOL NeedMatch) {
+BOOL SearchInLine(const TCHAR *Line,int Length,int Start,int End,int *MatchStart,int *MatchLength) {
 	int Len;
 
 	if (Start>Length) return FALSE;
@@ -72,10 +72,10 @@ BOOL SearchInLine(const TCHAR *Line,int Length,int Start,int End,int *MatchStart
 	if (Len<0) return FALSE;
 
 #ifdef UNICODE
-	return SearchIn(Line,Start,Len,MatchStart,MatchLength,NeedMatch);
+	return SearchIn(Line,Start,Len,MatchStart,MatchLength);
 #else
 	if (ERegExp) {
-		return SearchIn(Line,Start,Len,MatchStart,MatchLength,NeedMatch);
+		return SearchIn(Line,Start,Len,MatchStart,MatchLength);
 	} else {
 		if (EdInfo.AnsiMode || (EdInfo.TableNum != -1)) {
 			//	static - to allow REParam somewhere inside to store just a pointer, not a copy
@@ -83,10 +83,10 @@ BOOL SearchInLine(const TCHAR *Line,int Length,int Start,int End,int *MatchStart
 			static string OEMLine;
 			OEMLine = string(Line, Length);
 			EditorToOEM(OEMLine);
-			int Result=SearchIn(OEMLine.c_str(),Start,Len,MatchStart,MatchLength,NeedMatch);
+			int Result=SearchIn(OEMLine.c_str(),Start,Len,MatchStart,MatchLength);
 			return Result;
 		} else {
-			return SearchIn(Line, Start, Len, MatchStart, MatchLength, NeedMatch);
+			return SearchIn(Line, Start, Len, MatchStart, MatchLength);
 		}
 	}
 #endif
@@ -209,7 +209,7 @@ void FillLineBuffer(size_t FirstLine, size_t LastLine) {
 	}
 }
 
-BOOL SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,BOOL NeedMatch) {
+BOOL SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos) {
 	int Line,MatchStart,MatchLength;
 	TCHAR *Lines;
 	int LinesLength;
@@ -234,7 +234,7 @@ BOOL SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,BOOL Ne
 				}
 			}
 
-			if (SearchInLine(Lines, LinesLength, (Line==FirstLine) ? StartPos : 0, -1, &MatchStart, &MatchLength, NeedMatch)) {
+			if (SearchInLine(Lines, LinesLength, (Line==FirstLine) ? StartPos : 0, -1, &MatchStart, &MatchLength)) {
 				Relative2Absolute(Line, Lines, MatchStart, MatchLength, FirstLine, StartPos, LastLine, EndPos);
 				return TRUE;
 			}
@@ -258,7 +258,7 @@ BOOL SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,BOOL Ne
 				}
 			}
 
-			if (SearchInLine(Lines,LinesLength,(Line==FirstLine)?StartPos:0,-1,&MatchStart,&MatchLength,NeedMatch)) {
+			if (SearchInLine(Lines,LinesLength,(Line==FirstLine)?StartPos:0,-1,&MatchStart,&MatchLength)) {
 				if (MatchStart<=FirstLineLength) {
 					Relative2Absolute(Line,Lines,MatchStart,MatchLength,FirstLine,StartPos,LastLine,EndPos);
 					return TRUE;
@@ -389,6 +389,7 @@ void ECleanup(BOOL PatternOnly) {
 void SynchronizeWithFile(bool bReplace) {
 	ECaseSensitive = FCaseSensitive;
 	EUTF8 = FUTF8;
+	EReverse = FALSE;
 
 	if (FSearchAs <= SA_MULTILINE) {
 		ERegExp = (FSearchAs != SA_PLAINTEXT);

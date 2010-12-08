@@ -95,8 +95,8 @@ void EditorSeekToBeginEnd();
 
 void PatchEditorInfo(EditorInfo &EdInfo);
 
-BOOL SearchInLine(const TCHAR *Line,int Length,int Start,int End,int *MatchStart,int *MatchLength,BOOL NeedMatch);
-BOOL SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,BOOL NeedMatch);
+BOOL SearchInLine(const TCHAR *Line,int Length,int Start,int End,int *MatchStart,int *MatchLength);
+BOOL SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos);
 int  TopLine(int NeededLine,int ScreenHeight,int TotalLines,int CurrentTopLine);
 int	LeftColumn(int RightPosition,int ScreenWidth);
 void SaveSelection();

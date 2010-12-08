@@ -191,6 +191,10 @@ MAnyText			"&Any text"							"Любой &текст"
 MFindSelection		"Pick up &selection"				"Искать &выделенный текст"
 MAutoFindInSelection	"Turn '&In selection' on automatically"	"Включать поиск 'в в&ыделенном' автоматически"
 MUseRealEOL			"&Use real end-of-line sequences"	"Использовать &реальные концы строк"
+MPositionCursor		"P&osition cursor at:"				"Позиционировать курсор на:"
+MCurPosStart		"B&eginning of found fragment"		"Начало найденного фрагмента"
+MCurPosEnd			"En&d of found fragment"			"Конец найденного фрагмента"
+MCurAtNamedRef		"At na&med subpattern:"				"На именованный блок:"
 
 MInvalidNumber		"Value not integer or not in range %d..%d"	"Неправильное число или не в границах %d..%d"
 

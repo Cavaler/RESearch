@@ -252,7 +252,7 @@ BOOL ReplaceInText(int FirstLine, int StartPos, int LastLine, int EndPos) {
 	do {
 		int MatchFirstLine = FirstLine, MatchStartPos = StartPos;
 		int MatchLastLine = LastLine, MatchEndPos = EndPos;
-		if (!SearchInText(MatchFirstLine, MatchStartPos, MatchLastLine, MatchEndPos, TRUE)) return FALSE;
+		if (!SearchInText(MatchFirstLine, MatchStartPos, MatchLastLine, MatchEndPos)) return FALSE;
 
 		// Assuming that MatchedLine starts from the needed line
 		RefreshEditorInfo();
@@ -303,7 +303,7 @@ BOOL ReplaceInTextByLine(int FirstLine, int StartPos, int LastLine, int EndPos, 
 		int MatchLastLine = Line, MatchEndPos = (Line == LastLine)||EachLineLimited?EndPos:-1;
 		int FoundStartPos = MatchStartPos, FoundEndPos = MatchEndPos;
 
-		while (SearchInText(MatchFirstLine, FoundStartPos, MatchLastLine, FoundEndPos, TRUE)) {
+		while (SearchInText(MatchFirstLine, FoundStartPos, MatchLastLine, FoundEndPos)) {
 			Matched = TRUE;
 			// Assuming that MatchedLine starts from the needed line
 			RefreshEditorInfo();

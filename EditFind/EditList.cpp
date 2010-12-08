@@ -31,7 +31,7 @@ BOOL EditorListAllAgain() {
 		int FirstLine = CurrentLine, StartPos = 0, EndPos = -1;
 		int LastLine = (ESeveralLine) ? EdInfo.TotalLines-1 : CurrentLine;
 
-		if (SearchInText(FirstLine, StartPos, LastLine, EndPos, FALSE)) {
+		if (SearchInText(FirstLine, StartPos, LastLine, EndPos)) {
 			EditorSetPosition Position={FirstLine,-1,-1,-1,-1,-1};
 			EctlSetPosition(&Position);
 			EditorGetString String = {-1};

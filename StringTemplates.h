@@ -39,6 +39,7 @@ public:
 	int  Count() { return (int)m_arrMatch.size(); }
 
 	cstring GetParam(int nNumber);
+	int     FindParam(const cstring &strName, bool bCheckNumber = false);
 	cstring GetParam(const cstring &strName, bool bCheckNumber = false);
 
 	void FillStartLength(int *MatchStart, int *MatchLength);

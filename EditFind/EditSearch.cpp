@@ -11,9 +11,20 @@ void EditorSearchOK(int FirstLine,int StartPos,int LastLine,int EndPos) {
 	}
 	StartupInfo.EditorControl(ECTL_SELECT,&Select);
 
-	EditorSetPosition Position={(EReverse)?FirstLine:LastLine,(EReverse)?StartPos:EndPos,-1,
-		TopLine(FirstLine,EdInfo.WindowSizeY,EdInfo.TotalLines,StartEdInfo.TopScreenLine),
-		LeftColumn((EReverse)?StartPos:EndPos,EdInfo.WindowSizeX),-1};
+	EditorSetPosition Position = {
+		(EReverse) ? FirstLine : LastLine,
+		(EReverse) ? StartPos : EndPos,
+		-1, TopLine(FirstLine,EdInfo.WindowSizeY,EdInfo.TotalLines,StartEdInfo.TopScreenLine),
+		LeftColumn((EReverse)?StartPos:EndPos,EdInfo.WindowSizeX),-1
+	};
+
+	if (EPositionAtSub) {
+		int nSub = REParam.FindParam(EPositionSubName);
+		if (nSub >= 0) {
+			Position.CurPos = StartPos + REParam.m_arrMatch[nSub*2] - REParam.m_arrMatch[0];
+		}
+	}
+
 	EctlForceSetPosition(&Position);
 }
 
@@ -96,7 +107,7 @@ BOOL EditorSearchAgain() {
 	}
 
 	if (ESeveralLine) {
-		if (SearchInText(FirstLine,StartPos,LastLine,EndPos,FALSE)) {
+		if (SearchInText(FirstLine,StartPos,LastLine,EndPos)) {
 			EditorSearchOK(FirstLine,StartPos,LastLine,EndPos);
 			return TRUE;
 		}
@@ -106,7 +117,7 @@ BOOL EditorSearchAgain() {
 				int CurLastLine = Line;
 				int CurStartPos = (Line == FirstLine) ? StartPos : 0;
 				int CurEndPos = (Line == LastLine) ? EndPos : -1;
-				if (SearchInText(Line, CurStartPos, CurLastLine, CurEndPos,FALSE)) {
+				if (SearchInText(Line, CurStartPos, CurLastLine, CurEndPos)) {
 					EditorSearchOK(Line, CurStartPos, CurLastLine, CurEndPos);
 					return TRUE;
 				}
@@ -116,7 +127,7 @@ BOOL EditorSearchAgain() {
 				int CurLastLine = Line;
 				int CurStartPos = (Line == FirstLine) ? StartPos : 0;
 				int CurEndPos = (Line == LastLine) ? EndPos : -1;
-				if (SearchInText(Line, CurStartPos, CurLastLine, CurEndPos,FALSE)) {
+				if (SearchInText(Line, CurStartPos, CurLastLine, CurEndPos)) {
 					EditorSearchOK(Line, CurStartPos, CurLastLine, CurEndPos);
 					return TRUE;
 				}
