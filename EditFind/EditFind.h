@@ -33,6 +33,8 @@ public:
 	virtual int  ID() { return 2; }
 };
 
+enum EPositioning {EP_BEGIN, EP_DIR, EP_END};
+
 #define DECLARE_PERSIST_VARS
 #include "PersistVars.h"
 
@@ -63,6 +65,10 @@ EXTERN pcre *EPattern VALUE(NULL);
 EXTERN pcre_extra *EPatternExtra VALUE(NULL);
 EXTERN const unsigned char *ECharacterTables VALUE(NULL);
 EXTERN int SelStartLine,SelStartPos,SelEndLine,SelEndPos,SelType;
+
+EXTERN vector<TCHAR>	g_LineBuffer;
+EXTERN vector<int>		g_LineOffsets;
+EXTERN size_t			g_FirstLine;
 
 EXTERN EditorInfo EdInfo;
 #ifdef UNICODE
@@ -97,6 +103,9 @@ void PatchEditorInfo(EditorInfo &EdInfo);
 
 BOOL SearchInLine(const TCHAR *Line,int Length,int Start,int End,int *MatchStart,int *MatchLength);
 BOOL SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos);
+void AdjustPosition(TCHAR *Lines, int &FirstLine,int &StartPos);
+void Relative2Absolute(int Line,TCHAR *Lines,int MatchStart,int MatchLength,int &FirstLine,int &StartPos,int &LastLine,int &EndPos);
+
 int  TopLine(int NeededLine,int ScreenHeight,int TotalLines,int CurrentTopLine);
 int	LeftColumn(int RightPosition,int ScreenWidth);
 void SaveSelection();

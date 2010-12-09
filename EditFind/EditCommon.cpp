@@ -92,33 +92,29 @@ BOOL SearchInLine(const TCHAR *Line,int Length,int Start,int End,int *MatchStart
 #endif
 }
 
-void Relative2Absolute(int Line,TCHAR *Lines,int MatchStart,int MatchLength,int &FirstLine,int &StartPos,int &LastLine,int &EndPos) {
-	FirstLine=Line;StartPos=MatchStart;
-	do {			// Find first line
+void AdjustPosition(TCHAR *Lines, int &FirstLine,int &StartPos)
+{
+	do {
 		TCHAR *NewLine=(TCHAR *)_tmemchr(Lines,'\n',StartPos);
 		if (NewLine) {
-			int Pos=NewLine-Lines;
-			Lines+=Pos+1;
-			StartPos-=Pos+1;
+			int Pos = NewLine-Lines;
+			Lines += Pos+1;
+			StartPos -= Pos+1;
 			FirstLine++;
-		} else break;
-	} while (TRUE);
-
-	LastLine=FirstLine;EndPos=StartPos+MatchLength;
-	do {			// Find last line
-		TCHAR *NewLine=(TCHAR *)_tmemchr(Lines,'\n',EndPos);
-		if (NewLine) {
-			int Pos=NewLine-Lines;
-			Lines+=Pos+1;
-			EndPos-=Pos+1;
-			LastLine++;
 		} else break;
 	} while (TRUE);
 }
 
-vector<TCHAR>	g_LineBuffer;
-vector<int>		g_LineOffsets;
-size_t			g_FirstLine;
+void Relative2Absolute(int Line,TCHAR *Lines,int MatchStart,int MatchLength,int &FirstLine,int &StartPos,int &LastLine,int &EndPos)
+{
+	FirstLine = Line;
+	StartPos = MatchStart;
+	AdjustPosition(Lines, FirstLine, StartPos);
+
+	LastLine = FirstLine;
+	EndPos = StartPos+MatchLength;
+	AdjustPosition(Lines, LastLine, EndPos);
+}
 
 void ClearLineBuffer() {
 	g_LineBuffer.clear();

@@ -884,7 +884,7 @@ void ConfigureRenumbering(bool bRuntime) {
 }
 
 void ConfigureEditor() {
-	CFarDialog Dialog(60,29,_T("EditorConfig"));
+	CFarDialog Dialog(60, 30, _T("EditorConfig"));
 	Dialog.AddFrame(MEditorSearchSettings);
 
 	Dialog.Add(new CFarTextItem(5,3,0,MShowPositionOffset));
@@ -910,10 +910,11 @@ void ConfigureEditor() {
 	Dialog.Add(new CFarCheckBoxItem(5,18,0,MUseRealEOL,&g_bUseRealEOL));
 
 	Dialog.Add(new CFarTextItem(5,20,0,MPositionCursor));
-	Dialog.Add(new CFarRadioButtonItem(7,21,DIF_GROUP,MCurPosStart,(int *)&EPositionAtEnd,FALSE));
-	Dialog.Add(new CFarRadioButtonItem(7,22,0,MCurPosEnd,(int *)&EPositionAtEnd,TRUE));
-	Dialog.Add(new CFarCheckBoxItem(7,23,0,MCurAtNamedRef,&EPositionAtSub));
-	Dialog.Add(new CFarEditItem(32,23,45,0,NULL,EPositionSubName));
+	Dialog.Add(new CFarRadioButtonItem(7,21,DIF_GROUP,MCurPosStart,(int *)&EPositionAt, EP_BEGIN));
+	Dialog.Add(new CFarRadioButtonItem(7,22,0,MCurPosMove,(int *)&EPositionAt, EP_DIR));
+	Dialog.Add(new CFarRadioButtonItem(7,23,0,MCurPosEnd, (int *)&EPositionAt, EP_END));
+	Dialog.Add(new CFarCheckBoxItem(7,24,0,MCurAtNamedRef,&EPositionAtSub));
+	Dialog.Add(new CFarEditItem(32,24,45,0,"RESearch.SubName",EPositionSubName));
 
 	Dialog.AddButtons(MOk,MCancel);
 	Dialog.Display(-1);

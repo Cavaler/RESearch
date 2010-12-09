@@ -113,7 +113,7 @@ BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const tstring &Text
 
 	*Pattern=pcre_compile(Text.c_str(),iFlags,&ErrPtr,&ErrOffset,pTables);
 	if (!(*Pattern)) {
-		tstring ErrPos(ErrOffset >= Text.length() ? ErrOffset+1 : Text.length(), ' ');
+		tstring ErrPos(ErrOffset >= (Text.length() ? ErrOffset+1 : (int)Text.length()), ' ');
 		ErrPos[ErrOffset]='^';
 
 		const TCHAR *Lines[]={GetMsg(MRegExpError),ErrPtr,_T("\x01"),Text.c_str(),ErrPos.c_str(),GetMsg(MOk)};

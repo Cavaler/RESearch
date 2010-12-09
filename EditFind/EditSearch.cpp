@@ -11,17 +11,23 @@ void EditorSearchOK(int FirstLine,int StartPos,int LastLine,int EndPos) {
 	}
 	StartupInfo.EditorControl(ECTL_SELECT,&Select);
 
+	bool bAtStart = (EPositionAt == EP_BEGIN) || ((EPositionAt == EP_DIR) && EReverse);
+
 	EditorSetPosition Position = {
-		(EReverse) ? FirstLine : LastLine,
-		(EReverse) ? StartPos : EndPos,
-		-1, TopLine(FirstLine,EdInfo.WindowSizeY,EdInfo.TotalLines,StartEdInfo.TopScreenLine),
-		LeftColumn((EReverse)?StartPos:EndPos,EdInfo.WindowSizeX),-1
+		(bAtStart) ? FirstLine : LastLine,
+		(bAtStart) ? StartPos : EndPos,
+		-1, TopLine(FirstLine, EdInfo.WindowSizeY, EdInfo.TotalLines, StartEdInfo.TopScreenLine),
+		LeftColumn((bAtStart) ? StartPos : EndPos, EdInfo.WindowSizeX),
+		-1
 	};
 
 	if (EPositionAtSub) {
 		int nSub = REParam.FindParam(EPositionSubName);
 		if (nSub >= 0) {
-			Position.CurPos = StartPos + REParam.m_arrMatch[nSub*2] - REParam.m_arrMatch[0];
+			Position.CurLine = FirstLine;
+			Position.CurPos  = StartPos + REParam.m_arrMatch[nSub*2] - REParam.m_arrMatch[0];
+			AdjustPosition(&g_LineBuffer[0], Position.CurLine, Position.CurPos);
+			Position.LeftPos = LeftColumn(Position.CurPos, EdInfo.WindowSizeX);
 		}
 	}
 

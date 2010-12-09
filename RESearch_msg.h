@@ -193,6 +193,7 @@ enum eStringTable {
 	MUseRealEOL,
 	MPositionCursor,
 	MCurPosStart,
+	MCurPosMove,
 	MCurPosEnd,
 	MCurAtNamedRef,
 
