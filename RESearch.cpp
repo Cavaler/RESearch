@@ -914,7 +914,7 @@ void ConfigureEditor() {
 	Dialog.Add(new CFarRadioButtonItem(7,22,0,MCurPosMove,(int *)&EPositionAt, EP_DIR));
 	Dialog.Add(new CFarRadioButtonItem(7,23,0,MCurPosEnd, (int *)&EPositionAt, EP_END));
 	Dialog.Add(new CFarCheckBoxItem(7,24,0,MCurAtNamedRef,&EPositionAtSub));
-	Dialog.Add(new CFarEditItem(32,24,45,0,"RESearch.SubName",EPositionSubName));
+	Dialog.Add(new CFarEditItem(32,24,45,0,_T("RESearch.SubName"),EPositionSubName));
 
 	Dialog.AddButtons(MOk,MCancel);
 	Dialog.Display(-1);

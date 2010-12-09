@@ -9,10 +9,15 @@ Planned:
 	- Search in share-opened files
 	+ Allow [X] Remove empty with [X] Several lines
 
-	* Custom dialog for search progress, only increase width
+	* Custom dialog for search progress (only increase width)
+    * Highlight regexp error position with cursor
 
 	- Restoring position when opening for for view/edit from TmpPanel
 	  now works only partially
+
+Version 7.25 (09.12.2010)
+	+ Selectable cursor position upon search
+    - Fixed 'Esc' in x64 versions
 
 Version 7.20 (26.11.2010)
 	! PCRE 8.10 - Official implementation of \W etc via Unicode properties
