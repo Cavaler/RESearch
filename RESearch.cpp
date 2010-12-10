@@ -574,7 +574,7 @@ HANDLE OpenPluginFromEditorMenu(int Item) {
 				EditorSearchAgain();
 				break;
 			case 1:
-			_EditorReplaceAgain();
+				_EditorReplaceAgain();
 				break;
 			case 2:
 				EditorFilterAgain();

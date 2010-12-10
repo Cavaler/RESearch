@@ -1,25 +1,16 @@
 #include "StdAfx.h"
 #include "..\RESearch.h"
 
-void EditorSearchOK(int FirstLine,int StartPos,int LastLine,int EndPos) {
-	RefreshEditorInfo();
-
-	EditorSelect Select={BTYPE_STREAM,FirstLine,StartPos,EndPos-StartPos,LastLine-FirstLine+1};
-	if ((Select.BlockWidth == 0) && (Select.BlockHeight == 1)) {
-		Select.BlockWidth++;
-		if (Select.BlockStartPos>0) {Select.BlockStartPos--;Select.BlockWidth++;}
-	}
-	StartupInfo.EditorControl(ECTL_SELECT,&Select);
-
+void GetHighlightPosition(EditorSetPosition &Position, int FirstLine,int StartPos,int LastLine,int EndPos)
+{
 	bool bAtStart = (EPositionAt == EP_BEGIN) || ((EPositionAt == EP_DIR) && EReverse);
 
-	EditorSetPosition Position = {
-		(bAtStart) ? FirstLine : LastLine,
-		(bAtStart) ? StartPos : EndPos,
-		-1, TopLine(FirstLine, EdInfo.WindowSizeY, EdInfo.TotalLines, StartEdInfo.TopScreenLine),
-		LeftColumn((bAtStart) ? StartPos : EndPos, EdInfo.WindowSizeX),
-		-1
-	};
+	Position.CurLine = (bAtStart) ? FirstLine : LastLine;
+	Position.CurPos = (bAtStart) ? StartPos : EndPos;
+	Position.CurTabPos = -1;
+	Position.TopScreenLine = TopLine(FirstLine, EdInfo.WindowSizeY, EdInfo.TotalLines, StartEdInfo.TopScreenLine);
+	Position.LeftPos = LeftColumn((bAtStart) ? StartPos : EndPos, EdInfo.WindowSizeX);
+	Position.Overtype = -1;
 
 	if (EPositionAtSub) {
 		int nSub = REParam.FindParam(EPositionSubName);
@@ -30,7 +21,20 @@ void EditorSearchOK(int FirstLine,int StartPos,int LastLine,int EndPos) {
 			Position.LeftPos = LeftColumn(Position.CurPos, EdInfo.WindowSizeX);
 		}
 	}
+}
 
+void EditorSearchOK(int FirstLine,int StartPos,int LastLine,int EndPos) {
+	RefreshEditorInfo();
+
+	EditorSelect Select={BTYPE_STREAM,FirstLine,StartPos,EndPos-StartPos,LastLine-FirstLine+1};
+	if ((Select.BlockWidth == 0) && (Select.BlockHeight == 1)) {
+		Select.BlockWidth++;
+		if (Select.BlockStartPos>0) {Select.BlockStartPos--;Select.BlockWidth++;}
+	}
+	StartupInfo.EditorControl(ECTL_SELECT,&Select);
+
+	EditorSetPosition Position;
+	GetHighlightPosition(Position, FirstLine, StartPos, LastLine, EndPos);
 	EctlForceSetPosition(&Position);
 }
 

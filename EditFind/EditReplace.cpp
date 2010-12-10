@@ -145,9 +145,12 @@ eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &
 	RefreshEditorInfo();
 
 	LastReplaceLine = LastLine;LastReplacePos = EndPos;
-	EditorSetPosition Position = {(EReverse)?FirstLine:LastLine,(EReverse)?StartPos:EndPos,-1,
-		TopLine(FirstLine, EdInfo.WindowSizeY, EdInfo.TotalLines, StartEdInfo.TopScreenLine),
-		LeftColumn((EReverse)?StartPos:EndPos, EdInfo.WindowSizeX),-1};
+
+	EditorSetPosition Position;
+	GetHighlightPosition(Position, FirstLine, StartPos, LastLine, EndPos);
+	LastReplaceLine = Position.CurLine;
+	LastReplacePos = Position.CurPos;
+
 	EditorSelect Select = {BTYPE_STREAM, FirstLine, StartPos, EndPos-StartPos, LastLine-FirstLine + 1};
 
 	int Result;
@@ -393,6 +396,7 @@ BOOL EditorReplaceAgain() {
 
 	LastReplaceLine = EdInfo.CurLine;
 	LastReplacePos = EdInfo.CurPos;
+
 	if (EInSelection) {		// ***************** REPLACE IN SELECTION
 		SaveSelection();
 		ReplaceStartLine = SelStartLine;
@@ -422,7 +426,7 @@ BOOL EditorReplaceAgain() {
 	}
 
 	RefreshEditorInfo();
-	EditorSetPosition Position = {LastReplaceLine, LastReplacePos,-1,
+	EditorSetPosition Position = {LastReplaceLine, LastReplacePos, -1,
 		TopLine(LastReplaceLine, EdInfo.WindowSizeY, EdInfo.TotalLines,StartEdInfo.TopScreenLine),
 		LeftColumn(LastReplacePos, EdInfo.WindowSizeX),-1};
 	EctlForceSetPosition(&Position);
