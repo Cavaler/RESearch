@@ -15,6 +15,10 @@ Planned:
 	- Restoring position when opening for for view/edit from TmpPanel
 	  now works only partially
 
+Version 7.26 (10.12.2010)
+    - Selectable cursor position works for Replace too
+    * Updated pcrepattern.html
+
 Version 7.25 (09.12.2010)
 	+ Selectable cursor position upon search
     - Fixed 'Esc' in x64 versions
