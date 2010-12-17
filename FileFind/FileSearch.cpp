@@ -261,29 +261,36 @@ BOOL FindRegExpInBuffer(const char *Buffer,int Size,tstring &Text) {
 }
 
 BOOL FindMulti(const char *Buffer,int Size,BOOL (*Searcher)(const char *,int,tstring &)) {
-	tstring What = FText;
-	tstring Word;
-	BOOL Return=TRUE,WereAnyMaybes=FALSE,AnyMaybesFound=FALSE;
+	bool Return = true;
+	bool WereAnyMaybes = false;
+	bool AnyMaybesFound = false;
 
-	do {
-		GetStripWord(What,Word);
-		if (Word.size()==0) break;
+	for (size_t nWord = 0; nWord < FSWords.size(); nWord++) {
+		if (Interrupted()) {
+			Return = false;
+			break;
+		}
+
+		tstring Word = FSWords[nWord];
+		if (Word.empty()) continue;
+
 		if (Word[0]=='+') {
 			Word.erase(0,1);
-			if (!Searcher(Buffer,Size,Word)) {Return=FALSE;break;} else continue;
+			if (!Searcher(Buffer,Size,Word)) {Return=false;break;} else continue;
 		}
 		if (Word[0]=='-') {
 			Word.erase(0,1);
-			if (Searcher(Buffer,Size,Word)) {Return=FALSE;break;} else continue;
+			if (Searcher(Buffer,Size,Word)) {Return=false;break;} else continue;
 		}
-		WereAnyMaybes=TRUE;
+
+		WereAnyMaybes=true;
 		if (AnyMaybesFound) continue;
-		if (Searcher(Buffer,Size,Word)) AnyMaybesFound=TRUE;
-	} while (Word.size()&&(!g_bInterrupted));
+		if (Searcher(Buffer,Size,Word)) AnyMaybesFound=true;
+	}
 
 	// All OK with Require end Exclude
-	if (g_bInterrupted) Return=FALSE;
-	if (Return) Return=(!WereAnyMaybes)||AnyMaybesFound;
+	Return &= !WereAnyMaybes || AnyMaybesFound;
+
 	return Return;
 }
 

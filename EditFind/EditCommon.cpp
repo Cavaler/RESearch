@@ -390,13 +390,19 @@ void SynchronizeWithFile(bool bReplace) {
 		ERegExp = (FSearchAs != SA_PLAINTEXT);
 		ESeveralLine = (FSearchAs == SA_SEVERALLINE) || (FSearchAs == SA_MULTILINE);
 		EText = FText;
-		EPreparePattern(EText);
-		if (bReplace) {
-			ERReplace = FRReplace;
-			LastAction = 1;
-		} else
-			LastAction = 0;
+	} else {
+		ERegExp = (FSearchAs == SA_MULTIREGEXP);
+		ESeveralLine = FALSE;
+		EText = FSWords.empty() ? tstring() : FSWords[0];
+		if (!EText.empty() && ((EText[0] == '-') || (EText[0] == '+'))) EText.erase(0,1);
 	}
+
+	EPreparePattern(EText);
+	if (bReplace) {
+		ERReplace = FRReplace;
+		LastAction = 1;
+	} else
+		LastAction = 0;
 }
 
 int LastLine=0;
