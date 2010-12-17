@@ -96,11 +96,11 @@ BOOL DoFileReplace(HANDLE &hFile,const char *&Found,int FoundLen,const char *Rep
 	return TRUE;
 }
 
-BOOL FinishReplace(HANDLE hFile,const char *&Skip,int SkipLen,WIN32_FIND_DATA *FindData) {
+bool FinishReplace(HANDLE hFile,const char *&Skip,int SkipLen,WIN32_FIND_DATA *FindData) {
 	if (hFile!=INVALID_HANDLE_VALUE) {
 		if (ReplaceNumber == 0) {
 			CloseHandle(hFile);
-			return FALSE;
+			return false;
 		}
 
 		WriteBuffer(hFile,Skip,SkipLen,FindData->cFileName);
@@ -108,13 +108,13 @@ BOOL FinishReplace(HANDLE hFile,const char *&Skip,int SkipLen,WIN32_FIND_DATA *F
 		SetFileTime(hFile, &FindData->ftCreationTime, NULL, NULL);
 		CloseHandle(hFile);
 
-		return TRUE;
+		return true;
 	} else {
-		return FALSE;
+		return false;
 	}
 }
 
-BOOL ProcessPlainTextBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindData) {
+bool ProcessPlainTextBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindData) {
 	const char *Current=Buffer;
 	const char *Skip=Buffer;
 	HANDLE hFile=INVALID_HANDLE_VALUE;
@@ -150,7 +150,7 @@ BOOL ProcessPlainTextBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindD
 	return FinishReplace(hFile,Skip,Buffer+BufLen-Skip,FindData);
 }
 
-BOOL ProcessRegExpBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindData) {
+bool ProcessRegExpBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindData) {
 	const char *BufEnd=Buffer;
 	const char *Skip=Buffer;
 	HANDLE hFile=INVALID_HANDLE_VALUE;
@@ -195,7 +195,7 @@ int CountLinesIn(const char *Buffer,int Len) {
 	return LinesIn;
 }
 
-BOOL ReplaceSeveralLineBuffer(HANDLE &hFile,const char *&Buffer,const char *BufEnd,
+bool ReplaceSeveralLineBuffer(HANDLE &hFile,const char *&Buffer,const char *BufEnd,
 							  const char *&Skip, int &LinesIn,WIN32_FIND_DATA *FindData) {
 	int Start=0;
 	const char *LineEnd=Buffer;
@@ -231,12 +231,11 @@ BOOL ReplaceSeveralLineBuffer(HANDLE &hFile,const char *&Buffer,const char *BufE
 	return TRUE;
 }
 
-BOOL ProcessSeveralLineBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindData) {
+bool ProcessSeveralLineBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindData) {
 	const char *BufEnd=Buffer;
 	const char *Skip=Buffer;
 	HANDLE hFile=INVALID_HANDLE_VALUE;
 	int LinesIn=0;
-	BOOL Error=FALSE;
 
 	REParamA.Clear();
 	REParamA.AddRE(FPatternA);
@@ -245,18 +244,18 @@ BOOL ProcessSeveralLineBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *Fin
 		SkipWholeLine(BufEnd,&BufLen);
 		LinesIn++;
 		if ((LinesIn==SeveralLines) || ((BufEnd-Buffer) >= SeveralLinesKB*1024)) {
-			if (!ReplaceSeveralLineBuffer(hFile,Buffer,BufEnd,Skip,LinesIn,FindData)) {Error=TRUE;break;};
+			if (!ReplaceSeveralLineBuffer(hFile,Buffer,BufEnd,Skip,LinesIn,FindData)) break;
 		}
 	} while (BufLen);
 
 	while (Buffer<BufEnd) {
-		if (!ReplaceSeveralLineBuffer(hFile,Buffer,BufEnd,Skip,LinesIn,FindData)) {Error=TRUE;break;};
+		if (!ReplaceSeveralLineBuffer(hFile,Buffer,BufEnd,Skip,LinesIn,FindData)) break;
 	}
 
 	return FinishReplace(hFile,Skip,BufEnd-Skip,FindData);
 }
 
-BOOL ProcessBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindData) {
+bool ProcessBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindData) {
 	FRConfirmLineThisFile = FRConfirmLineThisRun;
 	FileConfirmed = !FRConfirmFileThisRun;
 	FindNumber = ReplaceNumber = 0;
@@ -290,6 +289,43 @@ tstring GetUniqueFileName(const TCHAR *szCurrent, const TCHAR *szExt) {
 	} while (true);
 }
 
+bool ReplaceSingleFile_Normal(WIN32_FIND_DATA *FindData, CFileMapping &mapFile) {
+	bool bProcess = ProcessBuffer(mapFile, FindData->nFileSizeLow, FindData);
+	mapFile.Close();
+
+	if (bProcess) {
+		if (!ReplaceFile(FindData->cFileName, g_strNewFileName.c_str(),
+			(FRSaveOriginal) ? g_strBackupFileName.c_str() : NULL,
+			REPLACEFILE_IGNORE_MERGE_ERRORS, NULL, NULL)) {
+
+				const TCHAR *Lines[]={GetMsg(MREReplace),GetMsg(MFileBackupError),FindData->cFileName,GetMsg(MOk)};
+				StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING|FMSG_ERRORTYPE,_T("FRBackupError"),Lines,4,1);
+		}
+	}
+
+	return bProcess;
+}
+
+//	Using slow but reliable mechanism for files with hardlinks
+bool ReplaceSingleFile_CopyFirst(WIN32_FIND_DATA *FindData, CFileMapping &mapFile) {
+	if (!CopyFile(FindData->cFileName, g_strBackupFileName.c_str(), FALSE)) {
+		return ReplaceSingleFile_Normal(FindData, mapFile);
+	}
+
+	mapFile.Close();
+	mapFile.Open(g_strBackupFileName.c_str());
+	g_strNewFileName = FindData->cFileName;
+
+	bool bProcess = ProcessBuffer(mapFile, FindData->nFileSizeLow, FindData);
+	mapFile.Close();
+
+	if (bProcess) {
+		if (!FRSaveOriginal) DeleteFile(g_strBackupFileName.c_str());
+	}
+
+	return bProcess;
+}
+
 void ReplaceSingleFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 	BOOL ReturnValue=FALSE;
 
@@ -307,18 +343,18 @@ void ReplaceSingleFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) 
 
 	CFileMapping mapFile;
 	if (mapFile.Open(FindData->cFileName)) {
-		BOOL bProcess = ProcessBuffer(mapFile, FindData->nFileSizeLow, FindData);
-		mapFile.Close();
+
+		BY_HANDLE_FILE_INFORMATION hfInfo;
+		GetFileInformationByHandle(mapFile.GetFileHandle(), &hfInfo);
+
+		bool bProcess;
+		if (hfInfo.nNumberOfLinks > 1) {
+			bProcess = ReplaceSingleFile_CopyFirst(FindData, mapFile);
+		} else {
+			bProcess = ReplaceSingleFile_Normal(FindData, mapFile);
+		}
 
 		if (bProcess) {
-			if (!ReplaceFile(FindData->cFileName, g_strNewFileName.c_str(),
-				(FRSaveOriginal) ? g_strBackupFileName.c_str() : NULL,
-				REPLACEFILE_IGNORE_MERGE_ERRORS, NULL, NULL)) {
-
-				const TCHAR *Lines[]={GetMsg(MREReplace),GetMsg(MFileBackupError),FindData->cFileName,GetMsg(MOk)};
-				StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING|FMSG_ERRORTYPE,_T("FRBackupError"),Lines,4,1);
-			}
-
 			AddFile(FindData, PanelItems);
 		}
 	} else {
