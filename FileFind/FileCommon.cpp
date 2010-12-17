@@ -176,7 +176,7 @@ int FPreparePattern(bool bAcceptEmpty) {
 			FSWords.push_back(Word);
 		} while (Word.size()&&(!g_bInterrupted));
 						}
-		return FALSE;
+		return TRUE;
 
 	case SA_REGEXP:
 	case SA_SEVERALLINE:
