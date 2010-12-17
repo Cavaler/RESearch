@@ -1,22 +1,22 @@
 #include "StdAfx.h"
 #include "..\RESearch.h"
 
-CParameterSet g_FSParamSet(FileSearchExecutor, 4, 6,
+CParameterSet g_FSParamSet(FileSearchExecutor, 4, 5,
 	"Mask", &MaskText, "Text", &SearchText, "@Mask", &FMask, "@Text", &FText,
 	"MaskAsRegExp", &FMaskAsRegExp, "CaseSensitive", &FCaseSensitive,
-	"UTF8", &FUTF8, "SearchAs", &FSearchAs, "IsInverse", &FSInverse,
+	"SearchAs", &FSearchAs, "IsInverse", &FSInverse,
 	"AdvancedID", &FAdvancedID
 	);
-CParameterSet g_FRParamSet(FileReplaceExecutor, 6, 5,
+CParameterSet g_FRParamSet(FileReplaceExecutor, 6, 4,
 	"Mask", &MaskText, "Text", &SearchText, "Replace", &ReplaceText,
 	"@Mask", &FMask, "@Text", &FText, "@Replace", &FRReplace,
 	"MaskAsRegExp", &FMaskAsRegExp, "CaseSensitive", &FCaseSensitive,
-	"UTF8", &FUTF8, "SearchAs", &FSearchAs, "AdvancedID", &FAdvancedID
+	"SearchAs", &FSearchAs, "AdvancedID", &FAdvancedID
 	);
-CParameterSet g_FGParamSet(FileGrepExecutor, 4, 10,
+CParameterSet g_FGParamSet(FileGrepExecutor, 4, 9,
 	"Mask", &MaskText, "Text", &SearchText, "@Mask", &FMask, "@Text", &FText,
 	"MaskAsRegExp", &FMaskAsRegExp, "CaseSensitive", &FCaseSensitive,
-	"UTF8", &FUTF8, "SearchAs", &FSearchAs, "IsInverse", &FSInverse,
+	"SearchAs", &FSearchAs, "IsInverse", &FSInverse,
 	"GrepWhat", &FGrepWhat, "AddLineNumbers", &FGAddLineNumbers,
 	"AddContext", &FGAddContext, "ContextLines", &FGContextLines,
 	"AdvancedID", &FAdvancedID
@@ -182,9 +182,9 @@ int FPreparePattern(bool bAcceptEmpty) {
 	case SA_SEVERALLINE:
 	case SA_MULTILINE:
 		if (FText.empty()) return TRUE;
-		return PreparePattern(&FPattern, &FPatternExtra, FText, FCaseSensitive, FUTF8, NULL)
+		return PreparePattern(&FPattern, &FPatternExtra, FText, FCaseSensitive, NULL)
 #ifdef UNICODE
-			&& PreparePattern(&FPatternA, &FPatternExtraA, DefFromUnicode(FText), FCaseSensitive, FUTF8, DefCharTables())
+			&& PreparePattern(&FPatternA, &FPatternExtraA, DefFromUnicode(FText), FCaseSensitive, DefCharTables())
 #endif
 			;
 	default:

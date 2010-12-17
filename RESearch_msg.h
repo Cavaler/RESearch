@@ -32,7 +32,6 @@ enum eStringTable {
 	MMenuSearchReplaceAgainRev,
 	MMenuFilterText,
 	MMenuTransliterate,
-	MMenuUTF8Converter,
 	MMenuShowLastResults,
 	MMenuBatches,
 	MMenuPreset,
@@ -115,14 +114,6 @@ enum eStringTable {
 	MListAllLines,
 
 	MRenumber,
-
-	MUTF8Converter,
-	MConverterANSI,
-	MConverterUTF8,
-	MConverterHex,
-	MConvert,
-	MUp,
-	MDown,
 
 	MFileOpenError,
 	MFileCreateError,
@@ -213,7 +204,6 @@ enum eStringTable {
 	MReplaceWith,
 	MReverseSearch,
 	MSeveralLine,
-	MUTF8,
 	MInSelection,
 	MRemoveEmpty,
 	MRemoveNoMatch,

@@ -91,8 +91,6 @@ BOOL ProcessFFLine(TCHAR *Line, BOOL *ShowDialog, INT_PTR *Item) {
 		case 'l':case 'L':FSearchAs=SA_MULTIREGEXP;break;
 		case 'd':*ShowDialog=TRUE;break;
 		case 'D':*ShowDialog=FALSE;break;
-		case 'u':FUTF8=TRUE;break;
-		case 'U':FUTF8=FALSE;break;
 		case '0':FSearchIn=SI_ALLDRIVES;break;
 		case '1':FSearchIn=SI_ALLLOCAL;break;
 		case '2':FSearchIn=SI_FROMROOT;break;
@@ -152,8 +150,6 @@ BOOL ProcessFRLine(TCHAR *Line,BOOL *ShowDialog,INT_PTR *Item) {
 		case 'B':FROverwriteBackup=FALSE;break;
 		case 'd':*ShowDialog=TRUE;break;
 		case 'D':*ShowDialog=FALSE;break;
-		case 'u':FUTF8=TRUE;break;
-		case 'U':FUTF8=FALSE;break;
 		case '0':FSearchIn=SI_ALLDRIVES;break;
 		case '1':FSearchIn=SI_ALLLOCAL;break;
 		case '2':FSearchIn=SI_FROMROOT;break;
@@ -302,7 +298,6 @@ int ShowFileMenu() {
 	MenuItems.push_back(CFarMenuItem(MMenuRenumber));
 	MenuItems.push_back(CFarMenuItem(MMenuUndoRename));
 	MenuItems.push_back(CFarMenuItem(true));
-	MenuItems.push_back(CFarMenuItem(MMenuUTF8Converter));
 	MenuItems.push_back(CFarMenuItem(MMenuShowLastResults));
 	MenuItems.push_back(CFarMenuItem(true));
 
@@ -323,7 +318,7 @@ int ShowFileMenu() {
 
 	vector<CFarMenuItemEx> MenuItemsEx;
 	UpgradeMenuItemVector(MenuItems, MenuItemsEx);
-	
+
 	if (m_arrLastRename.empty()) MenuItemsEx[11].Flags |= MIF_DISABLE;
 	if (LastTempPanel == NULL) MenuItemsEx[14].Flags |= MIF_DISABLE;
 
@@ -346,7 +341,6 @@ int ShowEditorMenu() {
 	MenuItems.push_back(CFarMenuItem(MMenuSearchReplaceAgain));
 	MenuItems.push_back(CFarMenuItem(MMenuSearchReplaceAgainRev));
 	MenuItems.push_back(CFarMenuItem(true));
-	MenuItems.push_back(CFarMenuItem(MMenuUTF8Converter));
 	MenuItems.push_back(CFarMenuItem(MMenuShowLastResults));
 
 	MenuItems.push_back(CFarMenuItem(true));
@@ -382,8 +376,6 @@ int ShowViewerMenu() {
 	MenuItems.push_back(CFarMenuItem(MMenuSearch));
 	MenuItems.push_back(CFarMenuItem(MMenuSearchAgain));
 //	MenuItems.push_back(CFarMenuItem(MMenuSearchAgainRev));
-	MenuItems.push_back(CFarMenuItem(true));
-	MenuItems.push_back(CFarMenuItem(MMenuUTF8Converter));
 
 	MenuItems.push_back(CFarMenuItem(true));
 	VSPresets->FillMenuItems(MenuItems);
@@ -444,48 +436,44 @@ HANDLE OpenPluginFromFileMenu(int Item, BOOL ShowDialog) {
 	}
 
 	switch (Item) {
-		case 0:
-			Result = FileFind(g_PanelItems,ShowDialog);
-			if (Result != OR_CANCEL) SynchronizeWithFile(false);
-			break;
-		case 1:
-			Result = FileReplace(g_PanelItems,ShowDialog);
-			if (Result != OR_CANCEL) SynchronizeWithFile(true);
-			break;
-		case 2:
-			Result = FileGrep(ShowDialog);
-			if (Result != OR_CANCEL) SynchronizeWithFile(false);
-			break;
-		case 4:ChangeSelection(MSelect);break;
-		case 5:ChangeSelection(MUnselect);break;
-		case 6:ChangeSelection(MFlipSelection);break;
-		case 8:
-			Result=RenameFiles(g_PanelItems,ShowDialog);
-			break;
-		case 9:
-			Result=RenameSelectedFiles(g_PanelItems,ShowDialog);
-			break;
-		case 10:
-			Result=RenumberFiles();
-			break;
-		case 11:
-			Result=UndoRenameFiles();
-			break;
-		case 13:
-			UTF8Converter();
+	case 0:
+		Result = FileFind(g_PanelItems,ShowDialog);
+		if (Result != OR_CANCEL) SynchronizeWithFile(false);
+		break;
+	case 1:
+		Result = FileReplace(g_PanelItems,ShowDialog);
+		if (Result != OR_CANCEL) SynchronizeWithFile(true);
+		break;
+	case 2:
+		Result = FileGrep(ShowDialog);
+		if (Result != OR_CANCEL) SynchronizeWithFile(false);
+		break;
+	case 4:ChangeSelection(MSelect);break;
+	case 5:ChangeSelection(MUnselect);break;
+	case 6:ChangeSelection(MFlipSelection);break;
+	case 8:
+		Result=RenameFiles(g_PanelItems,ShowDialog);
+		break;
+	case 9:
+		Result=RenameSelectedFiles(g_PanelItems,ShowDialog);
+		break;
+	case 10:
+		Result=RenumberFiles();
+		break;
+	case 11:
+		Result=UndoRenameFiles();
+		break;
+	case 13:
+		if (LastTempPanel) {
+			LastTempPanel->m_bActive = true;
+			return (HANDLE)LastTempPanel;
+		} else {
 			Result=OR_CANCEL;
 			break;
-		case 14:
-			if (LastTempPanel) {
-				LastTempPanel->m_bActive = true;
-				return (HANDLE)LastTempPanel;
-			} else {
-				Result=OR_CANCEL;
-				break;
-			}
+		}
 	}
-	if (Item >= 16) {
-		Item -= 16;
+	if (Item >= 15) {
+		Item -= 15;
 		Result = OpenPluginFromFilePreset(Item);
 	}
 
@@ -546,58 +534,55 @@ OperationResult OpenPluginFromEditorPreset(int Item) {
 HANDLE OpenPluginFromEditorMenu(int Item) {
 	FindIfClockPresent();
 	switch (Item = ShowEditorMenu()) {
-		case 0:
+	case 0:
+		if (EditorSearch()) LastAction=0;
+		break;
+	case 1:
+		if (EditorReplace()) LastAction=1;
+		break;
+	case 2:
+		if (EditorFilter()) LastAction=2;
+		break;
+	case 3:
+		if (EditorTransliterate()) LastAction=3;
+		break;
+	case 6:
+		EReverse = !EReverse;
+		//	fall-through
+	case 5:
+		ESearchAgainCalled = TRUE;
+		EPreparePattern(EText);		// In case codepage changed etc
+
+		switch (LastAction) {
+		case -1:
+			ESearchAgainCalled = FALSE;
 			if (EditorSearch()) LastAction=0;
 			break;
+		case 0:
+			EditorSearchAgain();
+			break;
 		case 1:
-			if (EditorReplace()) LastAction=1;
+			_EditorReplaceAgain();
 			break;
 		case 2:
-			if (EditorFilter()) LastAction=2;
+			EditorFilterAgain();
 			break;
 		case 3:
-			if (EditorTransliterate()) LastAction=3;
+			EditorTransliterateAgain();
 			break;
-		case 6:
-			EReverse = !EReverse;
-			//	fall-through
-		case 5:
-			ESearchAgainCalled = TRUE;
-			EPreparePattern(EText);		// In case codepage changed etc
-
-			switch (LastAction) {
-			case -1:
-				ESearchAgainCalled = FALSE;
-				if (EditorSearch()) LastAction=0;
-				break;
-			case 0:
-				EditorSearchAgain();
-				break;
-			case 1:
-				_EditorReplaceAgain();
-				break;
-			case 2:
-				EditorFilterAgain();
-				break;
-			case 3:
-				EditorTransliterateAgain();
-				break;
-			case 4:
-				EditorListAllAgain();
-				break;
-			};
-			if (Item == 6) EReverse = !EReverse;
+		case 4:
+			EditorListAllAgain();
 			break;
-		case 8:
-			UTF8Converter();
-			break;
-		case 9:
-			if (EditorListAllShowResults(false)) LastAction=4;
-			break;
+		};
+		if (Item == 6) EReverse = !EReverse;
+		break;
+	case 8:
+		if (EditorListAllShowResults(false)) LastAction=4;
+		break;
 	}
 
-	if (Item >= 11) {
-		Item -= 11;
+	if (Item >= 10) {
+		Item -= 10;
 		OpenPluginFromEditorPreset(Item);
 	}
 
@@ -614,14 +599,14 @@ OperationResult OpenPluginFromViewerPreset(int Item) {
 
 HANDLE OpenPluginFromViewerMenu(int Item) {
 	switch (ShowViewerMenu()) {
-		case 0:
-			if (ViewerSearch()) LastAction = 0;
-			break;
-//		case 2:
-//			EReverse = !EReverse;
-		case 1:
-			ESearchAgainCalled = TRUE;
-			switch (LastAction) {
+	case 0:
+		if (ViewerSearch()) LastAction = 0;
+		break;
+//	case 2:
+//		EReverse = !EReverse;
+	case 1:
+		ESearchAgainCalled = TRUE;
+		switch (LastAction) {
 		case -1:
 			ESearchAgainCalled = FALSE;
 			if (ViewerSearch()) LastAction = 0;
@@ -629,16 +614,13 @@ HANDLE OpenPluginFromViewerMenu(int Item) {
 		default:
 			if (ViewerSearchAgain()) LastAction = 0;
 			break;
-			}
-//			if (nMenu == 2) EReverse = !EReverse;
-			break;
-		case 3:
-			UTF8Converter();
-			break;
+		}
+//		if (nMenu == 2) EReverse = !EReverse;
+		break;
 	}
 
-	if (Item >= 5) {
-		Item -= 5;
+	if (Item >= 3) {
+		Item -= 3;
 		OpenPluginFromViewerPreset(Item);
 	}
 

@@ -211,8 +211,6 @@ BOOL EditorSearch() {
 	Dialog.Add(new CFarButtonItem(48,5,0,0,_T("&...")));
 
 	Dialog.Add(new CFarCheckBoxItem(5,6,0,MCaseSensitive,&ECaseSensitive));
-	Dialog.Add(new CFarCheckBoxItem(30,6,0,_T(""),&EUTF8));
-	Dialog.Add(new CFarButtonItem(34,6,0,0,MUTF8));
 	Dialog.Add(new CFarCheckBoxItem(5,7,0,MReverseSearch,&EReverse));
 	Dialog.Add(new CFarCheckBoxItem(30,7,(EdInfo.BlockType != BTYPE_NONE) ? 0 : DIF_DISABLE, MInSelection, &EInSelection));
 	Dialog.AddButtons(MOk, MShowAll); Dialog.AddButton(MCancel);
@@ -222,7 +220,7 @@ BOOL EditorSearch() {
 	if (SearchText.empty()) SearchText=EText;
 	int ExitCode;
 	do {
-		switch (ExitCode=Dialog.Display(6,-4,-3,3,7,-1,-6)) {
+		switch (ExitCode=Dialog.Display(5,-4,-3,3,7,-1)) {
 		case 0:
 			break;
 		case 1:
@@ -236,9 +234,6 @@ BOOL EditorSearch() {
 			break;
 		case 4:
 			ESPresets->ShowMenu(true);
-			break;
-		case 5:
-			UTF8Converter(SearchText);
 			break;
 		case -1:
 			return FALSE;
@@ -275,21 +270,14 @@ BOOL CESPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.Add(new CFarCheckBoxItem(5,7,0,MRegExp,&pPreset->m_mapInts["IsRegExp"]));
 	Dialog.Add(new CFarCheckBoxItem(5,8,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
 	Dialog.Add(new CFarCheckBoxItem(35,7,0,MSeveralLine,&pPreset->m_mapInts["SeveralLine"]));
-	Dialog.Add(new CFarCheckBoxItem(35,8,0,_T(""),&pPreset->m_mapInts["UTF8"]));
-	Dialog.Add(new CFarButtonItem(39,8,0,0,MUTF8));
 	Dialog.Add(new CFarCheckBoxItem(5,10,0,MAddToMenu,&pPreset->m_bAddToMenu));
 	Dialog.Add(new CFarCheckBoxItem(35,10,0,MListAllFromPreset,&pPreset->m_mapInts["ListAll"]));
 	Dialog.AddButtons(MOk,MCancel);
 
 	do {
-		switch (Dialog.Display(2, -2, -4)) {
+		switch (Dialog.Display(1, -2)) {
 		case 0:
 			return TRUE;
-		case 1:{		// avoid Internal Error for icl
-			tstring str = pPreset->m_mapStrings["SearchText"];
-			UTF8Converter(str);
-			break;
-			  }
 		default:
 			return FALSE;
 		}

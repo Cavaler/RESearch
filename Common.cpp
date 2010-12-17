@@ -98,7 +98,7 @@ bool CheckUsage(const tstring &strText, bool bRegExp, bool bSeveralLine) {
 	return true;
 }
 
-BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const tstring &Text,int CaseSensitive,BOOL bUTF8,const unsigned char *pTables) {
+BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const tstring &Text,int CaseSensitive,const unsigned char *pTables) {
 	if (Text.empty()) return FALSE;		// WAS: Not needed if empty NOW: what is search for nothing?
 	const TCHAR *ErrPtr;
 	int ErrOffset;
@@ -109,7 +109,6 @@ BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const tstring &Text
 #endif
 	if (DotMatchesNewline) iFlags |= PCRE_DOTALL;
 	if (!CaseSensitive) iFlags |= PCRE_CASELESS;
-	if (bUTF8) iFlags |= PCRE_UTF8;
 
 	*Pattern=pcre_compile(Text.c_str(),iFlags,&ErrPtr,&ErrOffset,pTables);
 	if (!(*Pattern)) {
@@ -128,14 +127,13 @@ BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const tstring &Text
 }
 
 #ifdef UNICODE
-BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,int CaseSensitive,BOOL bUTF8,const unsigned char *pTables) {
+BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,int CaseSensitive,const unsigned char *pTables) {
 	if (Text.empty()) return FALSE;		// WAS: Not needed if empty NOW: what is search for nothing?
 	const char *ErrPtr;
 	int ErrOffset;
 	int iFlags=PCRE_MULTILINE|PCRE_UCP;
 	if (DotMatchesNewline) iFlags |= PCRE_DOTALL;
 	if (!CaseSensitive) iFlags |= PCRE_CASELESS;
-	if (bUTF8) iFlags |= PCRE_UTF8;
 
 	*Pattern=pcre_compile(Text.c_str(),iFlags,&ErrPtr,&ErrOffset,pTables);
 	if (!(*Pattern)) {
@@ -438,71 +436,6 @@ wstring HexToUni(tstring strHex) {
 	}
 
 	return wstrUnicode;
-}
-
-#ifndef UNICODE
-tstring UTF8ToHex(string &strUTF8) {
-	return UniToHex(DecodeUTF8(strUTF8));
-}
-
-string HexToUTF8(tstring &strHex) {
-	return EncodeUTF8(HexToUni(strHex));
-}
-#endif
-
-void UTF8Converter(tstring strInit) {
-	tstring strANSI = strInit;
-	tstring strUTF8 = strInit;
-	tstring strHex;
-
-	CFarDialog Dialog(70,13,_T("UTF8Converter"));
-	Dialog.AddFrame(MUTF8Converter);
-	Dialog.Add(new CFarTextItem(5,3,0,MConverterANSI));
-	Dialog.Add(new CFarEditItem(11,3,57,DIF_HISTORY,_T("RESearch.ANSI"),strANSI));
-
-	Dialog.Add(new CFarTextItem(5,5,0,MConverterUTF8));
-	Dialog.Add(new CFarEditItem(11,5,57,DIF_HISTORY,_T("RESearch.UTF8"),strUTF8));
-
-	Dialog.Add(new CFarTextItem(5,7,0,MConverterHex));
-	Dialog.Add(new CFarEditItem(11,7,57,DIF_HISTORY,_T("RESearch.Hex"),strHex));
-
-	Dialog.Add(new CFarButtonItem(60,3,0,0,MConvert));
-	Dialog.Add(new CFarButtonItem(60,5,0,0,MConvert));
-	Dialog.Add(new CFarButtonItem(60,7,0,0,MConvert));
-	Dialog.Add(new CFarButtonItem(60,9,DIF_CENTERGROUP,1,MOk));
-
-	int iResult;
-	do {
-		switch (iResult = Dialog.Display(4, -4, -3, -2, -1)) {
-		case 0:
-#ifdef UNICODE
-			strUTF8 = OEMToUnicode(EncodeUTF8(strANSI));
-			strHex = UniToHex(strANSI);
-#else
-			strUTF8 = EncodeUTF8(strANSI, CP_OEMCP);
-			strHex = UTF8ToHex(strUTF8);
-#endif
-			break;
-		case 1:
-#ifdef UNICODE
-			strANSI = DecodeUTF8(OEMFromUnicode(strUTF8));
-			strHex = UniToHex(strANSI);
-#else
-			strANSI = DecodeUTF8A(strUTF8, CP_OEMCP);
-			strHex = UTF8ToHex(strUTF8);
-#endif
-			break;
-		case 2:
-#ifdef UNICODE
-			strANSI = HexToUni(strHex);
-			strUTF8 = OEMToUnicode(EncodeUTF8(strANSI));
-#else
-			strUTF8 = HexToUTF8(strHex);
-			strANSI = DecodeUTF8A(strUTF8, CP_OEMCP);
-#endif
-			break;
-		}
-	} while ((iResult == 0) || (iResult == 1) || (iResult == 2));
 }
 
 void QuoteRegExpString(tstring &strText) {

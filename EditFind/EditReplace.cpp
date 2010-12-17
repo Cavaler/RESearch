@@ -499,8 +499,6 @@ BOOL EditorReplace() {
 	Dialog.Add(new CFarButtonItem(48, 7, 0, 0, _T("&...")));
 
 	Dialog.Add(new CFarCheckBoxItem(5, 8, 0, MCaseSensitive, &ECaseSensitive));
-	Dialog.Add(new CFarCheckBoxItem(30, 8, 0, _T(""), &EUTF8));
-	Dialog.Add(new CFarButtonItem(34, 8, 0, 0, MUTF8));
 	Dialog.Add(new CFarCheckBoxItem(5, 9, 0, MReverseSearch, &EReverse));
 	Dialog.Add(new CFarCheckBoxItem(30, 9, (EdInfo.BlockType != BTYPE_NONE) ? 0 : DIF_DISABLE, MInSelection, &EInSelection));
 	Dialog.Add(new CFarCheckBoxItem(5, 10, 0, MRemoveEmpty, &ERRemoveEmpty));
@@ -521,7 +519,7 @@ BOOL EditorReplace() {
 
 	int ExitCode;
 	do {
-		switch (ExitCode = Dialog.Display(9, -5, -4, 5, 6, 10, -2, 13, -6, -1)) {
+		switch (ExitCode = Dialog.Display(8, -5, -4, 5, 6, 10, -2, -6, -1)) {
 		case 0:
 		case 1:
 			break;
@@ -538,12 +536,9 @@ BOOL EditorReplace() {
 			ERPresets->ShowMenu(true);
 			break;
 		case 6:
-			UTF8Converter(SearchText);
-			break;
-		case 7:
 			RunExternalEditor(ReplaceText);
 			break;
-		case 8:
+		case 7:
 			if (RunREBuilder(SearchText, ReplaceText)) {
 				ERegExp = TRUE;
 			}
@@ -603,8 +598,6 @@ BOOL CERPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.Add(new CFarCheckBoxItem(5, 9, 0, MRegExp, &pPreset->m_mapInts["IsRegExp"]));
 	Dialog.Add(new CFarCheckBoxItem(5, 10, 0, MCaseSensitive, &pPreset->m_mapInts["CaseSensitive"]));
 	Dialog.Add(new CFarCheckBoxItem(30, 9, 0, MSeveralLine, &pPreset->m_mapInts["SeveralLine"]));
-	Dialog.Add(new CFarCheckBoxItem(30, 10, 0, _T(""), &pPreset->m_mapInts["UTF8"]));
-	Dialog.Add(new CFarButtonItem(34, 10, 0, 0, MUTF8));
 	Dialog.Add(new CFarCheckBoxItem(5, 11, 0, MRemoveEmpty, &pPreset->m_mapInts["RemoveEmpty"]));
 	Dialog.Add(new CFarCheckBoxItem(30, 11, 0, MRemoveNoMatch, &pPreset->m_mapInts["RemoveNoMatch"]));
 	Dialog.Add(new CFarCheckBoxItem(5, 12, 0, MEvaluateAsScript, &pPreset->m_mapInts["AsScript"]));
@@ -615,15 +608,10 @@ BOOL CERPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.AddButtons(MOk, MCancel);
 
 	do {
-		switch (Dialog.Display(3, -2, -9, -4)) {
+		switch (Dialog.Display(2, -2, -4)) {
 		case 0:
 			return TRUE;
-		case 1:{		// avoid Internal Error for icl
-			tstring str = pPreset->m_mapStrings["Text"];
-			UTF8Converter(str);
-			break;
-			  }
-		case 2:
+		case 1:
 			RunExternalEditor(pPreset->m_mapStrings["Replace"]);
 			break;
 

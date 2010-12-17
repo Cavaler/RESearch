@@ -1,21 +1,21 @@
 #include "StdAfx.h"
 #include "..\RESearch.h"
 
-CParameterSet g_ESParamSet(EditorSearchExecutor, 2, 5,
+CParameterSet g_ESParamSet(EditorSearchExecutor, 2, 4,
 	"Text", &SearchText, "@Text", &EText,
-	"IsRegExp", &ERegExp, "CaseSensitive", &ECaseSensitive, "SeveralLine", &ESeveralLine, "UTF8", &EUTF8,
+	"IsRegExp", &ERegExp, "CaseSensitive", &ECaseSensitive, "SeveralLine", &ESeveralLine,
 	"ListAll", &EListAllFromPreset
 					 );
-CParameterSet g_ERParamSet(EditorReplaceExecutor, 4, 8,
+CParameterSet g_ERParamSet(EditorReplaceExecutor, 4, 7,
 	"Text", &SearchText, "Replace", &ReplaceText,
 	 "@Text", &EText,  "@Replace", &ERReplace,
 	"IsRegExp", &ERegExp, "CaseSensitive", &ECaseSensitive, "SeveralLine", &ESeveralLine,
-	"UTF8", &EUTF8, "RemoveEmpty", &ERRemoveEmpty, "RemoveNoMatch", &ERRemoveNoMatch,
+	"RemoveEmpty", &ERRemoveEmpty, "RemoveNoMatch", &ERRemoveNoMatch,
 	"AsScript", &EREvaluate, "Script", &EREvaluateScript
 					 );
-CParameterSet g_EFParamSet(EditorFilterExecutor, 2, 4,
+CParameterSet g_EFParamSet(EditorFilterExecutor, 2, 3,
 	"Text", &SearchText, "@Text", &EText,
-	"LeaveFilter", &EFLeaveFilter, "IsRegExp", &ERegExp, "CaseSensitive", &ECaseSensitive, "UTF8", &EUTF8
+	"LeaveFilter", &EFLeaveFilter, "IsRegExp", &ERegExp, "CaseSensitive", &ECaseSensitive
 					 );
 CParameterSet g_ETParamSet(EditorTransliterateExecutor, 2, 0,
 	"Text", &SearchText, "Replace", &ReplaceText,
@@ -339,7 +339,7 @@ BOOL EPreparePattern(tstring &SearchText) {
 		RefreshEditorInfo();
 
 #ifdef UNICODE
-		BOOL Result = PreparePattern(&EPattern,&EPatternExtra,SearchText,ECaseSensitive,EUTF8,NULL);
+		BOOL Result = PreparePattern(&EPattern,&EPatternExtra,SearchText,ECaseSensitive,NULL);
 #else
 		if (ECharacterTables && (ECharacterTables != ANSICharTables) && (ECharacterTables != OEMCharTables))
 			pcre_free((void *)ECharacterTables);
@@ -359,7 +359,7 @@ BOOL EPreparePattern(tstring &SearchText) {
 
 		char *OEMLine = _strdup(SearchText.c_str());
 		OEMToEditor(OEMLine, SearchText.size());
-		BOOL Result = PreparePattern(&EPattern,&EPatternExtra,OEMLine,ECaseSensitive,EUTF8,ECharacterTables);
+		BOOL Result = PreparePattern(&EPattern,&EPatternExtra,OEMLine,ECaseSensitive,ECharacterTables);
 		free(OEMLine);
 #endif
 		return Result;
@@ -384,7 +384,6 @@ void ECleanup(BOOL PatternOnly) {
 
 void SynchronizeWithFile(bool bReplace) {
 	ECaseSensitive = FCaseSensitive;
-	EUTF8 = FUTF8;
 	EReverse = FALSE;
 
 	if (FSearchAs <= SA_MULTILINE) {

@@ -173,8 +173,6 @@ BOOL ViewerSearch() {
 	Dialog.Add(new CFarCheckBoxItem(5,5,0,MRegExp,&ERegExp));
 	Dialog.Add(new CFarCheckBoxItem(30,5,DIF_DISABLE,MSeveralLine,&ESeveralLine));
 	Dialog.Add(new CFarCheckBoxItem(5,6,0,MCaseSensitive,&ECaseSensitive));
-	Dialog.Add(new CFarCheckBoxItem(30,6,0,_T(""),&EUTF8));
-	Dialog.Add(new CFarButtonItem(34,6,0,0,MUTF8));
 	Dialog.Add(new CFarCheckBoxItem(5,7,DIF_DISABLE,MReverseSearch,&EReverse));
 	Dialog.AddButtons(MOk,MCancel);
 	Dialog.Add(new CFarButtonItem(60,5,0,0,MBtnPresets));
@@ -185,7 +183,7 @@ BOOL ViewerSearch() {
 
 	int ExitCode;
 	do {
-		switch (ExitCode=Dialog.Display(4,-3,3,-1,-5)) {
+		switch (ExitCode=Dialog.Display(3,-3,3,-1)) {
 		case 0:
 			break;
 		case 1:
@@ -193,9 +191,6 @@ BOOL ViewerSearch() {
 			break;
 		case 2:
 			VSPresets->ShowMenu(true);
-			break;
-		case 3:
-			UTF8Converter(SearchText);
 			break;
 		case -1:
 			return FALSE;
@@ -219,19 +214,12 @@ BOOL CVSPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.Add(new CFarCheckBoxItem(5,7,0,MRegExp,&pPreset->m_mapInts["IsRegExp"]));
 	Dialog.Add(new CFarCheckBoxItem(5,8,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
 	Dialog.Add(new CFarCheckBoxItem(30,7,0,MSeveralLine,&pPreset->m_mapInts["SeveralLine"]));
-	Dialog.Add(new CFarCheckBoxItem(30,8,0,_T(""),&pPreset->m_mapInts["UTF8"]));
-	Dialog.Add(new CFarButtonItem(34,8,0,0,MUTF8));
 	Dialog.AddButtons(MOk,MCancel);
 
 	do {
-		switch (Dialog.Display(2, -2, -3)) {
+		switch (Dialog.Display(1, -2)) {
 		case 0:
 			return TRUE;
-		case 1:{		// avoid Internal Error for icl
-			tstring str = pPreset->m_mapStrings["SearchText"];
-			UTF8Converter(str);
-			break;
-			  }
 		default:
 			return FALSE;
 		}

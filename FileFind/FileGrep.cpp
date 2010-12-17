@@ -268,17 +268,15 @@ bool GrepPrompt(BOOL bPlugin) {
 	Dialog.Add(new CFarButtonItem(60,10,0,0,MBtnPresets));
 	Dialog.Add(new CFarCheckBoxItem(56,11,0,_T(""),&FAdvanced));
 	Dialog.Add(new CFarButtonItem(60,11,0,0,MBtnAdvanced));
-	Dialog.Add(new CFarCheckBoxItem(56,12,0,_T(""),&FUTF8));
-	Dialog.Add(new CFarButtonItem(60,12,0,0,MUTF8));
 	Dialog.SetFocus(3);
-	FACaseSensitive=FADirectoryCaseSensitive=MaskCaseHere();
+	FACaseSensitive = FADirectoryCaseSensitive = MaskCaseHere();
 
 	MaskText=FMask;
 	SearchText=FText;
 
 	int ExitCode;
 	do {
-		switch (ExitCode=Dialog.Display(5,-7,6,-5,-3,-1)) {
+		switch (ExitCode=Dialog.Display(4,-5,6,-3,-1)) {
 		case 0:
 			FSearchAs = AsRegExp ? SA_REGEXP : SA_PLAINTEXT;
 			FMask=MaskText;
@@ -293,15 +291,11 @@ bool GrepPrompt(BOOL bPlugin) {
 		case 3:
 			if (AdvancedSettings()) FAdvanced=TRUE;
 			break;
-		case 4:
-			UTF8Converter(SearchText);
-			break;
 		case -1:
 			return false;
 		}
 	} while ((ExitCode>=1) || !PrepareFileGrepPattern() || (!FGOutputToFile && !FGOpenInEditor));
 
-	if (FUTF8) FAllCharTables=FALSE;
 	return true;
 }
 
@@ -379,8 +373,6 @@ BOOL CFGPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.Add(new CFarCheckBoxItem(5,9,0,MRegExp,&AsRegExp));
 	Dialog.Add(new CFarCheckBoxItem(35,9,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
 	Dialog.Add(new CFarCheckBoxItem(5,10,0,MInverseSearch,&pPreset->m_mapInts["Inverse"]));
-	Dialog.Add(new CFarCheckBoxItem(35,10,0,_T(""),&pPreset->m_mapInts["UTF8"]));
-	Dialog.Add(new CFarButtonItem(39,10,0,0,MUTF8));
 
 	Dialog.Add(new CFarTextItem(5,11,DIF_BOXCOLOR|DIF_SEPARATOR,_T("")));
 
@@ -403,15 +395,12 @@ BOOL CFGPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.AddButtons(MOk,MCancel);
 
 	do {
-		switch (Dialog.Display(3, -2, 13, -4)) {
+		switch (Dialog.Display(2, -2, -4)) {
 		case 0:
 			pPreset->m_mapInts["SearchAs"] = AsRegExp ? SA_REGEXP : SA_PLAINTEXT;
 			pPreset->m_mapInts["AdvancedID"] = bFAdvanced ? nAdvancedID : 0;
 			return TRUE;
 		case 1:
-			UTF8Converter(pPreset->m_mapStrings["Text"]);
-			break;
-		case 2:
 			SelectAdvancedPreset(nAdvancedID, bFAdvanced);
 			break;
 		default:

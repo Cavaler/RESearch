@@ -385,7 +385,6 @@ OperationResult RenameFiles(panelitem_vector &PanelItems, BOOL ShowDialog) {
 	PInfo.GetInfo(false);
 	if (PInfo.Plugin||(PInfo.PanelType!=PTYPE_FILEPANEL)) return OR_FAILED;
 
-	FUTF8=FALSE;
 	if (ShowDialog) {
 		if (!RenameFilesPrompt()) return OR_CANCEL;
 	} else {
@@ -535,7 +534,6 @@ OperationResult RenameSelectedFiles(panelitem_vector &PanelItems, BOOL ShowDialo
 	PInfo.GetInfo(false);
 	if (PInfo.Plugin||(PInfo.PanelType!=PTYPE_FILEPANEL)) return OR_FAILED;
 
-	FUTF8=FALSE;
 	if (ShowDialog) {
 		if (!RenameSelectedFilesPrompt()) return OR_CANCEL;
 	} else {

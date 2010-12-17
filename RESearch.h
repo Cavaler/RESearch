@@ -82,11 +82,11 @@ EXTERN int FindNumber;
 EXTERN int ReplaceNumber;
 
 bool CheckUsage(const tstring &strText, bool bRegExp, bool bSeveralLine);
-BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const tstring &Text,int CaseSensitive,BOOL bUTF8=FALSE,const unsigned char *pTables=NULL);
+BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const tstring &Text,int CaseSensitive,const unsigned char *pTables=NULL);
 tstring EvaluateReplaceString(CREParameters<TCHAR> &Param, const TCHAR *Replace, const TCHAR *EOL, int Engine);
 
 #ifdef UNICODE
-BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,int CaseSensitive,BOOL bUTF8=FALSE,const unsigned char *pTables=NULL);
+BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,int CaseSensitive,const unsigned char *pTables=NULL);
 string EvaluateReplaceString(CREParameters<CHAR> &Param, const CHAR *Replace, const CHAR *EOL, int Engine);
 #endif
 
@@ -109,7 +109,6 @@ EXTERN CharTableSet *m_pReplaceTable;
 
 void PrepareLocaleStuff();
 tstring UpCaseString(const tstring &strText);
-void UTF8Converter(tstring strInit = _T(""));
 
 UINT GetDefCP();
 UINT IsDefCP(UINT nCP);

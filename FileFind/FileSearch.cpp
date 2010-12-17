@@ -252,7 +252,7 @@ BOOL FindRegExpInBuffer(const char *Buffer,int Size,tstring &Text) {
 	if (!Text[0]) return TRUE;
 	pcre *Pattern;
 	pcre_extra *PatternExtra;
-	if (PreparePattern(&Pattern, &PatternExtra, Text, FCaseSensitive, FALSE, OEMCharTables)) {
+	if (PreparePattern(&Pattern, &PatternExtra, Text, FCaseSensitive, OEMCharTables)) {
 		BOOL Return = FindExamineEncoding(Buffer, Size, FindRegExpWithEncoding);
 		pcre_free(Pattern);
 		pcre_free(PatternExtra);
@@ -374,8 +374,6 @@ int SearchPrompt(BOOL Plugin) {
 	Dialog.Add(new CFarButtonItem(60,7,0,0,MBtnPresets));
 	Dialog.Add(new CFarCheckBoxItem(56,9,0,_T(""),&FAdvanced));
 	Dialog.Add(new CFarButtonItem(60,9,0,0,MBtnAdvanced));
-	Dialog.Add(new CFarCheckBoxItem(56,11,0,_T(""),&FUTF8));
-	Dialog.Add(new CFarButtonItem(60,11,0,0,MUTF8));
 	Dialog.SetFocus(3);
 	FACaseSensitive=FADirectoryCaseSensitive=MaskCaseHere();
 
@@ -383,7 +381,7 @@ int SearchPrompt(BOOL Plugin) {
 	SearchText=FText;
 	int ExitCode;
 	do {
-		switch (ExitCode=Dialog.Display(5,-7,6,-5,-3,-1)) {
+		switch (ExitCode=Dialog.Display(4,-5,6,-3,-1)) {
 		case 0:
 			FMask=MaskText;
 			FText=SearchText;
@@ -398,14 +396,11 @@ int SearchPrompt(BOOL Plugin) {
 		case 3:
 			if (AdvancedSettings()) FAdvanced=TRUE;
 			break;
-		case 4:
-			UTF8Converter(SearchText);
-			break;
 		case -1:
 			return FALSE;
 		}
 	} while ((ExitCode>=1) || !PrepareFileSearchPattern());
-	if (FUTF8) FAllCharTables=FALSE;
+
 	return TRUE;
 }
 
@@ -418,7 +413,6 @@ OperationResult FileFind(panelitem_vector &PanelItems, BOOL ShowDialog, BOOL bSi
 	if (ShowDialog) {
 		if (!SearchPrompt(PInfo.Plugin)) return OR_CANCEL;
 	} else {
-		if (FUTF8) FAllCharTables=FALSE;
 		if (!PrepareFileSearchPattern()) return OR_CANCEL;
 	}
 
@@ -463,20 +457,16 @@ BOOL CFSPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.Add(new CFarCheckBoxItem(5,17,0,MInverseSearch,&pPreset->m_mapInts["Inverse"]));
 	Dialog.Add(new CFarCheckBoxItem(56,9,0,_T(""),&bFAdvanced));
 	Dialog.Add(new CFarButtonItem(60,9,0,0,MBtnAdvanced));
-	Dialog.Add(new CFarCheckBoxItem(56,11,0,_T(""),&pPreset->m_mapInts["UTF8"]));
-	Dialog.Add(new CFarButtonItem(60,11,0,0,MUTF8));
+
 	Dialog.Add(new CFarCheckBoxItem(5,19,0,MAddToMenu,&pPreset->m_bAddToMenu));
 	Dialog.AddButtons(MOk,MCancel);
 
 	do {
-		switch (Dialog.Display(3, -2, -4, -6)) {
+		switch (Dialog.Display(2, -2, -4)) {
 		case 0:
 			pPreset->m_mapInts["AdvancedID"] = bFAdvanced ? nAdvancedID : 0;
 			return TRUE;
 		case 1:
-			UTF8Converter(pPreset->m_mapStrings["Text"]);
-			break;
-		case 2:
 			SelectAdvancedPreset(nAdvancedID, bFAdvanced);
 			break;
 		default:

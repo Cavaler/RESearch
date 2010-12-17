@@ -377,8 +377,6 @@ int ReplacePrompt(BOOL Plugin) {
 	Dialog.Add(new CFarButtonItem(60,9,0,0,MBtnPresets));
 	Dialog.Add(new CFarCheckBoxItem(56,10,0,_T(""),&FAdvanced));
 	Dialog.Add(new CFarButtonItem(60,10,0,0,MBtnAdvanced));
-	Dialog.Add(new CFarCheckBoxItem(56,11,0,_T(""),&FUTF8));
-	Dialog.Add(new CFarButtonItem(60,11,0,0,MUTF8));
 	Dialog.SetFocus(3);
 	if (FSearchAs>=SA_MULTILINE) FSearchAs=SA_PLAINTEXT;
 	FACaseSensitive=FADirectoryCaseSensitive=MaskCaseHere();
@@ -388,7 +386,7 @@ int ReplacePrompt(BOOL Plugin) {
 	ReplaceText=FRReplace;
 	int ExitCode;
 	do {
-		switch (ExitCode=Dialog.Display(7, -7, 8, 9, -5, -3, -1)) {
+		switch (ExitCode=Dialog.Display(6, -5, 8, 9, -3, -1)) {
 		case 0:
 			FMask=MaskText;
 			FText=SearchText;
@@ -407,15 +405,11 @@ int ReplacePrompt(BOOL Plugin) {
 		case 4:
 			if (AdvancedSettings()) FAdvanced=TRUE;
 			break;
-		case 5:
-			UTF8Converter(SearchText);
-			break;
 		case -1:
 			return FALSE;
 		}
 	} while ((ExitCode>=1) || !PrepareFileReplacePattern());
 
-	if (FUTF8) FAllCharTables=FALSE;
 	return TRUE;
 }
 
@@ -479,22 +473,15 @@ BOOL CFRPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.Add(new CFarCheckBoxItem(5,14,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
 	Dialog.Add(new CFarCheckBoxItem(56,11,0,_T(""),&bFAdvanced));
 	Dialog.Add(new CFarButtonItem(60,11,0,0,MBtnAdvanced));
-	Dialog.Add(new CFarCheckBoxItem(56,13,0,_T(""),&pPreset->m_mapInts["UTF8"]));
-	Dialog.Add(new CFarButtonItem(60,13,0,0,MUTF8));
 	Dialog.Add(new CFarCheckBoxItem(5,16,0,MAddToMenu,&pPreset->m_bAddToMenu));
 	Dialog.AddButtons(MOk,MCancel);
 
 	do {
-		switch (Dialog.Display(3, -2, -4, -6)) {
+		switch (Dialog.Display(2, -2, -4)) {
 		case 0:
 			pPreset->m_mapInts["AdvancedID"] = bFAdvanced ? nAdvancedID : 0;
 			return TRUE;
-		case 1:{		// avoid Internal Error for icl
-			tstring str = pPreset->m_mapStrings["Text"];
-			UTF8Converter(str);
-			break;
-			  }
-		case 2:
+		case 1:
 			SelectAdvancedPreset(nAdvancedID, bFAdvanced);
 			break;
 		default:
