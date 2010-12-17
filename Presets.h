@@ -112,8 +112,8 @@ public:
 	CBatchAction(CBatchType &Type, tstring strName, HKEY hKey);
 	void Save(HKEY hKey, int nIndex);
 
-	bool Edit();
-	void EditItems();
+	void EditProperties();
+	bool EditItems();
 	void Execute();
 
 	CFarMenuItem GetMenuItem();

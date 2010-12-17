@@ -234,7 +234,7 @@ int CPresetCollection::ShowMenu(bool bExecute, int nDefaultID) {
 			CPreset *pPreset = NewPreset();
 			if (EditPreset(pPreset)) {
 				pPreset->m_nID = FindUnusedID();
-				insert(begin()+nResult, pPreset);
+				insert(begin()+((nResult >= 0) ? nResult : 0), pPreset);
 				Save();
 			} else {
 				delete pPreset;
@@ -420,29 +420,19 @@ void CBatchAction::Save(HKEY hKey, int nIndex) {
 	}
 }
 
-bool CBatchAction::Edit() {
+void CBatchAction::EditProperties() {
 	CFarDialog Dialog(60, 12, _T("BatchProperties"));
 	Dialog.AddFrame(MBatch);
 	Dialog.Add(new CFarTextItem(5, 3, 0, MBatchName));
 	Dialog.Add(new CFarEditItem(5, 4, 53, DIF_HISTORY, _T("SearchText"), m_strName));
 	Dialog.Add(new CFarCheckBoxItem(5, 6, 0, MAddToMenu, &m_bAddToMenu));
-	Dialog.Add(new CFarButtonItem(34, 6, 0, 0, MBtnCommands));
+	
 	Dialog.AddButtons(MOk, MCancel);
-	do {
-		switch (Dialog.Display(2, -2, -3)) {
-		case 0:
-			return true;
-		case 1:
-			EditItems();
-			break;
-		default:
-			return false;
-		}
-	} while (true);
+	Dialog.Display(-1);
 }
 
-void CBatchAction::EditItems() {
-	int piBreakKeys[]={VK_INSERT, (PKF_CONTROL<<16)|VK_UP, (PKF_CONTROL<<16)|VK_DOWN, VK_DELETE, 0};
+bool CBatchAction::EditItems() {
+	int piBreakKeys[]={VK_INSERT, (PKF_CONTROL<<16)|VK_UP, (PKF_CONTROL<<16)|VK_DOWN, VK_DELETE, VK_F6, 0};
 	vector<tstring> arrItems;
 
 	int nResult = 0;
@@ -453,17 +443,17 @@ void CBatchAction::EditItems() {
 		}
 
 		int nBreakKey;
-		nResult = ChooseMenu(arrItems, GetMsg(MBatchCommands), _T("Ins,Ctrl-\x18\x19,Del"), _T("Batch"), nResult,
+		tstring strTitle = FormatStr(GetMsg(MBatchCommands), m_strName.c_str());
+		nResult = ChooseMenu(arrItems, strTitle.c_str(), _T("Ins,Ctrl-\x18\x19,Del,F6"), _T("Batch"), nResult,
 			FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT, piBreakKeys, &nBreakKey);
 
 		switch (nBreakKey) {
 		case -1:
-			return;
+			return size() > 0;
 		case 0:{
 			BatchActionIndex NewIndex = m_Type.SelectPreset();
 			if (NewIndex != NO_BATCH_INDEX) {
-				push_back(NewIndex);
-				nResult = size()-1;
+				insert(begin()+((nResult >= 0) ? nResult : 0), NewIndex);
 			}
 			break;
 			   }
@@ -487,6 +477,9 @@ void CBatchAction::EditItems() {
 			if ((nResult >= 0) && (nResult < (int)size())) {
 				erase(begin() + nResult);
 			}
+			break;
+		case 4:
+			EditProperties();
 			break;
 		}
 	} while (true);
@@ -555,8 +548,9 @@ void CBatchActionCollection::ShowMenu() {
 			return;
 		case 0:{		//	VK_INSERT
 			CBatchAction *pBatch = new CBatchAction(m_Type);
-			if (pBatch->Edit()) {
-				push_back(pBatch);
+			pBatch->m_strName = _T("New Batch");
+			if (pBatch->EditItems()) {
+				insert(begin()+((nResult >= 0) ? nResult : 0), pBatch);
 				WriteRegistry();
 			} else {
 				delete pBatch;
@@ -576,7 +570,7 @@ void CBatchActionCollection::ShowMenu() {
 			break;
 		case 2:			//	VK_F4
 			if (nResult < (int)size()) {
-				at(nResult)->Edit();
+				at(nResult)->EditItems();
 				WriteRegistry();
 			}
 			break;
