@@ -1,28 +1,6 @@
 #include "StdAfx.h"
 #include "..\RESearch.h"
 
-void GetHighlightPosition(EditorSetPosition &Position, int FirstLine,int StartPos,int LastLine,int EndPos)
-{
-	bool bAtStart = (EPositionAt == EP_BEGIN) || ((EPositionAt == EP_DIR) && EReverse);
-
-	Position.CurLine = (bAtStart) ? FirstLine : LastLine;
-	Position.CurPos = (bAtStart) ? StartPos : EndPos;
-	Position.CurTabPos = -1;
-	Position.TopScreenLine = TopLine(FirstLine, EdInfo.WindowSizeY, EdInfo.TotalLines, StartEdInfo.TopScreenLine);
-	Position.LeftPos = LeftColumn((bAtStart) ? StartPos : EndPos, EdInfo.WindowSizeX);
-	Position.Overtype = -1;
-
-	if (EPositionAtSub) {
-		int nSub = REParam.FindParam(EPositionSubName);
-		if (nSub >= 0) {
-			Position.CurLine = FirstLine;
-			Position.CurPos  = StartPos + REParam.m_arrMatch[nSub*2] - REParam.m_arrMatch[0];
-			AdjustPosition(&g_LineBuffer[0], Position.CurLine, Position.CurPos);
-			Position.LeftPos = LeftColumn(Position.CurPos, EdInfo.WindowSizeX);
-		}
-	}
-}
-
 void EditorSearchOK(int FirstLine,int StartPos,int LastLine,int EndPos) {
 	RefreshEditorInfo();
 

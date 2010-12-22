@@ -10,18 +10,28 @@ Planned:
 	+ Allow [X] Remove empty with [X] Several lines
 
 	* Custom dialog for search progress (only increase width)
-    * Highlight regexp error position with cursor
+	* Highlight regexp error position with cursor
+	* Graying out unneeded 'escape string' buttons
 
 	- Restoring position when opening for for view/edit from TmpPanel
 	  now works only partially
 
+Version 7.30 (17.12.2010)
+	* Batch editing reworked
+	* Options for 'UTF8' search removed. Use Far2.
+	+ Hardlinks are not lost upon File Replace. However, it comes at a cost of copying entire file before replace
+	- Multi plain text/regexp fixed
+
+Version 7.261 (13.12.2010)
+	- Fixed crash upon invalid regexp
+
 Version 7.26 (10.12.2010)
-    - Selectable cursor position works for Replace too
-    * Updated pcrepattern.html
+	- Selectable cursor position works for Replace too
+	* Updated pcrepattern.html
 
 Version 7.25 (09.12.2010)
 	+ Selectable cursor position upon search
-    - Fixed 'Esc' in x64 versions
+	- Fixed 'Esc' in x64 versions
 
 Version 7.20 (26.11.2010)
 	! PCRE 8.10 - Official implementation of \W etc via Unicode properties

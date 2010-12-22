@@ -785,7 +785,7 @@ $ #Batch menu#
   #Ins#     to add a new preset to a batch
   #Del#     to remove preset from a batch
   #Ctrl-# to move preset up/down in a batch
-  #F6#      to rename current batch
+  #F6#      to rename current batch, or change other options
 @DeleteBatch
 $ #Delete batch#
   You are prompted to confirm deleting a batch sequence.

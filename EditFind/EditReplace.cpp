@@ -104,7 +104,7 @@ void DoEditReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, cons
 	LastReplacePos = EndPos = NewString.length()-OriginalEndLength;
 
 	Position.CurPos = (EReverse)?StartPos:EndPos;
-	Position.LeftPos = (EReverse)?-1:LeftColumn(Position.CurPos, EdInfo.WindowSizeX);
+	Position.LeftPos = (EReverse)?-1:LeftColumn(Position.CurPos);
 	if (NoAsking) {
 		EctlSetPosition(&Position);
 	} else {
@@ -427,8 +427,7 @@ BOOL EditorReplaceAgain() {
 
 	RefreshEditorInfo();
 	EditorSetPosition Position = {LastReplaceLine, LastReplacePos, -1,
-		TopLine(LastReplaceLine, EdInfo.WindowSizeY, EdInfo.TotalLines,StartEdInfo.TopScreenLine),
-		LeftColumn(LastReplacePos, EdInfo.WindowSizeX),-1};
+		TopLine(LastReplaceLine), LeftColumn(LastReplacePos),-1};
 	EctlForceSetPosition(&Position);
 
 	EditorEndUndo();

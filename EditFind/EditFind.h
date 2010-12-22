@@ -105,10 +105,11 @@ BOOL SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos);
 void AdjustPosition(TCHAR *Lines, int &FirstLine,int &StartPos);
 void Relative2Absolute(int Line,TCHAR *Lines,int MatchStart,int MatchLength,int &FirstLine,int &StartPos,int &LastLine,int &EndPos);
 
+int  TopLine(int NeededLine);
+int	 LeftColumn(int AtPosition);
+int	 LeftColumn(int LeftPosition, int AtPosition, int RightPosition, int ScreenWidth);
 void GetHighlightPosition(EditorSetPosition &Position, int FirstLine,int StartPos,int LastLine,int EndPos);
 
-int  TopLine(int NeededLine,int ScreenHeight,int TotalLines,int CurrentTopLine);
-int	 LeftColumn(int RightPosition,int ScreenWidth);
 void SaveSelection();
 void RestoreSelection();
 void RestorePosition(const EditorInfo &StartEdInfo);

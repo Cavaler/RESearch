@@ -88,8 +88,7 @@ BOOL EditorListAllShowResults(bool bImmediate) {
 	int nResult = ChooseMenu(Info.arrString, GetMsg(MListAllLines), NULL, _T("ListAll"), 0, FMENU_WRAPMODE|FMENU_SHOWAMPERSAND);
 	if (nResult >= 0) {
 		EditorSetPosition Position = {Info.arrLines[nResult].first, Info.arrLines[nResult].second, -1,
-			TopLine(Info.arrLines[nResult].first, EdInfo.WindowSizeY, EdInfo.TotalLines,StartEdInfo.TopScreenLine),
-			LeftColumn(Info.arrLines[nResult].second, EdInfo.WindowSizeY), -1};
+			TopLine(Info.arrLines[nResult].first), LeftColumn(Info.arrLines[nResult].second), -1};
 		EctlForceSetPosition(&Position);
 	} else {
 		EditorSetPosition Position = {EdInfo.CurLine, EdInfo.CurPos, EdInfo.CurTabPos, 

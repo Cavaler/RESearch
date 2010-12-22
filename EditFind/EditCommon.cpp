@@ -265,10 +265,11 @@ BOOL SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos) {
 	return FALSE;
 }
 
-int TopLine(int NeededLine,int ScreenHeight,int TotalLines,int CurrentTopLine) {
+int TopLine(int NeededLine) {
 	if (EKeepLineIfVisible) {
-		if ((NeededLine >= CurrentTopLine) && (NeededLine < CurrentTopLine+ScreenHeight))
-			return CurrentTopLine;
+		//	We're in the visible range right now
+		if ((NeededLine >= StartEdInfo.TopScreenLine) && (NeededLine < StartEdInfo.TopScreenLine+EdInfo.WindowSizeY))
+			return StartEdInfo.TopScreenLine;
 	}
 
 	int Top;
@@ -276,22 +277,64 @@ int TopLine(int NeededLine,int ScreenHeight,int TotalLines,int CurrentTopLine) {
 	case SP_TOP:
 		Top=NeededLine-EShowPositionOffset;break;
 	case SP_CENTER:
-		Top=NeededLine-ScreenHeight/2-EShowPositionOffset;break;
+		Top=NeededLine-EdInfo.WindowSizeY/2-EShowPositionOffset;break;
 	case SP_BOTTOM:
-		Top=NeededLine-ScreenHeight+EShowPositionOffset+1;break;
+		Top=NeededLine-EdInfo.WindowSizeY+EShowPositionOffset+1;break;
 	}
 	if (Top<0) Top=0;
-	if (Top>=TotalLines) Top=TotalLines-1;
+	if (Top>=EdInfo.TotalLines) Top=EdInfo.TotalLines-1;
 	return Top;
 }
 
-int LeftColumn(int RightPosition,int ScreenWidth) {
-	EditorConvertPos ConvertPos={-1,RightPosition,0};
-	StartupInfo.EditorControl(ECTL_REALTOTAB,&ConvertPos);
-	RightPosition=ConvertPos.DestPos;
+int RealToTab(int AtPosition) {
+	EditorConvertPos ConvertPos={-1, AtPosition, 0};
+	StartupInfo.EditorControl(ECTL_REALTOTAB, &ConvertPos);
+	return ConvertPos.DestPos;
+}
 
-	if (RightPosition<ScreenWidth-ERightSideOffset) return 0;
-	return (RightPosition-ScreenWidth+ERightSideOffset);
+int LeftColumn(int AtPosition) {
+	AtPosition = RealToTab(AtPosition);
+
+	if (AtPosition < EdInfo.WindowSizeX-ERightSideOffset) return 0;
+	return (AtPosition-(EdInfo.WindowSizeX-ERightSideOffset));
+}
+
+int LeftColumn(int LeftPosition, int AtPosition, int RightPosition) {
+	LeftPosition  = RealToTab(LeftPosition);
+	AtPosition    = RealToTab(AtPosition);
+	RightPosition = RealToTab(RightPosition);
+
+	int nLastPosition = EdInfo.WindowSizeX-ERightSideOffset;
+	int nPosition = 0;
+
+	if (RightPosition - nPosition > nLastPosition) nPosition = RightPosition-nLastPosition;
+	if (LeftPosition  - nPosition < ERightSideOffset) nPosition = LeftPosition-ERightSideOffset;
+	if (nPosition < 0) nPosition = 0;
+	if (AtPosition    - nPosition > nLastPosition) nPosition = AtPosition-nLastPosition;
+
+	return nPosition;
+}
+
+void GetHighlightPosition(EditorSetPosition &Position, int FirstLine,int StartPos,int LastLine,int EndPos)
+{
+	bool bAtStart = (EPositionAt == EP_BEGIN) || ((EPositionAt == EP_DIR) && EReverse);
+
+	Position.CurLine = (bAtStart) ? FirstLine : LastLine;
+	Position.CurPos = (bAtStart) ? StartPos : EndPos;
+	Position.CurTabPos = -1;
+	Position.TopScreenLine = TopLine(FirstLine);
+	Position.LeftPos = LeftColumn(StartPos, ((bAtStart) ? StartPos : EndPos), EndPos);
+	Position.Overtype = -1;
+
+	if (EPositionAtSub) {
+		int nSub = REParam.FindParam(EPositionSubName);
+		if (nSub >= 0) {
+			Position.CurLine = FirstLine;
+			Position.CurPos  = StartPos + REParam.m_arrMatch[nSub*2] - REParam.m_arrMatch[0];
+			AdjustPosition(&g_LineBuffer[0], Position.CurLine, Position.CurPos);
+			Position.LeftPos = LeftColumn(StartPos, Position.CurPos, EndPos);
+		}
+	}
 }
 
 void SaveSelection() {
