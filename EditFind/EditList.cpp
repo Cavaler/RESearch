@@ -1,9 +1,16 @@
 #include "StdAfx.h"
 #include "..\RESearch.h"
 
+struct sFindOneInfo {
+	int FirstLine;
+	int StartPos;
+	int LastLine;
+	int EndPos;
+};
+
 struct sFindAllInfo {
 	vector<tstring> arrString;
-	vector<pair<int, int> > arrLines;
+	vector<sFindOneInfo> arrLines;
 };
 map<tstring, sFindAllInfo> FindAllInfos;
 
@@ -45,7 +52,12 @@ BOOL EditorListAllAgain() {
 			EditorToOEM(str);
 #endif
 			Info.arrString.push_back(str);
-			Info.arrLines.push_back(pair<int, int>(FirstLine, StartPos));
+			sFindOneInfo OneInfo;
+			OneInfo.FirstLine = FirstLine;
+			OneInfo.StartPos  = StartPos;
+			OneInfo.LastLine  = LastLine;
+			OneInfo.EndPos    = EndPos;
+			Info.arrLines.push_back(OneInfo);
 			CurrentLine = FirstLine;
 		} else {
 			CurrentLine = LastLine;
@@ -87,9 +99,8 @@ BOOL EditorListAllShowResults(bool bImmediate) {
 
 	int nResult = ChooseMenu(Info.arrString, GetMsg(MListAllLines), NULL, _T("ListAll"), 0, FMENU_WRAPMODE|FMENU_SHOWAMPERSAND);
 	if (nResult >= 0) {
-		EditorSetPosition Position = {Info.arrLines[nResult].first, Info.arrLines[nResult].second, -1,
-			TopLine(Info.arrLines[nResult].first), LeftColumn(Info.arrLines[nResult].second), -1};
-		EctlForceSetPosition(&Position);
+		sFindOneInfo &OneInfo = Info.arrLines[nResult];
+		EditorSearchOK(OneInfo.FirstLine, OneInfo.StartPos, OneInfo.LastLine, OneInfo.EndPos);
 	} else {
 		EditorSetPosition Position = {EdInfo.CurLine, EdInfo.CurPos, EdInfo.CurTabPos, 
 			EdInfo.TopScreenLine, EdInfo.LeftPos, -1};

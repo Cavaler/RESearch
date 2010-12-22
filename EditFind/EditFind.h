@@ -105,6 +105,8 @@ BOOL SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos);
 void AdjustPosition(TCHAR *Lines, int &FirstLine,int &StartPos);
 void Relative2Absolute(int Line,TCHAR *Lines,int MatchStart,int MatchLength,int &FirstLine,int &StartPos,int &LastLine,int &EndPos);
 
+void EditorSearchOK(int FirstLine,int StartPos,int LastLine,int EndPos);
+
 int  TopLine(int NeededLine);
 int  TopLine(int FirstLine, int NeededLine, int LastLine);
 int	 LeftColumn(int AtPosition);
