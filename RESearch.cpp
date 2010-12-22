@@ -866,11 +866,11 @@ void ConfigureRenumbering(bool bRuntime) {
 }
 
 void ConfigureEditor() {
-	CFarDialog Dialog(60, 30, _T("EditorConfig"));
+	CFarDialog Dialog(60, 31, _T("EditorConfig"));
 	Dialog.AddFrame(MEditorSearchSettings);
 
 	Dialog.Add(new CFarTextItem(5,3,0,MShowPositionOffset));
-	Dialog.Add(new CFarEditItem(40,3,47,0,NULL,(int &)EShowPositionOffset,new CFarIntegerRangeValidator(-1024,1024)));
+	Dialog.Add(new CFarEditItem(38,3,42,0,NULL,(int &)EShowPositionOffset,new CFarIntegerRangeValidator(-1024,1024)));
 
 	Dialog.Add(new CFarTextItem(5,4,0,Mfrom));
 	Dialog.Add(new CFarRadioButtonItem(10,4,DIF_GROUP,MTop,(int *)&EShowPosition,SP_TOP));
@@ -878,25 +878,29 @@ void ConfigureEditor() {
 	Dialog.Add(new CFarRadioButtonItem(10,6,0,MBottom,(int *)&EShowPosition,SP_BOTTOM));
 	Dialog.Add(new CFarCheckBoxItem(5,7,0,MKeepLineIfVisible,&EKeepLineIfVisible));
 
-	Dialog.Add(new CFarTextItem(5,9,0,MRightSideOffset));
-	Dialog.Add(new CFarEditItem(32,9,39,0,NULL,(int &)ERightSideOffset,new CFarIntegerRangeValidator(0,1024)));
+	Dialog.Add(new CFarTextItem(5,9,0,MLRSideOffset));
+	Dialog.Add(new CFarEditItem(38,9,42,0,NULL,(int &)ELRSideOffset,new CFarIntegerRangeValidator(0, 1024)));
+	Dialog.Add(new CFarTextItem(44,9,0,MLROffsetChars));
+	Dialog.Add(new CFarTextItem(5, 10,0,MTDSideOffset));
+	Dialog.Add(new CFarEditItem(38,10,42,0,NULL,(int &)ETDSideOffset,new CFarIntegerRangeValidator(0, 1024)));
+	Dialog.Add(new CFarTextItem(44,10,0,MTDOffsetLines));
 
-	Dialog.Add(new CFarTextItem(5,11,0,MFindTextAtCursor));
-	Dialog.Add(new CFarRadioButtonItem(7,12,DIF_GROUP,MNone,(int *)&EFindTextAtCursor,FT_NONE));
-	Dialog.Add(new CFarRadioButtonItem(7,13,0,MWordOnly,(int *)&EFindTextAtCursor,FT_WORD));
-	Dialog.Add(new CFarRadioButtonItem(7,14,0,MAnyText,(int *)&EFindTextAtCursor,FT_ANY));
+	Dialog.Add(new CFarTextItem(5,12,0,MFindTextAtCursor));
+	Dialog.Add(new CFarRadioButtonItem(7,13,DIF_GROUP,MNone,(int *)&EFindTextAtCursor,FT_NONE));
+	Dialog.Add(new CFarRadioButtonItem(7,14,0,MWordOnly,(int *)&EFindTextAtCursor,FT_WORD));
+	Dialog.Add(new CFarRadioButtonItem(7,15,0,MAnyText,(int *)&EFindTextAtCursor,FT_ANY));
 
-	Dialog.Add(new CFarCheckBoxItem(7,15,0,MFindSelection,&EFindSelection));
-	Dialog.Add(new CFarCheckBoxItem(5,16,0,MAutoFindInSelection,&EAutoFindInSelection));
+	Dialog.Add(new CFarCheckBoxItem(7,16,0,MFindSelection,&EFindSelection));
+	Dialog.Add(new CFarCheckBoxItem(5,17,0,MAutoFindInSelection,&EAutoFindInSelection));
 	
-	Dialog.Add(new CFarCheckBoxItem(5,18,0,MUseRealEOL,&g_bUseRealEOL));
+	Dialog.Add(new CFarCheckBoxItem(5,19,0,MUseRealEOL,&g_bUseRealEOL));
 
-	Dialog.Add(new CFarTextItem(5,20,0,MPositionCursor));
-	Dialog.Add(new CFarRadioButtonItem(7,21,DIF_GROUP,MCurPosStart,(int *)&EPositionAt, EP_BEGIN));
-	Dialog.Add(new CFarRadioButtonItem(7,22,0,MCurPosMove,(int *)&EPositionAt, EP_DIR));
-	Dialog.Add(new CFarRadioButtonItem(7,23,0,MCurPosEnd, (int *)&EPositionAt, EP_END));
-	Dialog.Add(new CFarCheckBoxItem(7,24,0,MCurAtNamedRef,&EPositionAtSub));
-	Dialog.Add(new CFarEditItem(32,24,45,0,_T("RESearch.SubName"),EPositionSubName));
+	Dialog.Add(new CFarTextItem(5,21,0,MPositionCursor));
+	Dialog.Add(new CFarRadioButtonItem(7,22,DIF_GROUP,MCurPosStart,(int *)&EPositionAt, EP_BEGIN));
+	Dialog.Add(new CFarRadioButtonItem(7,23,0,MCurPosMove,(int *)&EPositionAt, EP_DIR));
+	Dialog.Add(new CFarRadioButtonItem(7,24,0,MCurPosEnd, (int *)&EPositionAt, EP_END));
+	Dialog.Add(new CFarCheckBoxItem(7,25,0,MCurAtNamedRef,&EPositionAtSub));
+	Dialog.Add(new CFarEditItem(32,25,45,0,_T("RESearch.SubName"),EPositionSubName));
 
 	Dialog.AddButtons(MOk,MCancel);
 	Dialog.Display(-1);

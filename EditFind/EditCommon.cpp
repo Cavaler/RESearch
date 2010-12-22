@@ -283,7 +283,20 @@ int TopLine(int NeededLine) {
 	}
 	if (Top<0) Top=0;
 	if (Top>=EdInfo.TotalLines) Top=EdInfo.TotalLines-1;
+
 	return Top;
+}
+
+int  TopLine(int FirstLine, int NeededLine, int LastLine) {
+	int nLastLine = EdInfo.WindowSizeY - ETDSideOffset - 1;
+	int nLine = TopLine(NeededLine);
+
+	if (LastLine   - nLine > nLastLine) nLine = LastLine-nLastLine;
+	if (FirstLine  - nLine < ETDSideOffset) nLine = FirstLine-ETDSideOffset;
+	if (nLine < 0) nLine = 0;
+	if (NeededLine - nLine > nLastLine) nLine = NeededLine-nLastLine;
+
+	return nLine;
 }
 
 int RealToTab(int AtPosition) {
@@ -295,8 +308,8 @@ int RealToTab(int AtPosition) {
 int LeftColumn(int AtPosition) {
 	AtPosition = RealToTab(AtPosition);
 
-	if (AtPosition < EdInfo.WindowSizeX-ERightSideOffset) return 0;
-	return (AtPosition-(EdInfo.WindowSizeX-ERightSideOffset));
+	if (AtPosition < EdInfo.WindowSizeX-ELRSideOffset) return 0;
+	return (AtPosition-(EdInfo.WindowSizeX-ELRSideOffset));
 }
 
 int LeftColumn(int LeftPosition, int AtPosition, int RightPosition) {
@@ -304,11 +317,13 @@ int LeftColumn(int LeftPosition, int AtPosition, int RightPosition) {
 	AtPosition    = RealToTab(AtPosition);
 	RightPosition = RealToTab(RightPosition);
 
-	int nLastPosition = EdInfo.WindowSizeX-ERightSideOffset;
+	if (LeftPosition > RightPosition) swap(LeftPosition, RightPosition);
+
+	int nLastPosition = EdInfo.WindowSizeX - ELRSideOffset - 1;
 	int nPosition = 0;
 
 	if (RightPosition - nPosition > nLastPosition) nPosition = RightPosition-nLastPosition;
-	if (LeftPosition  - nPosition < ERightSideOffset) nPosition = LeftPosition-ERightSideOffset;
+	if (LeftPosition  - nPosition < ELRSideOffset) nPosition = LeftPosition-ELRSideOffset;
 	if (nPosition < 0) nPosition = 0;
 	if (AtPosition    - nPosition > nLastPosition) nPosition = AtPosition-nLastPosition;
 
@@ -322,7 +337,7 @@ void GetHighlightPosition(EditorSetPosition &Position, int FirstLine,int StartPo
 	Position.CurLine = (bAtStart) ? FirstLine : LastLine;
 	Position.CurPos = (bAtStart) ? StartPos : EndPos;
 	Position.CurTabPos = -1;
-	Position.TopScreenLine = TopLine(FirstLine);
+	Position.TopScreenLine = TopLine(FirstLine, Position.CurLine, LastLine);
 	Position.LeftPos = LeftColumn(StartPos, ((bAtStart) ? StartPos : EndPos), EndPos);
 	Position.Overtype = -1;
 
@@ -332,6 +347,7 @@ void GetHighlightPosition(EditorSetPosition &Position, int FirstLine,int StartPo
 			Position.CurLine = FirstLine;
 			Position.CurPos  = StartPos + REParam.m_arrMatch[nSub*2] - REParam.m_arrMatch[0];
 			AdjustPosition(&g_LineBuffer[0], Position.CurLine, Position.CurPos);
+			Position.TopScreenLine = TopLine(FirstLine, Position.CurLine, LastLine);
 			Position.LeftPos = LeftColumn(StartPos, Position.CurPos, EndPos);
 		}
 	}
