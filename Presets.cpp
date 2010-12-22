@@ -163,7 +163,12 @@ void CPreset::Save(HKEY hKey, int nIndex) {
 //////////////////////////////////////////////////////////////////////////
 
 CPresetCollection::CPresetCollection(CParameterSet &ParamSet, const TCHAR *strKey, int nTitle)
-: m_ParamSet(ParamSet), m_strKey(strKey), m_nTitle(nTitle) {}
+: m_ParamSet(ParamSet)
+, m_strKey(strKey)
+, m_nTitle(nTitle)
+, m_nCurrent(0)
+{
+}
 
 void CPresetCollection::Load()
 {
@@ -212,19 +217,19 @@ int CPresetCollection::ShowMenu(bool bExecute, int nDefaultID) {
 	int piBreakKeys[]={VK_INSERT, VK_DELETE, VK_F4, (PKF_CONTROL<<16)|VK_UP, (PKF_CONTROL<<16)|VK_DOWN, 0};
 	vector<tstring> arrItems;
 
-	int nResult = 0;
 	do {
 		arrItems.resize(size());
 		for (size_t nPreset = 0; nPreset < size(); nPreset++) {
 			CPreset *pPreset = at(nPreset);
 			arrItems[nPreset] = pPreset->Name();
-			if (pPreset->m_nID == nDefaultID) nResult = nPreset;
+			if (pPreset->m_nID == nDefaultID) m_nCurrent = nPreset;
 		}
 
 		int nBreakKey;
 		tstring strTitle = FormatStr(_T("%s presets"), Name());
-		nResult = ChooseMenu(arrItems, strTitle.c_str(), _T("Ins,Del,F4,Ctrl-\x18\x19"), _T("Presets"), nResult,
+		int nResult = ChooseMenu(arrItems, strTitle.c_str(), _T("Ins,Del,F4,Ctrl-\x18\x19"), _T("Presets"), m_nCurrent,
 			FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT, piBreakKeys, &nBreakKey);
+		if (nResult >= 0) m_nCurrent = nResult;
 
 		switch (nBreakKey) {
 		case -1:
@@ -234,7 +239,7 @@ int CPresetCollection::ShowMenu(bool bExecute, int nDefaultID) {
 			CPreset *pPreset = NewPreset();
 			if (EditPreset(pPreset)) {
 				pPreset->m_nID = FindUnusedID();
-				insert(begin()+((nResult >= 0) ? nResult : 0), pPreset);
+				insert(begin()+((m_nCurrent >= 0) ? m_nCurrent : 0), pPreset);
 				Save();
 			} else {
 				delete pPreset;
@@ -242,37 +247,37 @@ int CPresetCollection::ShowMenu(bool bExecute, int nDefaultID) {
 			break;
 			  }
 		case 1:			//	VK_DELETE
-			if ((nResult >= 0) && (nResult < (int)size())) {
+			if ((m_nCurrent >= 0) && (m_nCurrent < (int)size())) {
 				const TCHAR *Lines[]={_T("Delete"), GetMsg(MDeletePresetQuery),
-					at(nResult)->Name().c_str(), GetMsg(MOk), GetMsg(MCancel)};
+					at(m_nCurrent)->Name().c_str(), GetMsg(MOk), GetMsg(MCancel)};
 				if (StartupInfo.Message(StartupInfo.ModuleNumber, FMSG_WARNING, _T("DeletePreset"), Lines, 5, 2)==0) {
-					delete at(nResult);
-					erase(begin() + nResult);
+					delete at(m_nCurrent);
+					erase(begin() + m_nCurrent);
 					Save();
 				}
 			}
 			break;
 		case 2:			//	VK_F4
-			if ((nResult >= 0) && (nResult < (int)size())) {
-				if (EditPreset(at(nResult))) Save();
+			if ((m_nCurrent >= 0) && (m_nCurrent < (int)size())) {
+				if (EditPreset(at(m_nCurrent))) Save();
 			}
 			break;
 		case 3:			//	VK_CTRL_UP
-			if (nResult > 0) {
-				CPreset *pPreset = at(nResult-1);
-				at(nResult-1) = at(nResult);
-				at(nResult) = pPreset;
+			if (m_nCurrent > 0) {
+				CPreset *pPreset = at(m_nCurrent-1);
+				at(m_nCurrent-1) = at(m_nCurrent);
+				at(m_nCurrent) = pPreset;
 				Save();
-				nResult--;
+				m_nCurrent--;
 			}
 			break;
 		case 4:			//	VK_CTRL_DOWN
-			if (nResult < (int)size()-1) {
-				CPreset *pPreset = at(nResult+1);
-				at(nResult+1) = at(nResult);
-				at(nResult) = pPreset;
+			if (m_nCurrent < (int)size()-1) {
+				CPreset *pPreset = at(m_nCurrent+1);
+				at(m_nCurrent+1) = at(m_nCurrent);
+				at(m_nCurrent) = pPreset;
 				Save();
-				nResult++;
+				m_nCurrent++;
 			}
 			break;
 		}
@@ -500,6 +505,7 @@ CFarMenuItem CBatchAction::GetMenuItem() {
 
 CBatchActionCollection::CBatchActionCollection(CBatchType &Type, HKEY hKey)
 : m_Type(Type)
+, m_nCurrent(0)
 {
 	TCHAR szKeyName[256];
 	DWORD dwIndex = 0;
@@ -524,15 +530,15 @@ void CBatchActionCollection::ShowMenu() {
 	int piBreakKeys[]={VK_INSERT, VK_DELETE, VK_F4, (PKF_CONTROL<<16)|VK_UP, (PKF_CONTROL<<16)|VK_DOWN, 0};
 	vector<tstring> arrItems;
 
-	int nResult = 0;
 	do {
 		arrItems.resize(size());
 		for (size_t nBatch = 0; nBatch < size(); nBatch++)
 			arrItems[nBatch] = at(nBatch)->m_strName;
 
 		int nBreakKey;
-		nResult = ChooseMenu(arrItems, GetMsg(m_Type.m_nTitle), _T("Ins,Del,F4,Ctrl-\x18\x19"), _T("Batches"), nResult,
+		int nResult = ChooseMenu(arrItems, GetMsg(m_Type.m_nTitle), _T("Ins,Del,F4,Ctrl-\x18\x19"), _T("Batches"), m_nCurrent,
 			FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT, piBreakKeys, &nBreakKey);
+		if (nResult >= 0) m_nCurrent = nResult;
 
 		switch (nBreakKey) {
 		case -1:
@@ -550,7 +556,7 @@ void CBatchActionCollection::ShowMenu() {
 			CBatchAction *pBatch = new CBatchAction(m_Type);
 			pBatch->m_strName = _T("New Batch");
 			if (pBatch->EditItems()) {
-				insert(begin()+((nResult >= 0) ? nResult : 0), pBatch);
+				insert(begin()+((m_nCurrent >= 0) ? m_nCurrent : 0), pBatch);
 				WriteRegistry();
 			} else {
 				delete pBatch;
@@ -558,38 +564,38 @@ void CBatchActionCollection::ShowMenu() {
 			break;
 			   }
 		case 1:			//	VK_DELETE
-			if (nResult < (int)size()) {
+			if (m_nCurrent < (int)size()) {
 				const TCHAR *Lines[]={_T("Delete"), GetMsg(MDeleteBatchQuery),
-					at(nResult)->m_strName.c_str(), GetMsg(MOk), GetMsg(MCancel)};
+					at(m_nCurrent)->m_strName.c_str(), GetMsg(MOk), GetMsg(MCancel)};
 				if (StartupInfo.Message(StartupInfo.ModuleNumber, FMSG_WARNING, _T("DeleteBatch"), Lines, 5, 2)==0) {
-					delete at(nResult);
-					erase(begin() + nResult);
+					delete at(m_nCurrent);
+					erase(begin() + m_nCurrent);
 					WriteRegistry();
 				}
 			}
 			break;
 		case 2:			//	VK_F4
-			if (nResult < (int)size()) {
-				at(nResult)->EditItems();
+			if (m_nCurrent < (int)size()) {
+				at(m_nCurrent)->EditItems();
 				WriteRegistry();
 			}
 			break;
 		case 3:			//	VK_CTRL_UP
-			if (nResult > 0) {
-				CBatchAction *pBatch = at(nResult-1);
-				at(nResult-1) = at(nResult);
-				at(nResult) = pBatch;
+			if (m_nCurrent > 0) {
+				CBatchAction *pBatch = at(m_nCurrent-1);
+				at(m_nCurrent-1) = at(m_nCurrent);
+				at(m_nCurrent) = pBatch;
 				WriteRegistry();
-				nResult--;
+				m_nCurrent--;
 			}
 			break;
 		case 4:			//	VK_CTRL_DOWN
-			if (nResult < (int)size()-1) {
-				CBatchAction *pBatch = at(nResult+1);
-				at(nResult+1) = at(nResult);
-				at(nResult) = pBatch;
+			if (m_nCurrent < (int)size()-1) {
+				CBatchAction *pBatch = at(m_nCurrent+1);
+				at(m_nCurrent+1) = at(m_nCurrent);
+				at(m_nCurrent) = pBatch;
 				WriteRegistry();
-				nResult++;
+				m_nCurrent++;
 			}
 			break;
 		}

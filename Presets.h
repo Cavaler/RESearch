@@ -74,8 +74,10 @@ public:
 	int m_nTitle;
 
 protected:
-	int FindUnusedID();
+	int  FindUnusedID();
 	void ValidateIDs();
+
+	int  m_nCurrent;
 };
 
 template<class _Preset>
@@ -134,8 +136,12 @@ public:
 
 	void FillMenuItems(vector<CFarMenuItem> &MenuItems);
 	CBatchAction *FindMenuAction(int &nIndex);
+
 public:
 	CBatchType &m_Type;
+
+protected:
+	int  m_nCurrent;
 };
 
 #endif
