@@ -125,6 +125,8 @@ public:
 
 protected:
 	CBatchType &m_Type;
+
+	int  m_nCurrent;
 };
 
 class CBatchActionCollection : public vector<CBatchAction *> {

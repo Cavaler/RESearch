@@ -440,7 +440,6 @@ bool CBatchAction::EditItems() {
 	int piBreakKeys[]={VK_INSERT, (PKF_CONTROL<<16)|VK_UP, (PKF_CONTROL<<16)|VK_DOWN, VK_DELETE, VK_F6, 0};
 	vector<tstring> arrItems;
 
-	int nResult = 0;
 	do {
 		arrItems.resize(size());
 		for (size_t nPreset = 0; nPreset < size(); nPreset++) {
@@ -449,8 +448,10 @@ bool CBatchAction::EditItems() {
 
 		int nBreakKey;
 		tstring strTitle = FormatStr(GetMsg(MBatchCommands), m_strName.c_str());
-		nResult = ChooseMenu(arrItems, strTitle.c_str(), _T("Ins,Ctrl-\x18\x19,Del,F6"), _T("Batch"), nResult,
+
+		int nResult = ChooseMenu(arrItems, strTitle.c_str(), _T("Ins,Ctrl-\x18\x19,Del,F6"), _T("Batch"), m_nCurrent,
 			FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT, piBreakKeys, &nBreakKey);
+		if (nResult >= 0) m_nCurrent = nResult;
 
 		switch (nBreakKey) {
 		case -1:
@@ -458,29 +459,29 @@ bool CBatchAction::EditItems() {
 		case 0:{
 			BatchActionIndex NewIndex = m_Type.SelectPreset();
 			if (NewIndex != NO_BATCH_INDEX) {
-				insert(begin()+((nResult >= 0) ? nResult : 0), NewIndex);
+				insert(begin()+((m_nCurrent >= 0) ? m_nCurrent : 0), NewIndex);
 			}
 			break;
 			   }
 		case 1:
-			if (nResult > 0) {
-				value_type nSave = at(nResult-1);
-				at(nResult-1) = at(nResult);
-				at(nResult) = nSave;
-				nResult--;
+			if (m_nCurrent > 0) {
+				value_type nSave = at(m_nCurrent-1);
+				at(m_nCurrent-1) = at(m_nCurrent);
+				at(m_nCurrent) = nSave;
+				m_nCurrent--;
 			}
 			break;
 		case 2:
-			if ((nResult >= 0) && (nResult < (int)size()-1)) {
-				value_type nSave = at(nResult+1);
-				at(nResult+1) = at(nResult);
-				at(nResult) = nSave;
-				nResult++;
+			if ((m_nCurrent >= 0) && (m_nCurrent < (int)size()-1)) {
+				value_type nSave = at(m_nCurrent+1);
+				at(m_nCurrent+1) = at(m_nCurrent);
+				at(m_nCurrent) = nSave;
+				m_nCurrent++;
 			}
 			break;
 		case 3:
-			if ((nResult >= 0) && (nResult < (int)size())) {
-				erase(begin() + nResult);
+			if ((m_nCurrent >= 0) && (m_nCurrent < (int)size())) {
+				erase(begin() + m_nCurrent);
 			}
 			break;
 		case 4:
