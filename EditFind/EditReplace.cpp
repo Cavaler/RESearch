@@ -439,47 +439,13 @@ BOOL EditorReplaceAgain() {
 
 //////////////////////////////////////////////////////////////////////////
 
-void UpdateERDialog(HANDLE hDlg, bool bCheckSel = true) {
-	if (EdInfo.BlockType == BTYPE_COLUMN) {
-		if (bCheckSel) {
-			if (IsDlgItemChecked(hDlg, 15)) {		//	EInSelection
-				CheckDlgItem(hDlg, 9, false);
-				EnableDlgItem(hDlg, 9, false);
-			} else {
-				EnableDlgItem(hDlg, 9, true);
-			}
-		} else {
-			if (IsDlgItemChecked(hDlg, 9)) {		//	ESeveralLines
-				CheckDlgItem(hDlg, 15, false);
-				EnableDlgItem(hDlg, 15, false);
-			} else {
-				EnableDlgItem(hDlg, 15, true);
-			}
-		}
-	}
-}
-
-LONG_PTR WINAPI EditorReplaceDialogProc(HANDLE hDlg, int nMsg, int nParam1, LONG_PTR lParam2) {
-	switch (nMsg) {
-	case DN_INITDIALOG:
-		UpdateERDialog(hDlg);
-		break;
-	case DN_BTNCLICK:
-		if (nParam1 == 9)
-			UpdateERDialog(hDlg, false);
-		else if (nParam1 == 15)
-			UpdateERDialog(hDlg, true);
-		break;
-	}
-	return StartupInfo.DefDlgProc(hDlg, nMsg, nParam1, lParam2);
-}
-
 BOOL EditorReplace() {
 	RefreshEditorInfo();
 	EInSelection = EAutoFindInSelection && (EdInfo.BlockType != BTYPE_NONE);
 
 	CFarDialog Dialog(76, 17, _T("ReplaceDlg"));
-	Dialog.SetWindowProc(EditorReplaceDialogProc, 0);
+	Dialog.SetWindowProc(EditorSearchDialogProc, 0);
+	Dialog.SetUseID(true);
 
 	Dialog.AddFrame(MREReplace);
 	Dialog.Add(new CFarTextItem(5, 2, 0, MSearchFor));
@@ -488,14 +454,14 @@ BOOL EditorReplace() {
 	Dialog.Add(new CFarTextItem(5, 4, 0, MReplaceWith));
 	Dialog.Add(new CFarEditItem(5, 5, 65, DIF_HISTORY|DIF_VAREDIT,_T("ReplaceText"), ReplaceText));
 
-	Dialog.Add(new CFarButtonItem(67, 3, 0, 0, _T("&\\")));
-	Dialog.Add(new CFarButtonItem(67, 5, 0, 0, _T("&/")));
+	Dialog.Add(new CFarButtonItem(67, 3, 0, 0, MQuoteSearch));
+	Dialog.Add(new CFarButtonItem(67, 5, 0, 0, MQuoteReplace));
 
 	Dialog.Add(new CFarTextItem(5, 6, DIF_BOXCOLOR|DIF_SEPARATOR, _T("")));
 
 	Dialog.Add(new CFarCheckBoxItem(5, 7, 0, MRegExp, &ERegExp));
 	Dialog.Add(new CFarCheckBoxItem(30, 7, 0, MSeveralLine, &ESeveralLine));
-	Dialog.Add(new CFarButtonItem(48, 7, 0, 0, _T("&...")));
+	Dialog.Add(new CFarButtonItem(48, 7, 0, 0, MEllipsis));
 
 	Dialog.Add(new CFarCheckBoxItem(5, 8, 0, MCaseSensitive, &ECaseSensitive));
 	Dialog.Add(new CFarCheckBoxItem(5, 9, 0, MReverseSearch, &EReverse));
@@ -518,26 +484,26 @@ BOOL EditorReplace() {
 
 	int ExitCode;
 	do {
-		switch (ExitCode = Dialog.Display(8, -5, -4, 5, 6, 10, -2, -6, -1)) {
-		case 0:
-		case 1:
+		switch (ExitCode = Dialog.Display(8, MReplace, MAll, MQuoteSearch, MQuoteReplace, MEllipsis, MBtnPresets, MRunEditor, MBtnREBuilder)) {
+		case MReplace:
+		case MAll:
 			break;
-		case 2:
+		case MQuoteSearch:
 			if (ERegExp) QuoteRegExpString(SearchText);
 			break;
-		case 3:
+		case MQuoteReplace:
 			QuoteReplaceString(ReplaceText);
 			break;
-		case 4:
+		case MEllipsis:
 			ConfigureSeveralLines();
 			break;
-		case 5:
+		case MBtnPresets:
 			ERPresets->ShowMenu(true);
 			break;
-		case 6:
+		case MRunEditor:
 			RunExternalEditor(ReplaceText);
 			break;
-		case 7:
+		case MBtnREBuilder:
 			if (RunREBuilder(SearchText, ReplaceText)) {
 				ERegExp = TRUE;
 			}
@@ -545,8 +511,8 @@ BOOL EditorReplace() {
 		case -1:
 			return FALSE;
 		}
-	} while ((ExitCode >= 2)||!EPreparePattern(SearchText));
-	
+	} while (((ExitCode != MReplace) && (ExitCode != MAll)) || !EPreparePattern(SearchText));
+
 	EText = SearchText;
 #ifdef UNICODE
 	ERReplace = ReplaceText;

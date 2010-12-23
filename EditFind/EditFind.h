@@ -88,6 +88,8 @@ BOOL EditorTransliterateAgain();
 BOOL EditorListAll();
 BOOL EditorListAllAgain();
 
+LONG_PTR WINAPI EditorSearchDialogProc(CFarDialog *pDlg, HANDLE hDlg, int nMsg, int nParam1, LONG_PTR lParam2);
+
 BOOL EditorListAllHasResults();
 BOOL EditorListAllShowResults(bool bImmediate);
 

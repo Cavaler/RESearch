@@ -1,5 +1,6 @@
 enum eStringTable {
 
+	MZero,
 	MOk,
 	MCancel,
 	MBtnPresets,
@@ -7,6 +8,9 @@ enum eStringTable {
 	MBtnBatch,
 	MError,
 	MWarning,
+	MQuoteSearch,
+	MQuoteReplace,
+	MEllipsis,
 
 	MSearchResults,
 

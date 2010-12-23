@@ -1,5 +1,6 @@
 .Language			English,English		Russian,Russian (Русский)
 
+MZero				""					""
 MOk					"Ok"				"&OK"
 MCancel				"Cancel"			"&Отмена"
 MBtnPresets			"Prese&ts"			"Пресеты"
@@ -7,6 +8,9 @@ MBtnAdvanced		"Advanc&ed"			"Дополнит"
 MBtnBatch			"&Batch"			"&Пакет"
 MError				"Error"				"Ошибка"
 MWarning			"Warning"			"Предупреждение"
+MQuoteSearch		"&\"
+MQuoteReplace		"&/"
+MEllipsis			"&..."
 
 MSearchResults		"Search results"	"Результаты поиска"
 

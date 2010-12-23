@@ -136,38 +136,53 @@ BOOL EditorSearchAgain() {
 
 //////////////////////////////////////////////////////////////////////////
 
-void UpdateESDialog(HANDLE hDlg, bool bCheckSel = true) {
+void UpdateESDialog(CFarDialog *pDlg, HANDLE hDlg, bool bCheckSel = true) {
+	int nSeveralLine = pDlg->GetIndex(MSeveralLine);
+	int nInSelection = pDlg->GetIndex(MInSelection);
+
 	if (EdInfo.BlockType == BTYPE_COLUMN) {
 		if (bCheckSel) {
-			if (IsDlgItemChecked(hDlg, 12)) {		//	EInSelection
-				CheckDlgItem(hDlg, 6, false);
-				EnableDlgItem(hDlg, 6, false);
+			if (IsDlgItemChecked(hDlg, nInSelection)) {
+				CheckDlgItem (hDlg, nSeveralLine, false);
+				EnableDlgItem(hDlg, nSeveralLine, false);
 			} else {
-				EnableDlgItem(hDlg, 6, true);
+				EnableDlgItem(hDlg, nSeveralLine, true);
 			}
 		} else {
-			if (IsDlgItemChecked(hDlg, 6)) {		//	ESeveralLines
-				CheckDlgItem(hDlg, 12, false);
-				EnableDlgItem(hDlg, 12, false);
+			if (IsDlgItemChecked(hDlg, nSeveralLine)) {
+				CheckDlgItem (hDlg, nInSelection, false);
+				EnableDlgItem(hDlg, nInSelection, false);
 			} else {
-				EnableDlgItem(hDlg, 12, true);
+				EnableDlgItem(hDlg, nInSelection, true);
 			}
 		}
 	}
+
+	int nRegExp = pDlg->GetIndex(MRegExp);
+	int nQuoteSearch = pDlg->GetIndex(MQuoteSearch);
+	EnableDlgItem(hDlg, nQuoteSearch, IsDlgItemChecked(hDlg, nRegExp));
 }
 
-LONG_PTR WINAPI EditorSearchDialogProc(HANDLE hDlg, int nMsg, int nParam1, LONG_PTR lParam2) {
+LONG_PTR WINAPI EditorSearchDialogProc(CFarDialog *pDlg, HANDLE hDlg, int nMsg, int nParam1, LONG_PTR lParam2) {
+	int nCtlID = pDlg->GetID(nParam1);
+
 	switch (nMsg) {
 	case DN_INITDIALOG:
-		UpdateESDialog(hDlg);
+		UpdateESDialog(pDlg, hDlg);
 		break;
 	case DN_BTNCLICK:
-		if (nParam1 == 6)
-			UpdateESDialog(hDlg, false);
-		else if (nParam1 == 12)
-			UpdateESDialog(hDlg, true);
+		switch (nCtlID) {
+		case MSeveralLine:
+			UpdateESDialog(pDlg, hDlg, false);
+			break;
+		case MInSelection:
+		case MRegExp:
+			UpdateESDialog(pDlg, hDlg, true);
+			break;
+		}
 		break;
 	}
+
 	return StartupInfo.DefDlgProc(hDlg, nMsg, nParam1, lParam2);
 }
 
@@ -177,50 +192,52 @@ BOOL EditorSearch() {
 
 	CFarDialog Dialog(76,13,_T("SearchDlg"));
 	Dialog.SetWindowProc(EditorSearchDialogProc, 0);
+	Dialog.SetUseID(true);
 
 	Dialog.AddFrame(MRESearch);
 	Dialog.Add(new CFarTextItem(5,2,0,MSearchFor));
 	Dialog.Add(new CFarEditItem(5,3,65,DIF_HISTORY|DIF_VAREDIT,_T("SearchText"),SearchText));
-	Dialog.Add(new CFarButtonItem(67,3,0,0,_T("&\\")));
+	Dialog.Add(new CFarButtonItem(67,3,0,0,MQuoteSearch));
 
 	Dialog.Add(new CFarTextItem(5,4,DIF_BOXCOLOR|DIF_SEPARATOR,_T("")));
 	Dialog.Add(new CFarCheckBoxItem(5,5,0,MRegExp,&ERegExp));
 	Dialog.Add(new CFarCheckBoxItem(30,5,0,MSeveralLine,&ESeveralLine));
-	Dialog.Add(new CFarButtonItem(48,5,0,0,_T("&...")));
+	Dialog.Add(new CFarButtonItem(48,5,0,0,MEllipsis));
 
 	Dialog.Add(new CFarCheckBoxItem(5,6,0,MCaseSensitive,&ECaseSensitive));
 	Dialog.Add(new CFarCheckBoxItem(5,7,0,MReverseSearch,&EReverse));
 	Dialog.Add(new CFarCheckBoxItem(30,7,(EdInfo.BlockType != BTYPE_NONE) ? 0 : DIF_DISABLE, MInSelection, &EInSelection));
-	Dialog.AddButtons(MOk, MShowAll); Dialog.AddButton(MCancel);
+	Dialog.AddButtons(MOk, MShowAll);
+	Dialog.AddButton(MCancel);
 	Dialog.Add(new CFarButtonItem(60,5,0,0,MBtnPresets));
 
 	SearchText=PickupText();
 	if (SearchText.empty()) SearchText=EText;
 	int ExitCode;
 	do {
-		switch (ExitCode=Dialog.Display(5,-4,-3,3,7,-1)) {
-		case 0:
+		switch (ExitCode=Dialog.Display(5, MOk, MShowAll, MQuoteSearch, MEllipsis, MBtnPresets)) {
+		case MOk:
 			break;
-		case 1:
+		case MShowAll:
 			// Show All
 			break;
-		case 2:
+		case MQuoteSearch:
 			if (ERegExp) QuoteRegExpString(SearchText);
 			break;
-		case 3:
+		case MEllipsis:
 			ConfigureSeveralLines();
 			break;
-		case 4:
+		case MBtnPresets:
 			ESPresets->ShowMenu(true);
 			break;
-		case -1:
+		default:
 			return FALSE;
 		}
-	} while ((ExitCode>=2)||!EPreparePattern(SearchText));
+	} while (((ExitCode != MOk) && (ExitCode != MShowAll)) || !EPreparePattern(SearchText));
 
 	EText=SearchText;
 	g_bInterrupted=FALSE;
-	if (!EText.empty()) (ExitCode == 0) ? EditorSearchAgain() : EditorListAllAgain();
+	if (!EText.empty()) (ExitCode == MOk) ? EditorSearchAgain() : EditorListAllAgain();
 	return TRUE;
 }
 
