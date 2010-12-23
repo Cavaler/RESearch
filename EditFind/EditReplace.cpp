@@ -446,6 +446,7 @@ BOOL EditorReplace() {
 	CFarDialog Dialog(76, 17, _T("ReplaceDlg"));
 	Dialog.SetWindowProc(EditorSearchDialogProc, 0);
 	Dialog.SetUseID(true);
+	Dialog.SetCancelID(MCancel);
 
 	Dialog.AddFrame(MREReplace);
 	Dialog.Add(new CFarTextItem(5, 2, 0, MSearchFor));
@@ -484,7 +485,7 @@ BOOL EditorReplace() {
 
 	int ExitCode;
 	do {
-		switch (ExitCode = Dialog.Display(8, MReplace, MAll, MQuoteSearch, MQuoteReplace, MEllipsis, MBtnPresets, MRunEditor, MBtnREBuilder)) {
+		switch (ExitCode = Dialog.Display(-1)) {
 		case MReplace:
 		case MAll:
 			break;

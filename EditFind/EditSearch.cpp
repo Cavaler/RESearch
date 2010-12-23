@@ -159,8 +159,15 @@ void UpdateESDialog(CFarDialog *pDlg, HANDLE hDlg, bool bCheckSel = true) {
 	}
 
 	int nRegExp = pDlg->GetIndex(MRegExp);
+	bool bRegExp = IsDlgItemChecked(hDlg, nRegExp);
+
 	int nQuoteSearch = pDlg->GetIndex(MQuoteSearch);
-	EnableDlgItem(hDlg, nQuoteSearch, IsDlgItemChecked(hDlg, nRegExp));
+	EnableDlgItem(hDlg, nQuoteSearch, bRegExp);
+
+	int nQuoteReplace = pDlg->GetIndex(MQuoteReplace);
+	if (nQuoteReplace > 0) {
+		EnableDlgItem(hDlg, nQuoteReplace, bRegExp || g_bEscapesInPlainText);
+	}
 }
 
 LONG_PTR WINAPI EditorSearchDialogProc(CFarDialog *pDlg, HANDLE hDlg, int nMsg, int nParam1, LONG_PTR lParam2) {
@@ -193,6 +200,7 @@ BOOL EditorSearch() {
 	CFarDialog Dialog(76,13,_T("SearchDlg"));
 	Dialog.SetWindowProc(EditorSearchDialogProc, 0);
 	Dialog.SetUseID(true);
+	Dialog.SetCancelID(MCancel);
 
 	Dialog.AddFrame(MRESearch);
 	Dialog.Add(new CFarTextItem(5,2,0,MSearchFor));
@@ -215,7 +223,7 @@ BOOL EditorSearch() {
 	if (SearchText.empty()) SearchText=EText;
 	int ExitCode;
 	do {
-		switch (ExitCode=Dialog.Display(5, MOk, MShowAll, MQuoteSearch, MEllipsis, MBtnPresets)) {
+		switch (ExitCode=Dialog.Display(-1)) {
 		case MOk:
 			break;
 		case MShowAll:
