@@ -121,6 +121,8 @@ BOOL CompileAdvancedSettings();
 void SelectAdvancedPreset(int &nID, bool &bSel);
 void ApplyAdvancedPreset();
 
+LONG_PTR WINAPI FileSearchDialogProc(CFarDialog *pDlg, HANDLE hDlg, int nMsg, int nParam1, LONG_PTR lParam2);
+
 BOOL MaskCaseHere();
 bool LocalFileTime(TCHAR cDrive);
 

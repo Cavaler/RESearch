@@ -164,10 +164,14 @@ BOOL ViewerSearch() {
 	g_ViewerInfo.erase(VInfo.ViewerID);
 
 	CFarDialog Dialog(76,13,_T("SearchDlg"));
+	Dialog.SetWindowProc(EditorSearchDialogProc, 0);
+	Dialog.SetUseID(true);
+	Dialog.SetCancelID(MCancel);
+
 	Dialog.AddFrame(MRESearch);
 	Dialog.Add(new CFarTextItem(5,2,0,MSearchFor));
 	Dialog.Add(new CFarEditItem(5,3,65,DIF_HISTORY|DIF_VAREDIT,_T("SearchText"),SearchText));
-	Dialog.Add(new CFarButtonItem(67,3,0,0,_T("&\\")));
+	Dialog.Add(new CFarButtonItem(67,3,0,0,MQuoteSearch));
 
 	Dialog.Add(new CFarTextItem(5,4,DIF_BOXCOLOR|DIF_SEPARATOR,_T("")));
 	Dialog.Add(new CFarCheckBoxItem(5,5,0,MRegExp,&ERegExp));
@@ -183,19 +187,19 @@ BOOL ViewerSearch() {
 
 	int ExitCode;
 	do {
-		switch (ExitCode=Dialog.Display(3,-3,3,-1)) {
-		case 0:
+		switch (ExitCode=Dialog.Display(-1)) {
+		case MOk:
 			break;
-		case 1:
+		case MQuoteSearch:
 			if (ERegExp) QuoteRegExpString(SearchText);
 			break;
-		case 2:
+		case MBtnPresets:
 			VSPresets->ShowMenu(true);
 			break;
-		case -1:
+		default:
 			return FALSE;
 		}
-	} while ((ExitCode>=1)||!EPreparePattern(SearchText));
+	} while ((ExitCode != MOk) || !EPreparePattern(SearchText));
 
 	EText=SearchText;
 	if (!EText.empty()) ViewerSearchAgain();

@@ -345,8 +345,52 @@ bool PrepareFileSearchPattern() {
 	return true;
 }
 
+void UpdateFSDialog(CFarDialog *pDlg, HANDLE hDlg) {
+	bool bRegExp = !IsDlgItemChecked(hDlg, pDlg->GetIndex(MPlainText));
+
+	int nMultiPlain = pDlg->GetIndex(MMultiPlainText);
+	if (nMultiPlain > 0)
+		bRegExp = bRegExp && !IsDlgItemChecked(hDlg, nMultiPlain);
+
+	int nQuoteSearch = pDlg->GetIndex(MQuoteSearch);
+	EnableDlgItem(hDlg, nQuoteSearch, bRegExp);
+
+	int nQuoteReplace = pDlg->GetIndex(MQuoteReplace);
+	if (nQuoteReplace > 0) {
+		EnableDlgItem(hDlg, nQuoteReplace, bRegExp || g_bEscapesInPlainText);
+	}
+}
+
+LONG_PTR WINAPI FileSearchDialogProc(CFarDialog *pDlg, HANDLE hDlg, int nMsg, int nParam1, LONG_PTR lParam2) {
+	int nCtlID = pDlg->GetID(nParam1);
+
+	switch (nMsg) {
+	case DN_INITDIALOG:
+		UpdateFSDialog(pDlg, hDlg);
+		break;
+	case DN_BTNCLICK:
+		switch (nCtlID) {
+		case MPlainText:
+		case MRegExp:
+		case MSeveralLineRegExp:
+		case MMultiLineRegExp:
+		case MMultiPlainText:
+		case MMultiRegExp:
+			UpdateFSDialog(pDlg, hDlg);
+			break;
+		}
+		break;
+	}
+
+	return StartupInfo.DefDlgProc(hDlg, nMsg, nParam1, lParam2);
+}
+
 int SearchPrompt(BOOL Plugin) {
 	CFarDialog Dialog(76,24,_T("FileSearchDlg"));
+	Dialog.SetWindowProc(FileSearchDialogProc, 0);
+	Dialog.SetUseID(true);
+	Dialog.SetCancelID(MCancel);
+
 	Dialog.AddFrame(MRESearch);
 
 	Dialog.Add(new CFarCheckBoxItem(35,2,0,MAsRegExp,&FMaskAsRegExp));
@@ -355,7 +399,7 @@ int SearchPrompt(BOOL Plugin) {
 
 	Dialog.Add(new CFarTextItem(5,4,0,MText));
 	Dialog.Add(new CFarEditItem(5,5,65,DIF_HISTORY|DIF_VAREDIT,_T("SearchText"), SearchText));
-	Dialog.Add(new CFarButtonItem(67,5,0,0,_T("&\\")));
+	Dialog.Add(new CFarButtonItem(67,5,0,0,MQuoteSearch));
 
 	Dialog.Add(new CFarTextItem(5,6,DIF_BOXCOLOR|DIF_SEPARATOR,_T("")));
 	Dialog.Add(new CFarRadioButtonItem(5,7,DIF_GROUP,MPlainText,(int *)&FSearchAs,SA_PLAINTEXT));
@@ -388,25 +432,25 @@ int SearchPrompt(BOOL Plugin) {
 	SearchText=FText;
 	int ExitCode;
 	do {
-		switch (ExitCode=Dialog.Display(4,-5,6,-3,-1)) {
-		case 0:
+		switch (ExitCode=Dialog.Display(-1)) {
+		case MOk:
 			FMask=MaskText;
 			FText=SearchText;
 			break;
-		case 1:
-			if ((FSearchAs!=SA_PLAINTEXT) && (FSearchAs!=SA_MULTITEXT)) QuoteRegExpString(SearchText);
+		case MQuoteSearch:
+			QuoteRegExpString(SearchText);
 			break;
-		case 2:
+		case MBtnPresets:
 			FSPresets->ShowMenu(true);
 			if (Plugin&&(FSearchIn<SI_FROMCURRENT)) FSearchIn=SI_FROMCURRENT;
 			break;
-		case 3:
+		case MBtnAdvanced:
 			if (AdvancedSettings()) FAdvanced=TRUE;
 			break;
-		case -1:
+		default:
 			return FALSE;
 		}
-	} while ((ExitCode>=1) || !PrepareFileSearchPattern());
+	} while ((ExitCode != MOk) || !PrepareFileSearchPattern());
 
 	return TRUE;
 }

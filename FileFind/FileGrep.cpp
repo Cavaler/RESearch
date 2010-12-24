@@ -226,10 +226,40 @@ bool PrepareFileGrepPattern() {
 	return true;
 }
 
+void UpdateFGDialog(CFarDialog *pDlg, HANDLE hDlg, bool bCheckSel = true) {
+	bool bRegExp = IsDlgItemChecked(hDlg, pDlg->GetIndex(MRegExp));
+
+	int nQuoteSearch = pDlg->GetIndex(MQuoteSearch);
+	EnableDlgItem(hDlg, nQuoteSearch, bRegExp);
+}
+
+LONG_PTR WINAPI FileGrepDialogProc(CFarDialog *pDlg, HANDLE hDlg, int nMsg, int nParam1, LONG_PTR lParam2) {
+	int nCtlID = pDlg->GetID(nParam1);
+
+	switch (nMsg) {
+	case DN_INITDIALOG:
+		UpdateFGDialog(pDlg, hDlg);
+		break;
+	case DN_BTNCLICK:
+		switch (nCtlID) {
+		case MRegExp:
+			UpdateFGDialog(pDlg, hDlg);
+			break;
+		}
+		break;
+	}
+
+	return StartupInfo.DefDlgProc(hDlg, nMsg, nParam1, lParam2);
+}
+
 bool GrepPrompt(BOOL bPlugin) {
 	BOOL AsRegExp = (FSearchAs == SA_REGEXP) || (FSearchAs == SA_SEVERALLINE) || (FSearchAs == SA_MULTILINE) || (FSearchAs == SA_MULTIREGEXP);
 
 	CFarDialog Dialog(76,25,_T("FileGrepDlg"));
+	Dialog.SetWindowProc(FileGrepDialogProc, 0);
+	Dialog.SetUseID(true);
+	Dialog.SetCancelID(MCancel);
+
 	Dialog.AddFrame(MREGrep);
 
 	Dialog.Add(new CFarCheckBoxItem(35,2,0,MAsRegExp,&FMaskAsRegExp));
@@ -238,7 +268,7 @@ bool GrepPrompt(BOOL bPlugin) {
 
 	Dialog.Add(new CFarTextItem(5,4,0,MText));
 	Dialog.Add(new CFarEditItem(5,5,65,DIF_HISTORY|DIF_VAREDIT,_T("SearchText"), SearchText));
-	Dialog.Add(new CFarButtonItem(67,5,0,0,_T("&\\")));
+	Dialog.Add(new CFarButtonItem(67,5,0,0,MQuoteSearch));
 
 	Dialog.Add(new CFarTextItem(5,6,DIF_BOXCOLOR|DIF_SEPARATOR,_T("")));
 	Dialog.Add(new CFarCheckBoxItem(5,7,0,MRegExp,&AsRegExp));
@@ -276,25 +306,25 @@ bool GrepPrompt(BOOL bPlugin) {
 
 	int ExitCode;
 	do {
-		switch (ExitCode=Dialog.Display(4,-5,6,-3,-1)) {
-		case 0:
+		switch (ExitCode=Dialog.Display(-1)) {
+		case MOk:
 			FSearchAs = AsRegExp ? SA_REGEXP : SA_PLAINTEXT;
 			FMask=MaskText;
 			FText=SearchText;
 			break;
-		case 1:
+		case MQuoteSearch:
 			if (AsRegExp) QuoteRegExpString(SearchText);
 			break;
-		case 2:
+		case MBtnPresets:
 			FGPresets->ShowMenu(true);
 			break;
-		case 3:
+		case MBtnAdvanced:
 			if (AdvancedSettings()) FAdvanced=TRUE;
 			break;
-		case -1:
+		default:
 			return false;
 		}
-	} while ((ExitCode>=1) || !PrepareFileGrepPattern() || (!FGOutputToFile && !FGOpenInEditor));
+	} while ((ExitCode != MOk) || !PrepareFileGrepPattern() || (!FGOutputToFile && !FGOpenInEditor));
 
 	return true;
 }

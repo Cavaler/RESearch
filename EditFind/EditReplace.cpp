@@ -522,7 +522,7 @@ BOOL EditorReplace() {
 	OEMToEditor(ERReplace_O2E);
 #endif
 
-	NoAsking = (ExitCode == 1);
+	NoAsking = (ExitCode == MAll);
 	ReplaceStartLine = -1;
 	FindNumber = ReplaceNumber = 0;
 	g_bInterrupted = FALSE;

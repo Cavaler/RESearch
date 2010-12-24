@@ -374,6 +374,10 @@ bool PrepareFileReplacePattern() {
 
 int ReplacePrompt(BOOL Plugin) {
 	CFarDialog Dialog(76,24,_T("FileReplaceDlg"));
+	Dialog.SetWindowProc(FileSearchDialogProc, 0);
+	Dialog.SetUseID(true);
+	Dialog.SetCancelID(MCancel);
+
 	Dialog.AddFrame(MREReplace);
 
 	Dialog.Add(new CFarCheckBoxItem(35,2,0,MAsRegExp,&FMaskAsRegExp));
@@ -386,8 +390,8 @@ int ReplacePrompt(BOOL Plugin) {
 	Dialog.Add(new CFarTextItem(5,6,0,MReplaceWith));
 	Dialog.Add(new CFarEditItem(5,7,65,DIF_HISTORY|DIF_VAREDIT,_T("ReplaceText"), ReplaceText));
 
-	Dialog.Add(new CFarButtonItem(67,5,0,0,_T("&\\")));
-	Dialog.Add(new CFarButtonItem(67,7,0,0,_T("&/")));
+	Dialog.Add(new CFarButtonItem(67,5,0,0,MQuoteSearch));
+	Dialog.Add(new CFarButtonItem(67,7,0,0,MQuoteReplace));
 
 	Dialog.Add(new CFarTextItem(5,8,DIF_BOXCOLOR|DIF_SEPARATOR, _T("")));
 	Dialog.Add(new CFarRadioButtonItem(5,9,DIF_GROUP,MPlainText,(int *)&FSearchAs,SA_PLAINTEXT));
@@ -422,29 +426,29 @@ int ReplacePrompt(BOOL Plugin) {
 	ReplaceText=FRReplace;
 	int ExitCode;
 	do {
-		switch (ExitCode=Dialog.Display(6, -5, 8, 9, -3, -1)) {
-		case 0:
+		switch (ExitCode=Dialog.Display(-1)) {
+		case MOk:
 			FMask=MaskText;
 			FText=SearchText;
 			FRReplace=ReplaceText;
 			break;
-		case 1:
+		case MQuoteSearch:
 			if ((FSearchAs!=SA_PLAINTEXT) && (FSearchAs!=SA_MULTITEXT)) QuoteRegExpString(SearchText);
 			break;
-		case 2:
+		case MQuoteReplace:
 			QuoteReplaceString(ReplaceText);
 			break;
-		case 3:
+		case MBtnPresets:
 			FRPresets->ShowMenu(true);
 			if (Plugin&&(FSearchIn<SI_FROMCURRENT)) FSearchIn=SI_FROMCURRENT;
 			break;
-		case 4:
+		case MBtnAdvanced:
 			if (AdvancedSettings()) FAdvanced=TRUE;
 			break;
-		case -1:
+		default:
 			return FALSE;
 		}
-	} while ((ExitCode>=1) || !PrepareFileReplacePattern());
+	} while ((ExitCode != MOk) || !PrepareFileReplacePattern());
 
 	return TRUE;
 }
