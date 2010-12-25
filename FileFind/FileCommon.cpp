@@ -101,6 +101,8 @@ void FCleanup(BOOL PatternOnly) {
 	if (FMaskSet) {delete FMaskSet;FMaskSet=NULL;}
 	if (FASystemFoldersMask) {delete FASystemFoldersMask;FASystemFoldersMask=NULL;}
 
+	REErrorOffset = -1;
+
 	if (!PatternOnly) {
 		if (FAFullFileNamePattern) {pcre_free(FAFullFileNamePattern);FAFullFileNamePattern=NULL;}
 		if (FAFullFileNamePatternExtra) {pcre_free(FAFullFileNamePatternExtra);FAFullFileNamePatternExtra=NULL;}
@@ -121,11 +123,12 @@ int FPrepareMaskPattern() {
 
 		FASystemFoldersMask = new CFarMaskSet(FASystemFolders.c_str());
 		if (!FASystemFoldersMask->Valid()) {
-			delete FASystemFoldersMask; FASystemFoldersMask = NULL;
-//			return FALSE;
+			delete FASystemFoldersMask;
+			FASystemFoldersMask = NULL;
 		}
 	}
 
+	REErrorField  = MMask;
 	if (FMaskAsRegExp) {
 		if (!PreparePattern(&FMaskPattern,&FMaskPatternExtra,FMask,FALSE)) return FALSE;
 	} else {
@@ -156,12 +159,14 @@ int FPreparePattern(bool bAcceptEmpty) {
 	FOEMReplace = DefFromUnicode(FRReplace);
 #endif
 
+	REErrorField  = MSearchFor;
 	switch (FSearchAs) {
 	case SA_PLAINTEXT:
 		PrepareBMHSearch(FTextUpcase.data(), FTextUpcase.length());
 #ifdef UNICODE
 		PrepareBMHSearchA(FOEMTextUpcase.data(), FOEMTextUpcase.size());
 #endif
+		REErrorOffset = -1;
 		return TRUE;
 
 	case SA_MULTITEXT:
@@ -175,8 +180,10 @@ int FPreparePattern(bool bAcceptEmpty) {
 			if (Word.size()==0) break;
 			FSWords.push_back(Word);
 		} while (Word.size()&&(!g_bInterrupted));
-						}
+
+		REErrorOffset = -1;
 		return TRUE;
+						}
 
 	case SA_REGEXP:
 	case SA_SEVERALLINE:

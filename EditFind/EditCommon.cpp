@@ -394,6 +394,7 @@ BOOL EPreparePattern(tstring &SearchText) {
 
 	if (!CheckUsage(SearchText, ERegExp!=0, ESeveralLine!=0)) return FALSE;
 
+	REErrorField  = MSearchFor;
 	if (ERegExp) {
 		RefreshEditorInfo();
 
@@ -425,6 +426,7 @@ BOOL EPreparePattern(tstring &SearchText) {
 	} else {
 		ETextUpcase = (ECaseSensitive) ? SearchText : UpCaseString(SearchText);
 		PrepareBMHSearch(ETextUpcase.data(), ETextUpcase.length());
+		REErrorOffset = -1;
 		return TRUE;
 	}
 }
@@ -432,6 +434,8 @@ BOOL EPreparePattern(tstring &SearchText) {
 void ECleanup(BOOL PatternOnly) {
 	if (EPattern) {pcre_free(EPattern);EPattern=NULL;}
 	if (EPatternExtra) {pcre_free(EPatternExtra);EPatternExtra=NULL;}
+
+	REErrorOffset = -1;
 
 	if (!PatternOnly) {
 		delete ESPresets;

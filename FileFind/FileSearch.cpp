@@ -353,7 +353,9 @@ void UpdateFSDialog(CFarDialog *pDlg, HANDLE hDlg) {
 		bRegExp = bRegExp && !IsDlgItemChecked(hDlg, nMultiPlain);
 
 	int nQuoteSearch = pDlg->GetIndex(MQuoteSearch);
-	EnableDlgItem(hDlg, nQuoteSearch, bRegExp);
+	if (nQuoteSearch > 0) {
+		EnableDlgItem(hDlg, nQuoteSearch, bRegExp);
+	}
 
 	int nQuoteReplace = pDlg->GetIndex(MQuoteReplace);
 	if (nQuoteReplace > 0) {
@@ -367,6 +369,7 @@ LONG_PTR WINAPI FileSearchDialogProc(CFarDialog *pDlg, HANDLE hDlg, int nMsg, in
 	switch (nMsg) {
 	case DN_INITDIALOG:
 		UpdateFSDialog(pDlg, hDlg);
+		HighlightREError(pDlg, hDlg);
 		break;
 	case DN_BTNCLICK:
 		switch (nCtlID) {

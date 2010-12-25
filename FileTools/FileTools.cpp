@@ -38,11 +38,24 @@ void FTCleanup(BOOL PatternOnly) {
 	}
 }
 
+LONG_PTR WINAPI FileSelectDialogProc(CFarDialog *pDlg, HANDLE hDlg, int nMsg, int nParam1, LONG_PTR lParam2) {
+	switch (nMsg) {
+	case DN_INITDIALOG:
+		HighlightREError(pDlg, hDlg);
+		break;
+	}
+
+	return StartupInfo.DefDlgProc(hDlg, nMsg, nParam1, lParam2);
+}
+
 void ChangeSelection(int How) {
 	tstring MaskText;
 
 	CFarDialog Dialog(44,10,_T("FileSelectDlg"));
+	Dialog.SetWindowProc(FileSelectDialogProc, 0);
+
 	Dialog.AddFrame(How);
+
 	Dialog.Add(new CFarCheckBoxItem(5,3,0,MAsRegExp,&FMaskAsRegExp));
 	Dialog.Add(new CFarCheckBoxItem(5,4,0,MCaseSensitive,&FACaseSensitive));
 	Dialog.Add(new CFarTextItem(5,2,0,MMask));
@@ -327,6 +340,8 @@ void RenameFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 
 BOOL RenameFilesPrompt() {
 	CFarDialog Dialog(76,20,_T("FileRenameDlg"));
+	Dialog.SetWindowProc(FileSearchDialogProc, 0);
+
 	Dialog.AddFrame(MRename);
 
 	Dialog.Add(new CFarCheckBoxItem(25,2,0,MAsRegExp,&FMaskAsRegExp));
@@ -489,6 +504,8 @@ BOOL PerformRenameSelectedFiles(CPanelInfo &PInfo, panelitem_vector &PanelItems)
 
 BOOL RenameSelectedFilesPrompt() {
 	CFarDialog Dialog(76, 15, _T("SelectedFileRenameDlg"));
+	Dialog.SetWindowProc(FileSearchDialogProc, 0);
+
 	Dialog.AddFrame(MRenameSelected);
 
 	Dialog.Add(new CFarCheckBoxItem(25,2,0,MRegExp,(BOOL *)&FSearchAs));

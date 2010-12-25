@@ -176,6 +176,7 @@ LONG_PTR WINAPI EditorSearchDialogProc(CFarDialog *pDlg, HANDLE hDlg, int nMsg, 
 	switch (nMsg) {
 	case DN_INITDIALOG:
 		UpdateESDialog(pDlg, hDlg);
+		HighlightREError(pDlg, hDlg);
 		break;
 	case DN_BTNCLICK:
 		switch (nCtlID) {

@@ -81,9 +81,13 @@ EXTERN int FileNumber;
 EXTERN int FindNumber;
 EXTERN int ReplaceNumber;
 
+EXTERN int REErrorField  VALUE(-1);
+EXTERN int REErrorOffset VALUE(-1);
+
 bool CheckUsage(const tstring &strText, bool bRegExp, bool bSeveralLine);
 BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const tstring &Text,int CaseSensitive,const unsigned char *pTables=NULL);
 tstring EvaluateReplaceString(CREParameters<TCHAR> &Param, const TCHAR *Replace, const TCHAR *EOL, int Engine);
+void HighlightREError(CFarDialog *pDlg, HANDLE hDlg);
 
 #ifdef UNICODE
 BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,int CaseSensitive,const unsigned char *pTables=NULL);

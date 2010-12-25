@@ -239,6 +239,7 @@ LONG_PTR WINAPI FileGrepDialogProc(CFarDialog *pDlg, HANDLE hDlg, int nMsg, int 
 	switch (nMsg) {
 	case DN_INITDIALOG:
 		UpdateFGDialog(pDlg, hDlg);
+		HighlightREError(pDlg, hDlg);
 		break;
 	case DN_BTNCLICK:
 		switch (nCtlID) {

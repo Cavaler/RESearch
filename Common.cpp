@@ -117,6 +117,8 @@ BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const tstring &Text
 
 		const TCHAR *Lines[]={GetMsg(MRegExpError),ErrPtr,_T("\x01"),Text.c_str(),ErrPos.c_str(),GetMsg(MOk)};
 		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("RegExpError"),Lines,6,1);
+
+		REErrorOffset = ErrOffset;
 		return FALSE;
 	} else {
 		if (PatternExtra) {
@@ -152,6 +154,19 @@ BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,
 	}
 }
 #endif
+
+void HighlightREError(CFarDialog *pDlg, HANDLE hDlg) {
+	if (REErrorOffset < 0) return;
+
+	int nIndex = pDlg->GetIndex(REErrorField);
+	if (nIndex <= 0) nIndex = pDlg->GetIndex(MSearchFor);
+	if (nIndex <= 0) nIndex = pDlg->GetIndex(MText);
+	if (nIndex <= 0) return;
+
+	COORD coord = {REErrorOffset, 0};
+	StartupInfo.SendDlgMessage(hDlg, DM_SETCURSORPOS, nIndex+1, (LONG_PTR)&coord);
+	StartupInfo.SendDlgMessage(hDlg, DM_SETFOCUS, nIndex+1, NULL);
+}
 
 #ifndef UNICODE
 TCHAR ConvertCase_OEM(TCHAR C) {
