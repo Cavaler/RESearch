@@ -38,14 +38,14 @@ void FTCleanup(BOOL PatternOnly) {
 	}
 }
 
-LONG_PTR WINAPI FileSelectDialogProc(CFarDialog *pDlg, HANDLE hDlg, int nMsg, int nParam1, LONG_PTR lParam2) {
+LONG_PTR WINAPI FileSelectDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LONG_PTR lParam2) {
 	switch (nMsg) {
 	case DN_INITDIALOG:
-		HighlightREError(pDlg, hDlg);
+		HighlightREError(pDlg);
 		break;
 	}
 
-	return StartupInfo.DefDlgProc(hDlg, nMsg, nParam1, lParam2);
+	return pDlg->DefDlgProc(nMsg, nParam1, lParam2);
 }
 
 void ChangeSelection(int How) {

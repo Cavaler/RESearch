@@ -155,7 +155,7 @@ BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,
 }
 #endif
 
-void HighlightREError(CFarDialog *pDlg, HANDLE hDlg) {
+void HighlightREError(CFarDialog *pDlg) {
 	if (REErrorOffset < 0) return;
 
 	int nIndex = pDlg->GetIndex(REErrorField);
@@ -164,8 +164,8 @@ void HighlightREError(CFarDialog *pDlg, HANDLE hDlg) {
 	if (nIndex <= 0) return;
 
 	COORD coord = {REErrorOffset, 0};
-	StartupInfo.SendDlgMessage(hDlg, DM_SETCURSORPOS, nIndex+1, (LONG_PTR)&coord);
-	StartupInfo.SendDlgMessage(hDlg, DM_SETFOCUS, nIndex+1, NULL);
+	StartupInfo.SendDlgMessage(pDlg->hDlg(), DM_SETCURSORPOS, nIndex+1, (LONG_PTR)&coord);
+	StartupInfo.SendDlgMessage(pDlg->hDlg(), DM_SETFOCUS, nIndex+1, NULL);
 }
 
 #ifndef UNICODE

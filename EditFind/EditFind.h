@@ -88,8 +88,8 @@ BOOL EditorTransliterateAgain();
 BOOL EditorListAll();
 BOOL EditorListAllAgain();
 
-void UpdateESDialog(CFarDialog *pDlg, HANDLE hDlg, bool bCheckSel = true);
-LONG_PTR WINAPI EditorSearchDialogProc(CFarDialog *pDlg, HANDLE hDlg, int nMsg, int nParam1, LONG_PTR lParam2);
+void UpdateESDialog(CFarDialog *pDlg, bool bCheckSel = true);
+LONG_PTR WINAPI EditorSearchDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LONG_PTR lParam2);
 
 BOOL EditorListAllHasResults();
 BOOL EditorListAllShowResults(bool bImmediate);

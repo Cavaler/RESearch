@@ -439,44 +439,41 @@ BOOL EditorReplaceAgain() {
 
 //////////////////////////////////////////////////////////////////////////
 
-void UpdateERDialog(CFarDialog *pDlg, HANDLE hDlg, bool bCheckSel = true) {
-	bool bSeveralLines = IsDlgItemChecked(hDlg, pDlg->GetIndex(MSeveralLine));
-
-	int nRemoveEmpty = pDlg->GetIndex(MRemoveEmpty);
-	int nRemoveNoMatch = pDlg->GetIndex(MRemoveNoMatch);
+void UpdateERDialog(CFarDialog *pDlg, bool bCheckSel = true) {
+	bool bSeveralLines = pDlg->IsDlgItemChecked(MSeveralLine);
 
 	if (bSeveralLines) {
-		CheckDlgItem(hDlg, nRemoveEmpty,   false);
-		CheckDlgItem(hDlg, nRemoveNoMatch, false);
+		pDlg->CheckDlgItem(MRemoveEmpty,   false);
+		pDlg->CheckDlgItem(MRemoveNoMatch, false);
 	}
-	EnableDlgItem(hDlg, nRemoveEmpty,   !bSeveralLines);
-	EnableDlgItem(hDlg, nRemoveNoMatch, !bSeveralLines);
+	pDlg->EnableDlgItem(MRemoveEmpty,   !bSeveralLines);
+	pDlg->EnableDlgItem(MRemoveNoMatch, !bSeveralLines);
 
-	UpdateESDialog(pDlg, hDlg, bCheckSel);
+	UpdateESDialog(pDlg, bCheckSel);
 }
 
-LONG_PTR WINAPI EditorReplaceDialogProc(CFarDialog *pDlg, HANDLE hDlg, int nMsg, int nParam1, LONG_PTR lParam2) {
+LONG_PTR WINAPI EditorReplaceDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LONG_PTR lParam2) {
 	int nCtlID = pDlg->GetID(nParam1);
 
 	switch (nMsg) {
 	case DN_INITDIALOG:
-		UpdateERDialog(pDlg, hDlg);
-		HighlightREError(pDlg, hDlg);
+		UpdateERDialog(pDlg);
+		HighlightREError(pDlg);
 		break;
 	case DN_BTNCLICK:
 		switch (nCtlID) {
 		case MSeveralLine:
-			UpdateERDialog(pDlg, hDlg, false);
+			UpdateERDialog(pDlg, false);
 			break;
 		case MInSelection:
 		case MRegExp:
-			UpdateERDialog(pDlg, hDlg, true);
+			UpdateERDialog(pDlg, true);
 			break;
 		}
 		break;
 	}
 
-	return StartupInfo.DefDlgProc(hDlg, nMsg, nParam1, lParam2);
+	return pDlg->DefDlgProc(nMsg, nParam1, lParam2);
 }
 
 

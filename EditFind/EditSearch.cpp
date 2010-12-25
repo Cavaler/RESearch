@@ -136,62 +136,55 @@ BOOL EditorSearchAgain() {
 
 //////////////////////////////////////////////////////////////////////////
 
-void UpdateESDialog(CFarDialog *pDlg, HANDLE hDlg, bool bCheckSel) {
-	int nSeveralLine = pDlg->GetIndex(MSeveralLine);
-	int nInSelection = pDlg->GetIndex(MInSelection);
-
+void UpdateESDialog(CFarDialog *pDlg, bool bCheckSel) {
 	if (EdInfo.BlockType == BTYPE_COLUMN) {
 		if (bCheckSel) {
-			if (IsDlgItemChecked(hDlg, nInSelection)) {
-				CheckDlgItem (hDlg, nSeveralLine, false);
-				EnableDlgItem(hDlg, nSeveralLine, false);
+			if (pDlg->IsDlgItemChecked(MInSelection)) {
+				pDlg->CheckDlgItem (MSeveralLine, false);
+				pDlg->EnableDlgItem(MSeveralLine, false);
 			} else {
-				EnableDlgItem(hDlg, nSeveralLine, true);
+				pDlg->EnableDlgItem(MSeveralLine, true);
 			}
 		} else {
-			if (IsDlgItemChecked(hDlg, nSeveralLine)) {
-				CheckDlgItem (hDlg, nInSelection, false);
-				EnableDlgItem(hDlg, nInSelection, false);
+			if (pDlg->IsDlgItemChecked(MSeveralLine)) {
+				pDlg->CheckDlgItem (MInSelection, false);
+				pDlg->EnableDlgItem(MInSelection, false);
 			} else {
-				EnableDlgItem(hDlg, nInSelection, true);
+				pDlg->EnableDlgItem(MInSelection, true);
 			}
 		}
 	}
 
-	int nRegExp = pDlg->GetIndex(MRegExp);
-	bool bRegExp = IsDlgItemChecked(hDlg, nRegExp);
+	bool bRegExp = pDlg->IsDlgItemChecked(MRegExp);
+	pDlg->EnableDlgItem(MQuoteSearch, bRegExp);
 
-	int nQuoteSearch = pDlg->GetIndex(MQuoteSearch);
-	EnableDlgItem(hDlg, nQuoteSearch, bRegExp);
-
-	int nQuoteReplace = pDlg->GetIndex(MQuoteReplace);
-	if (nQuoteReplace > 0) {
-		EnableDlgItem(hDlg, nQuoteReplace, bRegExp || g_bEscapesInPlainText);
+	if (pDlg->HasItem(MQuoteReplace)) {
+		pDlg->EnableDlgItem(MQuoteReplace, bRegExp || g_bEscapesInPlainText);
 	}
 }
 
-LONG_PTR WINAPI EditorSearchDialogProc(CFarDialog *pDlg, HANDLE hDlg, int nMsg, int nParam1, LONG_PTR lParam2) {
+LONG_PTR WINAPI EditorSearchDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LONG_PTR lParam2) {
 	int nCtlID = pDlg->GetID(nParam1);
 
 	switch (nMsg) {
 	case DN_INITDIALOG:
-		UpdateESDialog(pDlg, hDlg);
-		HighlightREError(pDlg, hDlg);
+		UpdateESDialog(pDlg);
+		HighlightREError(pDlg);
 		break;
 	case DN_BTNCLICK:
 		switch (nCtlID) {
 		case MSeveralLine:
-			UpdateESDialog(pDlg, hDlg, false);
+			UpdateESDialog(pDlg, false);
 			break;
 		case MInSelection:
 		case MRegExp:
-			UpdateESDialog(pDlg, hDlg, true);
+			UpdateESDialog(pDlg, true);
 			break;
 		}
 		break;
 	}
 
-	return StartupInfo.DefDlgProc(hDlg, nMsg, nParam1, lParam2);
+	return pDlg->DefDlgProc(nMsg, nParam1, lParam2);
 }
 
 BOOL EditorSearch() {

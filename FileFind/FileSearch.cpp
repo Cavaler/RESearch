@@ -345,31 +345,26 @@ bool PrepareFileSearchPattern() {
 	return true;
 }
 
-void UpdateFSDialog(CFarDialog *pDlg, HANDLE hDlg) {
-	bool bRegExp = !IsDlgItemChecked(hDlg, pDlg->GetIndex(MPlainText));
+void UpdateFSDialog(CFarDialog *pDlg) {
+	bool bRegExp = !pDlg->IsDlgItemChecked(MPlainText);
 
-	int nMultiPlain = pDlg->GetIndex(MMultiPlainText);
-	if (nMultiPlain > 0)
-		bRegExp = bRegExp && !IsDlgItemChecked(hDlg, nMultiPlain);
+	if (pDlg->HasItem(MMultiPlainText))
+		bRegExp = bRegExp && !pDlg->IsDlgItemChecked(MMultiPlainText);
 
-	int nQuoteSearch = pDlg->GetIndex(MQuoteSearch);
-	if (nQuoteSearch > 0) {
-		EnableDlgItem(hDlg, nQuoteSearch, bRegExp);
-	}
+	if (pDlg->HasItem(MQuoteSearch))
+		pDlg->EnableDlgItem(MQuoteSearch, bRegExp);
 
-	int nQuoteReplace = pDlg->GetIndex(MQuoteReplace);
-	if (nQuoteReplace > 0) {
-		EnableDlgItem(hDlg, nQuoteReplace, bRegExp || g_bEscapesInPlainText);
-	}
+	if (pDlg->HasItem(MQuoteReplace))
+		pDlg->EnableDlgItem(MQuoteReplace, bRegExp || g_bEscapesInPlainText);
 }
 
-LONG_PTR WINAPI FileSearchDialogProc(CFarDialog *pDlg, HANDLE hDlg, int nMsg, int nParam1, LONG_PTR lParam2) {
+LONG_PTR WINAPI FileSearchDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LONG_PTR lParam2) {
 	int nCtlID = pDlg->GetID(nParam1);
 
 	switch (nMsg) {
 	case DN_INITDIALOG:
-		UpdateFSDialog(pDlg, hDlg);
-		HighlightREError(pDlg, hDlg);
+		UpdateFSDialog(pDlg);
+		HighlightREError(pDlg);
 		break;
 	case DN_BTNCLICK:
 		switch (nCtlID) {
@@ -379,13 +374,13 @@ LONG_PTR WINAPI FileSearchDialogProc(CFarDialog *pDlg, HANDLE hDlg, int nMsg, in
 		case MMultiLineRegExp:
 		case MMultiPlainText:
 		case MMultiRegExp:
-			UpdateFSDialog(pDlg, hDlg);
+			UpdateFSDialog(pDlg);
 			break;
 		}
 		break;
 	}
 
-	return StartupInfo.DefDlgProc(hDlg, nMsg, nParam1, lParam2);
+	return pDlg->DefDlgProc(nMsg, nParam1, lParam2);
 }
 
 int SearchPrompt(BOOL Plugin) {

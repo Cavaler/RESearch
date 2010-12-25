@@ -226,31 +226,30 @@ bool PrepareFileGrepPattern() {
 	return true;
 }
 
-void UpdateFGDialog(CFarDialog *pDlg, HANDLE hDlg, bool bCheckSel = true) {
-	bool bRegExp = IsDlgItemChecked(hDlg, pDlg->GetIndex(MRegExp));
+void UpdateFGDialog(CFarDialog *pDlg, bool bCheckSel = true) {
+	bool bRegExp = pDlg->IsDlgItemChecked(MRegExp);
 
-	int nQuoteSearch = pDlg->GetIndex(MQuoteSearch);
-	EnableDlgItem(hDlg, nQuoteSearch, bRegExp);
+	pDlg->EnableDlgItem(MQuoteSearch, bRegExp);
 }
 
-LONG_PTR WINAPI FileGrepDialogProc(CFarDialog *pDlg, HANDLE hDlg, int nMsg, int nParam1, LONG_PTR lParam2) {
+LONG_PTR WINAPI FileGrepDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LONG_PTR lParam2) {
 	int nCtlID = pDlg->GetID(nParam1);
 
 	switch (nMsg) {
 	case DN_INITDIALOG:
-		UpdateFGDialog(pDlg, hDlg);
-		HighlightREError(pDlg, hDlg);
+		UpdateFGDialog(pDlg);
+		HighlightREError(pDlg);
 		break;
 	case DN_BTNCLICK:
 		switch (nCtlID) {
 		case MRegExp:
-			UpdateFGDialog(pDlg, hDlg);
+			UpdateFGDialog(pDlg);
 			break;
 		}
 		break;
 	}
 
-	return StartupInfo.DefDlgProc(hDlg, nMsg, nParam1, lParam2);
+	return pDlg->DefDlgProc(nMsg, nParam1, lParam2);
 }
 
 bool GrepPrompt(BOOL bPlugin) {
