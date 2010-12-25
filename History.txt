@@ -7,14 +7,15 @@ Regular Expression Search and Replace
 
 Planned:
 	- Search in share-opened files
-	+ Allow [X] Remove empty with [X] Several lines
 
-	* Custom dialog for search progress (only increase width)
-	* Highlight regexp error position with cursor
-	* Graying out unneeded 'escape string' buttons
-
-	- Restoring position when opening for for view/edit from TmpPanel
-	  now works only partially
+Version 7.35 (25.12.2010) Happy New Year!
+	* Positioning in editor now tries to keep all selection inside the window
+	* Last selected item stays selected in Presets/Batches menus
+	* Selecting entry from 'Show All' selects found text
+	* Disabling 'quote' buttons when appropriate
+    * Scan progress dialog only grows in width
+    * Highlighting regexp error with cursor
+    * Disabling [X] Remove empty / not matched in Several-lines mode
 
 Version 7.30 (17.12.2010)
 	* Batch editing reworked
