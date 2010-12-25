@@ -136,7 +136,7 @@ BOOL EditorSearchAgain() {
 
 //////////////////////////////////////////////////////////////////////////
 
-void UpdateESDialog(CFarDialog *pDlg, HANDLE hDlg, bool bCheckSel = true) {
+void UpdateESDialog(CFarDialog *pDlg, HANDLE hDlg, bool bCheckSel) {
 	int nSeveralLine = pDlg->GetIndex(MSeveralLine);
 	int nInSelection = pDlg->GetIndex(MInSelection);
 

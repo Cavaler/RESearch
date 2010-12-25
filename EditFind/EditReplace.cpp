@@ -439,12 +439,53 @@ BOOL EditorReplaceAgain() {
 
 //////////////////////////////////////////////////////////////////////////
 
+void UpdateERDialog(CFarDialog *pDlg, HANDLE hDlg, bool bCheckSel = true) {
+	bool bSeveralLines = IsDlgItemChecked(hDlg, pDlg->GetIndex(MSeveralLine));
+
+	int nRemoveEmpty = pDlg->GetIndex(MRemoveEmpty);
+	int nRemoveNoMatch = pDlg->GetIndex(MRemoveNoMatch);
+
+	if (bSeveralLines) {
+		CheckDlgItem(hDlg, nRemoveEmpty,   false);
+		CheckDlgItem(hDlg, nRemoveNoMatch, false);
+	}
+	EnableDlgItem(hDlg, nRemoveEmpty,   !bSeveralLines);
+	EnableDlgItem(hDlg, nRemoveNoMatch, !bSeveralLines);
+
+	UpdateESDialog(pDlg, hDlg, bCheckSel);
+}
+
+LONG_PTR WINAPI EditorReplaceDialogProc(CFarDialog *pDlg, HANDLE hDlg, int nMsg, int nParam1, LONG_PTR lParam2) {
+	int nCtlID = pDlg->GetID(nParam1);
+
+	switch (nMsg) {
+	case DN_INITDIALOG:
+		UpdateERDialog(pDlg, hDlg);
+		HighlightREError(pDlg, hDlg);
+		break;
+	case DN_BTNCLICK:
+		switch (nCtlID) {
+		case MSeveralLine:
+			UpdateERDialog(pDlg, hDlg, false);
+			break;
+		case MInSelection:
+		case MRegExp:
+			UpdateERDialog(pDlg, hDlg, true);
+			break;
+		}
+		break;
+	}
+
+	return StartupInfo.DefDlgProc(hDlg, nMsg, nParam1, lParam2);
+}
+
+
 BOOL EditorReplace() {
 	RefreshEditorInfo();
 	EInSelection = EAutoFindInSelection && (EdInfo.BlockType != BTYPE_NONE);
 
 	CFarDialog Dialog(76, 17, _T("ReplaceDlg"));
-	Dialog.SetWindowProc(EditorSearchDialogProc, 0);
+	Dialog.SetWindowProc(EditorReplaceDialogProc, 0);
 	Dialog.SetUseID(true);
 	Dialog.SetCancelID(MCancel);
 
