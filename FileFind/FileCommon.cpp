@@ -273,22 +273,30 @@ void ShortenFileName(const TCHAR *szFrom, TCHAR *szTo) {
 }
 
 void ShowProgress(const TCHAR *Directory, panelitem_vector &PanelItems) {
-	TCHAR Scanned[80],Found[80];
+	TCHAR Scanned[80], Found[80];
 
 	_stprintf_s(Scanned, 80, GetMsg(MFilesScanned), FilesScanned);
 	_stprintf_s(Found, 80, GetMsg(MFilesFound), PanelItems.size());
 
 	TCHAR szFileName[15][75];
-	const TCHAR *Lines[20]={GetMsg(MRESearch), Directory, Scanned, Found, _T(""),
+
+	int nItems = (PanelItems.size() > 15) ? 15 : PanelItems.size();
+	for (int nItem = 0; nItem < nItems; nItem++) {
+		ShortenFileName(FarFileName(PanelItems[nItem+PanelItems.size()-nItems].FindData), szFileName[nItem]);
+		int nLength = _tcslen(szFileName[nItem]);
+		if (nLength > ScanProgressX) ScanProgressX = nLength;
+	}
+
+	int nLength = _tcslen(Directory);
+	if (nLength > ScanProgressX) ScanProgressX = nLength;
+
+	tstring strFiller(ScanProgressX, ' ');
+
+	const TCHAR *Lines[20]={GetMsg(MRESearch), Directory, Scanned, Found, strFiller.c_str(),
 		szFileName[ 0], szFileName[ 1], szFileName[ 2], szFileName[ 3], szFileName[ 4], 
 		szFileName[ 5], szFileName[ 6], szFileName[ 7], szFileName[ 8], szFileName[ 9],
 		szFileName[10], szFileName[11], szFileName[12], szFileName[13], szFileName[14]};
-
-	int nMax = (PanelItems.size() > 15) ? 15 : PanelItems.size();
-	for (int nItem = 0; nItem < nMax; nItem++)
-		ShortenFileName(FarFileName(PanelItems[nItem+PanelItems.size()-nMax].FindData), szFileName[nItem]);
-
-	StartupInfo.Message(StartupInfo.ModuleNumber,0,NULL,Lines,5+nMax,0);
+	StartupInfo.Message(StartupInfo.ModuleNumber, 0, NULL, Lines, 5+nItems, 0);
 }
 
 BOOL AdvancedApplies(WIN32_FIND_DATA *FindData) {
@@ -437,6 +445,7 @@ int ScanDirectories(panelitem_vector &PanelItems,ProcessFileProc ProcessFile) {
 	PanelItems.clear();
 	g_bInterrupted=FALSE;
 	FilesScanned=0;
+	ScanProgressX = 40;	// Minimal width
 	CurrentRecursionLevel=0;
 
 	FADateBeforeThisLocal = FADateBeforeThis;

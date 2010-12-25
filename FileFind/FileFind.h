@@ -86,6 +86,7 @@ EXTERN pcre *FADirectoryPattern VALUE(NULL);
 EXTERN pcre_extra *FADirectoryPatternExtra VALUE(NULL);
 EXTERN DWORD CurrentRecursionLevel;
 EXTERN int  FilesScanned;
+EXTERN int  ScanProgressX;
 
 EXTERN CFarMaskSet *FASystemFoldersMask VALUE(NULL);
 
