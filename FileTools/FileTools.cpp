@@ -360,7 +360,7 @@ BOOL RenameFilesPrompt() {
 	Dialog.Add(new CFarTextItem(5,8,DIF_BOXCOLOR|DIF_SEPARATOR,_T("")));
 
 	Dialog.Add(new CFarTextItem(5,9,0,MSearchIn));
-	Dialog.Add(new CFarComboBoxItem(15,9,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearch, false),(int *)&FSearchIn));
+	Dialog.Add(new CFarComboBoxItem(15,9,55,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearch, false),(int *)&FSearchIn));
 
 	Dialog.Add(new CFarCheckBoxItem(5,11,0,MViewModified,&FROpenModified));
 	Dialog.Add(new CFarCheckBoxItem(5,12,0,MConfirmFile,&FRConfirmFile));
@@ -368,6 +368,7 @@ BOOL RenameFilesPrompt() {
 	Dialog.Add(new CFarCheckBoxItem(5,14,0,MPreviewRename,&FRPreviewRename));
 	Dialog.AddButtons(MOk,MCancel);
 	Dialog.Add(new CFarButtonItem(60,9,0,0,MBtnPresets));
+	Dialog.Add(new CFarButtonItem(58,10,0,0,MBtnREBuilder));
 	Dialog.SetFocus(4);
 
 	if (FSearchAs>=SA_SEVERALLINE) FSearchAs=SA_PLAINTEXT;
@@ -379,7 +380,7 @@ BOOL RenameFilesPrompt() {
 	ReplaceText=FRReplace;
 	int ExitCode;
 	do {
-		switch (ExitCode=Dialog.Display(2, -3, -1)) {
+		switch (ExitCode=Dialog.Display(3, -4, -2, -1)) {
 		case 0:
 			FMask=MaskText;
 			FText=SearchText;
@@ -388,7 +389,12 @@ BOOL RenameFilesPrompt() {
 		case 1:
 			RnPresets->ShowMenu(true);
 			break;
-		case -1:
+		case 2:
+			if (RunREBuilder(SearchText, ReplaceText)) {
+				FSearchAs = SA_REGEXP;
+			}
+			break;
+		default:
 			return FALSE;
 		}
 	} while ((ExitCode>=1)||!FPreparePattern(false));
@@ -522,6 +528,7 @@ BOOL RenameSelectedFilesPrompt() {
 	Dialog.Add(new CFarCheckBoxItem(5,9,0,MPreviewRename,&FRPreviewRename));
 	Dialog.AddButtons(MOk,MCancel);
 	Dialog.Add(new CFarButtonItem(60,6,0,0,MBtnPresets));
+	Dialog.Add(new CFarButtonItem(58,7,0,0,MBtnREBuilder));
 	Dialog.SetFocus(4);
 
 	if (FSearchAs>=SA_SEVERALLINE) FSearchAs=SA_PLAINTEXT;
@@ -531,7 +538,7 @@ BOOL RenameSelectedFilesPrompt() {
 	SearchText=FText;
 	ReplaceText=FRReplace;
 	do {
-		switch (ExitCode=Dialog.Display(2, -3, -1)) {
+		switch (ExitCode=Dialog.Display(3, -4, -2, -1)) {
 		case 0:
 			FText=SearchText;
 			FRReplace=ReplaceText;
@@ -539,7 +546,12 @@ BOOL RenameSelectedFilesPrompt() {
 		case 1:
 			QRPresets->ShowMenu(true);
 			break;
-		case -1:
+		case 2:
+			if (RunREBuilder(SearchText, ReplaceText)) {
+				FSearchAs = SA_REGEXP;
+			}
+			break;
+		default:
 			return FALSE;
 		}
 	} while ((ExitCode>=1)||!FPreparePattern(false));

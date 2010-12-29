@@ -417,6 +417,8 @@ int ReplacePrompt(BOOL Plugin) {
 	Dialog.Add(new CFarButtonItem(60,9,0,0,MBtnPresets));
 	Dialog.Add(new CFarCheckBoxItem(56,10,0,_T(""),&FAdvanced));
 	Dialog.Add(new CFarButtonItem(60,10,0,0,MBtnAdvanced));
+	Dialog.Add(new CFarButtonItem(58, 11, 0, FALSE, MBtnREBuilder));
+
 	Dialog.SetFocus(MMask, 1);
 	if (FSearchAs>=SA_MULTILINE) FSearchAs=SA_PLAINTEXT;
 	FACaseSensitive=FADirectoryCaseSensitive=MaskCaseHere();
@@ -444,6 +446,11 @@ int ReplacePrompt(BOOL Plugin) {
 			break;
 		case MBtnAdvanced:
 			if (AdvancedSettings()) FAdvanced=TRUE;
+			break;
+		case MBtnREBuilder:
+			if (RunREBuilder(SearchText, ReplaceText)) {
+				if (FSearchAs == SA_PLAINTEXT) FSearchAs = SA_REGEXP;
+			}
 			break;
 		default:
 			return FALSE;
