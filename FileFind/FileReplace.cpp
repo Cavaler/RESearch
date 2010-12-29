@@ -417,7 +417,7 @@ int ReplacePrompt(BOOL Plugin) {
 	Dialog.Add(new CFarButtonItem(60,9,0,0,MBtnPresets));
 	Dialog.Add(new CFarCheckBoxItem(56,10,0,_T(""),&FAdvanced));
 	Dialog.Add(new CFarButtonItem(60,10,0,0,MBtnAdvanced));
-	Dialog.SetFocus(3);
+	Dialog.SetFocus(MMask, 1);
 	if (FSearchAs>=SA_MULTILINE) FSearchAs=SA_PLAINTEXT;
 	FACaseSensitive=FADirectoryCaseSensitive=MaskCaseHere();
 

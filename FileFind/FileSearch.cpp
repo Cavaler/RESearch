@@ -423,7 +423,7 @@ int SearchPrompt(BOOL Plugin) {
 	Dialog.Add(new CFarButtonItem(60,7,0,0,MBtnPresets));
 	Dialog.Add(new CFarCheckBoxItem(56,9,0,_T(""),&FAdvanced));
 	Dialog.Add(new CFarButtonItem(60,9,0,0,MBtnAdvanced));
-	Dialog.SetFocus(3);
+	Dialog.SetFocus(MMask, 1);
 	FACaseSensitive=FADirectoryCaseSensitive=MaskCaseHere();
 
 	MaskText=FMask;

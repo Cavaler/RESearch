@@ -298,7 +298,7 @@ bool GrepPrompt(BOOL bPlugin) {
 	Dialog.Add(new CFarButtonItem(60,10,0,0,MBtnPresets));
 	Dialog.Add(new CFarCheckBoxItem(56,11,0,_T(""),&FAdvanced));
 	Dialog.Add(new CFarButtonItem(60,11,0,0,MBtnAdvanced));
-	Dialog.SetFocus(3);
+	Dialog.SetFocus(MMask, 1);
 	FACaseSensitive = FADirectoryCaseSensitive = MaskCaseHere();
 
 	MaskText=FMask;
