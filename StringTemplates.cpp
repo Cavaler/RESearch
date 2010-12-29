@@ -160,6 +160,7 @@ CREParameters<CHAR>::CREParameters()
 
 template<class CHAR>
 void CREParameters<CHAR>::Clear() {
+	m_arrMatch.clear();
 	m_mapStrParam.clear();
 	m_re = NULL;
 	m_szString = NULL;
