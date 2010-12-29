@@ -15,15 +15,24 @@ tstring MatchingRE(const tstring &strSource)
 
 tstring BuildRE(const tstring &strSource, const part_map &mapParts)
 {
-	tstring strResult = strSource;
-	int nSkip = 0;
+	tstring strResult;
 
+	int nLeftOff = 0;
 	for (part_map::const_iterator it = mapParts.begin(); it != mapParts.end(); it++) {
-		tstring strPart = strResult.substr(it->first - nSkip, it->second);
+		tstring strStart = strSource.substr(nLeftOff, it->first);
+		QuoteRegExpString(strStart);
+		strResult += strStart;
+
+		tstring strPart = strSource.substr(it->first, it->second);
 		tstring strRE = _T("(") + MatchingRE(strPart) + _T(")");
-		strResult.replace(it->first - nSkip, it->second, strRE);
-		nSkip += strPart.length()-strRE.length();
+		strResult += strRE;
+
+		nLeftOff = it->first + it->second;
 	}
+
+	tstring strEnd = strSource.substr(nLeftOff);
+	QuoteRegExpString(strEnd);
+	strResult += strEnd;
 
 	return strResult;
 }
