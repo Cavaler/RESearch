@@ -94,11 +94,14 @@ typename CStringOperations<CHAR>::cstring
 CStringOperations<CHAR>::ExpandParameter(const CHAR *&Replace, CREParameters<CHAR> &Param)
 {
 	vector<cstring> arrMatch;
-	if (CRegExpT<CHAR>::Match(Replace+1, _T2("\\{([^}]+)\\}"), 0, 0, &arrMatch)) {
+
+	//	Named/formatted parameters: {name}
+	if (CRegExpT<CHAR>::Match(Replace+1, _T2("^\\{([^}]+)\\}"), 0, 0, &arrMatch)) {
 		cstring strParam = arrMatch[1];
 		Replace = Replace + strParam.length()+3;
 
-		if (CRegExpT<CHAR>::Match(strParam, _T2("(.*?)((\\+|-)\\d+)"), 0, 0, &arrMatch)) {
+		//	Parameters with offset: {name+32}
+		if (CRegExpT<CHAR>::Match(strParam, _T2("^(.*?)((\\+|-)\\d+)"), 0, 0, &arrMatch)) {
 			strParam = arrMatch[1];
 			int nAdd = ctoi(arrMatch[2].c_str());
 			size_t nAlign = arrMatch[2].length()-1;
@@ -114,7 +117,8 @@ CStringOperations<CHAR>::ExpandParameter(const CHAR *&Replace, CREParameters<CHA
 				return strValue + arrMatch[2];
 			}
 
-		} else if (CRegExpT<CHAR>::Match(strParam, _T2("(.*?)((<|>)(\\d+))"), 0, 0, &arrMatch)) {
+		//	Parameters with alignment: {name>32}
+		} else if (CRegExpT<CHAR>::Match(strParam, _T2("^(.*?)((<|>)(\\d+))"), 0, 0, &arrMatch)) {
 			strParam = arrMatch[1];
 			CHAR cAlign = arrMatch[3][0];
 			size_t nAlign = ctoi(arrMatch[4].c_str());
@@ -125,7 +129,8 @@ CStringOperations<CHAR>::ExpandParameter(const CHAR *&Replace, CREParameters<CHA
 		} else {
 			return Param.GetParam(strParam, true);
 		}
-	} else if (CRegExpT<CHAR>::Match(Replace+1, _T2("\\d+|[A-Z]"), 0, 0, &arrMatch)) {
+		//	Simple parameters: $32 or $R
+	} else if (CRegExpT<CHAR>::Match(Replace+1, _T2("^\\d+|[A-Z]"), 0, 0, &arrMatch)) {
 		cstring strParam = arrMatch[0];
 		Replace = Replace + strParam.length()+1;
 
