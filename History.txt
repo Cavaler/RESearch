@@ -8,6 +8,12 @@ Regular Expression Search and Replace
 Planned:
 	- Search in share-opened files
 
+Version 7.36 (03.01.2011)
+	- RegExp Builder correctly escapes source string
+	- One rare crash fixed
+	- Nasty replace string parsing bug fixed
+	* RE Builder button added to File Replace / Rename
+
 Version 7.35 (25.12.2010) Happy New Year!
 	* Positioning in editor now tries to keep all selection inside the window
 	* Last selected item stays selected in Presets/Batches menus
