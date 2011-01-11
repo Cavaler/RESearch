@@ -2,11 +2,19 @@
 #include "..\RESearch.h"
 
 struct ViewerSearchInfo {
-	__int64  CurPos;	// Line
-	int      LeftPos;	// Column;
+	__int64  CurPos;	// Line offset in BYTES
+	int      LeftPos;	// Column in CHARS
 };
 
 map<int, ViewerSearchInfo> g_ViewerInfo;
+
+bool IsUnicode(const ViewerMode &Mode) {
+#ifdef UNICODE
+	return (Mode.CodePage == 1200) || (Mode.CodePage == 1201);
+#else
+	return Mode.Unicode != 0;
+#endif
+}
 
 #ifndef UNICODE
 string ToOEM(ViewerInfo &VInfo, const char *szData, int nLength) {
@@ -30,11 +38,7 @@ string ToOEM(ViewerInfo &VInfo, const char *szData, int nLength) {
 #endif
 
 tstring GetNextLine(ViewerInfo &VInfo, char *szData, int nLength, int &nSkip) {
-#ifdef UNICODE
-	if (VInfo.CurMode.CodePage == 1200) {
-#else
-	if (VInfo.CurMode.Unicode) {
-#endif
+	if (IsUnicode(VInfo.CurMode)) {
 		const wchar_t *wszData = (const wchar_t *)szData;
 		const wchar_t *wszCur = wszData;
 		while (nLength && !wcschr(L"\r\n", *wszCur)) {wszCur++; nLength--;}
@@ -68,8 +72,8 @@ tstring GetNextLine(ViewerInfo &VInfo, char *szData, int nLength, int &nSkip) {
 	}
 }
 
-void SetViewerSelection(__int64 nStart, int nLength) {
-	ViewerSelect VSelect = {nStart, nLength};
+void SetViewerSelection(__int64 nStart, int nLength, int nCharSize) {
+	ViewerSelect VSelect = {nStart / nCharSize, nLength / nCharSize};
 	StartupInfo.ViewerControl(VCTL_SELECT, &VSelect);
 
 	ViewerSetPosition VPos = {/*VSP_NOREDRAW*/0, (nStart > 256) ? nStart-256 : 0, 0};
@@ -97,18 +101,25 @@ BOOL ViewerSearchAgain() {
 	}
 	ViewerSearchInfo &Info = g_ViewerInfo[VInfo.ViewerID];
 
+	bool bUnicode  = IsUnicode(VInfo.CurMode);
+	int  nCharSize = bUnicode ? 2 : 1;
+
 	CFileMapping mapInput(VInfo.FileName);
 	if (!mapInput) return FALSE;
-
 	char *szData = mapInput;
 	if (!szData) return FALSE;
-#ifdef UNICODE
-	szData += (VInfo.CurMode.CodePage == 1200) ? Info.CurPos*2 : Info.CurPos;
-#else
-	szData += (VInfo.CurMode.Unicode) ? Info.CurPos*2 : Info.CurPos;
-#endif
 
 	long nOffset = (long)Info.CurPos;
+	if (bUnicode) {
+		if (nOffset == 0) {
+			if (mapInput.Size() >= 2) {
+				WORD wSig = *((WORD *)szData);
+				if ((wSig == 0xFEFF) || (wSig == 0xFFFE)) nOffset += 2;
+			}
+		}
+	}
+	szData += nOffset;
+
 	int nMatchCount = ERegExp ? pcre_info(EPattern, NULL, NULL) + 1 : 0;
 	int *pMatch = ERegExp ? new int[nMatchCount*3] : NULL;
 
@@ -127,16 +138,16 @@ BOOL ViewerSearchAgain() {
 
 			if (ERegExp) {
 				if (pcre_exec(EPattern, EPatternExtra, strLine.data(), strLine.length()-nLineOffset, nLineOffset, 0, pMatch, nMatchCount*3)>=0) {
-					SetViewerSelection(nOffset + pMatch[0], pMatch[1] - pMatch[0]);
-					Info.CurPos = nOffset;
+					SetViewerSelection(nOffset + pMatch[0]*nCharSize, (pMatch[1] - pMatch[0])*nCharSize, nCharSize);
+					Info.CurPos  = nOffset;
 					Info.LeftPos = pMatch[0] + pMatch[1];
 					break;
 				}
 			} else {
 				int nPos = BMHSearch(strLine.data()+nLineOffset, strLine.length()-nLineOffset, ETextUpcase.data(), ETextUpcase.length(), NULL);
 				if (nPos >= 0) {
-					SetViewerSelection(nOffset + nLineOffset + nPos, EText.length());
-					Info.CurPos = nOffset;
+					SetViewerSelection(nOffset + (nLineOffset + nPos)*nCharSize, EText.length()*nCharSize, nCharSize);
+					Info.CurPos  = nOffset;
 					Info.LeftPos = nLineOffset + nPos + EText.length();
 					break;
 				}
