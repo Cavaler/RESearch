@@ -24,21 +24,13 @@ enum OperationResult {OR_CANCEL,OR_FAILED,OR_OK,OR_PANEL};
 
 #include "Presets.h"
 
-#ifdef DEFINE_VARS
-#define EXTERN
-#define VALUE(n) = n
-#define CONSTRUCT(n) n
-#else
-#define EXTERN extern
-#define VALUE(n)
-#define CONSTRUCT(n)
-#endif
-
 enum   ShowPosition {SP_TOP,SP_CENTER,SP_BOTTOM};
 enum   FindTextAtCursor {FT_NONE,FT_WORD,FT_ANY};
 
 #define DECLARE_PERSIST_VARS
 #include "PersistVars.h"
+
+EXTERN HANDLE g_hInstance;
 
 #ifdef UNICODE
 typedef set<UINT> cp_set;

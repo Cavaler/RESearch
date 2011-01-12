@@ -1,6 +1,14 @@
 #include "StdAfx.h"
 #include "RESearch.h"
 
+BOOL __stdcall DllMain(HANDLE hInst, ULONG reason, LPVOID)
+{
+	if (reason == DLL_PROCESS_ATTACH)
+		g_hInstance = hInst;
+
+	return TRUE;
+}
+
 void WINAPI FAR_EXPORT(GetPluginInfo)(PluginInfo *Info) {
 	static const TCHAR *ConfigStrings[1];
 	static const TCHAR *MenuStrings[1];

@@ -149,11 +149,8 @@ class CReplaceScriptSite : public IActiveScriptSite {
 public:
 	CReplaceScriptSite(CReplaceParameters *pParams) : m_nCounter(0), m_pParams(pParams), m_pDispatch(NULL) {
 		TCHAR szModule[MAX_PATH];
-#ifdef UNICODE
-		GetModuleFileName(GetModuleHandle(_T("RESearchU.dll")), szModule, MAX_PATH);
-#else
-		GetModuleFileName(GetModuleHandle(_T("RESearch.dll")), szModule, MAX_PATH);
-#endif
+		GetModuleFileName((HMODULE)g_hInstance, szModule, MAX_PATH);
+
 		ITypeLib *pLib;
 		HRESULT hResult = LoadTypeLib(_bstr_t(szModule), &pLib);
 		if (FAILED(hResult)) {
