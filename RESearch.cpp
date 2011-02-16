@@ -368,7 +368,8 @@ int ShowEditorMenu() {
 
 	vector<CFarMenuItemEx> MenuItemsEx;
 	UpgradeMenuItemVector(MenuItems, MenuItemsEx);
-	if (!EditorListAllHasResults()) MenuItemsEx[9].Flags |= MIF_DISABLE;
+
+	if (!EditorListAllHasResults()) MenuItemsEx[8].Flags |= MIF_DISABLE;
 
 	int nResult = StartupInfo.Menu(StartupInfo.ModuleNumber, -1, -1, 0, FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT|FMENU_USEEXT,
 		GetMsg(MMenuHeader), NULL, _T("EditorMenu"), NULL, NULL,
@@ -585,7 +586,7 @@ HANDLE OpenPluginFromEditorMenu(int Item) {
 		if (Item == 6) EReverse = !EReverse;
 		break;
 	case 8:
-		if (EditorListAllShowResults(false)) LastAction=4;
+		EditorListAllShowResults(false);
 		break;
 	}
 
