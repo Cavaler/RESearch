@@ -7,6 +7,16 @@ Regular Expression Search and Replace
 
 Planned:
 	- Search in share-opened files
+    * File Replace encoding in dialog itself (Unicode)
+    * F4 in main menus on presets/batches
+    * F4 in batches to edit commands immediately
+
+Version 7.37 (16.02.2011)
+	- Positioning in Viewer fixed with Unicode
+    - Scripting in x64 and in Unicode fixed
+    - Fixed 'Show last results' available when no last results present
+    - Fixed 'Show last results' making 'Search/replace again' perform 'List All'
+    * Total line counter added to 'List All'
 
 Version 7.36 (03.01.2011)
 	- RegExp Builder correctly escapes source string
