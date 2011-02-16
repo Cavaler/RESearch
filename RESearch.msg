@@ -116,6 +116,7 @@ MLeaveMatching		"&Leave matching lines"		"&Оставить совпадающие строки"
 MRemoveMatching		"R&emove matching lines"	"&Убрать совпадающие строки"
 
 MListAllLines		"List all lines"			"Вывести все строки"
+MTotalLines			"Total %d lines"			"Всего %d строк"
 
 MRenumber			"Renumber"			"Перенумеровать"
 

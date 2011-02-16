@@ -97,7 +97,8 @@ BOOL EditorListAllShowResults(bool bImmediate) {
 #endif
 	if (Info.arrLines.size() == 0) return TRUE;
 
-	int nResult = ChooseMenu(Info.arrString, GetMsg(MListAllLines), NULL, _T("ListAll"), 0, FMENU_WRAPMODE|FMENU_SHOWAMPERSAND);
+	tstring strTotal = FormatStr(GetMsg(MTotalLines), Info.arrLines.size());
+	int nResult = ChooseMenu(Info.arrString, GetMsg(MListAllLines), strTotal.c_str(), _T("ListAll"), 0, FMENU_WRAPMODE|FMENU_SHOWAMPERSAND);
 	if (nResult >= 0) {
 		sFindOneInfo &OneInfo = Info.arrLines[nResult];
 		EditorSearchOK(OneInfo.FirstLine, OneInfo.StartPos, OneInfo.LastLine, OneInfo.EndPos);

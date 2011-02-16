@@ -116,6 +116,7 @@ enum eStringTable {
 	MRemoveMatching,
 
 	MListAllLines,
+	MTotalLines,
 
 	MRenumber,
 
