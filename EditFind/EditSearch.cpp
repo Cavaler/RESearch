@@ -58,6 +58,8 @@ BOOL EditorSearchAgain() {
 
 	StartEdInfo = EdInfo;
 
+	g_bInterrupted = false;
+
 	int FirstLine,StartPos,LastLine,EndPos;
 
 	if (EInSelection) {		// ***************** SEARCH IN SELECTION
