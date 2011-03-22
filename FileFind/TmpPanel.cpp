@@ -161,8 +161,9 @@ int CTemporaryPanel::ProcessKey(int Key,unsigned int ControlState) {
 				TempUserData *pData = (TempUserData *)Item.UserData;
 				if (!pData || (pData->FoundLine < 0)) return FALSE;
 
-				StartupInfo.Editor(FarFileName(Item.FindData), NULL, 0, 0, -1, -1, EF_NONMODAL|EF_IMMEDIATERETURN|EF_ENABLE_F6,
-					pData ? pData->FoundLine+1 : 0, pData ? pData->FoundColumn : 1
+				StartupInfo.Editor(FarFileName(Item.FindData), NULL, 0, 0, -1, -1,
+					EF_NONMODAL|EF_IMMEDIATERETURN|EF_ENABLE_F6,
+					pData->FoundLine+1, pData->FoundColumn
 #ifdef UNICODE
 					, CP_AUTODETECT
 #endif
