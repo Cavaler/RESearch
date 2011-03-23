@@ -40,7 +40,7 @@ void EWriteRegistry(HKEY Key) {
 }
 
 BOOL SearchIn(const TCHAR *Line,int Start,int Length,int *MatchStart,int *MatchLength) {
-	REParam.Clear();
+	REParam.Clear(FileMaskNamedParameters);
 	REParam.AddSource(Line, Length);
 
 	if (ERegExp) {

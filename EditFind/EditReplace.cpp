@@ -375,6 +375,16 @@ BOOL ReplaceInTextByLine(int FirstLine, int StartPos, int LastLine, int EndPos, 
 	return FALSE;
 }
 
+void EditorFillNamedParameters()
+{
+	CRegExpParam<TCHAR> reParseName;
+	reParseName.Compile(_T("(?<_fullname>^(?<_path>.*)\\\\(?<_name>.*)\\.(?<_ext>.*)$)"));
+
+	FileMaskNamedParameters.clear();
+	if (reParseName.Match(EdInfo.FileName))
+		reParseName.BackupParam(FileMaskNamedParameters);
+}
+
 BOOL _EditorReplaceAgain() {
 	NoAsking = FALSE;
 	return EditorReplaceAgain();
@@ -384,6 +394,7 @@ BOOL EditorReplaceAgain() {
 	RefreshEditorInfo();
 	PatchEditorInfo(EdInfo);
 	EctlForceSetPosition(NULL);
+	EditorFillNamedParameters();
 
 	EditorStartUndo();
 
