@@ -155,6 +155,33 @@ BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,
 }
 #endif
 
+void FillDefaultNamedParameters(const TCHAR *szFileName)
+{
+	CRegExpParam<TCHAR> reParseName;
+	reParseName.Compile(_T("(?<_fullname>^<?<fpath>(?<_path>.*)\\\\)(?<_filename>.*)$)"));
+
+	FileMaskNamedParameters.clear();
+	if (reParseName.Match(szFileName)) {
+		reParseName.BackupParam(FileMaskNamedParameters);
+
+		const tstring strName = FileMaskNamedParameters[_T("_filename")];
+
+		//	Easier to just manually check than invent complicated RE
+		if (strName.find('.') != tstring::npos) {
+			reParseName.Compile(_T("^(?<_name>.*)\\.(?<_ext>.*)$"));
+			reParseName.Match(strName);
+			reParseName.BackupParam(FileMaskNamedParameters);
+
+			reParseName.Compile(_T("^(?<_sname>.*?)\\.(?<_fext>.*)$"));
+			reParseName.Match(strName);
+			reParseName.BackupParam(FileMaskNamedParameters);
+		} else {
+			FileMaskNamedParameters[_T("_name")] = strName;
+			FileMaskNamedParameters[_T("_sname")] = strName;
+		}
+	}
+}
+
 void HighlightREError(CFarDialog *pDlg) {
 	if (REErrorOffset < 0) return;
 

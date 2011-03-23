@@ -377,12 +377,15 @@ BOOL ReplaceInTextByLine(int FirstLine, int StartPos, int LastLine, int EndPos, 
 
 void EditorFillNamedParameters()
 {
-	CRegExpParam<TCHAR> reParseName;
-	reParseName.Compile(_T("(?<_fullname>^(?<_path>.*)\\\\(?<_name>.*)\\.(?<_ext>.*)$)"));
+#ifdef UNICODE
+	int nLength = StartupInfo.EditorControl(ECTL_GETFILENAME, NULL);
 
-	FileMaskNamedParameters.clear();
-	if (reParseName.Match(EdInfo.FileName))
-		reParseName.BackupParam(FileMaskNamedParameters);
+	vector<wchar_t> arrName(nLength+1);
+	StartupInfo.EditorControl(ECTL_GETFILENAME, &arrName[0]);
+	FillDefaultNamedParameters(&arrName[0]);
+#else
+	FillDefaultNamedParameters(EdInfo.FileName);
+#endif
 }
 
 BOOL _EditorReplaceAgain() {
