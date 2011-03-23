@@ -3,7 +3,8 @@ Some non-obvious aspects of RESearch usage are explained here.
 - Literals like '\n' DO NOT work in plain text search! Either use regexp, or enter needed
   symbol directly using Ctrl-Q.
 
-- '\n' and others do work in replace string even with plain-text search.
+- '\n' and others do work in replace string even with plain-text search, UNLESS
+  "[x] Use escapes in plain-text replace" is turned off.
 
 - Single-line search in both editor and panels, both regexp and plaintext, is done
   by extracting lines from text sequentially, WITHOUT newline symbols - therefore to search for
@@ -20,7 +21,7 @@ Some non-obvious aspects of RESearch usage are explained here.
 
 - If zero-width string is found, characters surrounding it are highlighted.
 
-- If If UTF-16LE/BE or UTF-8 byte-order mark (BOM) is found in Search/Grep,
+- If UTF-16LE/BE or UTF-8 byte-order mark (BOM) is found in Search/Grep,
   no other encodings are tried!
 
 - Without [ ] Use all character tables, search/grep from panel is performed:

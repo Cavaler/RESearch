@@ -2,7 +2,7 @@
 .PluginContents=Regular Expression Search
 
 @Contents
-$ #Regular Expression Search and Replace, version 6.20#
+$ #Regular Expression Search and Replace, version 7.40#
     This plugin allows you to:
 
     - Perform text search and replace in editor
@@ -27,6 +27,8 @@ in file masks, searched text, and using various macros in replacement text.
 
    ~Regular Expression File Search~@FileSearchDlg@
    ~Regular Expression File Replace~@FileReplaceDlg@
+   ~Regular Expression File Rename~@FileRenameDlg@
+
    ~Advanced File Search options~@AdvancedFileSearchDlg@
 
    ~Search/replace/rename from command line~@CmdLine@
@@ -123,7 +125,7 @@ $ #Replacement text#
 
     For RegExp search only:
     $nn     - captured subpattern number nn. $0 is a whole matched portion.
-    ${name} - captured named subpattern.
+    ${name} - captured named subpattern. See also: ~Predefined named parameters~@PredefinedNamedParam@
 
     When replacing in editor:
     $L      - current line number (from 0)
@@ -148,6 +150,20 @@ up to the length of nnn (so you can do ${X+0000} if you need).
     ${X</>nnn} - align parameter with spaces to the left or right up to nnn characters.
 
     Also standard C-like metacharacters: \a, \b, \e, \f, \n, \r, \t, \v are recognized.
+
+@PredefinedNamedParam
+$ #Predefined named parameters#
+    You can refefrence some predefined named parameters in ~editor replace~@ReplaceDlg@ or
+~file replace~@FileReplaceDlg@/~rename~@FileRenameDlg@.
+
+    ${_fullname} - full name of current file
+    ${_path}     - path to current file, not including trailing '\'
+    ${_fpath}    - path to current file, including trailing '\'
+    ${_name}     - current file name (before #last# '.')
+    ${_ext}      - current file extension (after last '.')
+    ${_sname}    - current file name (before #first# '.')
+    ${_fext}     - current file extension (after first '.')
+
 @RegularReplaceScripting
 $ #Using scripting#
     To allow a user to achieve a much greater level of flexibility in replacing text, RESearch
