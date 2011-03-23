@@ -10,6 +10,15 @@ Planned:
     * File Replace encoding in dialog itself (Unicode)
     * F4 in main menus on presets/batches
     * F4 in batches to edit commands immediately
+    ? Named parameters in Search string
+
+Version 7.40 (23.03.2011)
+	- Interrupting replace works more properly
+	+ Named parameters from File mask can be used in File Replace/Rename
+	+ Some predefined named parameters for Replace/Rename
+
+Version 7.38 (28.02.2011)
+	- Fixed positioning from file search with [X] Save file position
 
 Version 7.37 (16.02.2011)
 	- Positioning in Viewer fixed with Unicode

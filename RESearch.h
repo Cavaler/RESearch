@@ -89,7 +89,8 @@ BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const tstring &Text
 tstring EvaluateReplaceString(CREParameters<TCHAR> &Param, const TCHAR *Replace, const TCHAR *EOL, int Engine);
 void HighlightREError(CFarDialog *pDlg);
 
-void FillDefaultNamedParameters(const TCHAR *szFileName);
+template<class CHAR>
+void FillDefaultNamedParameters(const CHAR *szFileName, typename CREParameters<CHAR>::named_parameters &arrParam);
 
 #ifdef UNICODE
 BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,int CaseSensitive,const unsigned char *pTables=NULL);
