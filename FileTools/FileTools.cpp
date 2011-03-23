@@ -470,7 +470,11 @@ BOOL PerformRenameSelectedFiles(CPanelInfo &PInfo, panelitem_vector &PanelItems)
 		for (int I=0;I<PInfo.ItemsNumber;I++) {
 			if (I==PInfo.CurrentItem) continue;
 			if (g_bInterrupted) break;
-			arrOrigNames.push_back(FarFileName(PInfo.PanelItems[I].FindData));
+
+			LPCTSTR szFileName = FarFileName(PInfo.PanelItems[I].FindData);
+			FileFillNamedParameters(CatFile(PInfo.CurDir, szFileName).c_str());
+			arrOrigNames.push_back(szFileName);
+
 			RenameFile(&FFDtoWFD(PInfo.PanelItems[I].FindData),PanelItems);
 		}
 	} else {
@@ -478,7 +482,11 @@ BOOL PerformRenameSelectedFiles(CPanelInfo &PInfo, panelitem_vector &PanelItems)
 			bRestoreSelection = FALSE;
 		for (int I=0;I<PInfo.SelectedItemsNumber;I++) {
 			if (g_bInterrupted) break;
-			arrOrigNames.push_back(FarFileName(PInfo.SelectedItems[I].FindData));
+
+			LPCTSTR szFileName = FarFileName(PInfo.SelectedItems[I].FindData);
+			FileFillNamedParameters(CatFile(PInfo.CurDir, szFileName).c_str());
+			arrOrigNames.push_back(szFileName);
+
 			RenameFile(&FFDtoWFD(PInfo.SelectedItems[I].FindData),PanelItems);
 		}
 	}
