@@ -125,7 +125,7 @@ bool ProcessPlainTextBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindD
 	char *Table=(FCaseSensitive) ? NULL : UpCaseTable;
 #endif
 
-	REParamA.Clear();
+	REParamA.Clear(FileMaskNamedParametersA);
 
 	while (!g_bInterrupted && (Current+FText.size()<=Buffer+BufLen)) {
 #ifdef UNICODE
@@ -156,7 +156,7 @@ bool ProcessRegExpBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindData
 	HANDLE hFile=INVALID_HANDLE_VALUE;
 	bool bError = false;
 
-	REParamA.Clear();
+	REParamA.Clear(FileMaskNamedParametersA);
 	REParamA.AddRE(FPatternA);
 
 	do {
@@ -243,7 +243,7 @@ bool ProcessSeveralLineBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *Fin
 	HANDLE hFile=INVALID_HANDLE_VALUE;
 	int LinesIn=0;
 
-	REParamA.Clear();
+	REParamA.Clear(FileMaskNamedParametersA);
 	REParamA.AddRE(FPatternA);
 
 	do {

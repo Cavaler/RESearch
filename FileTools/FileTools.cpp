@@ -136,7 +136,7 @@ BOOL ConfirmRename(const TCHAR *From,const TCHAR *To) {
 }
 
 BOOL FindRename(const TCHAR *FileName, int &MatchStart, int &MatchLength) {
-	REParam.Clear();
+	REParam.Clear(FileMaskNamedParameters);
 	REParam.AddSource(FileName, _tcslen(FileName));
 
 	if (FSearchAs==SA_REGEXP) {
@@ -454,6 +454,7 @@ OperationResult RenameFilesExecutor() {
 BOOL PerformRenameSelectedFiles(CPanelInfo &PInfo, panelitem_vector &PanelItems) {
 	FileNumber=-1;
 	g_bInterrupted=FALSE;
+	FileMaskNamedParameters.clear();
 
 	m_arrPendingRename.clear();
 	m_arrLastRename.clear();
