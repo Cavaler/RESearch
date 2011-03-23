@@ -25,10 +25,13 @@ class CREParameters {
 public:
 	typedef CStringOperations<CHAR> CSO;
 	typedef typename CSO::cstring cstring;
+	typedef map<cstring, cstring> named_parameters;
 
 	CREParameters();
 
 	void Clear();
+	void Clear(const named_parameters &mapParam);
+
 	void AddENumbers(int nL, int nN, int nS, int nR);
 	void AddFNumbers(int nF, int nS, int nR);
 	void AddSource(const CHAR *szString, size_t nLength);
@@ -42,11 +45,13 @@ public:
 	int     FindParam(const cstring &strName, bool bCheckNumber = false);
 	cstring GetParam(const cstring &strName, bool bCheckNumber = false);
 
+	void    BackupParam(named_parameters &mapParam);
+
 	void FillStartLength(int *MatchStart, int *MatchLength);
 	cstring Original();
 
 public:
-	map<cstring, cstring> m_mapStrParam;
+	named_parameters m_mapStrParam;
 
 	pcre *m_re;
 	const CHAR *m_szString;

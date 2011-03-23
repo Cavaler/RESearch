@@ -172,6 +172,12 @@ void CREParameters<CHAR>::Clear() {
 }
 
 template<class CHAR>
+void CREParameters<CHAR>::Clear(const named_parameters &mapParam) {
+	Clear();
+	m_mapStrParam = mapParam;
+}
+
+template<class CHAR>
 void CREParameters<CHAR>::AddENumbers(int nL, int nN, int nS, int nR) {
 	CHAR szNumber[16];
 	m_mapStrParam[CSO::_T2("L")] = CSO::ctoa(nL, szNumber);
@@ -223,7 +229,7 @@ CREParameters<CHAR>::GetParam(const cstring &strName, bool bCheckNumber) {
 	if (bCheckNumber && CSO::GetNumber(strName, nNumber))
 		return GetParam(nNumber);
 
-	map<cstring, cstring>::iterator it = m_mapStrParam.find(strName);
+	named_parameters::iterator it = m_mapStrParam.find(strName);
 	if (it != m_mapStrParam.end()) return it->second;
 
 	if (m_re == NULL) return cstring();
@@ -233,6 +239,17 @@ CREParameters<CHAR>::GetParam(const cstring &strName, bool bCheckNumber) {
 	cstring strSubStr = GetParam(nNumber);
 	m_mapStrParam[strName] = strSubStr;
 	return strSubStr;
+}
+
+template<class CHAR>
+void CREParameters<CHAR>::BackupParam(named_parameters &mapParam)
+{
+	vector<cstring> arrNames;
+	pcre_get_stringlist(m_re, arrNames);
+
+	for (size_t nParam = 0; nParam < arrNames.size(); nParam++) {
+		mapParam[arrNames[nParam]] = GetParam(arrNames[nParam]);
+	}
 }
 
 template<class CHAR>
