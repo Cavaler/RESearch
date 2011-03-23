@@ -155,32 +155,39 @@ BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,
 }
 #endif
 
-void FillDefaultNamedParameters(const TCHAR *szFileName)
+template<class CHAR>
+void FillDefaultNamedParameters(const CHAR *szFileName, typename CREParameters<CHAR>::named_parameters &arrParam)
 {
-	CRegExpParam<TCHAR> reParseName;
-	reParseName.Compile(_T("(?<_fullname>^<?<fpath>(?<_path>.*)\\\\)(?<_filename>.*)$)"));
+	typedef CStringOperations<CHAR> CSO;
+	CRegExpParam<CHAR> reParseName;
+	reParseName.Compile(CSO::_T2("(?<_fullname>^(?<fpath>(?<_path>.*)\\\\)(?<_filename>.*)$)"));
 
-	FileMaskNamedParameters.clear();
+	arrParam.clear();
 	if (reParseName.Match(szFileName)) {
-		reParseName.BackupParam(FileMaskNamedParameters);
+		reParseName.BackupParam(arrParam);
 
-		const tstring strName = FileMaskNamedParameters[_T("_filename")];
+		const CSO::cstring strName = arrParam[CSO::_T2("_filename")];
 
 		//	Easier to just manually check than invent complicated RE
 		if (strName.find('.') != tstring::npos) {
-			reParseName.Compile(_T("^(?<_name>.*)\\.(?<_ext>.*)$"));
+			reParseName.Compile(CSO::_T2("^(?<_name>.*)\\.(?<_ext>.*)$"));
 			reParseName.Match(strName);
-			reParseName.BackupParam(FileMaskNamedParameters);
+			reParseName.BackupParam(arrParam);
 
-			reParseName.Compile(_T("^(?<_sname>.*?)\\.(?<_fext>.*)$"));
+			reParseName.Compile(CSO::_T2("^(?<_sname>.*?)\\.(?<_fext>.*)$"));
 			reParseName.Match(strName);
-			reParseName.BackupParam(FileMaskNamedParameters);
+			reParseName.BackupParam(arrParam);
 		} else {
-			FileMaskNamedParameters[_T("_name")] = strName;
-			FileMaskNamedParameters[_T("_sname")] = strName;
+			arrParam[CSO::_T2("_name")] = strName;
+			arrParam[CSO::_T2("_sname")] = strName;
 		}
 	}
 }
+
+template void FillDefaultNamedParameters<TCHAR>(const TCHAR *szFileName, CREParameters<TCHAR>::named_parameters &arrParam);
+#ifdef UNICODE
+template void FillDefaultNamedParameters<char>(const char *szFileName, CREParameters<char>::named_parameters &arrParam);
+#endif
 
 void HighlightREError(CFarDialog *pDlg) {
 	if (REErrorOffset < 0) return;

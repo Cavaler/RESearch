@@ -382,9 +382,9 @@ void EditorFillNamedParameters()
 
 	vector<wchar_t> arrName(nLength+1);
 	StartupInfo.EditorControl(ECTL_GETFILENAME, &arrName[0]);
-	FillDefaultNamedParameters(&arrName[0]);
+	FillDefaultNamedParameters(&arrName[0], FileMaskNamedParameters);
 #else
-	FillDefaultNamedParameters(EdInfo.FileName);
+	FillDefaultNamedParameters(EdInfo.FileName, FileMaskNamedParameters);
 #endif
 }
 

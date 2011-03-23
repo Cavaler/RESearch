@@ -276,6 +276,14 @@ bool MultipleMasksApply(const TCHAR *FileName)
 	}
 }
 
+void FileFillNamedParameters(const TCHAR *szFileName)
+{
+	FillDefaultNamedParameters(szFileName, FileMaskNamedParameters);
+#ifdef UNICODE
+	FillDefaultNamedParameters(OEMFromUnicode(szFileName).c_str(), FileMaskNamedParametersA);
+#endif
+}
+
 void ShortenFileName(const TCHAR *szFrom, TCHAR *szTo) {
 	int nLength = _tcslen(szFrom);
 	if (nLength <= 74) {
@@ -405,6 +413,7 @@ int DoScanDirectory(TCHAR *Directory, panelitem_vector &PanelItems, ProcessFileP
 				LPCTSTR szName = _tcsrchr(FindDataArray[I].cFileName, '\\');
 				MultipleMasksApply(szName ? szName+1 : FindDataArray[I].cFileName);
 			}
+			FileFillNamedParameters(FindDataArray[I].cFileName);
 			ProcessFile(&FindDataArray[I],PanelItems);
 			Sleep(0);FilesScanned++;
 		}
@@ -541,6 +550,7 @@ int ScanDirectories(panelitem_vector &PanelItems,ProcessFileProc ProcessFile) {
 				g_bInterrupted|=Interrupted();
 				if (g_bInterrupted) break;
 				_tcscat(_tcscpy(CurFindData.cFileName, PInfoCurDir), FarFileName(PInfo.SelectedItems[I].FindData));
+				FileFillNamedParameters(CurFindData.cFileName);
 				ProcessFile(&CurFindData, PanelItems);
 				FilesScanned++;
 			}
