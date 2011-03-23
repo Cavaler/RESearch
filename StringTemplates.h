@@ -34,7 +34,9 @@ public:
 
 	void AddENumbers(int nL, int nN, int nS, int nR);
 	void AddFNumbers(int nF, int nS, int nR);
-	void AddSource(const CHAR *szString, size_t nLength);
+	void AddSource (const CHAR *szString, size_t nLength);
+	void CopySource(const CHAR *szString, size_t nLength);
+	void CopySource(const cstring &strString);
 	void AddRE(pcre *re);
 
 	vector<int> m_arrMatch;
@@ -54,8 +56,19 @@ public:
 	named_parameters m_mapStrParam;
 
 	pcre *m_re;
+
+	cstring m_strString;
 	const CHAR *m_szString;
 	size_t m_nLength;
+};
+
+template<class CHAR>
+class CRegExpParam : public CREParameters<CHAR> {
+public:
+	bool Compile(cstring strPattern, int iCompileFlags = 0);
+	bool Match(cstring strAnalyze, int iExecFlags = 0);
+
+protected:
 };
 
 #endif

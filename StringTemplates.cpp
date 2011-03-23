@@ -195,9 +195,23 @@ void CREParameters<CHAR>::AddFNumbers(int nF, int nS, int nR) {
 }
 
 template<class CHAR>
-void CREParameters<CHAR>::AddSource(const CHAR *szString, size_t nLength) {
+void CREParameters<CHAR>::AddSource (const CHAR *szString, size_t nLength) {
 	m_szString = szString;
-	m_nLength = nLength;
+	m_nLength  = nLength;
+}
+
+template<class CHAR>
+void CREParameters<CHAR>::CopySource(const CHAR *szString, size_t nLength) {
+	m_strString = cstring(szString, nLength);
+	m_szString  = m_strString.data();
+	m_nLength   = m_strString.size();
+}
+
+template<class CHAR>
+void CREParameters<CHAR>::CopySource(const cstring &strString) {
+	m_strString = strString;
+	m_szString  = m_strString.data();
+	m_nLength   = m_strString.size();
 }
 
 template<class CHAR>
@@ -266,7 +280,32 @@ CREParameters<CHAR>::Original()
 	return cstring(m_szString, m_arrMatch.empty() ? m_nLength : m_arrMatch[1]);
 }
 
+template<class CHAR>
+bool CRegExpParam<CHAR>::Compile(cstring strPattern, int iCompileFlags)
+{
+	Clear();
+
+	const CHAR *pszErrPtr;
+	int iErrOffset;
+
+	m_re = pcre_compile(strPattern.c_str(), iCompileFlags, &pszErrPtr, &iErrOffset, NULL);
+	if (!m_re) return false;
+
+	AddRE(m_re);
+	return true;
+}
+
+template<class CHAR>
+bool CRegExpParam<CHAR>::Match(cstring strAnalyze, int iExecFlags)
+{
+	CopySource(strAnalyze);
+
+	return pcre_exec(m_re, NULL, strAnalyze.data(), strAnalyze.size(), 0, 0, __super::Match(), Count()) >= 0;
+}
+
 template class CREParameters<char>;
+template class CRegExpParam<char>;
 #ifdef UNICODE
 template class CREParameters<wchar_t>;
+template class CRegExpParam<wchar_t>;
 #endif
