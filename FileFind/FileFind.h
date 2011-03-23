@@ -134,7 +134,7 @@ OperationResult FileGrepExecutor();
 OperationResult NoFilesFound();
 void InitFoundPosition();
 
-BOOL MultipleMasksApply(const TCHAR *Filename);
+bool MultipleMasksApply(const TCHAR *Filename);
 void AddFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems, bool bSearch = false);
 void AddFile(const TCHAR *szFileName, panelitem_vector &PanelItems, bool bSearch = false);
 int  ScanDirectories(panelitem_vector &PanelItems,ProcessFileProc ProcessFile);

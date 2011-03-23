@@ -244,11 +244,33 @@ int AddSlashLen(TCHAR *Directory) {
 	return Len;
 }
 
-BOOL MultipleMasksApply(const TCHAR *FileName) {
-	BOOL Result=FALSE,AnyPositive=FALSE;
+bool MultipleMasksApply(const TCHAR *FileName)
+{
+	FileMaskNamedParameters.clear();
+
+#ifdef UNICODE
+	FileMaskNamedParametersA.clear();
+#endif
 
 	if (FMaskAsRegExp) {
-		return do_pcre_exec(FMaskPattern,FMaskPatternExtra,FileName,_tcslen(FileName),0,0,NULL,NULL)>=0;
+		REParam.Clear();
+		REParam.AddRE(FMaskPattern);
+		REParam.AddSource(FileName,_tcslen(FileName));
+
+		if (do_pcre_exec(FMaskPattern, FMaskPatternExtra,FileName,_tcslen(FileName),0,0,REParam.Match(),REParam.Count())>=0) {
+			REParam.BackupParam(FileMaskNamedParameters);
+#ifdef UNICODE
+			CREParameters<char> REParamA;
+			REParamA.AddRE(FMaskPattern);
+			string strFileName = OEMFromUnicode(FileName);
+			REParamA.AddSource(strFileName.c_str(), strFileName.size());
+			REParamA.m_arrMatch = REParam.m_arrMatch;
+			REParamA.BackupParam(FileMaskNamedParametersA);
+#endif
+
+			return true;
+		} else
+			return false;
 	} else {
 		return (*FMaskSet)(FileName);
 	}
@@ -378,6 +400,11 @@ int DoScanDirectory(TCHAR *Directory, panelitem_vector &PanelItems, ProcessFileP
 	for (int I=0;I<FindDataCount;I++) {
 		g_bInterrupted|=Interrupted();if (g_bInterrupted) break;
 		if (!FAdvanced||AdvancedApplies(&FindDataArray[I])) {
+			//	Re-fill named parameters
+			if (FMaskAsRegExp) {
+				LPCTSTR szName = _tcsrchr(FindDataArray[I].cFileName, '\\');
+				MultipleMasksApply(szName ? szName+1 : FindDataArray[I].cFileName);
+			}
 			ProcessFile(&FindDataArray[I],PanelItems);
 			Sleep(0);FilesScanned++;
 		}

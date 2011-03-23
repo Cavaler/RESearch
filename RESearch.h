@@ -68,7 +68,15 @@ TCHAR ConvertCase_OEM(TCHAR C);
 TCHAR ConvertCase(TCHAR C);
 #include "StringTemplates.h"
 
-EXTERN CREParameters<TCHAR> REParam;
+typedef CREParameters<TCHAR> TREParameters;
+EXTERN TREParameters REParam;
+EXTERN TREParameters::named_parameters FileMaskNamedParameters;
+#ifdef UNICODE
+EXTERN CREParameters<char>::named_parameters FileMaskNamedParametersA;
+#else
+#define FileMaskNamedParametersA FileMaskNamedParameters
+#endif
+
 EXTERN int FileNumber;
 EXTERN int FindNumber;
 EXTERN int ReplaceNumber;
