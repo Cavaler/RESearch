@@ -528,7 +528,7 @@ bool CBatchAction::EditItems() {
 
 				if (pPreset->m_bAddToMenu || (CountPresets(*Collection(), pPreset) > 1)) {
 					const TCHAR *Lines[] = { GetMsg(MWarning),GetMsg(MUsedPreset),GetMsg(MOk),GetMsg(MCancel) };
-					if (StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"",Lines,4,2) != 0) break;
+					if (StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T(""),Lines,4,2) != 0) break;
 				}
 
 				if (pColl->EditPreset(pPreset))
