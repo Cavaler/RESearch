@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "..\RESearch.h"
 
-CHandle g_hOutput;
+::CHandle g_hOutput;
 int     g_nLines;
 
 struct sBufferedLine {

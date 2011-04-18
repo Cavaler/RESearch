@@ -1,10 +1,20 @@
 #include "StdAfx.h"
 #include "RESearch.h"
 
-BOOL __stdcall DllMain(HANDLE hInst, ULONG reason, LPVOID)
+CComModule _Module;
+
+BOOL __stdcall DllMain(HINSTANCE hInst, ULONG reason, LPVOID)
 {
 	if (reason == DLL_PROCESS_ATTACH)
+	{
 		g_hInstance = hInst;
+		_Module.Init(NULL, hInst, &__uuidof(__RESearchLib));
+	}
+	else
+	if (reason == DLL_PROCESS_DETACH)
+	{
+		_Module.Term();
+	}
 
 	return TRUE;
 }

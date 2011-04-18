@@ -7,32 +7,30 @@
 import "oaidl.idl";
 import "ocidl.idl";
 
+[	uuid(B6CA758A-78FB-4093-84D3-0A88D8EA7285),
+	version(1.0),
+	helpstring("RESearch 1.0 Type Library")
+]
+library RESearchLib
+{
+
 [	object,
 	uuid(22B6F9B8-CDB4-4cb9-9D5F-F2B36C3F76BC),
 	dual,
 	helpstring("IReplaceParameters Interface"),
 	pointer_default(unique),
 	nonextensible
-] interface IReplaceParameters : IUnknown {
-	[id(1)] HRESULT match([in]long lPos, [out,retval]BSTR *pbstrMatch);
-	[id(7)] HRESULT named([in]BSTR strParam, [out,retval]BSTR *pbstrMatch);
-	[id(2),propget] HRESULT eol([out,retval]BSTR *pbstrEOL);
-	[id(3),propget] HRESULT l([out,retval]long *pValue);
-	[id(4),propget] HRESULT n([out,retval]long *pValue);
-	[id(5),propget] HRESULT r([out,retval]long *pValue);
-	[id(6)] HRESULT result([in]BSTR bstrResult);
+]
+interface IReplaceParameters : IDispatch
+{
+	HRESULT match([in] long lPos, [out,retval] BSTR *pbstrMatch);
+	HRESULT named([in] BSTR strParam, [out,retval] BSTR *pbstrMatch);
+	HRESULT result([in] BSTR bstrResult);
+
+	HRESULT eol([out,retval] BSTR *pbstrEOL);
+	HRESULT l([out,retval] long *pValue);
+	HRESULT n([out,retval] long *pValue);
+	HRESULT r([out,retval] long *pValue);
 };
 
-[	uuid(B6CA758A-78FB-4093-84D3-0A88D8EA7285),
-	version(1.0),
-	helpstring("RESearch 1.0 Type Library")
-] library RESearchLib {
-	importlib("stdole32.tlb");
-	importlib("stdole2.tlb");
-
-	[	uuid(8E5DB420-B249-40b7-81B7-2E0049F4DB92),
-		helpstring("ReplaceParameters Class")
-	] coclass ReplaceParameters {
-		[default] interface IReplaceParameters;
-	};
 }

@@ -1,6 +1,11 @@
 #include "StdAfx.h"
 #include "RESearch.h"
-#include "RESearchIDL.h"
+
+#undef DEFINE_GUID	//	No other chance, since guiddef is in StdAfx
+#define DEFINE_GUID(name, l, w1, w2, b1, b2, b3, b4, b5, b6, b7, b8) \
+	EXTERN_C const GUID DECLSPEC_SELECTANY name \
+	= { l, w1, w2, { b1, b2,  b3,  b4,  b5,  b6,  b7,  b8 } }
+#include <activscp.h>
 
 _COM_SMARTPTR_TYPEDEF(IActiveScript, __uuidof(IActiveScript));
 _COM_SMARTPTR_TYPEDEF(IActiveScriptParse, __uuidof(IActiveScriptParse));
@@ -61,70 +66,52 @@ void EnumActiveScripts() {
 
 // ---------------------------------------------------
 
-class CReplaceParameters : public IReplaceParameters {
+class CReplaceParameters
+	: public CComObjectRootEx<CComSingleThreadModel>
+	, public IDispatchImpl<IReplaceParameters, &__uuidof(IReplaceParameters), &__uuidof(__RESearchLib), -1, -1>
+{
 public:
-	CReplaceParameters(CREParameters<TCHAR> &Param, const TCHAR *EOL)
-		: m_nCounter(0)
-		, m_Param(Param)
-		, m_szEOL(EOL)
+	BEGIN_COM_MAP(CReplaceParameters)
+		COM_INTERFACE_ENTRY(IReplaceParameters)
+		COM_INTERFACE_ENTRY(IDispatch)
+	END_COM_MAP()
+
+	void Init(CREParameters<TCHAR> *pParam, const TCHAR *szEOL)
 	{
+		m_pParam = pParam;
+		m_szEOL  = szEOL;
 	}
 
 	tstring Result() {return m_strResult;}
-	void SetOuter(IDispatch *pOuter) {m_pOuter = pOuter;}
-	~CReplaceParameters() {}
-
-	// IUnknown methods
-	STDMETHOD(QueryInterface)(REFIID riid, void** ppvObj) {
-		if (riid == __uuidof(IUnknown)) {
-			*ppvObj=static_cast<IReplaceParameters *>(this);
-		} else if (riid == __uuidof(IReplaceParameters)) {
-			*ppvObj=static_cast<IReplaceParameters *>(this);
-		} else if (m_pOuter) {
-			return m_pOuter->QueryInterface(riid, ppvObj);
-		} else {
-			*ppvObj=NULL;return E_NOINTERFACE;
-		}
-		static_cast<IUnknown *>(*ppvObj)->AddRef();
-		return S_OK;
-	}
-	STDMETHOD_(ULONG, AddRef)() {
-		return ++m_nCounter;
-	}
-	STDMETHOD_(ULONG, Release)() {
-		if (--m_nCounter==0) {
-			delete this;return 0;
-		} else return m_nCounter;
-	}
 
 	// IReplaceParameters methods
 	STDMETHOD(match)(long lPos, BSTR *pbstrMatch) {
-		*pbstrMatch = _bstr_t(m_Param.GetParam(lPos).c_str()).Detach();
+		*pbstrMatch = _bstr_t(m_pParam->GetParam(lPos).c_str()).Detach();
 		return S_OK;
 	}
 
 	STDMETHOD(named)(BSTR strParam, BSTR *pbstrMatch) {
-		*pbstrMatch = _bstr_t(m_Param.GetParam((LPCTSTR)_bstr_t(strParam)).c_str()).Detach();
+		*pbstrMatch = _bstr_t(m_pParam->GetParam((LPCTSTR)_bstr_t(strParam)).c_str()).Detach();
 		return S_OK;
 	}
 
-	STDMETHOD(get_eol)(BSTR *pbstrEOL) {
+	STDMETHOD(eol)(BSTR *pbstrEOL) {
 		*pbstrEOL = _bstr_t(m_szEOL).Detach();
 		return S_OK;
 	}
 
-	STDMETHOD(get_l)(long *pValue) {
-		*pValue = _ttoi(m_Param.GetParam(_T("L")).c_str());
+	STDMETHOD(l)(long *pValue) {
+		*pValue = _ttoi(m_pParam->GetParam(_T("L")).c_str());
 		return S_OK;
 	}
 
-	STDMETHOD(get_n)(long *pValue) {
-		*pValue = _ttoi(m_Param.GetParam(_T("N")).c_str());
+	STDMETHOD(n)(long *pValue) {
+		*pValue = _ttoi(m_pParam->GetParam(_T("N")).c_str());
 		return S_OK;
 	}
 
-	STDMETHOD(get_r)(long *pValue) {
-		*pValue = _ttoi(m_Param.GetParam(_T("R")).c_str());
+	STDMETHOD(r)(long *pValue) {
+		*pValue = _ttoi(m_pParam->GetParam(_T("R")).c_str());
 		return S_OK;
 	}
 
@@ -134,74 +121,25 @@ public:
 	}
 
 private:
-	ULONG m_nCounter;
-
-	CREParameters<TCHAR> &m_Param;
+	CREParameters<TCHAR> *m_pParam;
 	const TCHAR *m_szEOL;
 	tstring m_strResult;
-
-	IDispatch *m_pOuter;
 };
 
 // --------------------------------------------------
 
-class CReplaceScriptSite : public IActiveScriptSite {
+class CReplaceScriptSite
+	: public CComObjectRootEx < CComSingleThreadModel >
+	, public IActiveScriptSite
+{
 public:
-	CReplaceScriptSite(CReplaceParameters *pParams) : m_nCounter(0), m_pParams(pParams), m_pDispatch(NULL) {
-		TCHAR szModule[MAX_PATH];
-		GetModuleFileName((HMODULE)g_hInstance, szModule, MAX_PATH);
+	BEGIN_COM_MAP(CReplaceScriptSite)
+		COM_INTERFACE_ENTRY(IActiveScriptSite)
+	END_COM_MAP()
 
-		ITypeLib *pLib;
-		HRESULT hResult = LoadTypeLib(_bstr_t(szModule), &pLib);
-		if (FAILED(hResult)) {
-			ShowHResultError(MErrorLoadingTypeLib, hResult);
-			g_bInterrupted = TRUE;
-			return;
-		}
-
-		ITypeInfo *pInfo;
-		hResult = pLib->GetTypeInfoOfGuid(__uuidof(IReplaceParameters), &pInfo);
-		if (FAILED(hResult)) {
-			ShowHResultError(MErrorLoadingTypeLib, hResult);
-			pLib->Release();
-			g_bInterrupted = TRUE;
-			return;
-		}
-
-		hResult = CreateStdDispatch(pParams, pParams, pInfo, (IUnknown **)&m_pDispatch);
-		if (FAILED(hResult)) {
-			ShowHResultError(MErrorLoadingTypeLib, hResult);
-			g_bInterrupted = TRUE;
-		}
-
-		pParams->SetOuter(m_pDispatch);
-
-		pInfo->Release();
-		pLib->Release();
-	}
-	~CReplaceScriptSite() {
-		if (m_pDispatch) m_pDispatch->Release();
-	}
-
-	// IUnknown methods
-	STDMETHOD(QueryInterface)(REFIID riid, void** ppvObj) {
-		if (riid==IID_IUnknown) {
-			*ppvObj=static_cast<IActiveScriptSite *>(this);
-		} else if (riid==IID_IActiveScriptSite) {
-			*ppvObj=static_cast<IActiveScriptSite *>(this);
-		} else {
-			*ppvObj=NULL;return E_NOINTERFACE;
-		}
-		static_cast<IUnknown *>(*ppvObj)->AddRef();
-		return S_OK;
-	}
-	STDMETHOD_(ULONG, AddRef)() {
-		return ++m_nCounter;
-	}
-	STDMETHOD_(ULONG, Release)() {
-		if (--m_nCounter==0) {
-			delete this;return 0;
-		} else return m_nCounter;
+	void Init(CReplaceParameters *pParams)
+	{
+		m_pParams = pParams;
 	}
 
 	// IActiveScriptSite methods
@@ -222,11 +160,11 @@ public:
 
 		if (m_pParams && (_wcsicmp(pstrName, L"research") == 0)) {
 			if (dwReturnMask & SCRIPTINFO_ITYPEINFO) {
-				HRESULT hr = m_pDispatch->GetTypeInfo(0, 0, ppti);
+				HRESULT hr = m_pParams->GetTypeInfo(0, 0, ppti);
 				if (FAILED(hr)) return hr;
 			}
 			if (dwReturnMask & SCRIPTINFO_IUNKNOWN) {
-				*ppiunkItem = m_pParams;
+				*ppiunkItem = m_pParams->GetUnknown();
 				(*ppiunkItem)->AddRef();
 			}
 			return S_OK;
@@ -257,7 +195,6 @@ private:
 	ULONG m_nCounter;
 
 	CReplaceParameters *m_pParams;
-	IDispatch *m_pDispatch;
 };
 
 tstring EvaluateReplaceString(CREParameters<TCHAR> &Param, const TCHAR *Replace, const TCHAR *EOL, int Engine) {
@@ -274,10 +211,14 @@ tstring EvaluateReplaceString(CREParameters<TCHAR> &Param, const TCHAR *Replace,
 		return _T("");
 	}
 
-	CReplaceParameters *pParams = new CReplaceParameters(Param, EOL);
+	CReplaceParameters *pParams = new CComObject<CReplaceParameters>();
+	pParams->Init(&Param, EOL);
 	pParams->AddRef();
-	CReplaceScriptSite *pSite = new CReplaceScriptSite(pParams);
+
+	CReplaceScriptSite *pSite = new CComObject<CReplaceScriptSite>();
+	pSite->Init(pParams);
 	pSite->AddRef();
+
 	spEngine->SetScriptSite(pSite);
 
 	_bstr_t bstrText;
