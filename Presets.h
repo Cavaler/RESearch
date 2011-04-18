@@ -100,6 +100,7 @@ extern const BatchActionIndex NO_BATCH_INDEX;
 class CBatchType : public vector<CPresetCollection *> {
 public:
 	CBatchType(int nTitle, ...);
+	CPresetCollection *operator()(int nCollID);
 	CPreset *operator[](const BatchActionIndex &Pair);
 
 	BatchActionIndex SelectPreset();
@@ -125,6 +126,8 @@ public:
 
 protected:
 	CBatchType &m_Type;
+
+	class CBatchActionCollection *Collection();
 
 	int  m_nCurrent;
 };

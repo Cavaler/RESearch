@@ -40,6 +40,7 @@ MMenuShowLastResults	"Show last r&esults"	"Показать последние &результаты"
 MMenuBatches		"Batches..."				"Пакеты..."
 MMenuPreset			"Preset: "					"Пресет:"
 MMenuBatch			"Batch: "					"Пакет:"
+MUsedPreset			"This preset is used elsewhere. Edit it anyway?"	"Этот пресет используется где-то еще. Редактировать?"
 
 MRESearch			"Regular Expression Search"				"Поиск по регулярному выражению"
 MREReplace			"Regular Expression Replace"			"Замена по регулярному выражению"
