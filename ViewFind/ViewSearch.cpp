@@ -218,7 +218,7 @@ BOOL ViewerSearch() {
 }
 
 BOOL CVSPresetCollection::EditPreset(CPreset *pPreset) {
-	CFarDialog Dialog(76,14,_T("VSPresetDlg"));
+	CFarDialog Dialog(76,16,_T("VSPresetDlg"));
 	Dialog.AddFrame(MVSPreset);
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
 	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,_T("RESearch.PresetName"),pPreset->Name()));
@@ -229,6 +229,7 @@ BOOL CVSPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.Add(new CFarCheckBoxItem(5,7,0,MRegExp,&pPreset->m_mapInts["IsRegExp"]));
 	Dialog.Add(new CFarCheckBoxItem(5,8,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
 	Dialog.Add(new CFarCheckBoxItem(30,7,0,MSeveralLine,&pPreset->m_mapInts["SeveralLine"]));
+	Dialog.Add(new CFarCheckBoxItem(5,10,0,MAddToMenu,&pPreset->m_bAddToMenu));
 	Dialog.AddButtons(MOk,MCancel);
 
 	do {
