@@ -114,7 +114,7 @@ public:
 	CBatchAction(CBatchType &Type, tstring strName, HKEY hKey);
 	void Save(HKEY hKey, int nIndex);
 
-	void EditProperties();
+	bool EditProperties();
 	bool EditItems();
 	void Execute();
 

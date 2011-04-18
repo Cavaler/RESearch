@@ -224,6 +224,7 @@ int CPresetCollection::ShowMenu(bool bExecute, int nDefaultID) {
 			arrItems[nPreset] = pPreset->Name();
 			if (pPreset->m_nID == nDefaultID) m_nCurrent = nPreset;
 		}
+		arrItems.push_back(tstring());
 
 		int nBreakKey;
 		tstring strTitle = FormatStr(_T("%s presets"), Name());
@@ -233,7 +234,8 @@ int CPresetCollection::ShowMenu(bool bExecute, int nDefaultID) {
 
 		switch (nBreakKey) {
 		case -1:
-			if (bExecute && (nResult >= 0) && (nResult < (int)size())) at(nResult)->Apply();
+			if (nResult >= (int)size()) break;	//	Enter in empty menu or last item
+			if (bExecute && (nResult >= 0)) at(nResult)->Apply();
 			return nResult;
 		case 0:{		//	VK_INSERT
 			CPreset *pPreset = NewPreset();
@@ -425,7 +427,7 @@ void CBatchAction::Save(HKEY hKey, int nIndex) {
 	}
 }
 
-void CBatchAction::EditProperties() {
+bool CBatchAction::EditProperties() {
 	CFarDialog Dialog(60, 12, _T("BatchProperties"));
 	Dialog.AddFrame(MBatch);
 	Dialog.Add(new CFarTextItem(5, 3, 0, MBatchName));
@@ -433,7 +435,7 @@ void CBatchAction::EditProperties() {
 	Dialog.Add(new CFarCheckBoxItem(5, 6, 0, MAddToMenu, &m_bAddToMenu));
 	
 	Dialog.AddButtons(MOk, MCancel);
-	Dialog.Display(-1);
+	return Dialog.Display(-1) == 0;
 }
 
 bool CBatchAction::EditItems() {
@@ -535,6 +537,7 @@ void CBatchActionCollection::ShowMenu() {
 		arrItems.resize(size());
 		for (size_t nBatch = 0; nBatch < size(); nBatch++)
 			arrItems[nBatch] = at(nBatch)->m_strName;
+		arrItems.push_back(tstring());
 
 		int nBreakKey;
 		int nResult = ChooseMenu(arrItems, GetMsg(m_Type.m_nTitle), _T("Ins,Del,F4,Ctrl-\x18\x19"), _T("Batches"), m_nCurrent,
@@ -543,7 +546,9 @@ void CBatchActionCollection::ShowMenu() {
 
 		switch (nBreakKey) {
 		case -1:
-			if ((nResult >= 0) && (nResult < (int)size())) {
+			if (nResult >= (int)size()) break;
+
+			if (nResult >= 0) {
 				CBatchAction *pBatch = at(nResult);
 				const TCHAR *Lines[]={_T("Execute"), GetMsg(MExecuteBatchQuery),
 					pBatch->m_strName.c_str(), GetMsg(MOk), GetMsg(MCancel)};
@@ -556,7 +561,7 @@ void CBatchActionCollection::ShowMenu() {
 		case 0:{		//	VK_INSERT
 			CBatchAction *pBatch = new CBatchAction(m_Type);
 			pBatch->m_strName = _T("New Batch");
-			if (pBatch->EditItems()) {
+			if (pBatch->EditProperties()) {
 				insert(begin()+((m_nCurrent >= 0) ? m_nCurrent : 0), pBatch);
 				WriteRegistry();
 			} else {
