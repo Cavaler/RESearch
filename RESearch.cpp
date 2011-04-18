@@ -300,7 +300,7 @@ BOOL ProcessCommandLine(TCHAR *Line,BOOL *ShowDialog,INT_PTR *Item) {
 	return ProcessFFLine(Line+1,ShowDialog,Item);
 }
 
-int ShowFileMenu() {
+int ShowFileMenu(int &nBreakCode) {
 	vector<CFarMenuItem> MenuItems;
 
 	MenuItems.push_back(CFarMenuItem(MMenuSearch));
@@ -340,15 +340,18 @@ int ShowFileMenu() {
 	if (m_arrLastRename.empty()) MenuItemsEx[11].Flags |= MIF_DISABLE;
 	if (LastTempPanel == NULL) MenuItemsEx[14].Flags |= MIF_DISABLE;
 
+	int nBreakKeys[] = {VK_F4, 0};
+
 	int nResult = StartupInfo.Menu(StartupInfo.ModuleNumber, -1, -1, 0, FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT|FMENU_USEEXT,
-		GetMsg(MMenuHeader), NULL, _T("FileMenu"), NULL, NULL,
+		GetMsg(MMenuHeader), NULL, _T("FileMenu"), nBreakKeys, &nBreakCode, 
 		(const FarMenuItem *)&MenuItemsEx[0], MenuItems.size());
 
 	if (nResult >= 0) nLastSelection = nResult;
+
 	return nResult;
 }
 
-int ShowEditorMenu() {
+int ShowEditorMenu(int &nBreakCode) {
 	vector<CFarMenuItem> MenuItems;
 
 	MenuItems.push_back(CFarMenuItem(MMenuSearch));
@@ -381,15 +384,18 @@ int ShowEditorMenu() {
 
 	if (!EditorListAllHasResults()) MenuItemsEx[8].Flags |= MIF_DISABLE;
 
+	int nBreakKeys[] = {VK_F4, 0};
+
 	int nResult = StartupInfo.Menu(StartupInfo.ModuleNumber, -1, -1, 0, FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT|FMENU_USEEXT,
-		GetMsg(MMenuHeader), NULL, _T("EditorMenu"), NULL, NULL,
+		GetMsg(MMenuHeader), NULL, _T("EditorMenu"), nBreakKeys, &nBreakCode,
 		(const FarMenuItem *)&MenuItemsEx[0], MenuItems.size());
 
 	if (nResult >= 0) nLastSelection = nResult;
+
 	return nResult;
 }
 
-int ShowViewerMenu() {
+int ShowViewerMenu(int &nBreakCode) {
 	vector<CFarMenuItem> MenuItems;
 
 	MenuItems.push_back(CFarMenuItem(MMenuSearch));
@@ -403,98 +409,123 @@ int ShowViewerMenu() {
 	if (nLastSelection >= (int)MenuItems.size()) nLastSelection = 0;
 	MenuItems[nLastSelection].Selected = TRUE;
 
+	int nBreakKeys[] = {VK_F4, 0};
+
 	int nResult = StartupInfo.Menu(StartupInfo.ModuleNumber,-1,-1,0,FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT,GetMsg(MMenuHeader),
-		NULL,_T("EditorMenu"),NULL,NULL,&MenuItems[0],MenuItems.size());
+		NULL, _T("EditorMenu"), nBreakKeys, &nBreakCode, 
+		&MenuItems[0],MenuItems.size());
 
 	if (nResult >= 0) nLastSelection = nResult;
+
 	return nResult;
 }
 
-OperationResult OpenPluginFromFilePreset(int Item) {
-	CPreset *pPreset;
-	if (pPreset = FSPresets->FindMenuPreset(Item)) {
-		return pPreset->ExecutePreset();
+bool FindRunPreset(CPresetCollection *pColl, int &nItem, int nBreakCode, OperationResult &Result)
+{
+	CPreset *pPreset = pColl->FindMenuPreset(nItem);
+	if (pPreset == NULL) return false;
+
+	switch (nBreakCode) {
+	case -1:
+		Result = pPreset->ExecutePreset();
+		return true;
+	case 0:
+		if (pColl->EditPreset(pPreset)) pColl->Save();
+		Result = OR_OK;
+		break;
 	}
 
-	if (pPreset = FRPresets->FindMenuPreset(Item)) {
-		return pPreset->ExecutePreset();
-	}
+	return true;
+}
 
-	if (pPreset = FGPresets->FindMenuPreset(Item)) {
-		return pPreset->ExecutePreset();
-	}
+OperationResult OpenPluginFromFilePreset(int nItem, int nBreakCode)
+{
+	OperationResult Result = OR_CANCEL;
 
-	if (pPreset = RnPresets->FindMenuPreset(Item)) {
-		return pPreset->ExecutePreset();
-	}
+	if (FindRunPreset(FSPresets, nItem, nBreakCode, Result) ||
+		FindRunPreset(FRPresets, nItem, nBreakCode, Result) ||
+		FindRunPreset(FGPresets, nItem, nBreakCode, Result) ||
+		FindRunPreset(RnPresets, nItem, nBreakCode, Result) ||
+		FindRunPreset(QRPresets, nItem, nBreakCode, Result)
+		) return Result;
 
-	if (pPreset = QRPresets->FindMenuPreset(Item)) {
-		return pPreset->ExecutePreset();
-	}
-
-	Item--;
-	if (Item == 0) {
+	nItem--;
+	if (nItem == 0) {
 		g_pPanelBatches->ShowMenu();
 		return OR_OK;
-	} else Item--;
+	} else nItem--;
 
 	CBatchAction *pAction;
-	if (pAction = g_pPanelBatches->FindMenuAction(Item)) {
-		pAction->Execute();
-		return OR_OK;
+	if (pAction = g_pPanelBatches->FindMenuAction(nItem)) {
+		switch (nBreakCode) {
+		case -1:
+			pAction->Execute();
+			return OR_OK;
+		case 0:
+			if (pAction->EditItems())
+				WriteRegistry();
+			return OR_OK;
+		}
 	}
 
 	return OR_CANCEL;
 }
 
 HANDLE OpenPluginFromFileMenu(int Item, BOOL ShowDialog) {
-	OperationResult Result=OR_CANCEL;
-	if (!g_bFromCmdLine) {
-		Item=ShowFileMenu();
-		if (Item==-1) return INVALID_HANDLE_VALUE;
-	}
+	OperationResult Result = OR_CANCEL;
+	int nBreakCode = -1;
 
-	switch (Item) {
-	case 0:
-		Result = FileFind(g_PanelItems,ShowDialog);
-		if (Result != OR_CANCEL) SynchronizeWithFile(false);
-		break;
-	case 1:
-		Result = FileReplace(g_PanelItems,ShowDialog);
-		if (Result != OR_CANCEL) SynchronizeWithFile(true);
-		break;
-	case 2:
-		Result = FileGrep(ShowDialog);
-		if (Result != OR_CANCEL) SynchronizeWithFile(false);
-		break;
-	case 4:ChangeSelection(MSelect);break;
-	case 5:ChangeSelection(MUnselect);break;
-	case 6:ChangeSelection(MFlipSelection);break;
-	case 8:
-		Result=RenameFiles(g_PanelItems,ShowDialog);
-		break;
-	case 9:
-		Result=RenameSelectedFiles(g_PanelItems,ShowDialog);
-		break;
-	case 10:
-		Result=RenumberFiles();
-		break;
-	case 11:
-		Result=UndoRenameFiles();
-		break;
-	case 13:
-		if (LastTempPanel) {
-			LastTempPanel->m_bActive = true;
-			return (HANDLE)LastTempPanel;
-		} else {
-			Result=OR_CANCEL;
-			break;
+	do {
+		if (!g_bFromCmdLine) {
+			do {
+				Item = ShowFileMenu(nBreakCode);
+				if (Item == -1) return INVALID_HANDLE_VALUE;
+			} while ((nBreakCode >= 0) && (Item < 15));
 		}
-	}
-	if (Item >= 15) {
-		Item -= 15;
-		Result = OpenPluginFromFilePreset(Item);
-	}
+
+		switch (Item) {
+		case 0:
+			Result = FileFind(g_PanelItems,ShowDialog);
+			if (Result != OR_CANCEL) SynchronizeWithFile(false);
+			break;
+		case 1:
+			Result = FileReplace(g_PanelItems,ShowDialog);
+			if (Result != OR_CANCEL) SynchronizeWithFile(true);
+			break;
+		case 2:
+			Result = FileGrep(ShowDialog);
+			if (Result != OR_CANCEL) SynchronizeWithFile(false);
+			break;
+		case 4:ChangeSelection(MSelect);break;
+		case 5:ChangeSelection(MUnselect);break;
+		case 6:ChangeSelection(MFlipSelection);break;
+		case 8:
+			Result=RenameFiles(g_PanelItems,ShowDialog);
+			break;
+		case 9:
+			Result=RenameSelectedFiles(g_PanelItems,ShowDialog);
+			break;
+		case 10:
+			Result=RenumberFiles();
+			break;
+		case 11:
+			Result=UndoRenameFiles();
+			break;
+		case 13:
+			if (LastTempPanel) {
+				LastTempPanel->m_bActive = true;
+				return (HANDLE)LastTempPanel;
+			} else {
+				Result=OR_CANCEL;
+				break;
+			}
+		}
+		if (Item >= 15) {
+			Item -= 15;
+			Result = OpenPluginFromFilePreset(Item, nBreakCode);
+		}
+
+	} while (nBreakCode >= 0);
 
 	if (Result==OR_PANEL) {
 #ifdef UNICODE
@@ -520,128 +551,150 @@ HANDLE OpenPluginFromFileMenu(int Item, BOOL ShowDialog) {
 	}
 }
 
-OperationResult OpenPluginFromEditorPreset(int Item) {
-	CPreset *pPreset;
-	if (pPreset = ESPresets->FindMenuPreset(Item)) {
-		return pPreset->ExecutePreset();
-	}
-	if (pPreset = ERPresets->FindMenuPreset(Item)) {
-		return pPreset->ExecutePreset();
-	}
-	if (pPreset = EFPresets->FindMenuPreset(Item)) {
-		return pPreset->ExecutePreset();
-	}
-	if (pPreset = ETPresets->FindMenuPreset(Item)) {
-		return pPreset->ExecutePreset();
-	}
+OperationResult OpenPluginFromEditorPreset(int nItem, int nBreakCode)
+{
+	OperationResult Result = OR_CANCEL;
 
-	Item--;
-	if (Item == 0) {
+	if (FindRunPreset(ESPresets, nItem, nBreakCode, Result) ||
+		FindRunPreset(ERPresets, nItem, nBreakCode, Result) ||
+		FindRunPreset(EFPresets, nItem, nBreakCode, Result) ||
+		FindRunPreset(ETPresets, nItem, nBreakCode, Result)
+		) return OR_OK;
+
+	nItem--;
+	if (nItem == 0) {
 		g_pEditorBatches->ShowMenu();
 		return OR_OK;
-	} else Item--;
+	} else nItem--;
 
 	CBatchAction *pAction;
-	if (pAction = g_pEditorBatches->FindMenuAction(Item)) {
-		pAction->Execute();
-		return OR_OK;
+	if (pAction = g_pEditorBatches->FindMenuAction(nItem)) {
+		switch (nBreakCode) {
+		case -1:
+			pAction->Execute();
+			return OR_OK;
+		case 0:
+			if (pAction->EditItems())
+				WriteRegistry();
+			return OR_OK;
+		}
 	}
 
 	return OR_CANCEL;
 }
 
-HANDLE OpenPluginFromEditorMenu(int Item) {
+HANDLE OpenPluginFromEditorMenu(int nItem) {
 	FindIfClockPresent();
-	switch (Item = ShowEditorMenu()) {
-	case 0:
-		if (EditorSearch()) LastAction=0;
-		break;
-	case 1:
-		if (EditorReplace()) LastAction=1;
-		break;
-	case 2:
-		if (EditorFilter()) LastAction=2;
-		break;
-	case 3:
-		if (EditorTransliterate()) LastAction=3;
-		break;
-	case 6:
-		EReverse = !EReverse;
-		//	fall-through
-	case 5:
-		ESearchAgainCalled = TRUE;
-		EPreparePattern(EText);		// In case codepage changed etc
 
-		switch (LastAction) {
-		case -1:
-			ESearchAgainCalled = FALSE;
+	int nBreakCode = -1;
+
+	do {
+		do {
+			nItem = ShowEditorMenu(nBreakCode);
+			if (nItem == -1) return INVALID_HANDLE_VALUE;
+		} while ((nBreakCode >= 0) && (nItem < 10));
+
+		switch (nItem) {
+		case 0:
 			if (EditorSearch()) LastAction=0;
 			break;
-		case 0:
-			EditorSearchAgain();
-			break;
 		case 1:
-			_EditorReplaceAgain();
+			if (EditorReplace()) LastAction=1;
 			break;
 		case 2:
-			EditorFilterAgain();
+			if (EditorFilter()) LastAction=2;
 			break;
 		case 3:
-			EditorTransliterateAgain();
+			if (EditorTransliterate()) LastAction=3;
 			break;
-		case 4:
-			EditorListAllAgain();
-			break;
-		};
-		if (Item == 6) EReverse = !EReverse;
-		break;
-	case 8:
-		EditorListAllShowResults(false);
-		break;
-	}
+		case 6:
+			EReverse = !EReverse;
+			//	fall-through
+		case 5:
+			ESearchAgainCalled = TRUE;
+			EPreparePattern(EText);		// In case codepage changed etc
 
-	if (Item >= 10) {
-		Item -= 10;
-		OpenPluginFromEditorPreset(Item);
-	}
+			switch (LastAction) {
+			case -1:
+				ESearchAgainCalled = FALSE;
+				if (EditorSearch()) LastAction=0;
+				break;
+			case 0:
+				EditorSearchAgain();
+				break;
+			case 1:
+				_EditorReplaceAgain();
+				break;
+			case 2:
+				EditorFilterAgain();
+				break;
+			case 3:
+				EditorTransliterateAgain();
+				break;
+			case 4:
+				EditorListAllAgain();
+				break;
+			};
+			if (nItem == 6) EReverse = !EReverse;
+			break;
+		case 8:
+			EditorListAllShowResults(false);
+			break;
+		}
+
+		if (nItem >= 10) {
+			nItem -= 10;
+			OpenPluginFromEditorPreset(nItem, nBreakCode);
+		}
+	} while (nBreakCode >= 0);
 
 	return INVALID_HANDLE_VALUE;
 }
 
-OperationResult OpenPluginFromViewerPreset(int Item) {
-	CPreset *pPreset;
-	if (pPreset = VSPresets->FindMenuPreset(Item)) {
-		return pPreset->ExecutePreset();
-	}
+OperationResult OpenPluginFromViewerPreset(int nItem, int nBreakCode) {
+	OperationResult Result = OR_CANCEL;
+
+	if (FindRunPreset(VSPresets, nItem, nBreakCode, Result)) return OR_OK;
+
 	return OR_CANCEL;
 }
 
-HANDLE OpenPluginFromViewerMenu(int Item) {
-	switch (ShowViewerMenu()) {
-	case 0:
-		if (ViewerSearch()) LastAction = 0;
-		break;
-//	case 2:
-//		EReverse = !EReverse;
-	case 1:
-		ESearchAgainCalled = TRUE;
-		switch (LastAction) {
-		case -1:
-			ESearchAgainCalled = FALSE;
+HANDLE OpenPluginFromViewerMenu(int nItem)
+{
+	int nBreakCode = -1;
+
+	do {
+		do {
+			nItem = ShowViewerMenu(nBreakCode);
+			if (nItem == -1) return INVALID_HANDLE_VALUE;
+		} while ((nBreakCode >= 0) && (nItem < 3));
+
+		switch (nItem) {
+		case 0:
 			if (ViewerSearch()) LastAction = 0;
 			break;
-		default:
-			if (ViewerSearchAgain()) LastAction = 0;
+	//	case 2:
+	//		EReverse = !EReverse;
+		case 1:
+			ESearchAgainCalled = TRUE;
+			switch (LastAction) {
+			case -1:
+				ESearchAgainCalled = FALSE;
+				if (ViewerSearch()) LastAction = 0;
+				break;
+			default:
+				if (ViewerSearchAgain()) LastAction = 0;
+				break;
+			}
+	//		if (nMenu == 2) EReverse = !EReverse;
 			break;
 		}
-//		if (nMenu == 2) EReverse = !EReverse;
-		break;
-	}
 
-	if (Item >= 3) {
-		Item -= 3;
-		OpenPluginFromViewerPreset(Item);
-	}
+		if (nItem >= 3) {
+			nItem -= 3;
+			OpenPluginFromViewerPreset(nItem, nBreakCode);
+		}
+	} while (nBreakCode >= 0);
 
 	return INVALID_HANDLE_VALUE;
 }
