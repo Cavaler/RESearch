@@ -439,7 +439,7 @@ bool CBatchAction::EditProperties() {
 }
 
 bool CBatchAction::EditItems() {
-	int piBreakKeys[]={VK_INSERT, (PKF_CONTROL<<16)|VK_UP, (PKF_CONTROL<<16)|VK_DOWN, VK_DELETE, VK_F6, 0};
+	int piBreakKeys[]={VK_INSERT, (PKF_CONTROL<<16)|VK_UP, (PKF_CONTROL<<16)|VK_DOWN, VK_DELETE, 0};
 	vector<tstring> arrItems;
 
 	do {
@@ -451,7 +451,7 @@ bool CBatchAction::EditItems() {
 		int nBreakKey;
 		tstring strTitle = FormatStr(GetMsg(MBatchCommands), m_strName.c_str());
 
-		int nResult = ChooseMenu(arrItems, strTitle.c_str(), _T("Ins,Ctrl-\x18\x19,Del,F6"), _T("Batch"), m_nCurrent,
+		int nResult = ChooseMenu(arrItems, strTitle.c_str(), _T("Ins,Ctrl-\x18\x19,Del"), _T("Batch"), m_nCurrent,
 			FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT, piBreakKeys, &nBreakKey);
 		if (nResult >= 0) m_nCurrent = nResult;
 
@@ -485,9 +485,6 @@ bool CBatchAction::EditItems() {
 			if ((m_nCurrent >= 0) && (m_nCurrent < (int)size())) {
 				erase(begin() + m_nCurrent);
 			}
-			break;
-		case 4:
-			EditProperties();
 			break;
 		}
 	} while (true);
@@ -530,7 +527,7 @@ void CBatchActionCollection::Save(HKEY hKey) {
 }
 
 void CBatchActionCollection::ShowMenu() {
-	int piBreakKeys[]={VK_INSERT, VK_DELETE, VK_F4, (PKF_CONTROL<<16)|VK_UP, (PKF_CONTROL<<16)|VK_DOWN, 0};
+	int piBreakKeys[]={VK_INSERT, VK_DELETE, VK_F4, VK_F6, (PKF_CONTROL<<16)|VK_UP, (PKF_CONTROL<<16)|VK_DOWN, 0};
 	vector<tstring> arrItems;
 
 	do {
@@ -540,7 +537,7 @@ void CBatchActionCollection::ShowMenu() {
 		arrItems.push_back(tstring());
 
 		int nBreakKey;
-		int nResult = ChooseMenu(arrItems, GetMsg(m_Type.m_nTitle), _T("Ins,Del,F4,Ctrl-\x18\x19"), _T("Batches"), m_nCurrent,
+		int nResult = ChooseMenu(arrItems, GetMsg(m_Type.m_nTitle), _T("Ins,Del,F4,F6,Ctrl-\x18\x19"), _T("Batches"), m_nCurrent,
 			FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT, piBreakKeys, &nBreakKey);
 		if (nResult >= 0) m_nCurrent = nResult;
 
@@ -586,7 +583,13 @@ void CBatchActionCollection::ShowMenu() {
 				WriteRegistry();
 			}
 			break;
-		case 3:			//	VK_CTRL_UP
+		case 3:			//	VK_F6
+			if (m_nCurrent < (int)size()) {
+				at(m_nCurrent)->EditProperties();
+				WriteRegistry();
+			}
+			break;
+		case 4:			//	VK_CTRL_UP
 			if (m_nCurrent > 0) {
 				CBatchAction *pBatch = at(m_nCurrent-1);
 				at(m_nCurrent-1) = at(m_nCurrent);
@@ -595,7 +598,7 @@ void CBatchActionCollection::ShowMenu() {
 				m_nCurrent--;
 			}
 			break;
-		case 4:			//	VK_CTRL_DOWN
+		case 5:			//	VK_CTRL_DOWN
 			if (m_nCurrent < (int)size()-1) {
 				CBatchAction *pBatch = at(m_nCurrent+1);
 				at(m_nCurrent+1) = at(m_nCurrent);
