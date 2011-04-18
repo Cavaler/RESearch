@@ -301,23 +301,23 @@ BOOL ProcessCommandLine(TCHAR *Line,BOOL *ShowDialog,INT_PTR *Item) {
 }
 
 int ShowFileMenu(int &nBreakCode) {
-	vector<CFarMenuItem> MenuItems;
+	vector<CFarMenuItemEx> MenuItems;
 
-	MenuItems.push_back(CFarMenuItem(MMenuSearch));
-	MenuItems.push_back(CFarMenuItem(MMenuReplace));
-	MenuItems.push_back(CFarMenuItem(MMenuGrep));
-	MenuItems.push_back(CFarMenuItem(true));
-	MenuItems.push_back(CFarMenuItem(MMenuSelect));
-	MenuItems.push_back(CFarMenuItem(MMenuUnselect));
-	MenuItems.push_back(CFarMenuItem(MMenuFlipSelection));
-	MenuItems.push_back(CFarMenuItem(true));
-	MenuItems.push_back(CFarMenuItem(MMenuRename));
-	MenuItems.push_back(CFarMenuItem(MMenuRenameSelected));
-	MenuItems.push_back(CFarMenuItem(MMenuRenumber));
-	MenuItems.push_back(CFarMenuItem(MMenuUndoRename));
-	MenuItems.push_back(CFarMenuItem(true));
-	MenuItems.push_back(CFarMenuItem(MMenuShowLastResults));
-	MenuItems.push_back(CFarMenuItem(true));
+	MenuItems.push_back(CFarMenuItemEx(MMenuSearch));
+	MenuItems.push_back(CFarMenuItemEx(MMenuReplace));
+	MenuItems.push_back(CFarMenuItemEx(MMenuGrep));
+	MenuItems.push_back(CFarMenuItemEx(true));
+	MenuItems.push_back(CFarMenuItemEx(MMenuSelect));
+	MenuItems.push_back(CFarMenuItemEx(MMenuUnselect));
+	MenuItems.push_back(CFarMenuItemEx(MMenuFlipSelection));
+	MenuItems.push_back(CFarMenuItemEx(true));
+	MenuItems.push_back(CFarMenuItemEx(MMenuRename));
+	MenuItems.push_back(CFarMenuItemEx(MMenuRenameSelected));
+	MenuItems.push_back(CFarMenuItemEx(MMenuRenumber));
+	MenuItems.push_back(CFarMenuItemEx(MMenuUndoRename));
+	MenuItems.push_back(CFarMenuItemEx(true));
+	MenuItems.push_back(CFarMenuItemEx(MMenuShowLastResults));
+	MenuItems.push_back(CFarMenuItemEx(true));
 
 	FSPresets->FillMenuItems(MenuItems);
 	FRPresets->FillMenuItems(MenuItems);
@@ -325,26 +325,23 @@ int ShowFileMenu(int &nBreakCode) {
 	RnPresets->FillMenuItems(MenuItems);
 	QRPresets->FillMenuItems(MenuItems);
 
-	MenuItems.push_back(CFarMenuItem(true));
-	MenuItems.push_back(CFarMenuItem(MMenuBatches));
+	MenuItems.push_back(CFarMenuItemEx(true));
+	MenuItems.push_back(CFarMenuItemEx(MMenuBatches));
 
 	g_pPanelBatches->FillMenuItems(MenuItems);
 
 	static int nLastSelection = 0;
 	if (nLastSelection >= (int)MenuItems.size()) nLastSelection = 0;
-	MenuItems[nLastSelection].Selected = TRUE;
+	MenuItems[nLastSelection].Flags |= MIF_SELECTED;
 
-	vector<CFarMenuItemEx> MenuItemsEx;
-	UpgradeMenuItemVector(MenuItems, MenuItemsEx);
-
-	if (m_arrLastRename.empty()) MenuItemsEx[11].Flags |= MIF_DISABLE;
-	if (LastTempPanel == NULL) MenuItemsEx[14].Flags |= MIF_DISABLE;
+	if (m_arrLastRename.empty()) MenuItems[11].Flags |= MIF_DISABLE;
+	if (LastTempPanel == NULL) MenuItems[14].Flags |= MIF_DISABLE;
 
 	int nBreakKeys[] = {VK_F4, 0};
 
 	int nResult = StartupInfo.Menu(StartupInfo.ModuleNumber, -1, -1, 0, FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT|FMENU_USEEXT,
 		GetMsg(MMenuHeader), NULL, _T("FileMenu"), nBreakKeys, &nBreakCode, 
-		(const FarMenuItem *)&MenuItemsEx[0], MenuItems.size());
+		(const FarMenuItem *)&MenuItems[0], MenuItems.size());
 
 	if (nResult >= 0) nLastSelection = nResult;
 
@@ -352,68 +349,66 @@ int ShowFileMenu(int &nBreakCode) {
 }
 
 int ShowEditorMenu(int &nBreakCode) {
-	vector<CFarMenuItem> MenuItems;
+	vector<CFarMenuItemEx> MenuItems;
 
-	MenuItems.push_back(CFarMenuItem(MMenuSearch));
-	MenuItems.push_back(CFarMenuItem(MMenuReplace));
-	MenuItems.push_back(CFarMenuItem(MMenuFilterText));
-	MenuItems.push_back(CFarMenuItem(MMenuTransliterate));
-	MenuItems.push_back(CFarMenuItem(true));
-	MenuItems.push_back(CFarMenuItem(MMenuSearchReplaceAgain));
-	MenuItems.push_back(CFarMenuItem(MMenuSearchReplaceAgainRev));
-	MenuItems.push_back(CFarMenuItem(true));
-	MenuItems.push_back(CFarMenuItem(MMenuShowLastResults));
+	MenuItems.push_back(CFarMenuItemEx(MMenuSearch));
+	MenuItems.push_back(CFarMenuItemEx(MMenuReplace));
+	MenuItems.push_back(CFarMenuItemEx(MMenuFilterText));
+	MenuItems.push_back(CFarMenuItemEx(MMenuTransliterate));
+	MenuItems.push_back(CFarMenuItemEx(true));
+	MenuItems.push_back(CFarMenuItemEx(MMenuSearchReplaceAgain));
+	MenuItems.push_back(CFarMenuItemEx(MMenuSearchReplaceAgainRev));
+	MenuItems.push_back(CFarMenuItemEx(true));
+	MenuItems.push_back(CFarMenuItemEx(MMenuShowLastResults));
 
-	MenuItems.push_back(CFarMenuItem(true));
+	MenuItems.push_back(CFarMenuItemEx(true));
 	ESPresets->FillMenuItems(MenuItems);
 	ERPresets->FillMenuItems(MenuItems);
 	EFPresets->FillMenuItems(MenuItems);
 	ETPresets->FillMenuItems(MenuItems);
 
-	MenuItems.push_back(CFarMenuItem(true));
-	MenuItems.push_back(CFarMenuItem(MMenuBatches));
+	MenuItems.push_back(CFarMenuItemEx(true));
+	MenuItems.push_back(CFarMenuItemEx(MMenuBatches));
 
 	g_pEditorBatches->FillMenuItems(MenuItems);
 
 	static int nLastSelection = 0;
 	if (nLastSelection >= (int)MenuItems.size()) nLastSelection = 0;
-	MenuItems[nLastSelection].Selected = TRUE;
+	MenuItems[nLastSelection].Flags |= MIF_SELECTED;
 
-	vector<CFarMenuItemEx> MenuItemsEx;
-	UpgradeMenuItemVector(MenuItems, MenuItemsEx);
-
-	if (!EditorListAllHasResults()) MenuItemsEx[8].Flags |= MIF_DISABLE;
+	if (!EditorListAllHasResults()) MenuItems[8].Flags |= MIF_DISABLE;
 
 	int nBreakKeys[] = {VK_F4, 0};
 
 	int nResult = StartupInfo.Menu(StartupInfo.ModuleNumber, -1, -1, 0, FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT|FMENU_USEEXT,
 		GetMsg(MMenuHeader), NULL, _T("EditorMenu"), nBreakKeys, &nBreakCode,
-		(const FarMenuItem *)&MenuItemsEx[0], MenuItems.size());
+		(const FarMenuItem *)&MenuItems[0], MenuItems.size());
 
 	if (nResult >= 0) nLastSelection = nResult;
 
 	return nResult;
 }
 
-int ShowViewerMenu(int &nBreakCode) {
-	vector<CFarMenuItem> MenuItems;
+int ShowViewerMenu(int &nBreakCode)
+{
+	vector<CFarMenuItemEx> MenuItems;
 
-	MenuItems.push_back(CFarMenuItem(MMenuSearch));
-	MenuItems.push_back(CFarMenuItem(MMenuSearchAgain));
-//	MenuItems.push_back(CFarMenuItem(MMenuSearchAgainRev));
+	MenuItems.push_back(CFarMenuItemEx(MMenuSearch));
+	MenuItems.push_back(CFarMenuItemEx(MMenuSearchAgain));
+//	MenuItems.push_back(CFarMenuItemEx(MMenuSearchAgainRev));
 
-	MenuItems.push_back(CFarMenuItem(true));
+	MenuItems.push_back(CFarMenuItemEx(true));
 	VSPresets->FillMenuItems(MenuItems);
 
 	static int nLastSelection = 0;
 	if (nLastSelection >= (int)MenuItems.size()) nLastSelection = 0;
-	MenuItems[nLastSelection].Selected = TRUE;
+	MenuItems[nLastSelection].Flags |= MIF_SELECTED;
 
 	int nBreakKeys[] = {VK_F4, 0};
 
-	int nResult = StartupInfo.Menu(StartupInfo.ModuleNumber,-1,-1,0,FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT,GetMsg(MMenuHeader),
-		NULL, _T("EditorMenu"), nBreakKeys, &nBreakCode, 
-		&MenuItems[0],MenuItems.size());
+	int nResult = StartupInfo.Menu(StartupInfo.ModuleNumber,-1,-1,0,FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT|FMENU_USEEXT,
+		GetMsg(MMenuHeader), NULL, _T("ViewerMenu"), nBreakKeys, &nBreakCode, 
+		(const FarMenuItem *)&MenuItems[0], MenuItems.size());
 
 	if (nResult >= 0) nLastSelection = nResult;
 

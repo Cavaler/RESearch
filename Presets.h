@@ -35,7 +35,7 @@ public:
 
 	OperationResult ExecutePreset();
 	virtual void Apply();
-	void FillMenuItem(CFarMenuItem &Item);
+	void FillMenuItem(CFarMenuItemEx &Item);
 	void Save(HKEY hKey, int nIndex);
 
 	tstring &Name() {return m_mapStrings[""];}
@@ -63,7 +63,7 @@ public:
 	virtual int  ID() = 0;	// For batches
 	CPreset *operator()(int nID);
 
-	void FillMenuItems(vector<CFarMenuItem> &MenuItems);
+	void FillMenuItems(vector<CFarMenuItemEx> &MenuItems);
 	CPreset *FindMenuPreset(int &nIndex);
 
 	const TCHAR *Name()  {return m_strKey.c_str();}
@@ -119,7 +119,7 @@ public:
 	bool EditItems();
 	void Execute();
 
-	CFarMenuItem GetMenuItem();
+	CFarMenuItemEx GetMenuItem();
 
 	bool m_bAddToMenu;
 	tstring m_strName;
@@ -139,7 +139,7 @@ public:
 
 	void ShowMenu();
 
-	void FillMenuItems(vector<CFarMenuItem> &MenuItems);
+	void FillMenuItems(vector<CFarMenuItemEx> &MenuItems);
 	CBatchAction *FindMenuAction(int &nIndex);
 
 public:
