@@ -160,7 +160,7 @@ void FillDefaultNamedParameters(const CHAR *szFileName, typename CREParameters<C
 {
 	typedef CStringOperations<CHAR> CSO;
 	CRegExpParam<CHAR> reParseName;
-	reParseName.Compile(CSO::_T2("(?<_fullname>^(?<fpath>(?<_path>.*)\\\\)(?<_filename>.*)$)"));
+	reParseName.Compile(CSO::_T2("(?<_fullname>^(?<_fpath>(?<_path>.*)\\\\)(?<_filename>.*)$)"));
 
 	arrParam.clear();
 	if (reParseName.Match(szFileName)) {
