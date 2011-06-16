@@ -478,6 +478,12 @@ bool CBatchAction::EditItems() {
 	do {
 		arrItems.resize(size());
 		for (size_t nPreset = 0; nPreset < size(); nPreset++) {
+			CPreset *pPreset = m_Type[at(nPreset)];
+			if (pPreset == NULL) {
+				erase(begin()+nPreset);
+				nPreset--;
+				continue;
+			}
 			arrItems[nPreset] = m_Type[at(nPreset)]->Name();
 		}
 
@@ -525,6 +531,7 @@ bool CBatchAction::EditItems() {
 				BatchActionIndex Index = at(m_nCurrent);
 				CPresetCollection *pColl = m_Type(Index.first);
 				CPreset *pPreset = (*pColl)(Index.second);
+				if (pPreset == NULL) break;
 
 				if (pPreset->m_bAddToMenu || (CountPresets(*Collection(), pPreset) > 1)) {
 					const TCHAR *Lines[] = { GetMsg(MWarning),GetMsg(MUsedPreset),GetMsg(MOk),GetMsg(MCancel) };
@@ -542,6 +549,7 @@ bool CBatchAction::EditItems() {
 void CBatchAction::Execute() {
 	for (size_t nAction = 0; nAction < size(); nAction++) {
 		CPreset *pPreset = m_Type[at(nAction)];
+		if (pPreset == NULL) continue;
 		if (pPreset->ExecutePreset() != OR_OK) break;
 	}
 }
