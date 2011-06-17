@@ -8,9 +8,14 @@ Regular Expression Search and Replace
 Planned:
 	- Search in share-opened files
     * File Replace encoding in dialog itself (Unicode)
-    * F4 in main menus on presets/batches
-    * F4 in batches to edit commands immediately
     ? Named parameters in Search string
+    * Storing values between replacements
+
+Version 7.41 (16.06.2011)
+	* Batch / preset editing changed slightly
+	* Can edit preset directly from batch
+	* Functions eol()/l()/n()/r() in Scripting are actually functions now, not properties
+	+ F4 from main menu on Preset / Batch will edit it
 
 Version 7.40 (23.03.2011)
 	- Interrupting replace works more properly

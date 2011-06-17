@@ -274,7 +274,7 @@ MEditorBatches		"Editor batches"					"Пакеты для редактора"
 MBatch				"Batch"								"Пакет"
 MBatchName			"Batch &name:"						"Имя пакета:"
 MBtnCommands		"&Commands..."						"&Команды..."
-MBatchCommands		"Batch '%s' commands"					"Команды пакета '%s'"
+MBatchCommands		"Batch '%s' commands"				"Команды пакета '%s'"
 
 MDeleteBatchQuery	"Are you sure to delete batch"		"Вы хотите удалить пакет"
 MExecuteBatchQuery	"Are you sure to execute batch"		"Вы хотите выполнить пакет"
