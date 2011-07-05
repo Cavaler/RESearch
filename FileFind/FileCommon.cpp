@@ -583,13 +583,56 @@ BOOL ConfirmFile(int Title,const TCHAR *FileName) {
 	return FALSE;
 }
 
-template<class CHAR>
-void SkipNoCRLF(const CHAR *&Buffer,int *Size) {
-	if (Size) {
-		while ((*Size)&&(*Buffer!=0x0D)&&(*Buffer!=0x0A)) {Buffer++;(*Size)--;}
+template<> void SkipNoCRLF<char>(const char *&Buffer,int *Size)
+{
+	//	memchr() is so optimized that searching twice is still much faster
+	//	than plain bytewise search...
+
+	char *p  = (char *)Buffer;
+	char *p1 = (char *)memchr(p, 0x0D, *Size);
+	char *p2 = (char *)memchr(p, 0x0A, *Size);
+	if (p1 == NULL) {
+		if (p2 == NULL) {
+			Buffer += *Size;
+			*Size = 0;
+		} else {
+			Buffer += (p2-p);
+			*Size  -= (p2-p);
+		}
+	} else if ((p2 == NULL) || (p1 < p2)) {
+		Buffer += (p1-p);
+		*Size  -= (p1-p);
 	} else {
-		while ((*Buffer!=0x0D)&&(*Buffer!=0x0A)) Buffer++;
+		Buffer += (p2-p);
+		*Size  -= (p2-p);
 	}
+}
+
+void SkipNoCRLF(const wchar_t *&Buffer, int *Size, wchar_t w1, wchar_t w2)
+{
+	wchar_t *p  = (wchar_t *)Buffer;
+	wchar_t *p1 = (wchar_t *)wmemchr(p, w1, *Size);
+	wchar_t *p2 = (wchar_t *)wmemchr(p, w2, *Size);
+	if (p1 == NULL) {
+		if (p2 == NULL) {
+			Buffer += *Size;
+			*Size = 0;
+		} else {
+			Buffer += (p2-p);
+			*Size  -= (p2-p);
+		}
+	} else if ((p2 == NULL) || (p1 < p2)) {
+		Buffer += (p1-p);
+		*Size  -= (p1-p);
+	} else {
+		Buffer += (p2-p);
+		*Size  -= (p2-p);
+	}
+}
+
+template<> void SkipNoCRLF<wchar_t>(const wchar_t *&Buffer,int *Size)
+{
+	SkipNoCRLF(Buffer, Size, 0x0D, 0x0A);
 }
 
 template<class CHAR>
@@ -609,10 +652,8 @@ void SkipWholeLine(const CHAR *&Buffer,int *Size) {
 	SkipCRLF(Buffer,Size);
 }
 
-template void SkipNoCRLF<char>(const char *&Buffer,int *Size);
 template void SkipCRLF<char>(const char *&Buffer,int *Size);
 template void SkipWholeLine<char>(const char *&Buffer,int *Size);
-template void SkipNoCRLF<wchar_t>(const wchar_t *&Buffer,int *Size);
 template void SkipCRLF<wchar_t>(const wchar_t *&Buffer,int *Size);
 template void SkipWholeLine<wchar_t>(const wchar_t *&Buffer,int *Size);
 
@@ -631,18 +672,10 @@ void SkipNoCRLF(const char *&Buffer,int *Size, eLikeUnicode nUni) {
 		SkipNoCRLF(Buffer, Size);
 		break;
 	case UNI_LE:
-		if (Size) {
-			while ((*Size >= 2) && (LE(Buffer)!=0x0D) && (LE(Buffer)!=0x0A)) {Buffer+=2;(*Size)-=2;}
-		} else {
-			while ((LE(Buffer)!=0x0D) && (LE(Buffer)!=0x0A)) Buffer+=2;
-		}
+		SkipNoCRLF((const wchar_t *&)Buffer, Size, 0x0D, 0x0A);
 		break;
 	case UNI_BE:
-		if (Size) {
-			while ((*Size >= 2) && (BE(Buffer)!=0x0D) && (BE(Buffer)!=0x0A)) {Buffer+=2;(*Size)-=2;}
-		} else {
-			while ((BE(Buffer)!=0x0D) && (BE(Buffer)!=0x0A)) Buffer+=2;
-		}
+		SkipNoCRLF((const wchar_t *&)Buffer, Size, 0x0D00, 0x0A00);
 		break;
 	}
 }
