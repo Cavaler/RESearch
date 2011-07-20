@@ -66,25 +66,25 @@ BOOL FindTextInBuffer(const char *Buffer, int Size, tstring &Text) {
 	Table = (FCaseSensitive) ? NULL : UpCaseTable;
 
 	// No signature, but anyway Unicode?
-	if (FromUnicodeLE(Buffer, Size, arrData)
+	if (
 #ifdef UNICODE
-		&& (g_setAllCPs.find(CP_UNICODE) != g_setAllCPs.end())
+		(g_setAllCPs.find(CP_UNICODE) != g_setAllCPs.end()) &&
 #endif
-		) {
+		FromUnicodeLE(Buffer, Size, arrData)) {
 		if ((arrData.size() > 0) && FindTextInBufferWithTable(&arrData[0], arrData.size(), TextUpcase, Table)) return TRUE;
 	}
-	if (FromUnicodeBE(Buffer, Size, arrData)
+	if (
 #ifdef UNICODE
-		&& (g_setAllCPs.find(CP_REVERSEBOM) != g_setAllCPs.end())
+		(g_setAllCPs.find(CP_REVERSEBOM) != g_setAllCPs.end()) &&
 #endif
-		) {
+		FromUnicodeBE(Buffer, Size, arrData)) {
 		if ((arrData.size() > 0) && FindTextInBufferWithTable(&arrData[0], arrData.size(), TextUpcase, Table)) return TRUE;
 	}
-	if (FromUTF8(Buffer, Size, arrData)
+	if (
 #ifdef UNICODE
-		&& (g_setAllCPs.find(CP_UTF8) != g_setAllCPs.end())
+		(g_setAllCPs.find(CP_UTF8) != g_setAllCPs.end()) &&
 #endif
-		) {
+		FromUTF8(Buffer, Size, arrData)) {
 		if ((arrData.size() > 0) && FindTextInBufferWithTable(&arrData[0], arrData.size(), TextUpcase, Table)) return TRUE;
 	}
 
@@ -97,68 +97,67 @@ BOOL FindPlainText(const char *Buffer,int Size) {
 
 //////////////////////////////////////////////////////////////////////////
 
-BOOL FindPattern(pcre *Pattern, pcre_extra *PatternExtra, const char *Buffer, int Size, eLikeUnicode nUni, bool bNeedColumn) {
+BOOL FindPattern(const char *Buffer, int Size, eLikeUnicode nUni, bool bNeedColumn) {
 	if (Size == 0) return FALSE;
 
-	vector<TCHAR> arrData;
 	if (nUni != UNI_NONE) {
+		vector<TCHAR> arrData;
 		if (FromUnicodeDetect(Buffer, Size, arrData, nUni)) {
-			if ((arrData.size() > 0) && (do_pcre_exec(Pattern, PatternExtra, &arrData[0], arrData.size(), 0, 0, NULL, 0) >= 0)) return TRUE;
+			if ((arrData.size() > 0) && (do_pcre_exec(FPattern, FPatternExtra, &arrData[0], arrData.size(), 0, 0, NULL, 0) >= 0)) return TRUE;
 		}
 		return FALSE;
 	}
 
-	vector<int> arrMatch((pcre_info(Pattern, NULL, NULL)+1)*3);
 #ifdef UNICODE
-//	do_pcre_execA doesn't work since pattern is compiled as Unicode one
-	string strData(Buffer, Size);
-	wstring wstrData = DefToUnicode(strData);
-	int nResult = do_pcre_exec(Pattern, PatternExtra, wstrData.data(), wstrData.size(), 0, 0, &arrMatch[0], arrMatch.size());
+	int nResult = do_pcre_execA(FPatternA, FPatternExtraA, Buffer, Size, 0, 0, &REParam.m_arrMatch[0], REParam.m_arrMatch.size());
 #else
-	int nResult = do_pcre_exec(Pattern, PatternExtra, Buffer, Size, 0, 0, &arrMatch[0], arrMatch.size());
+	int nResult = do_pcre_exec(FPattern, FPatternExtra, Buffer, Size, 0, 0, &REParam.m_arrMatch[0], REParam.m_arrMatch.size());
 #endif
 	if (nResult >= 0) {
-		if (bNeedColumn) g_nFoundColumn = arrMatch[0]+1;
+		if (bNeedColumn) g_nFoundColumn = REParam.m_arrMatch[0]+1;
 		return TRUE;
 	}
 
 	if (!FAllCharTables) return FALSE;
 
 #ifdef UNICODE
+	hack_string strData(Buffer, Size);
 	for (cp_set::iterator it = g_setAllCPs.begin(); it != g_setAllCPs.end(); it++) {
 		UINT nCP = *it;
 		if (nCP == (g_bDefaultOEM ? GetOEMCP() : GetACP())) continue;
 		if ((nCP == CP_UNICODE) || (nCP == CP_REVERSEBOM)) continue;
 
 		wstring wstrData = StrToUnicode(strData, nCP);
-		if (do_pcre_exec(Pattern, PatternExtra, wstrData.data(), wstrData.size(), 0, 0, NULL, 0) >= 0) return TRUE;
+		if (do_pcre_exec(FPattern, FPatternExtra, wstrData.data(), wstrData.size(), 0, 0, NULL, 0) >= 0) return TRUE;
 	}
 #else
 	vector<char> SaveBuf(Size);
 	for (size_t I=0; I < XLatTables.size(); I++) {
 		memmove(&SaveBuf[0], Buffer, Size);
 		XLatBuffer((BYTE *)&SaveBuf[0], Size, I);
-		if (do_pcre_exec(Pattern, PatternExtra, &SaveBuf[0], Size, 0, 0, NULL, 0) >= 0) return TRUE;
+		if (do_pcre_exec(FPattern, FPatternExtra, &SaveBuf[0], Size, 0, 0, NULL, 0) >= 0) return TRUE;
 	}
 #endif
+
+	vector<TCHAR> arrData;
 
 	if ((nUni != UNI_LE) && FromUnicodeLE(Buffer, Size, arrData)
 #ifdef UNICODE
 		&& (g_setAllCPs.find(CP_UNICODE) != g_setAllCPs.end())
 #endif
 		) {
-		if ((arrData.size() > 0) && (do_pcre_exec(Pattern, PatternExtra, &arrData[0], arrData.size(), 0, 0, NULL, 0) >= 0)) return TRUE;
+		if ((arrData.size() > 0) && (do_pcre_exec(FPattern, FPatternExtra, &arrData[0], arrData.size(), 0, 0, NULL, 0) >= 0)) return TRUE;
 	}
 	if ((nUni != UNI_BE) && FromUnicodeBE(Buffer, Size, arrData)
 #ifdef UNICODE
 		&& (g_setAllCPs.find(CP_REVERSEBOM) != g_setAllCPs.end())
 #endif
 		) {
-			if ((arrData.size() > 0) && (do_pcre_exec(Pattern, PatternExtra, &arrData[0], arrData.size(), 0, 0, NULL, 0) >= 0)) return TRUE;
+			if ((arrData.size() > 0) && (do_pcre_exec(FPattern, FPatternExtra, &arrData[0], arrData.size(), 0, 0, NULL, 0) >= 0)) return TRUE;
 	}
 #ifndef UNICODE
 	if ((nUni != UNI_UTF8) && FromUTF8(Buffer, Size, arrData)) {
-		if ((arrData.size() > 0) && (do_pcre_exec(Pattern, PatternExtra, &arrData[0], arrData.size(), 0, 0, NULL, 0) >= 0)) return TRUE;
+		if ((arrData.size() > 0) && (do_pcre_exec(FPattern, FPatternExtra, &arrData[0], arrData.size(), 0, 0, NULL, 0) >= 0)) return TRUE;
 	}
 #endif
 
@@ -171,7 +170,7 @@ BOOL FindRegExpWithEncoding(const char *Buffer, int Size, eLikeUnicode nUni) {
 	do {
 		Buffer=BufEnd;
 		SkipNoCRLF(BufEnd, &Size, nUni);
-		if (FindPattern(FPattern, FPatternExtra, Buffer, BufEnd-Buffer, nUni, true)) return TRUE;
+		if (FindPattern(Buffer, BufEnd-Buffer, nUni, true)) return TRUE;
 		SkipCRLF(BufEnd, &Size, nUni);
 		g_nFoundLine++;
 	} while (Size > nRest);
@@ -188,7 +187,7 @@ BOOL FindSeveralLineRegExpWithEncoding(const char *Buffer, int Size, eLikeUnicod
 		LinesIn++;
 		if (LinesIn == SeveralLines) {
 			Len=BufEnd-Buffer;
-			if (FindPattern(FPattern, FPatternExtra, Buffer, Len, nUni, false)) return TRUE;
+			if (FindPattern(Buffer, Len, nUni, false)) return TRUE;
 			SkipWholeLine(Buffer, &Len, nUni);
 			g_nFoundLine++;
 			LinesIn--;
@@ -197,7 +196,7 @@ BOOL FindSeveralLineRegExpWithEncoding(const char *Buffer, int Size, eLikeUnicod
 
 	Len=BufEnd-Buffer;
 	while (Len) {
-		if (FindPattern(FPattern, FPatternExtra, Buffer, Len, nUni, false)) return TRUE;
+		if (FindPattern(Buffer, Len, nUni, false)) return TRUE;
 		SkipWholeLine(Buffer, &Len, nUni);
 		g_nFoundLine++;
 	}
@@ -205,7 +204,7 @@ BOOL FindSeveralLineRegExpWithEncoding(const char *Buffer, int Size, eLikeUnicod
 }
 
 BOOL FindMultiLineRegExpWithEncoding(const char *Buffer, int Size, eLikeUnicode nUni) {
-	return FindPattern(FPattern, FPatternExtra, Buffer, Size, nUni, false);
+	return FindPattern(Buffer, Size, nUni, false);
 }
 
 BOOL FindExamineEncoding(const char *Buffer, int Size, BOOL (*Searcher)(const char *, int, eLikeUnicode)) {
@@ -295,7 +294,6 @@ BOOL FindMulti(const char *Buffer,int Size,BOOL (*Searcher)(const char *,int,tst
 }
 
 BOOL FindMultiPlainText(const char *Buffer,int Size) {return FindMulti(Buffer,Size,FindTextInBuffer);}
-BOOL FindMultiRegExp(const char *Buffer,int Size) {return FindMulti(Buffer,Size,FindRegExpInBuffer);}
 
 BOOL FindMemoryMapped(TCHAR *FileName,BOOL (*Searcher)(const char *,int)) {
 	CFileMapping mapFile;
@@ -308,6 +306,11 @@ BOOL FindMemoryMapped(TCHAR *FileName,BOOL (*Searcher)(const char *,int)) {
 	DWORD FileSize = mapFile.Size();
 	if (FAdvanced && FASearchHead && (FileSize>FASearchHeadLimit)) FileSize=FASearchHeadLimit;
 	if ((FSearchAs == SA_PLAINTEXT) && (FileSize < FText.length())) return FALSE;
+
+//	Pre-cache file
+//	for (size_t n = 0; n < FileSize/4; n++) __asm mov eax, dword ptr [n];
+//	for (size_t n = 0; n < FileSize;   n++) __asm mov al, byte ptr [n];
+
 	return Searcher(mapFile, FileSize);
 }
 
@@ -321,6 +324,9 @@ void SearchFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 		return;
 	}
 
+	REParam.Clear();
+	if (FPattern) REParam.AddRE(FPattern);
+
 	if (FText.empty()) IsFound=TRUE; else 
 	if (FindData->nFileSizeLow==0) IsFound=FALSE; else 
 	switch (FSearchAs) {
@@ -329,7 +335,6 @@ void SearchFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 	case SA_SEVERALLINE		:IsFound=FindMemoryMapped(FindData->cFileName,FindSeveralLineRegExp);break;
 	case SA_MULTILINE		:IsFound=FindMemoryMapped(FindData->cFileName,FindMultiLineRegExp);break;
 	case SA_MULTITEXT		:IsFound=FindMemoryMapped(FindData->cFileName,FindMultiPlainText);break;
-	case SA_MULTIREGEXP		:IsFound=FindMemoryMapped(FindData->cFileName,FindMultiRegExp);break;
 	default:IsFound=FALSE;
 	}
 
@@ -405,7 +410,7 @@ int SearchPrompt(BOOL Plugin) {
 	Dialog.Add(new CFarRadioButtonItem(5,9,0,MSeveralLineRegExp,(int *)&FSearchAs,SA_SEVERALLINE));
 	Dialog.Add(new CFarRadioButtonItem(5,10,0,MMultiLineRegExp,	(int *)&FSearchAs,SA_MULTILINE));
 	Dialog.Add(new CFarRadioButtonItem(5,11,0,MMultiPlainText,	(int *)&FSearchAs,SA_MULTITEXT));
-	Dialog.Add(new CFarRadioButtonItem(5,12,0,MMultiRegExp,		(int *)&FSearchAs,SA_MULTIREGEXP));
+	Dialog.Add(new CFarRadioButtonItem(5,12,DIF_DISABLE,MMultiRegExp,		(int *)&FSearchAs,SA_MULTIREGEXP));
 
 	Dialog.Add(new CFarCheckBoxItem(5,14,0,MCaseSensitive,&FCaseSensitive));
 	Dialog.Add(new CFarCheckBoxItem(5,15,0,MInverseSearch,&FSInverse));
@@ -500,7 +505,7 @@ BOOL CFSPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.Add(new CFarRadioButtonItem(5,11,0,		MSeveralLineRegExp,	pSearchAs,SA_SEVERALLINE));
 	Dialog.Add(new CFarRadioButtonItem(5,12,0,		MMultiLineRegExp,	pSearchAs,SA_MULTILINE));
 	Dialog.Add(new CFarRadioButtonItem(5,13,0,		MMultiPlainText,	pSearchAs,SA_MULTITEXT));
-	Dialog.Add(new CFarRadioButtonItem(5,14,0,		MMultiRegExp,		pSearchAs,SA_MULTIREGEXP));
+	Dialog.Add(new CFarRadioButtonItem(5,14,DIF_DISABLE,MMultiRegExp,	pSearchAs,SA_MULTIREGEXP));
 
 	Dialog.Add(new CFarCheckBoxItem(5,16,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
 	Dialog.Add(new CFarCheckBoxItem(5,17,0,MInverseSearch,&pPreset->m_mapInts["Inverse"]));

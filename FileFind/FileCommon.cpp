@@ -611,22 +611,22 @@ template<> void SkipNoCRLF<char>(const char *&Buffer,int *Size)
 void SkipNoCRLF(const wchar_t *&Buffer, int *Size, wchar_t w1, wchar_t w2)
 {
 	wchar_t *p  = (wchar_t *)Buffer;
-	wchar_t *p1 = (wchar_t *)wmemchr(p, w1, *Size);
-	wchar_t *p2 = (wchar_t *)wmemchr(p, w2, *Size);
+	wchar_t *p1 = (wchar_t *)wmemchr(p, w1, *Size/2);
+	wchar_t *p2 = (wchar_t *)wmemchr(p, w2, *Size/2);
 	if (p1 == NULL) {
 		if (p2 == NULL) {
-			Buffer += *Size;
+			Buffer += *Size/2;
 			*Size = 0;
 		} else {
 			Buffer += (p2-p);
-			*Size  -= (p2-p);
+			*Size  -= (p2-p)*2;
 		}
 	} else if ((p2 == NULL) || (p1 < p2)) {
 		Buffer += (p1-p);
-		*Size  -= (p1-p);
+		*Size  -= (p1-p)*2;
 	} else {
 		Buffer += (p2-p);
-		*Size  -= (p2-p);
+		*Size  -= (p2-p)*2;
 	}
 }
 

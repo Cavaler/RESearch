@@ -738,23 +738,23 @@ void RunExternalEditor(tstring &strText) {
 
 hack_string::hack_string(const char *szData, size_t nSize) {
 	_Bx._Ptr = (char *)szData;
-	_Myres = 32;
+	_Myres = string::_BUF_SIZE*2;
 	_Mysize = nSize;
 }
 hack_string::~hack_string() {
 	_Bx._Ptr = NULL;
-	_Myres = 15;
+	_Myres = string::_BUF_SIZE-1;
 	_Mysize = 0;
 }
 
 hack_wstring::hack_wstring(const wchar_t *szData, size_t nSize) {
 	_Bx._Ptr = (wchar_t *)szData;
-	_Myres = 32;
+	_Myres = wstring::_BUF_SIZE*2;
 	_Mysize = nSize;
 }
 hack_wstring::~hack_wstring() {
 	_Bx._Ptr = NULL;
-	_Myres = 15;
+	_Myres = wstring::_BUF_SIZE-1;
 	_Mysize = 0;
 }
 
