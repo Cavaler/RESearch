@@ -11,6 +11,9 @@ Planned:
     ? Named parameters in Search string
     * Storing values between replacements
 
+Version 7.42 (20.07.2011)
+	+ Some speed improvements for regexp search from panels
+
 Version 7.41 (16.06.2011)
 	* Batch / preset editing changed slightly
 	* Can edit preset directly from batch
