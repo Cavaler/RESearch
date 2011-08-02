@@ -71,7 +71,6 @@ TCHAR ConvertCase(TCHAR C);
 typedef CREParameters<TCHAR> TREParameters;
 EXTERN TREParameters REParam;
 EXTERN TREParameters::named_parameters FileMaskNamedParameters;
-EXTERN TREParameters::named_parameters EditorNamedParameters;
 #ifdef UNICODE
 EXTERN CREParameters<char>::named_parameters FileMaskNamedParametersA;
 #else

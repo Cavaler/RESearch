@@ -58,12 +58,13 @@ public:
 	int     FindParam(const cstring &strName, bool bCheckNumber = false);
 	cstring GetParam(const cstring &strName, bool bCheckNumber = false);
 
+	void    BackupParam();
 	void    BackupParam(named_parameters &mapParam);
 
 	void FillStartLength(int *MatchStart, int *MatchLength);
 	cstring Original();
 
-	void    FillNamedReferences(cstring &strRegExp);
+	cstring FillNamedReferences(const cstring &strPattern, bool bQuote=true);
 
 public:
 	named_parameters m_mapStrParam;

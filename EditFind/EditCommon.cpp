@@ -399,7 +399,8 @@ BOOL EPreparePattern(tstring &SearchText) {
 		RefreshEditorInfo();
 
 #ifdef UNICODE
-		BOOL Result = PreparePattern(&EPattern,&EPatternExtra,SearchText,ECaseSensitive,NULL);
+		tstring FillSearchText = REParam.FillNamedReferences(SearchText, true);
+		BOOL Result = PreparePattern(&EPattern,&EPatternExtra,FillSearchText,ECaseSensitive,NULL);
 #else
 		if (ECharacterTables && (ECharacterTables != ANSICharTables) && (ECharacterTables != OEMCharTables))
 			pcre_free((void *)ECharacterTables);
@@ -417,10 +418,11 @@ BOOL EPreparePattern(tstring &SearchText) {
 			ECharacterTables = OEMCharTables;
 		}
 
-		char *OEMLine = _strdup(SearchText.c_str());
-		OEMToEditor(OEMLine, SearchText.size());
+		string OEMLine = SearchText;
+		OEMToEditor(OEMLine);
+		OEMLine = REParam.FillNamedReferences(OEMLine);
+
 		BOOL Result = PreparePattern(&EPattern,&EPatternExtra,OEMLine,ECaseSensitive,ECharacterTables);
-		free(OEMLine);
 #endif
 		return Result;
 	} else {
@@ -431,9 +433,11 @@ BOOL EPreparePattern(tstring &SearchText) {
 	}
 }
 
-void ECleanup(BOOL PatternOnly) {
-	if (EPattern) {pcre_free(EPattern);EPattern=NULL;}
-	if (EPatternExtra) {pcre_free(EPatternExtra);EPatternExtra=NULL;}
+void ECleanup(BOOL PatternOnly)
+{
+	REParam.BackupParam();
+	PCRE_FREE(EPattern);
+	PCRE_FREE(EPatternExtra);
 
 	REErrorOffset = -1;
 

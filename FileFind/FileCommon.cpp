@@ -89,23 +89,27 @@ void FWriteRegistry(HKEY Key) {
 	#include "PersistVars.h"
 }
 
-void FCleanup(BOOL PatternOnly) {
-	if (FPattern) {pcre_free(FPattern);FPattern=NULL;}
-	if (FPatternExtra) {pcre_free(FPatternExtra);FPatternExtra=NULL;}
+void FCleanup(BOOL PatternOnly)
+{
+	REParam.BackupParam();
+
+	PCRE_FREE(FPattern);
+	PCRE_FREE(FPatternExtra);
+	PCRE_FREE(FMaskPattern);
+	PCRE_FREE(FMaskPatternExtra);
 #ifdef UNICODE
-	if (FPatternA) {pcre_free(FPatternA);FPatternA=NULL;}
-	if (FPatternExtraA) {pcre_free(FPatternExtraA);FPatternExtraA=NULL;}
+	PCRE_FREE(FPatternA);
+	PCRE_FREE(FPatternExtraA);
 #endif
-	if (FMaskPattern) {pcre_free(FMaskPattern);FMaskPattern=NULL;}
-	if (FMaskPatternExtra) {pcre_free(FMaskPatternExtra);FMaskPatternExtra=NULL;}
+
 	if (FMaskSet) {delete FMaskSet;FMaskSet=NULL;}
 	if (FASystemFoldersMask) {delete FASystemFoldersMask;FASystemFoldersMask=NULL;}
 
 	REErrorOffset = -1;
 
 	if (!PatternOnly) {
-		if (FAFullFileNamePattern) {pcre_free(FAFullFileNamePattern);FAFullFileNamePattern=NULL;}
-		if (FAFullFileNamePatternExtra) {pcre_free(FAFullFileNamePatternExtra);FAFullFileNamePatternExtra=NULL;}
+		PCRE_FREE(FAFullFileNamePattern);
+		PCRE_FREE(FAFullFileNamePatternExtra);
 
 		delete FSPresets;
 		delete FRPresets;
@@ -130,7 +134,8 @@ int FPrepareMaskPattern() {
 
 	REErrorField  = MMask;
 	if (FMaskAsRegExp) {
-		if (!PreparePattern(&FMaskPattern,&FMaskPatternExtra,FMask,FALSE)) return FALSE;
+		tstring strPattern = REParam.FillNamedReferences(FMask);
+		if (!PreparePattern(&FMaskPattern,&FMaskPatternExtra,strPattern,FALSE)) return FALSE;
 	} else {
 		FMaskSet = new CFarMaskSet(FMask.c_str());
 		if (!FMaskSet->Valid()) {
@@ -187,13 +192,15 @@ int FPreparePattern(bool bAcceptEmpty) {
 
 	case SA_REGEXP:
 	case SA_SEVERALLINE:
-	case SA_MULTILINE:
+	case SA_MULTILINE:{
 		if (FText.empty()) return TRUE;
-		return PreparePattern(&FPattern, &FPatternExtra, FText, FCaseSensitive, NULL)
+		tstring strPattern = REParam.FillNamedReferences(FText);
+		return PreparePattern(&FPattern, &FPatternExtra, strPattern, FCaseSensitive, NULL)
 #ifdef UNICODE
-			&& PreparePattern(&FPatternA, &FPatternExtraA, DefFromUnicode(FText), FCaseSensitive, DefCharTables())
+			&& PreparePattern(&FPatternA, &FPatternExtraA, DefFromUnicode(strPattern), FCaseSensitive, DefCharTables())
 #endif
 			;
+					  }
 	default:
 		return FALSE;
 	}
@@ -898,11 +905,12 @@ BOOL AdvancedSettings() {
 	return TRUE;
 }
 
-BOOL CompileAdvancedSettings() {
-	if (FAFullFileNamePattern) {pcre_free(FAFullFileNamePattern);FAFullFileNamePattern=NULL;}
-	if (FAFullFileNamePatternExtra) {pcre_free(FAFullFileNamePatternExtra);FAFullFileNamePatternExtra=NULL;}
-	if (FADirectoryPattern) {pcre_free(FADirectoryPattern);FADirectoryPattern=NULL;}
-	if (FADirectoryPatternExtra) {pcre_free(FADirectoryPatternExtra);FADirectoryPatternExtra=NULL;}
+BOOL CompileAdvancedSettings()
+{
+	PCRE_FREE(FAFullFileNamePattern);
+	PCRE_FREE(FAFullFileNamePatternExtra);
+	PCRE_FREE(FADirectoryPattern);
+	PCRE_FREE(FADirectoryPatternExtra);
 
 	if (FAFullFileNameMatch) {
 		if (!PreparePattern(&FAFullFileNamePattern,&FAFullFileNamePatternExtra,FAFullFileName,FACaseSensitive)) return FALSE;

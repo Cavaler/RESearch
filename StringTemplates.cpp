@@ -266,6 +266,12 @@ CREParameters<CHAR>::GetParam(const cstring &strName, bool bCheckNumber) {
 }
 
 template<class CHAR>
+void CREParameters<CHAR>::BackupParam()
+{
+	BackupParam(m_mapStrParam);
+}
+
+template<class CHAR>
 void CREParameters<CHAR>::BackupParam(named_parameters &mapParam)
 {
 	vector<cstring> arrNames;
@@ -291,18 +297,22 @@ CREParameters<CHAR>::Original()
 }
 
 template<class CHAR>
-void CREParameters<CHAR>::FillNamedReferences(cstring &strRegExp)
+typename CREParameters<CHAR>::cstring
+CREParameters<CHAR>::FillNamedReferences(const cstring &strPattern, bool bQuote)
 {
+	cstring strResult = strPattern;
 	int nStart = 0;
 	CRegExpT<CHAR> re(CSO::_T2("\\$\\{(.*?)\\}"));
 
 	vector<cstring> arrRefs;
-	while (re.Match(strRegExp.substr(nStart), 0, &arrRefs)) {
+	while (re.Match(strResult.substr(nStart), 0, &arrRefs)) {
 		cstring strReplace = GetParam(arrRefs[1], false);
-		CSO::QuoteRegExpString(strReplace);
-		strRegExp.replace(nStart+re.RefStart(0), arrRefs[0].length(), strReplace);
+		if (bQuote) CSO::QuoteRegExpString(strReplace);
+		strResult.replace(nStart+re.RefStart(0), arrRefs[0].length(), strReplace);
 		nStart += strReplace.length();
 	}
+
+	return strResult;
 }
 
 template<class CHAR>
