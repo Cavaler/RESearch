@@ -470,7 +470,11 @@ OperationResult FileFind(panelitem_vector &PanelItems, BOOL ShowDialog, BOOL bSi
 		if (!PrepareFileSearchPattern()) return OR_CANCEL;
 	}
 
-	if (ScanDirectories(PanelItems, SearchFile)) {
+	CDebugTimer tm(_T("FileFind() took %d ms"));
+	int nResult = ScanDirectories(PanelItems, SearchFile);
+	tm.Stop();
+
+	if (nResult) {
 		return (PanelItems.empty()) ? (bSilent ? OR_OK : NoFilesFound()) : OR_PANEL;
 	} else return OR_FAILED;
 }

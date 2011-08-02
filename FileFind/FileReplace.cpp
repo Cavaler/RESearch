@@ -487,7 +487,12 @@ OperationResult FileReplace(panelitem_vector &PanelItems, BOOL ShowDialog, BOOL 
 	FRConfirmReadonlyThisRun = (FRReplaceReadonly != RR_ALWAYS);
 	FRConfirmLineThisRun=FRConfirmLine;
 	FileNumber = -1;	// Easier to increment
-	if (ScanDirectories(PanelItems, ReplaceSingleFile)) {
+
+	CDebugTimer tm(_T("FileReplace() took %d ms"));
+	int nResult = ScanDirectories(PanelItems, ReplaceSingleFile);
+	tm.Stop();
+
+	if (nResult) {
 		if (!FROpenModified) return OR_OK; else
 			return (PanelItems.empty()) ? (bSilent ? OR_OK : NoFilesFound()) : OR_PANEL;
 	} else return OR_FAILED;

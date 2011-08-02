@@ -362,7 +362,11 @@ OperationResult FileGrep(BOOL ShowDialog) {
 	AddGrepLine(L"\xFEFF", false);
 #endif
 
-	if (ScanDirectories(g_PanelItems,GrepFile)) {
+	CDebugTimer tm(_T("FileGrep() took %d ms"));
+	int nResult = ScanDirectories(g_PanelItems, GrepFile);
+	tm.Stop();
+
+	if (nResult) {
 		g_hOutput.Close();
 		if (FGOpenInEditor) {
 			StartupInfo.Editor(strFileName.c_str(), NULL, 0, 0, -1, -1,

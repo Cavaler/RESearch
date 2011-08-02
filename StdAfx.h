@@ -36,6 +36,7 @@ using namespace std;
 
 #include <Pavel.h>
 #include <CRegExp.h>
+#include <DebugTimer.h>
 
 #import "RESearch.tlb" raw_interfaces_only
 using namespace RESearchLib;
