@@ -863,7 +863,7 @@ void ConfigureFile() {
 #ifdef UNICODE
 	CFarDialog Dialog(70, 21, _T("FileConfig"));
 #else
-	CFarDialog Dialog(70, 18, _T("FileConfig"));
+	CFarDialog Dialog(70, 20, _T("FileConfig"));
 #endif
 	Dialog.AddFrame(MFileSearchSettings);
 
@@ -879,7 +879,8 @@ void ConfigureFile() {
 
 	Dialog.Add(new CFarCheckBoxItem(5, 9, 0, MSkipSystemFolders, &FASkipSystemFolders));
 	Dialog.Add(new CFarEditItem(9, 10, 45, DIF_HISTORY,_T("RESearch.SystemFolders"), FASystemFolders));
-	Dialog.Add(new CFarCheckBoxItem(5, 12, 0, MEditSrchAfterFile, &FSEditSrchAfterFile));
+	Dialog.Add(new CFarCheckBoxItem(5, 12, 0, MUseSingleCR, &FSUseSingleCR));
+	Dialog.Add(new CFarCheckBoxItem(5, 14, 0, MEditSrchAfterFile, &FSEditSrchAfterFile));
 
 #ifdef UNICODE
 	Dialog.Add(new CFarTextItem(5,14,0,MDefaultCP));

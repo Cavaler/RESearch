@@ -585,48 +585,73 @@ BOOL ConfirmFile(int Title,const TCHAR *FileName) {
 
 template<> void SkipNoCRLF<char>(const char *&Buffer,int *Size)
 {
-	//	memchr() is so optimized that searching twice is still much faster
-	//	than plain bytewise search...
-
 	char *p  = (char *)Buffer;
-	char *p1 = (char *)memchr(p, 0x0D, *Size);
-	char *p2 = (char *)memchr(p, 0x0A, *Size);
-	if (p1 == NULL) {
-		if (p2 == NULL) {
-			Buffer += *Size;
-			*Size = 0;
+
+	if (FSUseSingleCR) {
+		//	memchr() is so optimized that searching twice is still much faster
+		//	than plain bytewise search...
+
+		char *p1 = (char *)memchr(p, 0x0D, *Size);
+		char *p2 = (char *)memchr(p, 0x0A, *Size);
+		if (p1 == NULL) {
+			if (p2 == NULL) {
+				Buffer += *Size;
+				*Size = 0;
+			} else {
+				Buffer += (p2-p);
+				*Size  -= (p2-p);
+			}
+		} else if ((p2 == NULL) || (p1 < p2)) {
+			Buffer += (p1-p);
+			*Size  -= (p1-p);
 		} else {
 			Buffer += (p2-p);
 			*Size  -= (p2-p);
 		}
-	} else if ((p2 == NULL) || (p1 < p2)) {
-		Buffer += (p1-p);
-		*Size  -= (p1-p);
 	} else {
-		Buffer += (p2-p);
-		*Size  -= (p2-p);
+		char *p2 = (char *)memchr(p, 0x0A, *Size);
+		if (p2 == NULL) {
+			Buffer += *Size;
+			*Size = 0;
+		} else {
+			if ((p2 > p) && (p2[-1] == 0x0D)) p2--;
+			Buffer += (p2-p);
+			*Size  -= (p2-p);
+		}
 	}
 }
 
 void SkipNoCRLF(const wchar_t *&Buffer, int *Size, wchar_t w1, wchar_t w2)
 {
 	wchar_t *p  = (wchar_t *)Buffer;
-	wchar_t *p1 = (wchar_t *)wmemchr(p, w1, *Size/2);
-	wchar_t *p2 = (wchar_t *)wmemchr(p, w2, *Size/2);
-	if (p1 == NULL) {
-		if (p2 == NULL) {
-			Buffer += *Size/2;
-			*Size = 0;
+	if (FSUseSingleCR) {
+		wchar_t *p1 = (wchar_t *)wmemchr(p, w1, *Size/2);
+		wchar_t *p2 = (wchar_t *)wmemchr(p, w2, *Size/2);
+		if (p1 == NULL) {
+			if (p2 == NULL) {
+				Buffer += *Size/2;
+				*Size = 0;
+			} else {
+				Buffer += (p2-p);
+				*Size  -= (p2-p)*2;
+			}
+		} else if ((p2 == NULL) || (p1 < p2)) {
+			Buffer += (p1-p);
+			*Size  -= (p1-p)*2;
 		} else {
 			Buffer += (p2-p);
 			*Size  -= (p2-p)*2;
 		}
-	} else if ((p2 == NULL) || (p1 < p2)) {
-		Buffer += (p1-p);
-		*Size  -= (p1-p)*2;
 	} else {
-		Buffer += (p2-p);
-		*Size  -= (p2-p)*2;
+		wchar_t *p2 = (wchar_t *)wmemchr(p, w2, *Size/2);
+		if (p2 == NULL) {
+			Buffer += *Size/2;
+			*Size = 0;
+		} else {
+			if ((p2 > p) && (p2[-1] == w1)) p2--;
+			Buffer += (p2-p);
+			*Size  -= (p2-p)*2;
+		}
 	}
 }
 

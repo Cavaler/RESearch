@@ -163,6 +163,7 @@ enum eStringTable {
 	MAsk,
 	MAlways,
 	MSkipSystemFolders,
+	MUseSingleCR,
 	MEditSrchAfterFile,
 
 	MRenumberSettings,

@@ -163,6 +163,7 @@ MNever				"N&ever"										"Не заменять"
 MAsk				"A&sk"											"Спросить"
 MAlways				"&Always"										"&Всегда"
 MSkipSystemFolders	"Skip preconfig&ured system folders:"	"Пропускать заданные системные каталоги:"
+MUseSingleCR		"Search for CR-onl&y EOL"				"Искать переводы строк из одного CR"
 MEditSrchAfterFile	"Au&tomatic search in editor"			"Автомати&ческий поиск в редакторе"
 
 MRenumberSettings	"Renumbering settings"				"Перенумерование"
