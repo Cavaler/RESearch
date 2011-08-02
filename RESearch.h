@@ -71,6 +71,7 @@ TCHAR ConvertCase(TCHAR C);
 typedef CREParameters<TCHAR> TREParameters;
 EXTERN TREParameters REParam;
 EXTERN TREParameters::named_parameters FileMaskNamedParameters;
+EXTERN TREParameters::named_parameters EditorNamedParameters;
 #ifdef UNICODE
 EXTERN CREParameters<char>::named_parameters FileMaskNamedParametersA;
 #else
@@ -134,9 +135,6 @@ int ReverseBMHSearch(const TCHAR *Buffer,int BufferLength,const TCHAR *String,in
 void PrepareBMHSearchA(const char *String,int StringLength);
 int BMHSearchA(const char *Buffer,int BufferLength,const char *String,int StringLength,char *XLatTable);
 #endif
-
-void QuoteRegExpString(tstring &strText);
-void QuoteReplaceString(tstring &strText);
 
 void EditorStartUndo();
 void EditorEndUndo();

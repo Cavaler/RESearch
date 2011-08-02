@@ -226,7 +226,7 @@ BOOL EditorSearch() {
 			// Show All
 			break;
 		case MQuoteSearch:
-			if (ERegExp) QuoteRegExpString(SearchText);
+			if (ERegExp) CSO::QuoteRegExpString(SearchText);
 			break;
 		case MEllipsis:
 			ConfigureSeveralLines();

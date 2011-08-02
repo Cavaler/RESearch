@@ -313,7 +313,7 @@ bool GrepPrompt(BOOL bPlugin) {
 			FText=SearchText;
 			break;
 		case MQuoteSearch:
-			if (AsRegExp) QuoteRegExpString(SearchText);
+			if (AsRegExp) CSO::QuoteRegExpString(SearchText);
 			break;
 		case MBtnPresets:
 			FGPresets->ShowMenu(true);

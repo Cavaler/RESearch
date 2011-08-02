@@ -542,10 +542,10 @@ BOOL EditorReplace() {
 		case MAll:
 			break;
 		case MQuoteSearch:
-			if (ERegExp) QuoteRegExpString(SearchText);
+			if (ERegExp) CSO::QuoteRegExpString(SearchText);
 			break;
 		case MQuoteReplace:
-			QuoteReplaceString(ReplaceText);
+			CSO::QuoteReplaceString(ReplaceText);
 			break;
 		case MEllipsis:
 			ConfigureSeveralLines();

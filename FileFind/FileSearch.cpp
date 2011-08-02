@@ -441,7 +441,7 @@ int SearchPrompt(BOOL Plugin) {
 			FText=SearchText;
 			break;
 		case MQuoteSearch:
-			QuoteRegExpString(SearchText);
+			CSO::QuoteRegExpString(SearchText);
 			break;
 		case MBtnPresets:
 			FSPresets->ShowMenu(true);

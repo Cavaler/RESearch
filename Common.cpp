@@ -487,24 +487,6 @@ wstring HexToUni(tstring strHex) {
 	return wstrUnicode;
 }
 
-void QuoteRegExpString(tstring &strText) {
-	for (size_t I=0; I<strText.length();I++) {
-		if (_tcschr(_T("()[]{}\\^$+*.?|"), strText[I])) {
-			strText.insert(I++, 1, '\\');
-			continue;
-		}
-	}
-}
-
-void QuoteReplaceString(tstring &strText) {
-	for (size_t I=0; I<strText.length();I++) {
-		if ((strText[I] == '\\') || (strText[I] == '$')) {
-			strText.insert(I++, 1, '\\');
-			continue;
-		}
-	}
-}
-
 void EditorStartUndo() {
 #ifdef UNICODE
 	EditorUndoRedo UR;

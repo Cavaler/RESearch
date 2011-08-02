@@ -446,10 +446,10 @@ int ReplacePrompt(BOOL Plugin) {
 			FRReplace=ReplaceText;
 			break;
 		case MQuoteSearch:
-			if ((FSearchAs!=SA_PLAINTEXT) && (FSearchAs!=SA_MULTITEXT)) QuoteRegExpString(SearchText);
+			if ((FSearchAs!=SA_PLAINTEXT) && (FSearchAs!=SA_MULTITEXT)) CSO::QuoteRegExpString(SearchText);
 			break;
 		case MQuoteReplace:
-			QuoteReplaceString(ReplaceText);
+			CSO::QuoteReplaceString(ReplaceText);
 			break;
 		case MBtnPresets:
 			FRPresets->ShowMenu(true);

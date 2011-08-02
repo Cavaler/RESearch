@@ -20,7 +20,7 @@ tstring BuildRE(const tstring &strSource, const part_map &mapParts)
 	int nLeftOff = 0;
 	for (part_map::const_iterator it = mapParts.begin(); it != mapParts.end(); it++) {
 		tstring strStart = strSource.substr(nLeftOff, it->first);
-		QuoteRegExpString(strStart);
+		CSO::QuoteRegExpString(strStart);
 		strResult += strStart;
 
 		tstring strPart = strSource.substr(it->first, it->second);
@@ -31,7 +31,7 @@ tstring BuildRE(const tstring &strSource, const part_map &mapParts)
 	}
 
 	tstring strEnd = strSource.substr(nLeftOff);
-	QuoteRegExpString(strEnd);
+	CSO::QuoteRegExpString(strEnd);
 	strResult += strEnd;
 
 	return strResult;

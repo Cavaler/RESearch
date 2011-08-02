@@ -12,8 +12,19 @@ public:
 
 	static bool GetNumber(const cstring &str, int &nValue);
 
+	static void QuoteAny(cstring &str, const CHAR *szList);
+
 	static cstring ExpandParameter(const CHAR *&Replace, CREParameters<CHAR> &Param);
 	static cstring CreateReplaceString(const CHAR *Replace, const CHAR *EOL, int Engine, CREParameters<CHAR> &Param);
+
+	static void QuoteRegExpString (cstring &strText) {
+		QuoteAny(strText, _T2("()[]{}\\^$+*.?|"));
+	}
+
+	static void QuoteReplaceString(cstring &strText) {
+		QuoteAny(strText, _T2("\\$"));
+	}
+
 };
 
 typedef CStringOperations<TCHAR>    CSO;
@@ -51,6 +62,8 @@ public:
 
 	void FillStartLength(int *MatchStart, int *MatchLength);
 	cstring Original();
+
+	void    FillNamedReferences(cstring &strRegExp);
 
 public:
 	named_parameters m_mapStrParam;

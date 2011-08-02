@@ -142,12 +142,22 @@ CStringOperations<CHAR>::ExpandParameter(const CHAR *&Replace, CREParameters<CHA
 }
 
 template<class CHAR>
-bool CStringOperations<CHAR>   ::GetNumber(const cstring &str, int &nValue) {
+bool CStringOperations<CHAR>::GetNumber(const cstring &str, int &nValue) {
 	static CRegExpT<CHAR> reNumber(_T2("^[-+]?\\d+$"));
 	if (reNumber.Match(str)) {
 		nValue = ctoi(str.c_str());
 		return true;
 	} else return false;
+}
+
+template<class CHAR>
+void CStringOperations<CHAR>::QuoteAny(cstring &str, const CHAR *szList) {
+	for (size_t i=0; i < str.length(); i++) {
+		if (cstrchr(_T2("()[]{}\\^$+*.?|"), str[i])) {
+			str.insert(i++, 1, '\\');
+			continue;
+		}
+	}
 }
 
 template class CStringOperations<char>;
@@ -278,6 +288,21 @@ typename CREParameters<CHAR>::cstring
 CREParameters<CHAR>::Original()
 {
 	return cstring(m_szString, m_arrMatch.empty() ? m_nLength : m_arrMatch[1]);
+}
+
+template<class CHAR>
+void CREParameters<CHAR>::FillNamedReferences(cstring &strRegExp)
+{
+	int nStart = 0;
+	CRegExpT<CHAR> re(CSO::_T2("\\$\\{(.*?)\\}"));
+
+	vector<cstring> arrRefs;
+	while (re.Match(strRegExp.substr(nStart), 0, &arrRefs)) {
+		cstring strReplace = GetParam(arrRefs[1], false);
+		CSO::QuoteRegExpString(strReplace);
+		strRegExp.replace(nStart+re.RefStart(0), arrRefs[0].length(), strReplace);
+		nStart += strReplace.length();
+	}
 }
 
 template<class CHAR>

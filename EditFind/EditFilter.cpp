@@ -66,7 +66,7 @@ BOOL EditorFilter() {
 		case MOk:
 			break;
 		case MQuoteSearch:
-			if (ERegExp) QuoteRegExpString(SearchText);
+			if (ERegExp) CSO::QuoteRegExpString(SearchText);
 			break;
 		case MBtnPresets:
 			EFPresets->ShowMenu(true);
