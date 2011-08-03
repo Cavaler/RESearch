@@ -39,14 +39,16 @@ void EWriteRegistry(HKEY Key) {
 	#include "PersistVars.h"
 }
 
-BOOL SearchIn(const TCHAR *Line,int Start,int Length,int *MatchStart,int *MatchLength) {
-	REParam.Clear(FileMaskNamedParameters);
+BOOL SearchIn(const TCHAR *Line,int Start,int Length,int *MatchStart,int *MatchLength)
+{
+	REParam.Clear();
 	REParam.AddSource(Line, Length);
 
 	if (ERegExp) {
 		REParam.AddRE(EPattern);
 
 		if (pcre_exec(EPattern,EPatternExtra,Line,Start+Length,Start,0,REParam.Match(),REParam.Count())>=0) {
+			MatchDone();
 			REParam.FillStartLength(MatchStart, MatchLength);
 			return TRUE;
 		}
@@ -396,7 +398,7 @@ BOOL EPreparePattern(tstring &SearchText) {
 
 	REErrorField  = MSearchFor;
 	if (ERegExp) {
-		RefreshEditorInfo();
+		EditorFillNamedParameters();
 
 #ifdef UNICODE
 		tstring FillSearchText = REParam.FillNamedReferences(SearchText, true);
@@ -673,6 +675,17 @@ void RefreshEditorInfo() {
 	} else {
 		EditorFileName = _T("");
 	}
+#endif
+}
+
+void EditorFillNamedParameters()
+{
+	RefreshEditorInfo();
+#ifdef UNICODE
+	FillDefaultNamedParameters(EditorFileName.c_str());
+	REParam.CopyParam(REParamA);
+#else
+	FillDefaultNamedParameters(EdInfo.FileName);
 #endif
 }
 

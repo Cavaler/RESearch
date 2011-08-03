@@ -189,8 +189,10 @@ LONG_PTR WINAPI EditorSearchDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, 
 	return pDlg->DefDlgProc(nMsg, nParam1, lParam2);
 }
 
-BOOL EditorSearch() {
-	RefreshEditorInfo();
+BOOL EditorSearch()
+{
+	EditorFillNamedParameters();
+
 	EInSelection = EAutoFindInSelection && (EdInfo.BlockType != BTYPE_NONE);
 
 	CFarDialog Dialog(76,13,_T("SearchDlg"));

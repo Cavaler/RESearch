@@ -38,7 +38,10 @@ BOOL EditorFilterAgain() {
 	return TRUE;
 }
 
-BOOL EditorFilter() {
+BOOL EditorFilter()
+{
+	EditorFillNamedParameters();
+
 	CFarDialog Dialog(76,13,_T("FilterDlg"));
 	Dialog.SetWindowProc(EditorSearchDialogProc, 0);
 	Dialog.SetUseID(true);

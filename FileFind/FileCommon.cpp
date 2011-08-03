@@ -253,28 +253,13 @@ int AddSlashLen(TCHAR *Directory) {
 
 bool MultipleMasksApply(const TCHAR *FileName)
 {
-	FileMaskNamedParameters.clear();
-
-#ifdef UNICODE
-	FileMaskNamedParametersA.clear();
-#endif
-
 	if (FMaskAsRegExp) {
 		REParam.Clear();
 		REParam.AddRE(FMaskPattern);
 		REParam.AddSource(FileName,_tcslen(FileName));
 
 		if (do_pcre_exec(FMaskPattern, FMaskPatternExtra,FileName,_tcslen(FileName),0,0,REParam.Match(),REParam.Count())>=0) {
-			REParam.BackupParam(FileMaskNamedParameters);
-#ifdef UNICODE
-			CREParameters<char> REParamA;
-			REParamA.AddRE(FMaskPattern);
-			string strFileName = OEMFromUnicode(FileName);
-			REParamA.AddSource(strFileName.c_str(), strFileName.size());
-			REParamA.m_arrMatch = REParam.m_arrMatch;
-			REParamA.BackupParam(FileMaskNamedParametersA);
-#endif
-
+			MatchDone();
 			return true;
 		} else
 			return false;
@@ -285,9 +270,9 @@ bool MultipleMasksApply(const TCHAR *FileName)
 
 void FileFillNamedParameters(const TCHAR *szFileName)
 {
-	FillDefaultNamedParameters(szFileName, FileMaskNamedParameters);
+	FillDefaultNamedParameters(szFileName);
 #ifdef UNICODE
-	FillDefaultNamedParameters(OEMFromUnicode(szFileName).c_str(), FileMaskNamedParametersA);
+	REParam.CopyParam(REParamA);
 #endif
 }
 

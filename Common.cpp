@@ -155,39 +155,47 @@ BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,
 }
 #endif
 
-template<class CHAR>
-void FillDefaultNamedParameters(const CHAR *szFileName, typename CREParameters<CHAR>::named_parameters &arrParam)
+void FillDefaultNamedParameters(const TCHAR *szFileName)
 {
-	typedef CStringOperations<CHAR> CSO;
-	CRegExpParam<CHAR> reParseName;
+	CRegExpParam<TCHAR> reParseName;
 	reParseName.Compile(CSO::_T2("(?<_fullname>^(?<_fpath>(?<_path>.*)\\\\)(?<_filename>.*)$)"));
 
-	arrParam.clear();
 	if (reParseName.Match(szFileName)) {
-		reParseName.BackupParam(arrParam);
+		reParseName.CopyParam(REParam);
 
-		const CSO::cstring strName = arrParam[CSO::_T2("_filename")];
+		const CSO::cstring strName = reParseName.m_mapStrParam[CSO::_T2("_filename")];
 
 		//	Easier to just manually check than invent complicated RE
 		if (strName.find('.') != tstring::npos) {
 			reParseName.Compile(CSO::_T2("^(?<_name>.*)\\.(?<_ext>.*)$"));
 			reParseName.Match(strName);
-			reParseName.BackupParam(arrParam);
+			reParseName.CopyParam(REParam);
 
 			reParseName.Compile(CSO::_T2("^(?<_sname>.*?)\\.(?<_fext>.*)$"));
 			reParseName.Match(strName);
-			reParseName.BackupParam(arrParam);
+			reParseName.CopyParam(REParam);
 		} else {
-			arrParam[CSO::_T2("_name")] = strName;
-			arrParam[CSO::_T2("_sname")] = strName;
+			REParam.SetParam(CSO::_T2("_name"), strName);
+			REParam.SetParam(CSO::_T2("_sname"), strName);
 		}
 	}
 }
 
-template void FillDefaultNamedParameters<TCHAR>(const TCHAR *szFileName, CREParameters<TCHAR>::named_parameters &arrParam);
+void MatchDone()
+{
+	REParam.BackupParam();
 #ifdef UNICODE
-template void FillDefaultNamedParameters<char>(const char *szFileName, CREParameters<char>::named_parameters &arrParam);
+	REParam.CopyParam(REParamA);
 #endif
+}
+
+void OEMMatchDone()
+{
+	REParamA.BackupParam();
+#ifdef UNICODE
+	REParamA.CopyParam(REParam);
+#endif
+}
 
 void HighlightREError(CFarDialog *pDlg) {
 	if (REErrorOffset < 0) return;

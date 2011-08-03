@@ -41,7 +41,7 @@ public:
 	CREParameters();
 
 	void Clear();
-	void Clear(const named_parameters &mapParam);
+	bool Empty();
 
 	void AddENumbers(int nL, int nN, int nS, int nR);
 	void AddFNumbers(int nF, int nS, int nR);
@@ -55,12 +55,12 @@ public:
 	int  Count() { return (int)m_arrMatch.size(); }
 
 	cstring GetParam(int nNumber);
-	int     FindParam(const cstring &strName, bool bCheckNumber = false);
 	cstring GetParam(const cstring &strName, bool bCheckNumber = false);
-	void    SetParam(const cstring &strName, const string &strValue);
+	int     FindParam(const cstring &strName, bool bCheckNumber = false);
+	void    SetParam(const cstring &strName, const cstring &strValue);
 
 	void    BackupParam();
-	void    BackupParam(named_parameters &mapParam);
+	template<class CHAR2> void CopyParam(CREParameters<CHAR2> &Param2);
 
 	void FillStartLength(int *MatchStart, int *MatchLength);
 	cstring Original();

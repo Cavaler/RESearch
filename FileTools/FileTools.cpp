@@ -135,14 +135,16 @@ BOOL ConfirmRename(const TCHAR *From,const TCHAR *To) {
 	return FALSE;
 }
 
-BOOL FindRename(const TCHAR *FileName, int &MatchStart, int &MatchLength) {
-	REParam.Clear(FileMaskNamedParameters);
+BOOL FindRename(const TCHAR *FileName, int &MatchStart, int &MatchLength)
+{
+	REParam.Clear();
 	REParam.AddSource(FileName, _tcslen(FileName));
 
 	if (FSearchAs==SA_REGEXP) {
 		REParam.AddRE(FPattern);
 
 		if (do_pcre_exec(FPattern,FPatternExtra,FileName,_tcslen(FileName),MatchStart,0,REParam.Match(),REParam.Count())>=0) {
+			MatchDone();
 			REParam.FillStartLength(&MatchStart, &MatchLength);
 			return TRUE;
 		}
@@ -451,10 +453,10 @@ OperationResult RenameFilesExecutor() {
 	} else return OR_FAILED;
 }
 
-BOOL PerformRenameSelectedFiles(CPanelInfo &PInfo, panelitem_vector &PanelItems) {
+BOOL PerformRenameSelectedFiles(CPanelInfo &PInfo, panelitem_vector &PanelItems)
+{
 	FileNumber=-1;
 	g_bInterrupted=FALSE;
-	FileMaskNamedParameters.clear();
 
 	m_arrPendingRename.clear();
 	m_arrLastRename.clear();

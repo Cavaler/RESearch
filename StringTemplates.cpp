@@ -175,16 +175,15 @@ CREParameters<CHAR>::CREParameters()
 
 template<class CHAR>
 void CREParameters<CHAR>::Clear() {
+	if (m_re) BackupParam();
 	m_arrMatch.clear();
-	m_mapStrParam.clear();
 	m_re = NULL;
 	m_szString = NULL;
 }
 
 template<class CHAR>
-void CREParameters<CHAR>::Clear(const named_parameters &mapParam) {
-	Clear();
-	m_mapStrParam = mapParam;
+bool CREParameters<CHAR>::Empty() {
+	return ((m_re == NULL) || (m_szString == NULL));
 }
 
 template<class CHAR>
@@ -225,14 +224,24 @@ void CREParameters<CHAR>::CopySource(const cstring &strString) {
 }
 
 template<class CHAR>
-void CREParameters<CHAR>::AddRE(pcre *re) {
+void CREParameters<CHAR>::AddRE(pcre *re)
+{
 	m_re = re;
 	m_arrMatch.resize((pcre_info(re, NULL, NULL)+1)*3);
+
+	vector<cstring> arrNames;
+	pcre_get_stringlist(m_re, arrNames);
+
+	for (size_t nParam = 0; nParam < arrNames.size(); nParam++) {
+		named_parameters::iterator it = m_mapStrParam.find(arrNames[nParam]);
+		if (it != m_mapStrParam.end()) m_mapStrParam.erase(it);
+	}
 }
 
 template<class CHAR>
-typename CREParameters<CHAR>::cstring CREParameters<CHAR>::GetParam(int nNumber) {
-	if ((nNumber < 0) || (nNumber >= Count()/3)) return cstring();
+typename CREParameters<CHAR>::cstring CREParameters<CHAR>::GetParam(int nNumber)
+{
+	if ((nNumber < 0) || (nNumber >= Count()/3) || Empty()) return cstring();
 
 	return cstring(m_szString+m_arrMatch[nNumber*2], m_arrMatch[nNumber*2+1]-m_arrMatch[nNumber*2]);
 }
@@ -248,7 +257,8 @@ int CREParameters<CHAR>::FindParam(const cstring &strName, bool bCheckNumber) {
 
 template<class CHAR>
 typename CREParameters<CHAR>::cstring
-CREParameters<CHAR>::GetParam(const cstring &strName, bool bCheckNumber) {
+CREParameters<CHAR>::GetParam(const cstring &strName, bool bCheckNumber)
+{
 	int nNumber;
 	if (bCheckNumber && CSO::GetNumber(strName, nNumber))
 		return GetParam(nNumber);
@@ -256,7 +266,7 @@ CREParameters<CHAR>::GetParam(const cstring &strName, bool bCheckNumber) {
 	named_parameters::iterator it = m_mapStrParam.find(strName);
 	if (it != m_mapStrParam.end()) return it->second;
 
-	if (m_re == NULL) return cstring();
+	if (Empty()) return cstring();
 
 	nNumber = pcre_get_stringnumber(m_re, strName.c_str());
 
@@ -266,7 +276,7 @@ CREParameters<CHAR>::GetParam(const cstring &strName, bool bCheckNumber) {
 }
 
 template<class CHAR>
-void CREParameters<CHAR>::SetParam(const cstring &strName, const string &strValue)
+void CREParameters<CHAR>::SetParam(const cstring &strName, const cstring &strValue)
 {
 	m_mapStrParam[strName] = strValue;
 }
@@ -274,17 +284,23 @@ void CREParameters<CHAR>::SetParam(const cstring &strName, const string &strValu
 template<class CHAR>
 void CREParameters<CHAR>::BackupParam()
 {
-	BackupParam(m_mapStrParam);
-}
+	if (Empty()) return;
 
-template<class CHAR>
-void CREParameters<CHAR>::BackupParam(named_parameters &mapParam)
-{
 	vector<cstring> arrNames;
 	pcre_get_stringlist(m_re, arrNames);
 
 	for (size_t nParam = 0; nParam < arrNames.size(); nParam++) {
-		mapParam[arrNames[nParam]] = GetParam(arrNames[nParam]);
+		int nNumber = pcre_get_stringnumber(m_re, arrNames[nParam].c_str());
+		m_mapStrParam[arrNames[nParam]] = GetParam(nNumber);
+	}
+}
+
+template<class CHAR> template<class CHAR2>
+void CREParameters<CHAR>::CopyParam(CREParameters<CHAR2> &Param2)
+{
+	for (named_parameters::iterator it = m_mapStrParam.begin(); it != m_mapStrParam.end(); it++) {
+		Param2.m_mapStrParam[CREParameters<CHAR2>::CSO::Convert(it->first, CP_OEMCP)] =
+			CREParameters<CHAR2>::CSO::Convert(it->second, CP_OEMCP);
 	}
 }
 
@@ -345,8 +361,12 @@ bool CRegExpParam<CHAR>::Match(cstring strAnalyze, int iExecFlags)
 }
 
 template class CREParameters<char>;
+template void CREParameters<char>::CopyParam(CREParameters<char> &);
 template class CRegExpParam<char>;
 #ifdef UNICODE
 template class CREParameters<wchar_t>;
+template void CREParameters<char   >::CopyParam(CREParameters<wchar_t> &);
+template void CREParameters<wchar_t>::CopyParam(CREParameters<char   > &);
+template void CREParameters<wchar_t>::CopyParam(CREParameters<wchar_t> &);
 template class CRegExpParam<wchar_t>;
 #endif

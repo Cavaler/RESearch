@@ -1,8 +1,6 @@
 #include "StdAfx.h"
 #include "..\RESearch.h"
 
-CREParameters<char> REParamA;
-
 tstring g_strNewFileName;
 tstring g_strBackupFileName;
 
@@ -125,7 +123,7 @@ bool ProcessPlainTextBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindD
 	char *Table=(FCaseSensitive) ? NULL : UpCaseTable;
 #endif
 
-	REParamA.Clear(FileMaskNamedParametersA);
+	REParamA.Clear();
 
 	while (!g_bInterrupted && (Current+FText.size()<=Buffer+BufLen)) {
 #ifdef UNICODE
@@ -156,7 +154,7 @@ bool ProcessRegExpBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindData
 	HANDLE hFile=INVALID_HANDLE_VALUE;
 	bool bError = false;
 
-	REParamA.Clear(FileMaskNamedParametersA);
+	REParamA.Clear();
 	REParamA.AddRE(FPatternA);
 
 	do {
@@ -167,6 +165,7 @@ bool ProcessRegExpBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindData
 			   (do_pcre_execA(FPatternA,FPatternExtraA,Buffer,BufEnd-Buffer,Start,0,REParamA.Match(),REParamA.Count())>=0))
 		{
 			REParamA.AddSource(Buffer,BufEnd-Buffer);
+			OEMMatchDone();
 			REParamA.AddFNumbers(FileNumber, FindNumber, ReplaceNumber);
 #ifdef UNICODE
 			string Replace = CSOA::CreateReplaceString(FOEMReplace.c_str(), "\n", -1, REParamA);
@@ -212,6 +211,7 @@ bool ReplaceSeveralLineBuffer(HANDLE &hFile,const char *&Buffer,const char *BufE
 		if (NewBuffer>=LineEnd) break;
 
 		REParamA.AddSource(Buffer,BufEnd-Buffer);
+		OEMMatchDone();
 		REParamA.AddFNumbers(FileNumber, FindNumber, ReplaceNumber);
 #ifdef UNICODE
 		string Replace = CSOA::CreateReplaceString(FOEMReplace.c_str(), "\n", -1, REParamA);
@@ -243,7 +243,7 @@ bool ProcessSeveralLineBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *Fin
 	HANDLE hFile=INVALID_HANDLE_VALUE;
 	int LinesIn=0;
 
-	REParamA.Clear(FileMaskNamedParametersA);
+	REParamA.Clear();
 	REParamA.AddRE(FPatternA);
 
 	do {

@@ -75,6 +75,7 @@ EXTERN wstring EditorFileName;
 #endif
 EXTERN EditorInfo StartEdInfo;
 void RefreshEditorInfo();
+void EditorFillNamedParameters();
 
 BOOL EditorSearch();
 BOOL EditorSearchAgain();

@@ -100,6 +100,10 @@ BOOL FindPlainText(const char *Buffer,int Size) {
 BOOL FindPattern(const char *Buffer, int Size, eLikeUnicode nUni, bool bNeedColumn) {
 	if (Size == 0) return FALSE;
 
+//	NOTE
+//	We don't do MatchDone() here, since it'll require potentially heavy SetSource()
+//	And not really needed - we'll get named parameters only from last file
+
 	if (nUni != UNI_NONE) {
 		vector<TCHAR> arrData;
 		if (FromUnicodeDetect(Buffer, Size, arrData, nUni)) {
@@ -109,12 +113,13 @@ BOOL FindPattern(const char *Buffer, int Size, eLikeUnicode nUni, bool bNeedColu
 	}
 
 #ifdef UNICODE
-	int nResult = do_pcre_execA(FPatternA, FPatternExtraA, Buffer, Size, 0, 0, &REParam.m_arrMatch[0], REParam.m_arrMatch.size());
+	int nResult = do_pcre_execA(FPatternA, FPatternExtraA, Buffer, Size, 0, 0, REParamA.Match(), REParamA.Count());
 #else
-	int nResult = do_pcre_exec(FPattern, FPatternExtra, Buffer, Size, 0, 0, &REParam.m_arrMatch[0], REParam.m_arrMatch.size());
+	int nResult = do_pcre_exec(FPattern, FPatternExtra, Buffer, Size, 0, 0, REParamA.Match(), REParamA.Count());
 #endif
 	if (nResult >= 0) {
-		if (bNeedColumn) g_nFoundColumn = REParam.m_arrMatch[0]+1;
+//		OEMMatchDone();
+		if (bNeedColumn) g_nFoundColumn = REParamA.m_arrMatch[0]+1;
 		return TRUE;
 	}
 

@@ -70,12 +70,13 @@ TCHAR ConvertCase(TCHAR C);
 
 typedef CREParameters<TCHAR> TREParameters;
 EXTERN TREParameters REParam;
-EXTERN TREParameters::named_parameters FileMaskNamedParameters;
 #ifdef UNICODE
-EXTERN CREParameters<char>::named_parameters FileMaskNamedParametersA;
+EXTERN CREParameters<char> REParamA;
 #else
-#define FileMaskNamedParametersA FileMaskNamedParameters
+#define REParamA REParam
 #endif
+void MatchDone();
+void OEMMatchDone();
 
 EXTERN int FileNumber;
 EXTERN int FindNumber;
@@ -89,8 +90,7 @@ BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const tstring &Text
 tstring EvaluateReplaceString(CREParameters<TCHAR> &Param, const TCHAR *Replace, const TCHAR *EOL, int Engine);
 void HighlightREError(CFarDialog *pDlg);
 
-template<class CHAR>
-void FillDefaultNamedParameters(const CHAR *szFileName, typename CREParameters<CHAR>::named_parameters &arrParam);
+void FillDefaultNamedParameters(const TCHAR *szFileName);
 
 #ifdef UNICODE
 BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,int CaseSensitive,const unsigned char *pTables=NULL);

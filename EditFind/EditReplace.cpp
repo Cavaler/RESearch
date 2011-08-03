@@ -375,19 +375,6 @@ BOOL ReplaceInTextByLine(int FirstLine, int StartPos, int LastLine, int EndPos, 
 	return FALSE;
 }
 
-void EditorFillNamedParameters()
-{
-#ifdef UNICODE
-	int nLength = StartupInfo.EditorControl(ECTL_GETFILENAME, NULL);
-
-	vector<wchar_t> arrName(nLength+1);
-	StartupInfo.EditorControl(ECTL_GETFILENAME, &arrName[0]);
-	FillDefaultNamedParameters(&arrName[0], FileMaskNamedParameters);
-#else
-	FillDefaultNamedParameters(EdInfo.FileName, FileMaskNamedParameters);
-#endif
-}
-
 BOOL _EditorReplaceAgain() {
 	NoAsking = FALSE;
 	return EditorReplaceAgain();
@@ -397,7 +384,6 @@ BOOL EditorReplaceAgain() {
 	RefreshEditorInfo();
 	PatchEditorInfo(EdInfo);
 	EctlForceSetPosition(NULL);
-	EditorFillNamedParameters();
 
 	EditorStartUndo();
 
@@ -491,8 +477,10 @@ LONG_PTR WINAPI EditorReplaceDialogProc(CFarDialog *pDlg, int nMsg, int nParam1,
 }
 
 
-BOOL EditorReplace() {
-	RefreshEditorInfo();
+BOOL EditorReplace()
+{
+	EditorFillNamedParameters();
+
 	EInSelection = EAutoFindInSelection && (EdInfo.BlockType != BTYPE_NONE);
 
 	CFarDialog Dialog(76, 17, _T("ReplaceDlg"));

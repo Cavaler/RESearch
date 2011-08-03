@@ -50,14 +50,14 @@ void UpdateStrings(HANDLE hDlg, sREData *pData) {
 	pcre *re;
 	if (!PreparePattern(&re, NULL, strRE, ECaseSensitive)) return;
 
-	REParam.Clear();
-	REParam.AddSource(strSource.c_str(), strSource.length());
-	REParam.AddRE(re);
+	TREParameters ThisREParam;
+	ThisREParam.AddSource(strSource.c_str(), strSource.length());
+	ThisREParam.AddRE(re);
 
-	if (pcre_exec(re, NULL, strSource.c_str(), strSource.length(), 0, 0, REParam.Match(), REParam.Count()) < 0) return;
+	if (pcre_exec(re, NULL, strSource.c_str(), strSource.length(), 0, 0, ThisREParam.Match(), ThisREParam.Count()) < 0) return;
 
 	tstring strReplace = GetDlgItemText(hDlg, 6);
-	tstring strResult = CSO::CreateReplaceString(strReplace.c_str(), _T("\n"), -1, REParam);
+	tstring strResult = CSO::CreateReplaceString(strReplace.c_str(), _T("\n"), -1, ThisREParam);
 	StartupInfo.SendDlgMessage(hDlg, DM_SETTEXTPTR, 8, (LONG_PTR)strResult.data());
 }
 
