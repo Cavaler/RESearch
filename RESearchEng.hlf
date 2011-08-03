@@ -93,6 +93,8 @@ of opening bracket in pattern, counted from 1.
    #(?<name> )# same as above, but with the possibility to reference by name, via #${name}# in replace or:
    #\k<name># or #\g{name}# in search.
 
+   #${name}#    (nonstandard!) reference named parameter from previous search.
+
     To make any special character match itself, precede it with '\'.
 
     Patterns can be recursed to any depth. For example, pattern
