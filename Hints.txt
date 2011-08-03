@@ -29,4 +29,4 @@ Some non-obvious aspects of RESearch usage are explained here.
   2. In ANSI version, OEM codepage is used
   3. In Unicode version, codepage selected as default is used (OEM or ANSI)
 
-- In Replace from panels, only OEM/default CP is used.
+- In Replace from panels, only default codepage is used.

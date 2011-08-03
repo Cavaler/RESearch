@@ -7,9 +7,18 @@ Regular Expression Search and Replace
 
 Planned:
 	- Search in share-opened files
-    * File Replace encoding in dialog itself (Unicode)
-    ? Named parameters in Search string
-    * Storing values between replacements
+	* File Replace encoding in dialog itself (Unicode)
+	? Searching in streams
+
+Version 7.43 (03.08.2011)
+	! .pdb files included in separate archive (RESearchPDB.rar)
+	- One reentrancy problem solved
+	* pcrepattern.html updated
+	* Search for 'CR only' end of lines made optional - marginal speed-up
+	+ Named parameters in RE Search string: ${name}
+	+ store('name', 'value') function added to script interface
+	+ All named parameters are always preserved between searches
+	  Except named parameters from file search
 
 Version 7.42 (20.07.2011)
 	+ Some speed improvements for regexp search from panels
@@ -30,10 +39,10 @@ Version 7.38 (28.02.2011)
 
 Version 7.37 (16.02.2011)
 	- Positioning in Viewer fixed with Unicode
-    - Scripting in x64 and in Unicode fixed
-    - Fixed 'Show last results' available when no last results present
-    - Fixed 'Show last results' making 'Search/replace again' perform 'List All'
-    * Total line counter added to 'List All'
+	- Scripting in x64 and in Unicode fixed
+	- Fixed 'Show last results' available when no last results present
+	- Fixed 'Show last results' making 'Search/replace again' perform 'List All'
+	* Total line counter added to 'List All'
 
 Version 7.36 (03.01.2011)
 	- RegExp Builder correctly escapes source string
@@ -46,9 +55,9 @@ Version 7.35 (25.12.2010) Happy New Year!
 	* Last selected item stays selected in Presets/Batches menus
 	* Selecting entry from 'Show All' selects found text
 	* Disabling 'quote' buttons when appropriate
-    * Scan progress dialog only grows in width
-    * Highlighting regexp error with cursor
-    * Disabling [X] Remove empty / not matched in Several-lines mode
+	* Scan progress dialog only grows in width
+	* Highlighting regexp error with cursor
+	* Disabling [X] Remove empty / not matched in Several-lines mode
 
 Version 7.30 (17.12.2010)
 	* Batch editing reworked
