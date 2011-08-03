@@ -54,7 +54,7 @@ and copyright by the University of Cambridge, England.
 $ #Regular Expression Basics#
     Regular expression is a specially formatted string, designed to match not one
 string, but a set of them. For full information, see included pcrepattern.html file or
-~PCRE 7.4 library~@PCRE@ documentation.
+~PCRE library~@PCRE@ documentation.
     Most commonly used patterns are:
 
     #.# (dot) matches any single character, #except# newline
@@ -94,6 +94,7 @@ of opening bracket in pattern, counted from 1.
    #\k<name># or #\g{name}# in search.
 
    #${name}#    (nonstandard!) reference named parameter from previous search.
+Can use all ~Predefined named parameters~@PredefinedNamedParam@ here too.
 
     To make any special character match itself, precede it with '\'.
 
@@ -160,6 +161,7 @@ $ #Predefined named parameters#
 
     ${_fullname} - full name of current file
     ${_path}     - path to current file, not including trailing '\'
+    ${_filename} - current file name and extension
     ${_fpath}    - path to current file, including trailing '\'
     ${_name}     - current file name (before #last# '.')
     ${_ext}      - current file extension (after last '.')
