@@ -120,6 +120,11 @@ public:
 		return S_OK;
 	}
 
+	STDMETHOD(store)(BSTR strParam, BSTR strValue) {
+		m_pParam->SetParam((LPCTSTR)_bstr_t(strParam), (LPCTSTR)_bstr_t(strValue));
+		return S_OK;
+	}
+
 private:
 	CREParameters<TCHAR> *m_pParam;
 	const TCHAR *m_szEOL;

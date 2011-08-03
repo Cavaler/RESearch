@@ -57,6 +57,7 @@ public:
 	cstring GetParam(int nNumber);
 	int     FindParam(const cstring &strName, bool bCheckNumber = false);
 	cstring GetParam(const cstring &strName, bool bCheckNumber = false);
+	void    SetParam(const cstring &strName, const string &strValue);
 
 	void    BackupParam();
 	void    BackupParam(named_parameters &mapParam);

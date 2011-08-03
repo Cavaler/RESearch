@@ -266,6 +266,12 @@ CREParameters<CHAR>::GetParam(const cstring &strName, bool bCheckNumber) {
 }
 
 template<class CHAR>
+void CREParameters<CHAR>::SetParam(const cstring &strName, const string &strValue)
+{
+	m_mapStrParam[strName] = strValue;
+}
+
+template<class CHAR>
 void CREParameters<CHAR>::BackupParam()
 {
 	BackupParam(m_mapStrParam);
