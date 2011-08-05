@@ -9,6 +9,12 @@ Planned:
 	- Search in share-opened files
 	* File Replace encoding in dialog itself (Unicode)
 	? Searching in streams
+	
+Version 7.44 (05.08.2011)
+	* 'Clean up named variables' command
+	- Predefined variables fixed
+	* init('name', 'value') function - see help
+	- Selection error in Viewer Search fixed
 
 Version 7.43 (03.08.2011)
 	! .pdb files included in separate archive (RESearchPDB.rar)
