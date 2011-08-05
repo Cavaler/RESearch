@@ -2,7 +2,7 @@
 #include "..\RESearch.h"
 
 struct ViewerSearchInfo {
-	__int64  CurPos;	// Line offset in BYTES
+	__int64  CurPos;	// Line offset in BYTES from file start
 	int      LeftPos;	// Column in CHARS
 };
 
@@ -120,8 +120,8 @@ BOOL ViewerSearchAgain() {
 	}
 	szData += nOffset;
 
-	int nMatchCount = ERegExp ? pcre_info(EPattern, NULL, NULL) + 1 : 0;
-	int *pMatch = ERegExp ? new int[nMatchCount*3] : NULL;
+	REParam.Clear();
+	if (ERegExp) REParam.AddRE(EPattern);
 
 	if (ESeveralLine) {
 	} else {
@@ -137,10 +137,10 @@ BOOL ViewerSearchAgain() {
 			if (!ECaseSensitive) strLine = UpCaseString(strLine);
 
 			if (ERegExp) {
-				if (pcre_exec(EPattern, EPatternExtra, strLine.data(), strLine.length()-nLineOffset, nLineOffset, 0, pMatch, nMatchCount*3)>=0) {
-					SetViewerSelection(nOffset + pMatch[0]*nCharSize, (pMatch[1] - pMatch[0])*nCharSize, nCharSize);
+				if (pcre_exec(EPattern, EPatternExtra, strLine.data(), strLine.length(), nLineOffset, 0, REParam.Match(), REParam.Count())>=0) {
+					SetViewerSelection(nOffset + REParam.m_arrMatch[0]*nCharSize, (REParam.m_arrMatch[1] - REParam.m_arrMatch[0])*nCharSize, nCharSize);
 					Info.CurPos  = nOffset;
-					Info.LeftPos = pMatch[0] + pMatch[1];
+					Info.LeftPos = REParam.m_arrMatch[1];
 					break;
 				}
 			} else {
@@ -160,7 +160,6 @@ BOOL ViewerSearchAgain() {
 		} while (nOffset < (long)mapInput.Size());
 	}
 
-	if (ERegExp) delete[] pMatch;
 	if (!g_bInterrupted) {
 		const TCHAR *Lines[]={GetMsg(MRESearch),GetMsg(MCannotFind),EText.c_str(),GetMsg(MOk)};
 		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("VCannotFind"),Lines,4,1);
