@@ -32,6 +32,7 @@ interface IReplaceParameters : IDispatch
 	HRESULT n([out,retval] long *pValue);
 	HRESULT r([out,retval] long *pValue);
 
+	HRESULT init ([in] BSTR strParam, [in] BSTR strValue);
 	HRESULT store([in] BSTR strParam, [in] BSTR strValue);
 };
 

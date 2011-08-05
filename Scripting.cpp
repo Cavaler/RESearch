@@ -76,7 +76,7 @@ public:
 		COM_INTERFACE_ENTRY(IDispatch)
 	END_COM_MAP()
 
-	void Init(CREParameters<TCHAR> *pParam, const TCHAR *szEOL)
+	void Init(TREParameters *pParam, const TCHAR *szEOL)
 	{
 		m_pParam = pParam;
 		m_szEOL  = szEOL;
@@ -120,13 +120,18 @@ public:
 		return S_OK;
 	}
 
+	STDMETHOD(init )(BSTR strParam, BSTR strValue) {
+		m_pParam->InitParam((LPCTSTR)_bstr_t(strParam), (LPCTSTR)_bstr_t(strValue));
+		return S_OK;
+	}
+
 	STDMETHOD(store)(BSTR strParam, BSTR strValue) {
 		m_pParam->SetParam((LPCTSTR)_bstr_t(strParam), (LPCTSTR)_bstr_t(strValue));
 		return S_OK;
 	}
 
 private:
-	CREParameters<TCHAR> *m_pParam;
+	TREParameters *m_pParam;
 	const TCHAR *m_szEOL;
 	tstring m_strResult;
 };
@@ -202,7 +207,7 @@ private:
 	CReplaceParameters *m_pParams;
 };
 
-tstring EvaluateReplaceString(CREParameters<TCHAR> &Param, const TCHAR *Replace, const TCHAR *EOL, int Engine) {
+tstring EvaluateReplaceString(TREParameters &Param, const TCHAR *Replace, const TCHAR *EOL, int Engine) {
 	EXCEPINFO ExcepInfo;
 	HRESULT hResult;
 

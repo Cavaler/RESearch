@@ -566,6 +566,8 @@ BOOL EditorReplace()
 	ReplaceStartLine = -1;
 	FindNumber = ReplaceNumber = 0;
 	g_bInterrupted = FALSE;
+	REParam.m_setInitParam.clear();
+
 	if (!EText.empty()) EditorReplaceAgain();
 	return TRUE;
 }
@@ -583,6 +585,7 @@ OperationResult EditorReplaceExecutor() {
 
 	NoAsking = TRUE;
 	FindNumber = ReplaceNumber = 0;
+	REParam.m_setInitParam.clear();
 
 	EditorSeekToBeginEnd();
 

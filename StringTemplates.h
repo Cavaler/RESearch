@@ -37,6 +37,7 @@ public:
 	typedef CStringOperations<CHAR> CSO;
 	typedef typename CSO::cstring cstring;
 	typedef map<cstring, cstring> named_parameters;
+	typedef set<cstring> parameters_list;
 
 	CREParameters();
 
@@ -54,10 +55,11 @@ public:
 	int *Match() { return m_arrMatch.empty() ? NULL : &m_arrMatch[0]; }
 	int  Count() { return (int)m_arrMatch.size(); }
 
-	cstring GetParam(int nNumber);
-	cstring GetParam(const cstring &strName, bool bCheckNumber = false);
+	cstring GetParam (int nNumber);
+	cstring GetParam (const cstring &strName, bool bCheckNumber = false);
 	int     FindParam(const cstring &strName, bool bCheckNumber = false);
-	void    SetParam(const cstring &strName, const cstring &strValue);
+	void    SetParam (const cstring &strName, const cstring &strValue);
+	void    InitParam(const cstring &strName, const cstring &strValue);
 
 	void    BackupParam();
 	template<class CHAR2> void CopyParam(CREParameters<CHAR2> &Param2);
@@ -69,6 +71,7 @@ public:
 
 public:
 	named_parameters m_mapStrParam;
+	parameters_list  m_setInitParam;	// for script::init()
 
 	pcre *m_re;
 

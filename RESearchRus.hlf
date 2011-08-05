@@ -182,6 +182,8 @@ and many others are also available)
     #l/n/r()#       Returns the same as $L/$N/$R in usual replace
     #eol()#         Returns a suitable end-of-line sequence
     #result(str)#   Has to be called to return a resulting value back to RESearch
+    #store(n, v)#   Store value 'v' in named parameter 'n'
+    #init(n, v)#    Same as store(), except that it works only once after 'Replace' is invoked.
 
 @UTF8
 $ #Поддержка UTF-8#

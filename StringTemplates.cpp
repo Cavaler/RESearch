@@ -282,6 +282,16 @@ void CREParameters<CHAR>::SetParam(const cstring &strName, const cstring &strVal
 }
 
 template<class CHAR>
+void CREParameters<CHAR>::InitParam(const cstring &strName, const cstring &strValue)
+{
+	parameters_list::iterator it = m_setInitParam.find(strName);
+	if (it == m_setInitParam.end()) {
+		SetParam(strName, strValue);
+		m_setInitParam.insert(strName);
+	}
+}
+
+template<class CHAR>
 void CREParameters<CHAR>::BackupParam()
 {
 	if (Empty()) return;
