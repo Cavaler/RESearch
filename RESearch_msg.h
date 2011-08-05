@@ -41,6 +41,7 @@ enum eStringTable {
 	MMenuPreset,
 	MMenuBatch,
 	MUsedPreset,
+	MMenuClearVariables,
 
 	MRESearch,
 	MREReplace,

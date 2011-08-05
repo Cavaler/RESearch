@@ -317,6 +317,7 @@ int ShowFileMenu(int &nBreakCode) {
 	MenuItems.push_back(CFarMenuItemEx(MMenuUndoRename));
 	MenuItems.push_back(CFarMenuItemEx(true));
 	MenuItems.push_back(CFarMenuItemEx(MMenuShowLastResults));
+	MenuItems.push_back(CFarMenuItemEx(MMenuClearVariables));
 	MenuItems.push_back(CFarMenuItemEx(true));
 
 	FSPresets->FillMenuItems(MenuItems);
@@ -335,7 +336,7 @@ int ShowFileMenu(int &nBreakCode) {
 	MenuItems[nLastSelection].Flags |= MIF_SELECTED;
 
 	if (m_arrLastRename.empty()) MenuItems[11].Flags |= MIF_DISABLE;
-	if (LastTempPanel == NULL) MenuItems[14].Flags |= MIF_DISABLE;
+	if (LastTempPanel == NULL) MenuItems[13].Flags |= MIF_DISABLE;
 
 	int nBreakKeys[] = {VK_F4, 0};
 
@@ -360,6 +361,7 @@ int ShowEditorMenu(int &nBreakCode) {
 	MenuItems.push_back(CFarMenuItemEx(MMenuSearchReplaceAgainRev));
 	MenuItems.push_back(CFarMenuItemEx(true));
 	MenuItems.push_back(CFarMenuItemEx(MMenuShowLastResults));
+	MenuItems.push_back(CFarMenuItemEx(MMenuClearVariables));
 
 	MenuItems.push_back(CFarMenuItemEx(true));
 	ESPresets->FillMenuItems(MenuItems);
@@ -396,6 +398,7 @@ int ShowViewerMenu(int &nBreakCode)
 	MenuItems.push_back(CFarMenuItemEx(MMenuSearch));
 	MenuItems.push_back(CFarMenuItemEx(MMenuSearchAgain));
 //	MenuItems.push_back(CFarMenuItemEx(MMenuSearchAgainRev));
+	MenuItems.push_back(CFarMenuItemEx(MMenuClearVariables));
 
 	MenuItems.push_back(CFarMenuItemEx(true));
 	VSPresets->FillMenuItems(MenuItems);
@@ -514,6 +517,9 @@ HANDLE OpenPluginFromFileMenu(int Item, BOOL ShowDialog) {
 				Result=OR_CANCEL;
 				break;
 			}
+		case 14:
+			ClearVariables();
+			break;
 		}
 		if (Item >= 15) {
 			Item -= 15;
@@ -635,6 +641,9 @@ HANDLE OpenPluginFromEditorMenu(int nItem) {
 		case 8:
 			EditorListAllShowResults(false);
 			break;
+		case 9:
+			ClearVariables();
+			break;
 		}
 
 		if (nItem >= 10) {
@@ -682,6 +691,9 @@ HANDLE OpenPluginFromViewerMenu(int nItem)
 				break;
 			}
 	//		if (nMenu == 2) EReverse = !EReverse;
+			break;
+		case 2:
+			ClearVariables();
 			break;
 		}
 

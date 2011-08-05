@@ -181,6 +181,12 @@ void FillDefaultNamedParameters(const TCHAR *szFileName)
 	}
 }
 
+void ClearVariables()
+{
+	REParam.m_mapStrParam.clear();
+	REParamA.m_mapStrParam.clear();
+}
+
 void MatchDone()
 {
 	REParam.BackupParam();

@@ -91,6 +91,7 @@ tstring EvaluateReplaceString(CREParameters<TCHAR> &Param, const TCHAR *Replace,
 void HighlightREError(CFarDialog *pDlg);
 
 void FillDefaultNamedParameters(const TCHAR *szFileName);
+void ClearVariables();
 
 #ifdef UNICODE
 BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,int CaseSensitive,const unsigned char *pTables=NULL);

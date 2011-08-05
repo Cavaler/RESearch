@@ -298,6 +298,8 @@ void CREParameters<CHAR>::BackupParam()
 template<class CHAR> template<class CHAR2>
 void CREParameters<CHAR>::CopyParam(CREParameters<CHAR2> &Param2)
 {
+	BackupParam();
+
 	for (named_parameters::iterator it = m_mapStrParam.begin(); it != m_mapStrParam.end(); it++) {
 		Param2.m_mapStrParam[CREParameters<CHAR2>::CSO::Convert(it->first, CP_OEMCP)] =
 			CREParameters<CHAR2>::CSO::Convert(it->second, CP_OEMCP);
