@@ -772,17 +772,7 @@ int ConfigureSeveralLines() {
 
 #ifdef UNICODE
 
-vector<CFarMenuItem> g_arrCPItems;
-vector<int> g_arrCPs;
-
-void AddCP(int nCP, LPCTSTR szText) {
-	g_arrCPItems.push_back(FormatStrW(L"%5d | %s", nCP, szText));
-	g_arrCPs.push_back(nCP);
-
-	if (g_setAllCPs.find(nCP) != g_setAllCPs.end()) {
-		g_arrCPItems[g_arrCPItems.size()-1].Checked = true;
-	}
-}
+vector<int> g_arrEnumCPs;
 
 BOOL CALLBACK EnumCPProc(LPTSTR lpCodePageString) {
 	UINT codePage = _ttoi(lpCodePageString);
@@ -793,24 +783,44 @@ BOOL CALLBACK EnumCPProc(LPTSTR lpCodePageString) {
 	if (!GetCPInfoEx(codePage, 0, &cpiex)) return TRUE;
 	if (cpiex.MaxCharSize != 1) return TRUE;
 
-	AddCP(codePage, cpiex.CodePageName);
+	g_arrEnumCPs.push_back(codePage);
 
 	return TRUE;
 }
 
-int ConfigureCP() {
-	g_arrCPItems.clear();
+void AddCP(int nCP, LPCTSTR szText, vector<int> &arrCPs, vector<CFarMenuItem> &arrCPItems)
+{
+	arrCPs.push_back(nCP);
+	arrCPItems.push_back(FormatStrW(L"%5d | %s", nCP, szText));
 
-	AddCP(GetOEMCP(), L"OEM");
-	AddCP(GetACP(), L"ANSI");
-	g_arrCPItems.push_back(true);	g_arrCPs.push_back(0);
-	AddCP(CP_UTF7, L"UTF-7");
-	AddCP(CP_UTF8, L"UTF-8");
-	AddCP(CP_UNICODE, L"UTF-16 (Little endian)");
-	AddCP(CP_REVERSEBOM, L"UTF-16 (Big endian)");
-	g_arrCPItems.push_back(true);	g_arrCPs.push_back(0);
+	if (g_setAllCPs.find(nCP) != g_setAllCPs.end()) {
+		arrCPItems[arrCPItems.size()-1].Checked = true;
+	}
+}
 
+int ConfigureCP()
+{
+	vector<int> arrCPs;
+	vector<CFarMenuItem> arrCPItems;
+
+	AddCP(GetOEMCP(), L"OEM", arrCPs, arrCPItems);
+	AddCP(GetACP(), L"ANSI", arrCPs, arrCPItems);
+	arrCPItems.push_back(true);	arrCPs.push_back(0);
+	AddCP(CP_UTF7, L"UTF-7", arrCPs, arrCPItems);
+	AddCP(CP_UTF8, L"UTF-8", arrCPs, arrCPItems);
+	AddCP(CP_UNICODE, L"UTF-16 (Little endian)", arrCPs, arrCPItems);
+	AddCP(CP_REVERSEBOM, L"UTF-16 (Big endian)", arrCPs, arrCPItems);
+	arrCPItems.push_back(true);	arrCPs.push_back(0);
+
+	g_arrEnumCPs.clear();
 	EnumSystemCodePages(EnumCPProc, CP_INSTALLED);
+
+	sort(g_arrEnumCPs.begin(), g_arrEnumCPs.end());
+	for each (int nCP in g_arrEnumCPs) {
+		CPINFOEX cpiex;
+		GetCPInfoEx(nCP, 0, &cpiex);
+		AddCP(nCP, cpiex.CodePageName, arrCPs, arrCPItems);
+	}
 
 	int nBreakKeys[] = {VK_INSERT, 0};
 	int nBreakCode;
@@ -819,10 +829,10 @@ int ConfigureCP() {
 
 	int nItem = 0;
 	do {
-		g_arrCPItems[nItem].Selected = true;
+		arrCPItems[nItem].Selected = true;
 		int nResult = StartupInfo.Menu(StartupInfo.ModuleNumber, -1, -1, 0, FMENU_WRAPMODE, GetMsg(MAllCPMenu), L"Ins, Enter/Esc",
-			L"Help", nBreakKeys, &nBreakCode, &g_arrCPItems[0], g_arrCPItems.size());
-		g_arrCPItems[nItem].Selected = false;
+			L"Help", nBreakKeys, &nBreakCode, &arrCPItems[0], arrCPItems.size());
+		arrCPItems[nItem].Selected = false;
 		nItem = nResult;
 
 		if (nBreakCode == -1) {
@@ -832,13 +842,13 @@ int ConfigureCP() {
 			return TRUE;
 		}
 
-		if (g_arrCPs[nItem] != 0) {
-			if (g_arrCPItems[nItem].Checked) {
-				g_arrCPItems[nItem].Checked = false;
-				setCPs.erase(g_arrCPs[nItem]);
+		if (arrCPs[nItem] != 0) {
+			if (arrCPItems[nItem].Checked) {
+				arrCPItems[nItem].Checked = false;
+				setCPs.erase(arrCPs[nItem]);
 			} else {
-				g_arrCPItems[nItem].Checked = true;
-				setCPs.insert(g_arrCPs[nItem]);
+				arrCPItems[nItem].Checked = true;
+				setCPs.insert(arrCPs[nItem]);
 			}
 		}
 	} while (true);
