@@ -521,8 +521,8 @@ HANDLE OpenPluginFromFileMenu(int Item, BOOL ShowDialog) {
 			ClearVariables();
 			break;
 		}
-		if (Item >= 15) {
-			Item -= 15;
+		if (Item >= 16) {
+			Item -= 16;
 			Result = OpenPluginFromFilePreset(Item, nBreakCode);
 		}
 
@@ -646,8 +646,8 @@ HANDLE OpenPluginFromEditorMenu(int nItem) {
 			break;
 		}
 
-		if (nItem >= 10) {
-			nItem -= 10;
+		if (nItem >= 11) {
+			nItem -= 11;
 			OpenPluginFromEditorPreset(nItem, nBreakCode);
 		}
 	} while (nBreakCode >= 0);
@@ -697,8 +697,8 @@ HANDLE OpenPluginFromViewerMenu(int nItem)
 			break;
 		}
 
-		if (nItem >= 3) {
-			nItem -= 3;
+		if (nItem >= 4) {
+			nItem -= 4;
 			OpenPluginFromViewerPreset(nItem, nBreakCode);
 		}
 	} while (nBreakCode >= 0);
