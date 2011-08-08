@@ -9,7 +9,14 @@ Planned:
 	- Search in share-opened files
 	* File Replace encoding in dialog itself (Unicode)
 	? Searching in streams
-	
+
+Version 7.44.1 (08.08.2011)
+	- Fixed crash in File Search in Unicode
+	- Fixed crash after File Search
+	- Fixed named variables with Search Again in different file
+	- Fixed Panel configuration dialog in Unicode
+	- Fixed presets/batches shift in main menu
+
 Version 7.44 (05.08.2011)
 	* 'Clean up named variables' command
 	- Predefined variables fixed
