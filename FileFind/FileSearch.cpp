@@ -331,6 +331,10 @@ void SearchFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 
 	REParam.Clear();
 	if (FPattern) REParam.AddRE(FPattern);
+#ifdef UNICODE
+	REParamA.Clear();
+	if (FPattern) REParamA.AddRE(FPattern);
+#endif
 
 	if (FText.empty()) IsFound=TRUE; else 
 	if (FindData->nFileSizeLow==0) IsFound=FALSE; else 
