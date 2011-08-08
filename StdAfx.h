@@ -32,6 +32,7 @@ public:
 #include <map>
 #include <set>
 #include <deque>
+#include <algorithm>
 using namespace std;
 
 #include <Pavel.h>
