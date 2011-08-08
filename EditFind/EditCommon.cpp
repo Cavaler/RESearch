@@ -466,7 +466,6 @@ void SynchronizeWithFile(bool bReplace) {
 		if (!EText.empty() && ((EText[0] == '-') || (EText[0] == '+'))) EText.erase(0,1);
 	}
 
-	EPreparePattern(EText);
 	if (bReplace) {
 		ERReplace = FRReplace;
 		LastAction = 1;

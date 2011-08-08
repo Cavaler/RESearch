@@ -51,10 +51,12 @@ void PatchEditorInfo(EditorInfo &EdInfo) {
 	}
 }
 
-BOOL EditorSearchAgain() {
+BOOL EditorSearchAgain()
+{
 	RefreshEditorInfo();
 	PatchEditorInfo(EdInfo);
 	EctlForceSetPosition(NULL);
+	if (!EPreparePattern(SearchText)) return FALSE;
 
 	StartEdInfo = EdInfo;
 
