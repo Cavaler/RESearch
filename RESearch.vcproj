@@ -1700,6 +1700,50 @@
 					/>
 				</FileConfiguration>
 			</File>
+			<Filter
+				Name="FileOperations"
+				>
+				<File
+					RelativePath=".\FileFind\Backend.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\FileFind\Backend.h"
+					>
+				</File>
+				<File
+					RelativePath=".\FileFind\Encoders.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\FileFind\Encoders.h"
+					>
+				</File>
+				<File
+					RelativePath=".\FileFind\FileOperations.h"
+					>
+				</File>
+				<File
+					RelativePath=".\FileFind\Frontends.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\FileFind\Frontends.h"
+					>
+				</File>
+				<File
+					RelativePath=".\FileFind\IFileOperations.h"
+					>
+				</File>
+				<File
+					RelativePath=".\FileFind\Processors.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\FileFind\Processors.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="FileTools Sources"

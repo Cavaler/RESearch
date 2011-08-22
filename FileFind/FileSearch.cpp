@@ -1,6 +1,8 @@
 #include "StdAfx.h"
 #include "..\RESearch.h"
 
+#include "FileOperations.h"
+
 BOOL FindTextInBufferWithTable(const TCHAR *Buffer, int Size, tstring &TextUpcase, TCHAR *Table) {
 	return BMHSearch(Buffer, Size, TextUpcase.data(), TextUpcase.size(), Table) >= 0;
 }
@@ -339,7 +341,15 @@ void SearchFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 	if (FText.empty()) IsFound=TRUE; else 
 	if (FindData->nFileSizeLow==0) IsFound=FALSE; else 
 	switch (FSearchAs) {
+#ifdef DEBUG
+	case SA_PLAINTEXT		:{
+		CSearchPlainTextFrontend Frontend(FText);
+		IsFound = RunSearch(FindData->cFileName, &Frontend);
+		break;
+							 }
+#else
 	case SA_PLAINTEXT		:IsFound=FindMemoryMapped(FindData->cFileName,FindPlainText);break;
+#endif
 	case SA_REGEXP			:IsFound=FindMemoryMapped(FindData->cFileName,FindRegExp);break;
 	case SA_SEVERALLINE		:IsFound=FindMemoryMapped(FindData->cFileName,FindSeveralLineRegExp);break;
 	case SA_MULTILINE		:IsFound=FindMemoryMapped(FindData->cFileName,FindMultiLineRegExp);break;

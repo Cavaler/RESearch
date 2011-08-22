@@ -48,6 +48,8 @@ bool CFileBackend::Open(LPCTSTR szFileName)
 	ReadFile(m_hFile, m_szBuffer, m_nBlockSize, &dwRead, NULL);
 	m_nSize = dwRead;
 
+	m_pEncoder->Decode(m_szBuffer, m_nSize);
+
 	return true;
 }
 
@@ -56,16 +58,17 @@ void CFileBackend::Close()
 	if (m_hFile == INVALID_HANDLE_VALUE) return;
 
 	CloseHandle(m_hFile);
+	m_hFile = INVALID_HANDLE_VALUE;
 }
 
 char *CFileBackend::Buffer()
 {
-	return m_szBuffer;
+	return m_pEncoder->Buffer();
 }
 
 INT_PTR	CFileBackend::Size()
 {
-	return m_nSize;
+	return  m_pEncoder->Size();
 }
 
 bool CFileBackend::Last()
@@ -75,13 +78,20 @@ bool CFileBackend::Last()
 
 bool CFileBackend::Move(INT_PTR nLength)
 {
-	if (nLength > m_nSize) return false;
+	if (nLength < 0) nLength = m_pEncoder->Size() - nLength;
 
-	memmove(m_szBuffer, m_szBuffer + (m_nSize - nLength), nLength);
+	nLength = m_pEncoder->OriginalOffset(nLength);
+
+	if (nLength > m_nSize) return false;
+	int nRest = m_nSize - nLength;
+
+	memmove(m_szBuffer, m_szBuffer + nLength, nRest);
 
 	DWORD dwRead;
-	ReadFile(m_hFile, m_szBuffer+nLength, m_nBlockSize-nLength, &dwRead, NULL);
-	m_nSize = dwRead + nLength;
+	ReadFile(m_hFile, m_szBuffer+nRest, m_nBlockSize-nRest, &dwRead, NULL);
+	m_nSize = dwRead + nRest;
+
+	m_pEncoder->Decode(m_szBuffer, m_nSize);
 
 	return true;
 }
