@@ -50,7 +50,7 @@ INT_PTR	CSameWidthEncoder::OriginalOffset(INT_PTR nOffset)
 //////////////////////////////////////////////////////////////////////////
 // CPassthroughEncoder
 
-bool CPassthroughEncoder::Decode(char *szBuffer, INT_PTR nLength)
+bool CPassthroughEncoder::Decode(const char *szBuffer, INT_PTR &nLength)
 {
 	Clear();
 
@@ -63,7 +63,7 @@ bool CPassthroughEncoder::Decode(char *szBuffer, INT_PTR nLength)
 	return true;
 }
 
-bool CPassthroughEncoder::Encode(char *szBuffer, INT_PTR nLength)
+bool CPassthroughEncoder::Encode(const char *szBuffer, INT_PTR &nLength)
 {
 	Clear();
 
@@ -90,7 +90,7 @@ CSingleByteToOEMEncoder::CSingleByteToOEMEncoder(UINT nCP, UINT nOEM )
 {
 }
 
-bool CSingleByteToOEMEncoder::Decode(char *szBuffer, INT_PTR nLength)
+bool CSingleByteToOEMEncoder::Decode(const char *szBuffer, INT_PTR &nLength)
 {
 	Clear();
 	if (nLength == 0) return true;
@@ -112,7 +112,7 @@ bool CSingleByteToOEMEncoder::Decode(char *szBuffer, INT_PTR nLength)
 	return true;
 }
 
-bool CSingleByteToOEMEncoder::Encode(char *szBuffer, INT_PTR nLength)
+bool CSingleByteToOEMEncoder::Encode(const char *szBuffer, INT_PTR &nLength)
 {
 	Clear();
 	if (nLength == 0) return true;
@@ -147,10 +147,12 @@ CUnicodeToOEMEncoder::CUnicodeToOEMEncoder(UINT nOEM)
 {
 }
 
-bool CUnicodeToOEMEncoder::Decode(char *szBuffer, INT_PTR nLength)
+bool CUnicodeToOEMEncoder::Decode(const char *szBuffer, INT_PTR &nLength)
 {
 	Clear();
 	if (nLength == 0) return true;
+
+	nLength &= ~1;	// Even only
 
 	int nSize = WideCharToMultiByte(m_nOEM, 0, (wchar_t *)szBuffer, nLength/2, NULL, 0, NULL, NULL);
 	if (nSize == 0) return false;
@@ -163,7 +165,7 @@ bool CUnicodeToOEMEncoder::Decode(char *szBuffer, INT_PTR nLength)
 	return true;
 }
 
-bool CUnicodeToOEMEncoder::Encode(char *szBuffer, INT_PTR nLength)
+bool CUnicodeToOEMEncoder::Encode(const char *szBuffer, INT_PTR &nLength)
 {
 	Clear();
 	if (nLength == 0) return true;
@@ -181,6 +183,7 @@ bool CUnicodeToOEMEncoder::Encode(char *szBuffer, INT_PTR nLength)
 
 INT_PTR CUnicodeToOEMEncoder::DecodedOffset (INT_PTR nOffset)
 {
+	if (nOffset & 1) return -1;
 	return nOffset / 2;
 }
 

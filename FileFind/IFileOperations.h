@@ -20,7 +20,7 @@ public:		//	Replace functions
 	virtual bool	WriteBack(INT_PTR nLength) = 0;
 
 	//	Write a new data instead of old one
-	virtual bool	WriteThru(char *szBuffer, INT_PTR nLength, INT_PTR nSkipLength) = 0;
+	virtual bool	WriteThru(const char *szBuffer, INT_PTR nLength, INT_PTR nSkipLength) = 0;
 };
 
 //	Source encoding is determined by created instance
@@ -30,7 +30,7 @@ class IEncoder
 {
 public:		//	Decoding functions
 
-	virtual bool	Decode(char *szBuffer, INT_PTR nLength) = 0;
+	virtual bool	Decode(const char *szBuffer, INT_PTR &nLength) = 0;
 	virtual char *	Buffer() = 0;
 	virtual INT_PTR	Size() = 0;
 
@@ -41,7 +41,7 @@ public:		//	Encoding functions
 			//	To encode, clone a decoder and use same Buffer() / Size()
 
 	virtual IEncoder *Clone() = 0;
-	virtual bool	Encode(char *szBuffer, INT_PTR nLength) = 0;
+	virtual bool	Encode(const char *szBuffer, INT_PTR &nLength) = 0;
 
 };
 

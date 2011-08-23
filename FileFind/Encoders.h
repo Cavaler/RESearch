@@ -27,8 +27,8 @@ public:
 class CPassthroughEncoder : public CSameWidthEncoder
 {
 public:
-	virtual bool	Decode(char *szBuffer, INT_PTR nLength);
-	virtual bool	Encode(char *szBuffer, INT_PTR nLength);
+	virtual bool	Decode(const char *szBuffer, INT_PTR &nLength);
+	virtual bool	Encode(const char *szBuffer, INT_PTR &nLength);
 	virtual IEncoder *Clone();
 };
 
@@ -37,8 +37,8 @@ class CSingleByteToOEMEncoder : public CSameWidthEncoder
 public:
 	CSingleByteToOEMEncoder(UINT nCP, UINT nOEM = CP_OEMCP);
 
-	virtual bool	Decode(char *szBuffer, INT_PTR nLength);
-	virtual bool	Encode(char *szBuffer, INT_PTR nLength);
+	virtual bool	Decode(const char *szBuffer, INT_PTR &nLength);
+	virtual bool	Encode(const char *szBuffer, INT_PTR &nLength);
 	virtual IEncoder *Clone();
 
 protected:
@@ -51,8 +51,8 @@ class CUnicodeToOEMEncoder : public CEncoder
 public:
 	CUnicodeToOEMEncoder(UINT nOEM = CP_OEMCP);
 
-	virtual bool	Decode(char *szBuffer, INT_PTR nLength);
-	virtual bool	Encode(char *szBuffer, INT_PTR nLength);
+	virtual bool	Decode(const char *szBuffer, INT_PTR &nLength);
+	virtual bool	Encode(const char *szBuffer, INT_PTR &nLength);
 	virtual INT_PTR	DecodedOffset (INT_PTR nOffset);
 	virtual INT_PTR	OriginalOffset(INT_PTR nOffset);
 	virtual IEncoder *Clone();

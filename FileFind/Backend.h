@@ -19,10 +19,12 @@ public:
 	virtual bool	Last();
 	virtual bool	Move(INT_PTR nLength);
 	virtual bool	WriteBack(INT_PTR nLength);
-	virtual bool	WriteThru(char *szBuffer, INT_PTR nLength, INT_PTR nSkipLength);
+	virtual bool	WriteThru(const char *szBuffer, INT_PTR nLength, INT_PTR nSkipLength);
 
 protected:
 	HANDLE		m_hFile;
+	bool		m_bEOF;
+	bool		ReadUp(INT_PTR nRest);
 
 	INT_PTR		m_nBlockSize;
 	IEncoder   *m_pEncoder;
