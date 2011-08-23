@@ -39,12 +39,14 @@ void CFileBackend::Done()
 	m_nSize    = 0;
 }
 
-bool CFileBackend::Open(LPCTSTR szFileName)
+bool CFileBackend::Open(LPCTSTR szFileName, INT_PTR nSkip)
 {
 	m_hFile = CreateFile(szFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, NULL, NULL);
 	if (m_hFile == INVALID_HANDLE_VALUE) return false;
-	m_bEOF = false;
 
+	SetFilePointer(m_hFile, nSkip, NULL, SEEK_SET);
+
+	m_bEOF = false;
 	ReadUp(0);
 
 	return true;

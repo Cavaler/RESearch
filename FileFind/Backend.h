@@ -10,7 +10,7 @@ public:
 	bool Init(INT_PTR nBlockSize, IEncoder *pEncoder);
 	void Done();
 
-	bool Open(LPCTSTR szFileName);
+	bool Open(LPCTSTR szFileName, INT_PTR nSkip = 0);
 	void Close();
 
 public:

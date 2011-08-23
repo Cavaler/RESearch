@@ -196,3 +196,118 @@ IEncoder *CUnicodeToOEMEncoder::Clone()
 {
 	return new CUnicodeToOEMEncoder(m_nOEM);
 }
+
+//////////////////////////////////////////////////////////////////////////
+// CUTF8Traverse
+void CUTF8Traverse::SetString(const char *szBuffer, INT_PTR nLength)
+{
+	nByte = 0;
+	nChar = 0;
+
+	for (; nByte < nLength; ) {
+		utf2char[nByte] = nChar;
+		char2utf[nChar] = nByte;
+		char c = szBuffer[nByte];
+		if		((c & 0x80) == 0x00) nByte += 1;		//	0xxxxxxx
+		else if ((c & 0xE0) == 0xC0) nByte += 2;		//	110xxxxx
+		else if ((c & 0xF0) == 0xE0) nByte += 3;		//	1110xxxx
+		else if ((c & 0xF8) == 0xF0) nByte += 4;		//	11110xxx
+		else nByte += 1;
+		nChar++;
+	}
+
+	utf2char[nByte] = nChar;
+	char2utf[nChar] = nByte;
+}
+
+INT_PTR	CUTF8Traverse::ByteToChar(INT_PTR nOffset)
+{
+	return (nOffset < nByte) ? utf2char[nOffset] : -1;
+}
+
+INT_PTR	CUTF8Traverse::CharToByte(INT_PTR nOffset)
+{
+	return (nOffset < nChar) ? char2utf[nOffset] : -1;
+}
+
+//////////////////////////////////////////////////////////////////////////
+// CUTF8ToOEMEncoder
+
+CUTF8ToOEMEncoder::CUTF8ToOEMEncoder(UINT nOEM)
+: m_nOEM(nOEM)
+{
+}
+
+void CutToValidUTF8(const char *szBuffer, INT_PTR &nLength)
+{
+	while (nLength > 0) {
+		if ((szBuffer[nLength-1] & 0x80) == 0x00) break;		// 1-byte
+		if ((szBuffer[nLength-2] & 0xE0) == 0xC0) break;		// 2-byte
+		if ((szBuffer[nLength-3] & 0xF0) == 0xE0) break;		// 3-byte
+		if ((szBuffer[nLength-4] & 0xF8) == 0xF0) break;		// 4-byte
+
+		nLength--;
+	}
+}
+
+bool CUTF8ToOEMEncoder::Decode(const char *szBuffer, INT_PTR &nLength)
+{
+	Clear();
+	if (nLength == 0) return true;
+
+	CutToValidUTF8(szBuffer, nLength);
+	m_UT.SetString(szBuffer, nLength);
+
+	int nSize = MultiByteToWideChar(CP_UTF8, 0, szBuffer, nLength, NULL, 0);
+	if (nSize == 0) return false;
+
+	vector<wchar_t> arrWsz(nSize);
+	MultiByteToWideChar(CP_UTF8, 0, szBuffer, nLength, &arrWsz[0], arrWsz.size());
+
+	nSize = WideCharToMultiByte(m_nOEM, 0, &arrWsz[0], arrWsz.size(), NULL, 0, NULL, NULL);
+	if (nSize == 0) return false;
+
+	m_szBuffer = (char *)malloc(nSize);
+	if (m_szBuffer == NULL) return false;
+
+	m_nSize = WideCharToMultiByte(m_nOEM, 0, &arrWsz[0], arrWsz.size(), m_szBuffer, nSize, NULL, NULL);
+
+	return true;
+}
+
+bool CUTF8ToOEMEncoder::Encode(const char *szBuffer, INT_PTR &nLength)
+{
+	Clear();
+	if (nLength == 0) return true;
+
+	int nSize = MultiByteToWideChar(m_nOEM, 0, szBuffer, nLength, NULL, 0);
+	if (nSize == 0) return false;
+
+	vector<wchar_t> arrWsz(nSize);
+	MultiByteToWideChar(m_nOEM, 0, szBuffer, nLength, &arrWsz[0], arrWsz.size());
+
+	nSize = WideCharToMultiByte(CP_UTF8, 0, &arrWsz[0], arrWsz.size(), NULL, 0, NULL, NULL);
+	if (nSize == 0) return false;
+
+	m_szBuffer = (char *)malloc(nSize);
+	if (m_szBuffer == NULL) return false;
+
+	m_nSize = WideCharToMultiByte(CP_UTF8, 0, &arrWsz[0], arrWsz.size(), m_szBuffer, nSize, NULL, NULL);
+
+	return true;
+}
+
+INT_PTR CUTF8ToOEMEncoder::DecodedOffset (INT_PTR nOffset)
+{
+	return m_UT.ByteToChar(nOffset);
+}
+
+INT_PTR CUTF8ToOEMEncoder::OriginalOffset(INT_PTR nOffset)
+{
+	return m_UT.CharToByte(nOffset);
+}
+
+IEncoder *CUTF8ToOEMEncoder::Clone()
+{
+	return new CUTF8ToOEMEncoder(m_nOEM);
+}
