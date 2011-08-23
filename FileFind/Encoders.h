@@ -17,12 +17,46 @@ protected:
 	void		Clear();
 };
 
-class CPassthroughEncoder : public CEncoder
+class CSameWidthEncoder : public CEncoder
+{
+public:
+	virtual INT_PTR	DecodedOffset (INT_PTR nOffset);
+	virtual INT_PTR	OriginalOffset(INT_PTR nOffset);
+};
+
+class CPassthroughEncoder : public CSameWidthEncoder
 {
 public:
 	virtual bool	Decode(char *szBuffer, INT_PTR nLength);
+	virtual bool	Encode(char *szBuffer, INT_PTR nLength);
+	virtual IEncoder *Clone();
+};
+
+class CSingleByteToOEMEncoder : public CSameWidthEncoder
+{
+public:
+	CSingleByteToOEMEncoder(UINT nCP, UINT nOEM = CP_OEMCP);
+
+	virtual bool	Decode(char *szBuffer, INT_PTR nLength);
+	virtual bool	Encode(char *szBuffer, INT_PTR nLength);
+	virtual IEncoder *Clone();
+
+protected:
+	UINT m_nCP;
+	UINT m_nOEM;
+};
+
+class CUnicodeToOEMEncoder : public CEncoder
+{
+public:
+	CUnicodeToOEMEncoder(UINT nOEM = CP_OEMCP);
+
+	virtual bool	Decode(char *szBuffer, INT_PTR nLength);
+	virtual bool	Encode(char *szBuffer, INT_PTR nLength);
 	virtual INT_PTR	DecodedOffset (INT_PTR nOffset);
 	virtual INT_PTR	OriginalOffset(INT_PTR nOffset);
 	virtual IEncoder *Clone();
-	virtual bool	Encode(char *szBuffer, INT_PTR nLength);
+
+protected:
+	UINT m_nOEM;
 };
