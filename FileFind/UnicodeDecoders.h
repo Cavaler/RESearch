@@ -43,14 +43,14 @@ public:
 	CAnyToReverseUnicode(IDecoder *pDecoder);
 	~CAnyToReverseUnicode();
 
-	virtual bool	Decode(const char *szBuffer, INT_PTR &nLength);
-	virtual char *	Buffer() { return m_pDecoder->Buffer(); }
-	virtual INT_PTR	Size()   { return m_pDecoder->Size();   }
+	virtual bool		Decode(const char *szBuffer, INT_PTR &nLength);
+	virtual const char *Buffer() { return m_pDecoder->Buffer(); }
+	virtual INT_PTR		Size()   { return m_pDecoder->Size();   }
 
-	virtual INT_PTR	DecodedOffset (INT_PTR nOffset) { return m_pDecoder->DecodedOffset (nOffset); }
-	virtual INT_PTR	OriginalOffset(INT_PTR nOffset) { return m_pDecoder->OriginalOffset(nOffset); }
+	virtual INT_PTR		DecodedOffset (INT_PTR nOffset) { return m_pDecoder->DecodedOffset (nOffset); }
+	virtual INT_PTR		OriginalOffset(INT_PTR nOffset) { return m_pDecoder->OriginalOffset(nOffset); }
 
-	virtual IDecoder *GetDecoder();
+	virtual IDecoder *	GetDecoder();
 
 protected:
 	IDecoder * m_pDecoder;

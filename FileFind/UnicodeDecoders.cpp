@@ -137,7 +137,7 @@ bool CAnyToReverseUnicode::Decode(const char *szBuffer, INT_PTR &nLength)
 {
 	if (!m_pDecoder->Decode(szBuffer, nLength)) return false;
 
-	ReverseUnicode(m_pDecoder->Buffer(), m_pDecoder->Size());
+	ReverseUnicode((char *)m_pDecoder->Buffer(), m_pDecoder->Size());
 
 	return true;
 }

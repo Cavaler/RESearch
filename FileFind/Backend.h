@@ -19,7 +19,7 @@ public:
 	void Done();
 
 public:
-	virtual char *	Buffer();
+	virtual const char *Buffer();
 	virtual INT_PTR	Size();
 	virtual bool	Last();
 	virtual bool	Move(INT_PTR nLength);

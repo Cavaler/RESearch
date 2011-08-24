@@ -87,7 +87,7 @@ void CFileBackend::Close()
 	m_pDecoder = NULL;
 }
 
-char *CFileBackend::Buffer()
+const char *CFileBackend::Buffer()
 {
 	return m_pDecoder ? m_pDecoder->Buffer() : m_szBuffer;
 }

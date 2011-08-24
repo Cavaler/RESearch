@@ -8,8 +8,8 @@ public:
 	~CDecoder();
 
 public:
-	virtual char *	Buffer();
-	virtual INT_PTR	Size();
+	virtual const char *Buffer();
+	virtual INT_PTR		Size();
 
 protected:
 	char	   *m_szBuffer;

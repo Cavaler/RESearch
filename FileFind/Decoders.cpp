@@ -24,7 +24,7 @@ CDecoder::~CDecoder()
 	Clear();
 }
 
-char *CDecoder::Buffer()
+const char *CDecoder::Buffer()
 {
 	return m_szBuffer;
 }
