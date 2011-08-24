@@ -1728,11 +1728,15 @@
 					>
 				</File>
 				<File
-					RelativePath=".\FileFind\Frontends.cpp"
+					RelativePath=".\FileFind\Frontends.h"
 					>
 				</File>
 				<File
-					RelativePath=".\FileFind\Frontends.h"
+					RelativePath=".\FileFind\FrontendsOEM.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\FileFind\FrontendsUnicode.cpp"
 					>
 				</File>
 				<File

@@ -4,11 +4,11 @@
 class CSearchPlainTextFrontend : public IFrontend
 {
 public:
-	CSearchPlainTextFrontend(const tstring &strText);
-
 	virtual bool	Process(IBackend *pBackend);
+};
 
-protected:
-	tstring m_strText;
-
+class CSearchRegExpFrontend : public IFrontend
+{
+public:
+	virtual bool	Process(IBackend *pBackend);
 };

@@ -343,7 +343,7 @@ void SearchFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 	switch (FSearchAs) {
 #ifdef DEBUG
 	case SA_PLAINTEXT		:{
-		CSearchPlainTextFrontend Frontend(FText);
+		CSearchPlainTextFrontend Frontend;
 #ifndef UNICODE
 		IsFound = RunSearch(FindData->cFileName, &Frontend);
 #else
@@ -351,10 +351,19 @@ void SearchFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 #endif
 		break;
 							 }
+	case SA_REGEXP		:{
+		CSearchRegExpFrontend Frontend;
+#ifndef UNICODE
+		IsFound = RunSearch(FindData->cFileName, &Frontend);
+#else
+		IsFound = RunSearch(FindData->cFileName, &Frontend, true);
+#endif
+		break;
+							 }
 #else
 	case SA_PLAINTEXT		:IsFound=FindMemoryMapped(FindData->cFileName,FindPlainText);break;
-#endif
 	case SA_REGEXP			:IsFound=FindMemoryMapped(FindData->cFileName,FindRegExp);break;
+#endif
 	case SA_SEVERALLINE		:IsFound=FindMemoryMapped(FindData->cFileName,FindSeveralLineRegExp);break;
 	case SA_MULTILINE		:IsFound=FindMemoryMapped(FindData->cFileName,FindMultiLineRegExp);break;
 	case SA_MULTITEXT		:IsFound=FindMemoryMapped(FindData->cFileName,FindMultiPlainText);break;
