@@ -5,7 +5,7 @@
 class IBackend
 {
 public:		//	Search functions
-	virtual char *	Buffer() = 0;		//	OEM or UTF-8
+	virtual const char *Buffer() = 0;		//	OEM or UTF-8
 	virtual INT_PTR	Size() = 0;			//	Bytes
 	virtual bool	Last() = 0;
 
@@ -29,19 +29,22 @@ public:		//	Replace functions
 class IDecoder
 {
 public:
-	virtual bool	Decode(const char *szBuffer, INT_PTR &nLength) = 0;
-	virtual char *	Buffer() = 0;
-	virtual INT_PTR	Size() = 0;
+	virtual bool		Decode(const char *szBuffer, INT_PTR &nLength) = 0;
+	virtual const char *Buffer() = 0;
+	virtual INT_PTR		Size() = 0;
 
-	virtual INT_PTR	DecodedOffset (INT_PTR nOffset) = 0;
-	virtual INT_PTR	OriginalOffset(INT_PTR nOffset) = 0;
+	virtual INT_PTR		DecodedOffset (INT_PTR nOffset) = 0;
+	virtual INT_PTR		OriginalOffset(INT_PTR nOffset) = 0;
 
-	virtual IDecoder *GetDecoder() = 0;
+	virtual IDecoder *	GetDecoder() = 0;
 };
 
-class IProcessor
+class ISplitLineProcessor
 {
 public:
+	virtual bool		GetNextLine() = 0;
+	virtual const char *Buffer() = 0;
+	virtual INT_PTR		Size() = 0;
 };
 
 class IFrontend
