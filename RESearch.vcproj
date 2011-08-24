@@ -1720,6 +1720,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\FileFind\FileOperations.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\FileFind\FileOperations.h"
 					>
 				</File>
@@ -1733,6 +1737,14 @@
 				</File>
 				<File
 					RelativePath=".\FileFind\IFileOperations.h"
+					>
+				</File>
+				<File
+					RelativePath=".\FileFind\OEMEncoders.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\FileFind\OEMEncoders.h"
 					>
 				</File>
 				<File
