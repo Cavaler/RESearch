@@ -1,11 +1,11 @@
 #pragma once
 #include "IFileOperations.h"
 
-class CEncoder : public IEncoder
+class CDecoder : public IDecoder
 {
 public:
-	CEncoder();
-	~CEncoder();
+	CDecoder();
+	~CDecoder();
 
 public:
 	virtual char *	Buffer();
@@ -17,19 +17,19 @@ protected:
 	void		Clear();
 };
 
-class CSameWidthEncoder : public CEncoder
+class CSameWidthDecoder : public CDecoder
 {
 public:
 	virtual INT_PTR	DecodedOffset (INT_PTR nOffset);
 	virtual INT_PTR	OriginalOffset(INT_PTR nOffset);
 };
 
-class CPassthroughEncoder : public CSameWidthEncoder
+class CPassthroughDecoder : public CSameWidthDecoder
 {
 public:
 	virtual bool	Decode(const char *szBuffer, INT_PTR &nLength);
 	virtual bool	Encode(const char *szBuffer, INT_PTR &nLength);
-	virtual IEncoder *Clone();
+	virtual IDecoder *GetDecoder();
 };
 
 class CUTF8Traverse {
@@ -47,4 +47,8 @@ protected:
 	INT_PTR nChar;
 };
 
-#include "OEMEncoders.h"
+void CutToValidUTF8(const char *szBuffer, INT_PTR &nLength);
+
+#include "OEMDecoders.h"
+#include "UTF8Decoders.h"
+#include "UnicodeDecoders.h"

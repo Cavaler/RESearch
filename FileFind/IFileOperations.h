@@ -26,10 +26,9 @@ public:		//	Replace functions
 //	Source encoding is determined by created instance
 //	Target encoding in OEM for ANSI mode and UTF-8 for Unicode
 
-class IEncoder
+class IDecoder
 {
-public:		//	Decoding functions
-
+public:
 	virtual bool	Decode(const char *szBuffer, INT_PTR &nLength) = 0;
 	virtual char *	Buffer() = 0;
 	virtual INT_PTR	Size() = 0;
@@ -37,12 +36,7 @@ public:		//	Decoding functions
 	virtual INT_PTR	DecodedOffset (INT_PTR nOffset) = 0;
 	virtual INT_PTR	OriginalOffset(INT_PTR nOffset) = 0;
 
-public:		//	Encoding functions
-			//	To encode, clone a decoder and use same Buffer() / Size()
-
-	virtual IEncoder *Clone() = 0;
-	virtual bool	Encode(const char *szBuffer, INT_PTR &nLength) = 0;
-
+	virtual IDecoder *GetDecoder() = 0;
 };
 
 class IProcessor

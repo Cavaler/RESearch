@@ -147,7 +147,7 @@ void GrepFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 	if ((FSearchAs == SA_PLAINTEXT) && (FileSize < FText.length())) return;
 
 
-	CEncodedFileT encFile(mapFile, FileSize);
+	EncodedFile::CEncodedFileT encFile(mapFile, FileSize);
 
 	//	1 - Autodetect
 

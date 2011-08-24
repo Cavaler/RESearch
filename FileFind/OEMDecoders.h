@@ -1,73 +1,71 @@
 #pragma once
 #include "IFileOperations.h"
 
-class CSingleByteToOEMEncoder : public CSameWidthEncoder
+class CSingleByteToOEMDecoder : public CSameWidthDecoder
 {
 public:
-	CSingleByteToOEMEncoder(UINT nCP, UINT nOEM = CP_OEMCP);
+	CSingleByteToOEMDecoder(UINT nCP, UINT nOEM = CP_OEMCP);
 
 	virtual bool	Decode(const char *szBuffer, INT_PTR &nLength);
-	virtual bool	Encode(const char *szBuffer, INT_PTR &nLength);
-	virtual IEncoder *Clone();
+	virtual IDecoder *GetDecoder();
 
 protected:
 	UINT m_nCP;
 	UINT m_nOEM;
 };
 
-class CTableToOEMEncoder : public CSameWidthEncoder
+class CTableToOEMDecoder : public CSameWidthDecoder
 {
 public:
-	CTableToOEMEncoder(const char *szTable);
+	CTableToOEMDecoder(const char *szDecodeTable, const char *szEncodeTable);
 
 	virtual bool	Decode(const char *szBuffer, INT_PTR &nLength);
-	virtual bool	Encode(const char *szBuffer, INT_PTR &nLength);
-	virtual IEncoder *Clone();
+	virtual IDecoder *GetDecoder();
 
 protected:
-	const char *m_szTable;
+	const char *m_szDecodeTable;
+	const char *m_szEncodeTable;
 };
 
-class CUnicodeToOEMEncoder : public CEncoder
+class CUnicodeToOEMDecoder : public CDecoder
 {
 public:
-	CUnicodeToOEMEncoder(UINT nOEM = CP_OEMCP);
+	CUnicodeToOEMDecoder(UINT nOEM = CP_OEMCP);
 
 	virtual bool	Decode(const char *szBuffer, INT_PTR &nLength);
-	virtual bool	Encode(const char *szBuffer, INT_PTR &nLength);
 	virtual INT_PTR	DecodedOffset (INT_PTR nOffset);
 	virtual INT_PTR	OriginalOffset(INT_PTR nOffset);
-	virtual IEncoder *Clone();
-
-protected:
-	UINT m_nOEM;
-};
-
-class CReverseUnicodeToOEMEncoder : public CEncoder
-{
-public:
-	CReverseUnicodeToOEMEncoder(UINT nOEM = CP_OEMCP);
-
-	virtual bool	Decode(const char *szBuffer, INT_PTR &nLength);
-	virtual bool	Encode(const char *szBuffer, INT_PTR &nLength);
-	virtual INT_PTR	DecodedOffset (INT_PTR nOffset);
-	virtual INT_PTR	OriginalOffset(INT_PTR nOffset);
-	virtual IEncoder *Clone();
+	virtual IDecoder *GetDecoder();
 
 protected:
 	UINT m_nOEM;
 };
 
-class CUTF8ToOEMEncoder : public CEncoder
+class CReverseUnicodeToOEMDecoder : public CDecoder
 {
 public:
-	CUTF8ToOEMEncoder(UINT nOEM = CP_OEMCP);
+	CReverseUnicodeToOEMDecoder(UINT nOEM = CP_OEMCP);
 
 	virtual bool	Decode(const char *szBuffer, INT_PTR &nLength);
 	virtual bool	Encode(const char *szBuffer, INT_PTR &nLength);
 	virtual INT_PTR	DecodedOffset (INT_PTR nOffset);
 	virtual INT_PTR	OriginalOffset(INT_PTR nOffset);
-	virtual IEncoder *Clone();
+	virtual IDecoder *GetDecoder();
+
+protected:
+	UINT m_nOEM;
+};
+
+class CUTF8ToOEMDecoder : public CDecoder
+{
+public:
+	CUTF8ToOEMDecoder(UINT nOEM = CP_OEMCP);
+
+	virtual bool	Decode(const char *szBuffer, INT_PTR &nLength);
+	virtual bool	Encode(const char *szBuffer, INT_PTR &nLength);
+	virtual INT_PTR	DecodedOffset (INT_PTR nOffset);
+	virtual INT_PTR	OriginalOffset(INT_PTR nOffset);
+	virtual IDecoder *GetDecoder();
 
 protected:
 	UINT m_nOEM;

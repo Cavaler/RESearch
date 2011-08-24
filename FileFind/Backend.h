@@ -12,7 +12,7 @@ public:
 
 	bool Open(LPCTSTR szFileName);
 
-	bool SetEncoder(IEncoder *pEncoder, INT_PTR nSkip = 0);
+	bool SetDecoder(IDecoder *pDecoder, INT_PTR nSkip = 0);
 
 	void Close();
 
@@ -32,7 +32,7 @@ protected:
 	bool		ReadUp(INT_PTR nRest);
 
 	INT_PTR		m_nBlockSize;
-	IEncoder   *m_pEncoder;
+	IDecoder   *m_pDecoder;
 
 	char	   *m_szBuffer;
 	INT_PTR		m_nSize;

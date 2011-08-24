@@ -1,16 +1,16 @@
 #include "StdAfx.h"
-#include "Encoders.h"
+#include "Decoders.h"
 
 //////////////////////////////////////////////////////////////////////////
-// CEncoder
+// CDecoder
 
-CEncoder::CEncoder()
+CDecoder::CDecoder()
 : m_szBuffer(NULL)
 , m_nSize(0)
 {
 }
 
-void CEncoder::Clear()
+void CDecoder::Clear()
 {
 	if (m_szBuffer) {
 		free(m_szBuffer);
@@ -19,38 +19,38 @@ void CEncoder::Clear()
 	m_nSize = 0;
 }
 
-CEncoder::~CEncoder()
+CDecoder::~CDecoder()
 {
 	Clear();
 }
 
-char *CEncoder::Buffer()
+char *CDecoder::Buffer()
 {
 	return m_szBuffer;
 }
 
-INT_PTR	CEncoder::Size()
+INT_PTR	CDecoder::Size()
 {
 	return m_nSize;
 }
 
 //////////////////////////////////////////////////////////////////////////
-// CSameWidthEncoder
+// CSameWidthDecoder
 
-INT_PTR	CSameWidthEncoder::DecodedOffset (INT_PTR nOffset)
+INT_PTR	CSameWidthDecoder::DecodedOffset (INT_PTR nOffset)
 {
 	return nOffset;
 }
 
-INT_PTR	CSameWidthEncoder::OriginalOffset(INT_PTR nOffset)
+INT_PTR	CSameWidthDecoder::OriginalOffset(INT_PTR nOffset)
 {
 	return nOffset;
 }
 
 //////////////////////////////////////////////////////////////////////////
-// CPassthroughEncoder
+// CPassthroughDecoder
 
-bool CPassthroughEncoder::Decode(const char *szBuffer, INT_PTR &nLength)
+bool CPassthroughDecoder::Decode(const char *szBuffer, INT_PTR &nLength)
 {
 	Clear();
 
@@ -63,7 +63,7 @@ bool CPassthroughEncoder::Decode(const char *szBuffer, INT_PTR &nLength)
 	return true;
 }
 
-bool CPassthroughEncoder::Encode(const char *szBuffer, INT_PTR &nLength)
+bool CPassthroughDecoder::Encode(const char *szBuffer, INT_PTR &nLength)
 {
 	Clear();
 
@@ -76,9 +76,9 @@ bool CPassthroughEncoder::Encode(const char *szBuffer, INT_PTR &nLength)
 	return true;
 }
 
-IEncoder *CPassthroughEncoder::Clone()
+IDecoder *CPassthroughDecoder::GetDecoder()
 {
-	return new CPassthroughEncoder();
+	return new CPassthroughDecoder();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -113,4 +113,16 @@ INT_PTR	CUTF8Traverse::ByteToChar(INT_PTR nOffset)
 INT_PTR	CUTF8Traverse::CharToByte(INT_PTR nOffset)
 {
 	return (nOffset <= nChar) ? char2utf[nOffset] : -1;
+}
+
+void CutToValidUTF8(const char *szBuffer, INT_PTR &nLength)
+{
+	while (nLength > 0) {
+		if ((szBuffer[nLength-1] & 0x80) == 0x00) break;		// 1-byte
+		if ((szBuffer[nLength-2] & 0xE0) == 0xC0) break;		// 2-byte
+		if ((szBuffer[nLength-3] & 0xF0) == 0xE0) break;		// 3-byte
+		if ((szBuffer[nLength-4] & 0xF8) == 0xF0) break;		// 4-byte
+
+		nLength--;
+	}
 }

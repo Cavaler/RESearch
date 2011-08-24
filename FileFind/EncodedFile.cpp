@@ -1,6 +1,8 @@
 #include "StdAfx.h"
 #include "..\RESearch.h"
 
+namespace EncodedFile {
+
 CDelayedDecoder::CDelayedDecoder(const char *szData, DWORD dwSize, CDecoder &pDecoder) : m_szData(szData), m_dwSize(dwSize), m_pDecoder(pDecoder) {
 	GetSystemInfo(&m_Info);
 
@@ -299,4 +301,6 @@ template<class CHAR> bool CEncodedFile<CHAR>::Run(bool (*Processor)(const CHAR *
 	} __except (m_pDD->ExcFilter(GetExceptionInformation())) {
 		return false;
 	}
+}
+
 }

@@ -344,7 +344,11 @@ void SearchFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 #ifdef DEBUG
 	case SA_PLAINTEXT		:{
 		CSearchPlainTextFrontend Frontend(FText);
+#ifndef UNICODE
 		IsFound = RunSearch(FindData->cFileName, &Frontend);
+#else
+		IsFound = RunSearch(FindData->cFileName, &Frontend, false);
+#endif
 		break;
 							 }
 #else

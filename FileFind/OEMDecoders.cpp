@@ -1,16 +1,16 @@
 #include "StdAfx.h"
-#include "Encoders.h"
+#include "Decoders.h"
 
 //////////////////////////////////////////////////////////////////////////
-// CSingleByteToOEMEncoder
+// CSingleByteToOEMDecoder
 
-CSingleByteToOEMEncoder::CSingleByteToOEMEncoder(UINT nCP, UINT nOEM )
+CSingleByteToOEMDecoder::CSingleByteToOEMDecoder(UINT nCP, UINT nOEM )
 : m_nCP(nCP)
 , m_nOEM(nOEM)
 {
 }
 
-bool CSingleByteToOEMEncoder::Decode(const char *szBuffer, INT_PTR &nLength)
+bool CSingleByteToOEMDecoder::Decode(const char *szBuffer, INT_PTR &nLength)
 {
 	Clear();
 	if (nLength == 0) return true;
@@ -32,42 +32,21 @@ bool CSingleByteToOEMEncoder::Decode(const char *szBuffer, INT_PTR &nLength)
 	return true;
 }
 
-bool CSingleByteToOEMEncoder::Encode(const char *szBuffer, INT_PTR &nLength)
+IDecoder *CSingleByteToOEMDecoder::GetDecoder()
 {
-	Clear();
-	if (nLength == 0) return true;
-
-	int nSize = MultiByteToWideChar(m_nOEM, 0, szBuffer, nLength, NULL, 0);
-	if (nSize == 0) return false;
-
-	vector<wchar_t> arrWsz(nSize);
-	MultiByteToWideChar(m_nOEM, 0, szBuffer, nLength, &arrWsz[0], arrWsz.size());
-
-	nSize = WideCharToMultiByte(m_nCP, 0, &arrWsz[0], arrWsz.size(), NULL, 0, NULL, NULL);
-	if (nSize == 0) return false;
-
-	m_szBuffer = (char *)malloc(nSize);
-	if (m_szBuffer == NULL) return false;
-
-	m_nSize = WideCharToMultiByte(m_nCP, 0, &arrWsz[0], arrWsz.size(), m_szBuffer, nSize, NULL, NULL);
-
-	return true;
-}
-
-IEncoder *CSingleByteToOEMEncoder::Clone()
-{
-	return new CSingleByteToOEMEncoder(m_nCP, m_nOEM);
+	return new CSingleByteToOEMDecoder(m_nOEM, m_nCP);
 }
 
 //////////////////////////////////////////////////////////////////////////
-// CTableToOEMEncoder
+// CTableToOEMDecoder
 
-CTableToOEMEncoder::CTableToOEMEncoder(const char *szTable)
-: m_szTable(szTable)
+CTableToOEMDecoder::CTableToOEMDecoder(const char *szDecodeTable, const char *szEncodeTable)
+: m_szDecodeTable(szDecodeTable)
+, m_szEncodeTable(szEncodeTable)
 {
 }
 
-bool CTableToOEMEncoder::Decode(const char *szBuffer, INT_PTR &nLength)
+bool CTableToOEMDecoder::Decode(const char *szBuffer, INT_PTR &nLength)
 {
 	Clear();
 	if (nLength == 0) return true;
@@ -76,44 +55,25 @@ bool CTableToOEMEncoder::Decode(const char *szBuffer, INT_PTR &nLength)
 	m_nSize = nLength;
 
 	for (INT_PTR nChar = 0; nChar < nLength; nChar++)
-		m_szBuffer[nChar] = m_szTable[(BYTE)szBuffer[nChar]];
+		m_szBuffer[nChar] = m_szDecodeTable[(BYTE)szBuffer[nChar]];
 
 	return true;
 }
 
-bool CTableToOEMEncoder::Encode(const char *szBuffer, INT_PTR &nLength)
+IDecoder *CTableToOEMDecoder::GetDecoder()
 {
-	Clear();
-	if (nLength == 0) return true;
-
-	char szReverseTable[256];
-	memset(&szReverseTable, 256, 0);
-	for (INT_PTR nChar = 0; nChar < 256; nChar++)
-		szReverseTable[m_szTable[nChar]] = nChar;
-
-	m_szBuffer = (char *)malloc(nLength);
-	m_nSize = nLength;
-
-	for (INT_PTR nChar = 0; nChar < nLength; nChar++)
-		m_szBuffer[nChar] = szReverseTable[(BYTE)szBuffer[nChar]];
-
-	return true;
-}
-
-IEncoder *CTableToOEMEncoder::Clone()
-{
-	return new CTableToOEMEncoder(m_szTable);
+	return new CTableToOEMDecoder(m_szEncodeTable, m_szDecodeTable);
 }
 
 //////////////////////////////////////////////////////////////////////////
-// CUnicodeToOEMEncoder
+// CUnicodeToOEMDecoder
 
-CUnicodeToOEMEncoder::CUnicodeToOEMEncoder(UINT nOEM)
+CUnicodeToOEMDecoder::CUnicodeToOEMDecoder(UINT nOEM)
 : m_nOEM(nOEM)
 {
 }
 
-bool CUnicodeToOEMEncoder::Decode(const char *szBuffer, INT_PTR &nLength)
+bool CUnicodeToOEMDecoder::Decode(const char *szBuffer, INT_PTR &nLength)
 {
 	Clear();
 	nLength &= ~1;	// Even only
@@ -130,47 +90,31 @@ bool CUnicodeToOEMEncoder::Decode(const char *szBuffer, INT_PTR &nLength)
 	return true;
 }
 
-bool CUnicodeToOEMEncoder::Encode(const char *szBuffer, INT_PTR &nLength)
-{
-	Clear();
-	if (nLength == 0) return true;
-
-	int nSize = MultiByteToWideChar(m_nOEM, 0, szBuffer, nLength, NULL, 0);
-	if (nSize == 0) return false;
-
-	m_szBuffer = (char *)malloc(nSize*2);
-	if (m_szBuffer == NULL) return false;
-
-	m_nSize = MultiByteToWideChar(m_nOEM, 0, szBuffer, nLength, (wchar_t *)szBuffer, nSize)*2;
-
-	return true;
-}
-
-INT_PTR CUnicodeToOEMEncoder::DecodedOffset (INT_PTR nOffset)
+INT_PTR CUnicodeToOEMDecoder::DecodedOffset (INT_PTR nOffset)
 {
 	if (nOffset & 1) return -1;
 	return nOffset / 2;
 }
 
-INT_PTR CUnicodeToOEMEncoder::OriginalOffset(INT_PTR nOffset)
+INT_PTR CUnicodeToOEMDecoder::OriginalOffset(INT_PTR nOffset)
 {
 	return nOffset * 2;
 }
 
-IEncoder *CUnicodeToOEMEncoder::Clone()
+IDecoder *CUnicodeToOEMDecoder::GetDecoder()
 {
-	return new CUnicodeToOEMEncoder(m_nOEM);
+	return new CSingleByteToUnicodeDecoder(m_nOEM);
 }
 
 //////////////////////////////////////////////////////////////////////////
-// CReverseUnicodeToOEMEncoder
+// CReverseUnicodeToOEMDecoder
 
-CReverseUnicodeToOEMEncoder::CReverseUnicodeToOEMEncoder(UINT nOEM)
+CReverseUnicodeToOEMDecoder::CReverseUnicodeToOEMDecoder(UINT nOEM)
 : m_nOEM(nOEM)
 {
 }
 
-bool CReverseUnicodeToOEMEncoder::Decode(const char *szBuffer, INT_PTR &nLength)
+bool CReverseUnicodeToOEMDecoder::Decode(const char *szBuffer, INT_PTR &nLength)
 {
 	Clear();
 	nLength &= ~1;	// Even only
@@ -189,7 +133,7 @@ bool CReverseUnicodeToOEMEncoder::Decode(const char *szBuffer, INT_PTR &nLength)
 	return true;
 }
 
-bool CReverseUnicodeToOEMEncoder::Encode(const char *szBuffer, INT_PTR &nLength)
+bool CReverseUnicodeToOEMDecoder::Encode(const char *szBuffer, INT_PTR &nLength)
 {
 	Clear();
 	if (nLength == 0) return true;
@@ -208,43 +152,32 @@ bool CReverseUnicodeToOEMEncoder::Encode(const char *szBuffer, INT_PTR &nLength)
 	return true;
 }
 
-INT_PTR CReverseUnicodeToOEMEncoder::DecodedOffset (INT_PTR nOffset)
+INT_PTR CReverseUnicodeToOEMDecoder::DecodedOffset (INT_PTR nOffset)
 {
 	if (nOffset & 1) return -1;
 	return nOffset / 2;
 }
 
-INT_PTR CReverseUnicodeToOEMEncoder::OriginalOffset(INT_PTR nOffset)
+INT_PTR CReverseUnicodeToOEMDecoder::OriginalOffset(INT_PTR nOffset)
 {
 	return nOffset * 2;
 }
 
-IEncoder *CReverseUnicodeToOEMEncoder::Clone()
+IDecoder *CReverseUnicodeToOEMDecoder::GetDecoder()
 {
-	return new CReverseUnicodeToOEMEncoder(m_nOEM);
+//	return new CSingleByteToReverseUnicodeDecoder(m_nOEM);
+	return NULL;
 }
 
 //////////////////////////////////////////////////////////////////////////
-// CUTF8ToOEMEncoder
+// CUTF8ToOEMDecoder
 
-CUTF8ToOEMEncoder::CUTF8ToOEMEncoder(UINT nOEM)
+CUTF8ToOEMDecoder::CUTF8ToOEMDecoder(UINT nOEM)
 : m_nOEM(nOEM)
 {
 }
 
-void CutToValidUTF8(const char *szBuffer, INT_PTR &nLength)
-{
-	while (nLength > 0) {
-		if ((szBuffer[nLength-1] & 0x80) == 0x00) break;		// 1-byte
-		if ((szBuffer[nLength-2] & 0xE0) == 0xC0) break;		// 2-byte
-		if ((szBuffer[nLength-3] & 0xF0) == 0xE0) break;		// 3-byte
-		if ((szBuffer[nLength-4] & 0xF8) == 0xF0) break;		// 4-byte
-
-		nLength--;
-	}
-}
-
-bool CUTF8ToOEMEncoder::Decode(const char *szBuffer, INT_PTR &nLength)
+bool CUTF8ToOEMDecoder::Decode(const char *szBuffer, INT_PTR &nLength)
 {
 	Clear();
 	if (nLength == 0) return true;
@@ -270,7 +203,7 @@ bool CUTF8ToOEMEncoder::Decode(const char *szBuffer, INT_PTR &nLength)
 	return true;
 }
 
-bool CUTF8ToOEMEncoder::Encode(const char *szBuffer, INT_PTR &nLength)
+bool CUTF8ToOEMDecoder::Encode(const char *szBuffer, INT_PTR &nLength)
 {
 	Clear();
 	if (nLength == 0) return true;
@@ -292,17 +225,17 @@ bool CUTF8ToOEMEncoder::Encode(const char *szBuffer, INT_PTR &nLength)
 	return true;
 }
 
-INT_PTR CUTF8ToOEMEncoder::DecodedOffset (INT_PTR nOffset)
+INT_PTR CUTF8ToOEMDecoder::DecodedOffset (INT_PTR nOffset)
 {
 	return m_UT.ByteToChar(nOffset);
 }
 
-INT_PTR CUTF8ToOEMEncoder::OriginalOffset(INT_PTR nOffset)
+INT_PTR CUTF8ToOEMDecoder::OriginalOffset(INT_PTR nOffset)
 {
 	return m_UT.CharToByte(nOffset);
 }
 
-IEncoder *CUTF8ToOEMEncoder::Clone()
+IDecoder *CUTF8ToOEMDecoder::GetDecoder()
 {
-	return new CUTF8ToOEMEncoder(m_nOEM);
+	return new CSingleByteToUTF8Decoder(m_nOEM);
 }

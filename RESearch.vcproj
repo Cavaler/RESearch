@@ -1712,11 +1712,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\FileFind\Encoders.cpp"
+					RelativePath=".\FileFind\Decoders.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\FileFind\Encoders.h"
+					RelativePath=".\FileFind\Decoders.h"
 					>
 				</File>
 				<File
@@ -1740,11 +1740,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\FileFind\OEMEncoders.cpp"
+					RelativePath=".\FileFind\OEMDecoders.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\FileFind\OEMEncoders.h"
+					RelativePath=".\FileFind\OEMDecoders.h"
 					>
 				</File>
 				<File
@@ -1753,6 +1753,22 @@
 				</File>
 				<File
 					RelativePath=".\FileFind\Processors.h"
+					>
+				</File>
+				<File
+					RelativePath=".\FileFind\UnicodeDecoders.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\FileFind\UnicodeDecoders.h"
+					>
+				</File>
+				<File
+					RelativePath=".\FileFind\UTF8Decoders.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\FileFind\UTF8Decoders.h"
 					>
 				</File>
 			</Filter>

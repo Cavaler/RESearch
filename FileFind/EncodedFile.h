@@ -1,6 +1,8 @@
 #ifndef __ENCODEDFILE_H
 #define __ENCODEDFILE_H
 
+namespace EncodedFile {
+
 class CDecoder {
 public:
 	virtual float SizeIncr() = 0;
@@ -146,5 +148,7 @@ protected:
 typedef CEncodedFile<char>    CEncodedFileA;
 typedef CEncodedFile<wchar_t> CEncodedFileW;
 typedef CEncodedFile<TCHAR>   CEncodedFileT;
+
+}
 
 #endif

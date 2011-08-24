@@ -4,7 +4,7 @@
 CFileBackend::CFileBackend()
 : m_hFile		(INVALID_HANDLE_VALUE)
 , m_nBlockSize	(0)
-, m_pEncoder	(NULL)
+, m_pDecoder	(NULL)
 , m_szBuffer	(NULL)
 , m_nSize		(0)
 {
@@ -48,9 +48,9 @@ bool CFileBackend::Open(LPCTSTR szFileName)
 	return true;
 }
 
-bool CFileBackend::SetEncoder(IEncoder *pEncoder, INT_PTR nSkip)
+bool CFileBackend::SetDecoder(IDecoder *pDecoder, INT_PTR nSkip)
 {
-	m_pEncoder = pEncoder;
+	m_pDecoder = pDecoder;
 
 	SetFilePointer(m_hFile, nSkip, NULL, SEEK_SET);
 
@@ -68,9 +68,9 @@ bool CFileBackend::ReadUp(INT_PTR nRest)
 
 	m_bEOF = m_nSize < m_nBlockSize;
 
-	if (m_pEncoder) {
+	if (m_pDecoder) {
 		INT_PTR nOrigSize = m_nSize;
-		m_pEncoder->Decode(m_szBuffer, m_nSize);
+		m_pDecoder->Decode(m_szBuffer, m_nSize);
 		if (nOrigSize != m_nSize)
 			SetFilePointer(m_hFile, m_nSize-nOrigSize, NULL, SEEK_CUR);
 	}
@@ -85,17 +85,17 @@ void CFileBackend::Close()
 	CloseHandle(m_hFile);
 	m_hFile = INVALID_HANDLE_VALUE;
 
-	m_pEncoder = NULL;
+	m_pDecoder = NULL;
 }
 
 char *CFileBackend::Buffer()
 {
-	return m_pEncoder ? m_pEncoder->Buffer() : m_szBuffer;
+	return m_pDecoder ? m_pDecoder->Buffer() : m_szBuffer;
 }
 
 INT_PTR	CFileBackend::Size()
 {
-	return m_pEncoder ? m_pEncoder->Size() : m_nSize;
+	return m_pDecoder ? m_pDecoder->Size() : m_nSize;
 }
 
 bool CFileBackend::Last()
@@ -107,7 +107,7 @@ bool CFileBackend::Move(INT_PTR nLength)
 {
 	if (nLength < 0) nLength = Size() - nLength;
 
-	nLength = m_pEncoder->OriginalOffset(nLength);
+	nLength = m_pDecoder->OriginalOffset(nLength);
 	if (nLength < 0) return false;
 
 	if (nLength > m_nSize) return false;
