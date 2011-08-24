@@ -165,8 +165,7 @@ INT_PTR CReverseUnicodeToOEMDecoder::OriginalOffset(INT_PTR nOffset)
 
 IDecoder *CReverseUnicodeToOEMDecoder::GetDecoder()
 {
-//	return new CSingleByteToReverseUnicodeDecoder(m_nOEM);
-	return NULL;
+	return new CAnyToReverseUnicode(new CSingleByteToUnicodeDecoder(m_nOEM));
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -199,28 +198,6 @@ bool CUTF8ToOEMDecoder::Decode(const char *szBuffer, INT_PTR &nLength)
 	if (m_szBuffer == NULL) return false;
 
 	m_nSize = WideCharToMultiByte(m_nOEM, 0, &arrWsz[0], arrWsz.size(), m_szBuffer, nSize, NULL, NULL);
-
-	return true;
-}
-
-bool CUTF8ToOEMDecoder::Encode(const char *szBuffer, INT_PTR &nLength)
-{
-	Clear();
-	if (nLength == 0) return true;
-
-	int nSize = MultiByteToWideChar(m_nOEM, 0, szBuffer, nLength, NULL, 0);
-	if (nSize == 0) return false;
-
-	vector<wchar_t> arrWsz(nSize);
-	MultiByteToWideChar(m_nOEM, 0, szBuffer, nLength, &arrWsz[0], arrWsz.size());
-
-	nSize = WideCharToMultiByte(CP_UTF8, 0, &arrWsz[0], arrWsz.size(), NULL, 0, NULL, NULL);
-	if (nSize == 0) return false;
-
-	m_szBuffer = (char *)malloc(nSize);
-	if (m_szBuffer == NULL) return false;
-
-	m_nSize = WideCharToMultiByte(CP_UTF8, 0, &arrWsz[0], arrWsz.size(), m_szBuffer, nSize, NULL, NULL);
 
 	return true;
 }

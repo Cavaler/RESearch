@@ -55,9 +55,8 @@ bool CFileBackend::SetDecoder(IDecoder *pDecoder, INT_PTR nSkip)
 	SetFilePointer(m_hFile, nSkip, NULL, SEEK_SET);
 
 	m_bEOF = false;
-	ReadUp(0);
 
-	return true;
+	return ReadUp(0);
 }
 
 bool CFileBackend::ReadUp(INT_PTR nRest)
@@ -70,12 +69,12 @@ bool CFileBackend::ReadUp(INT_PTR nRest)
 
 	if (m_pDecoder) {
 		INT_PTR nOrigSize = m_nSize;
-		m_pDecoder->Decode(m_szBuffer, m_nSize);
+		if (!m_pDecoder->Decode(m_szBuffer, m_nSize)) return false;
 		if (nOrigSize != m_nSize)
 			SetFilePointer(m_hFile, m_nSize-nOrigSize, NULL, SEEK_CUR);
 	}
 
-	return m_bEOF;
+	return true;
 }
 
 void CFileBackend::Close()
@@ -115,9 +114,7 @@ bool CFileBackend::Move(INT_PTR nLength)
 
 	memmove(m_szBuffer, m_szBuffer + nLength, nRest);
 
-	ReadUp(nRest);
-
-	return true;
+	return ReadUp(nRest);
 }
 
 bool CFileBackend::WriteBack(INT_PTR nLength)
