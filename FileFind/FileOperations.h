@@ -9,7 +9,7 @@
 bool RunSearch(LPCTSTR szFileName, IFrontend *pFrontend)
 {
 	shared_ptr<CFileBackend> pBackend = new CFileBackend();
-	if (!pBackend->Init(66)) return false;
+	if (!pBackend->Init(1024*1024)) return false;
 	if (!pBackend->Open(szFileName)) return false;
 
 	shared_ptr<IEncoder> pEncoder;
@@ -35,6 +35,13 @@ bool RunSearch(LPCTSTR szFileName, IFrontend *pFrontend)
 	if (pFrontend->Process(pBackend)) return true;
 
 	if (!FAllCharTables) return false;
+
+	for (size_t nTable = 0; nTable < XLatTables.size(); nTable++) {
+		const char *szTable = (const char *)XLatTables[nTable].DecodeTable;
+
+		pEncoder = new CTableToOEMEncoder(szTable);
+		if (pBackend->SetEncoder(pEncoder) && pFrontend->Process(pBackend)) return true;
+	}
 
 	pEncoder = new CUnicodeToOEMEncoder();
 	if (pBackend->SetEncoder(pEncoder) && pFrontend->Process(pBackend)) return true;

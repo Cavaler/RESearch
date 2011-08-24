@@ -140,6 +140,52 @@ IEncoder *CSingleByteToOEMEncoder::Clone()
 }
 
 //////////////////////////////////////////////////////////////////////////
+// CTableToOEMEncoder
+
+CTableToOEMEncoder::CTableToOEMEncoder(const char *szTable)
+: m_szTable(szTable)
+{
+}
+
+bool CTableToOEMEncoder::Decode(const char *szBuffer, INT_PTR &nLength)
+{
+	Clear();
+	if (nLength == 0) return true;
+
+	m_szBuffer = (char *)malloc(nLength);
+	m_nSize = nLength;
+
+	for (INT_PTR nChar = 0; nChar < nLength; nChar++)
+		m_szBuffer[nChar] = m_szTable[(BYTE)szBuffer[nChar]];
+
+	return true;
+}
+
+bool CTableToOEMEncoder::Encode(const char *szBuffer, INT_PTR &nLength)
+{
+	Clear();
+	if (nLength == 0) return true;
+
+	char szReverseTable[256];
+	memset(&szReverseTable, 256, 0);
+	for (INT_PTR nChar = 0; nChar < 256; nChar++)
+		szReverseTable[m_szTable[nChar]] = nChar;
+
+	m_szBuffer = (char *)malloc(nLength);
+	m_nSize = nLength;
+
+	for (INT_PTR nChar = 0; nChar < nLength; nChar++)
+		m_szBuffer[nChar] = szReverseTable[(BYTE)szBuffer[nChar]];
+
+	return true;
+}
+
+IEncoder *CTableToOEMEncoder::Clone()
+{
+	return new CTableToOEMEncoder(m_szTable);
+}
+
+//////////////////////////////////////////////////////////////////////////
 // CUnicodeToOEMEncoder
 
 CUnicodeToOEMEncoder::CUnicodeToOEMEncoder(UINT nOEM)

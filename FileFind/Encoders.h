@@ -46,6 +46,19 @@ protected:
 	UINT m_nOEM;
 };
 
+class CTableToOEMEncoder : public CSameWidthEncoder
+{
+public:
+	CTableToOEMEncoder(const char *szTable);
+
+	virtual bool	Decode(const char *szBuffer, INT_PTR &nLength);
+	virtual bool	Encode(const char *szBuffer, INT_PTR &nLength);
+	virtual IEncoder *Clone();
+
+protected:
+	const char *m_szTable;
+};
+
 class CUnicodeToOEMEncoder : public CEncoder
 {
 public:
