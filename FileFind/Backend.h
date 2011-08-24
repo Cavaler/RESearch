@@ -7,11 +7,16 @@ public:
 	CFileBackend();
 	~CFileBackend();
 
-	bool Init(INT_PTR nBlockSize, IEncoder *pEncoder);
-	void Done();
+	//	Methods ordered by life cycle
+	bool Init(INT_PTR nBlockSize);
 
-	bool Open(LPCTSTR szFileName, INT_PTR nSkip = 0);
+	bool Open(LPCTSTR szFileName);
+
+	bool SetEncoder(IEncoder *pEncoder, INT_PTR nSkip = 0);
+
 	void Close();
+
+	void Done();
 
 public:
 	virtual char *	Buffer();

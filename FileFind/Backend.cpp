@@ -16,10 +16,9 @@ CFileBackend::~CFileBackend()
 	Done();
 }
 
-bool CFileBackend::Init(INT_PTR nBlockSize, IEncoder *pEncoder)
+bool CFileBackend::Init(INT_PTR nBlockSize)
 {
 	m_nBlockSize = nBlockSize;
-	m_pEncoder   = pEncoder;
 
 	m_szBuffer   = (char *)malloc(nBlockSize);
 	m_nSize      = 0;
@@ -39,10 +38,19 @@ void CFileBackend::Done()
 	m_nSize    = 0;
 }
 
-bool CFileBackend::Open(LPCTSTR szFileName, INT_PTR nSkip)
+bool CFileBackend::Open(LPCTSTR szFileName)
 {
 	m_hFile = CreateFile(szFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, NULL, NULL);
 	if (m_hFile == INVALID_HANDLE_VALUE) return false;
+
+	ReadUp(0);
+
+	return true;
+}
+
+bool CFileBackend::SetEncoder(IEncoder *pEncoder, INT_PTR nSkip)
+{
+	m_pEncoder = pEncoder;
 
 	SetFilePointer(m_hFile, nSkip, NULL, SEEK_SET);
 
@@ -60,10 +68,12 @@ bool CFileBackend::ReadUp(INT_PTR nRest)
 
 	m_bEOF = m_nSize < m_nBlockSize;
 
-	INT_PTR nOrigSize = m_nSize;
-	m_pEncoder->Decode(m_szBuffer, m_nSize);
-	if (nOrigSize != m_nSize)
-		SetFilePointer(m_hFile, m_nSize-nOrigSize, NULL, SEEK_CUR);
+	if (m_pEncoder) {
+		INT_PTR nOrigSize = m_nSize;
+		m_pEncoder->Decode(m_szBuffer, m_nSize);
+		if (nOrigSize != m_nSize)
+			SetFilePointer(m_hFile, m_nSize-nOrigSize, NULL, SEEK_CUR);
+	}
 
 	return m_bEOF;
 }
@@ -74,16 +84,18 @@ void CFileBackend::Close()
 
 	CloseHandle(m_hFile);
 	m_hFile = INVALID_HANDLE_VALUE;
+
+	m_pEncoder = NULL;
 }
 
 char *CFileBackend::Buffer()
 {
-	return m_pEncoder->Buffer();
+	return m_pEncoder ? m_pEncoder->Buffer() : m_szBuffer;
 }
 
 INT_PTR	CFileBackend::Size()
 {
-	return  m_pEncoder->Size();
+	return m_pEncoder ? m_pEncoder->Size() : m_nSize;
 }
 
 bool CFileBackend::Last()
@@ -93,9 +105,10 @@ bool CFileBackend::Last()
 
 bool CFileBackend::Move(INT_PTR nLength)
 {
-	if (nLength < 0) nLength = m_pEncoder->Size() - nLength;
+	if (nLength < 0) nLength = Size() - nLength;
 
 	nLength = m_pEncoder->OriginalOffset(nLength);
+	if (nLength < 0) return false;
 
 	if (nLength > m_nSize) return false;
 	int nRest = m_nSize - nLength;

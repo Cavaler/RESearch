@@ -150,9 +150,8 @@ CUnicodeToOEMEncoder::CUnicodeToOEMEncoder(UINT nOEM)
 bool CUnicodeToOEMEncoder::Decode(const char *szBuffer, INT_PTR &nLength)
 {
 	Clear();
-	if (nLength == 0) return true;
-
 	nLength &= ~1;	// Even only
+	if (nLength == 0) return true;
 
 	int nSize = WideCharToMultiByte(m_nOEM, 0, (wchar_t *)szBuffer, nLength/2, NULL, 0, NULL, NULL);
 	if (nSize == 0) return false;
@@ -198,6 +197,68 @@ IEncoder *CUnicodeToOEMEncoder::Clone()
 }
 
 //////////////////////////////////////////////////////////////////////////
+// CReverseUnicodeToOEMEncoder
+
+CReverseUnicodeToOEMEncoder::CReverseUnicodeToOEMEncoder(UINT nOEM)
+: m_nOEM(nOEM)
+{
+}
+
+bool CReverseUnicodeToOEMEncoder::Decode(const char *szBuffer, INT_PTR &nLength)
+{
+	Clear();
+	nLength &= ~1;	// Even only
+	if (nLength == 0) return true;
+
+	m_nSize = nLength/2;
+
+	m_szBuffer = (char *)malloc(m_nSize);
+	if (m_szBuffer == NULL) return false;
+
+	for (INT_PTR nChar = 0; nChar < m_nSize; nChar++) {
+		wchar_t wcSingle = (szBuffer[nChar*2]<<8) + szBuffer[nChar*2+1];
+		WideCharToMultiByte(m_nOEM, 0, &wcSingle, 1, m_szBuffer+nChar, 1, NULL, NULL);
+	}
+
+	return true;
+}
+
+bool CReverseUnicodeToOEMEncoder::Encode(const char *szBuffer, INT_PTR &nLength)
+{
+	Clear();
+	if (nLength == 0) return true;
+
+	m_nSize = nLength*2;
+	m_szBuffer = (char *)malloc(m_nSize);
+	if (m_szBuffer == NULL) return false;
+
+	for (INT_PTR nChar = 0; nChar < m_nSize/2; nChar++) {
+		wchar_t wcSingle;
+		MultiByteToWideChar(m_nOEM, 0, szBuffer+nChar, 1, &wcSingle, 1);
+		m_szBuffer[nChar*2  ] = (wcSingle >> 8) & 0xFF;
+		m_szBuffer[nChar*2+1] = wcSingle & 0xFF;
+	}
+
+	return true;
+}
+
+INT_PTR CReverseUnicodeToOEMEncoder::DecodedOffset (INT_PTR nOffset)
+{
+	if (nOffset & 1) return -1;
+	return nOffset / 2;
+}
+
+INT_PTR CReverseUnicodeToOEMEncoder::OriginalOffset(INT_PTR nOffset)
+{
+	return nOffset * 2;
+}
+
+IEncoder *CReverseUnicodeToOEMEncoder::Clone()
+{
+	return new CReverseUnicodeToOEMEncoder(m_nOEM);
+}
+
+//////////////////////////////////////////////////////////////////////////
 // CUTF8Traverse
 void CUTF8Traverse::SetString(const char *szBuffer, INT_PTR nLength)
 {
@@ -222,12 +283,12 @@ void CUTF8Traverse::SetString(const char *szBuffer, INT_PTR nLength)
 
 INT_PTR	CUTF8Traverse::ByteToChar(INT_PTR nOffset)
 {
-	return (nOffset < nByte) ? utf2char[nOffset] : -1;
+	return (nOffset <= nByte) ? utf2char[nOffset] : -1;
 }
 
 INT_PTR	CUTF8Traverse::CharToByte(INT_PTR nOffset)
 {
-	return (nOffset < nChar) ? char2utf[nOffset] : -1;
+	return (nOffset <= nChar) ? char2utf[nOffset] : -1;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -260,6 +321,7 @@ bool CUTF8ToOEMEncoder::Decode(const char *szBuffer, INT_PTR &nLength)
 
 	int nSize = MultiByteToWideChar(CP_UTF8, 0, szBuffer, nLength, NULL, 0);
 	if (nSize == 0) return false;
+	if (m_UT.CharToByte(nSize) != nLength) return false;
 
 	vector<wchar_t> arrWsz(nSize);
 	MultiByteToWideChar(CP_UTF8, 0, szBuffer, nLength, &arrWsz[0], arrWsz.size());

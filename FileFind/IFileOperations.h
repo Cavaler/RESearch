@@ -5,8 +5,8 @@
 class IBackend
 {
 public:		//	Search functions
-	virtual char *	Buffer() = 0;
-	virtual INT_PTR	Size() = 0;
+	virtual char *	Buffer() = 0;		//	OEM or UTF-8
+	virtual INT_PTR	Size() = 0;			//	Bytes
 	virtual bool	Last() = 0;
 
 	virtual bool	Move(INT_PTR nLength) = 0;
