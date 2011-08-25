@@ -34,12 +34,8 @@ bool CSearchRegExpFrontend::Process(IBackend *pBackend)
 
 	do {
 		int nResult = do_pcre_exec(FPattern, FPatternExtra, Proc.Buffer(), Proc.Size(), 0, 0, REParamA.Match(), REParamA.Count());
-
-		if (nResult >= 0) {
-//			OEMMatchDone();
-//			if (bNeedColumn) g_nFoundColumn = REParamA.m_arrMatch[0]+1;
-			return true;
-		}
+		if (nResult >= 0) return true;
+		g_nFoundLine++;
 	} while (Proc.GetNextLine());
 
 	return false;

@@ -1,5 +1,6 @@
 #include "StdAfx.h"
 #include "Frontends.h"
+#include "Processors.h"
 #include "..\RESearch.h"
 
 #ifdef UNICODE
@@ -29,6 +30,14 @@ bool CSearchPlainTextFrontend::Process(IBackend *pBackend)
 
 bool CSearchRegExpFrontend::Process(IBackend *pBackend)
 {
+	CSingleByteSplitLineProcessor Proc(pBackend);
+
+	do {
+		int nResult = do_pcre_execA(FPattern, FPatternExtra, Proc.Buffer(), Proc.Size(), 0, 0, REParamA.Match(), REParamA.Count());
+		if (nResult >= 0) return true;
+		g_nFoundLine++;
+	} while (Proc.GetNextLine());
+
 	return false;
 }
 
