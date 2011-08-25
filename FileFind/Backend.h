@@ -26,14 +26,16 @@ public:
 	virtual bool	WriteBack(INT_PTR nLength);
 	virtual bool	WriteThru(const char *szBuffer, INT_PTR nLength, INT_PTR nSkipLength);
 
+	static void Free();
+
 protected:
 	HANDLE		m_hFile;
 	bool		m_bEOF;
 	bool		ReadUp(INT_PTR nRest);
 
-	INT_PTR		m_nBlockSize;
+	static char	   *m_szBuffer;
+	static INT_PTR	m_nBlockSize;
 	IDecoder   *m_pDecoder;
 
-	char	   *m_szBuffer;
 	INT_PTR		m_nSize;
 };

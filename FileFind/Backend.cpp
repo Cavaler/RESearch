@@ -1,11 +1,12 @@
 #include "StdAfx.h"
 #include "Backend.h"
 
+char *CFileBackend::m_szBuffer = NULL;
+INT_PTR CFileBackend::m_nBlockSize = 0;
+
 CFileBackend::CFileBackend()
 : m_hFile		(INVALID_HANDLE_VALUE)
-, m_nBlockSize	(0)
 , m_pDecoder	(NULL)
-, m_szBuffer	(NULL)
 , m_nSize		(0)
 {
 }
@@ -18,9 +19,11 @@ CFileBackend::~CFileBackend()
 
 bool CFileBackend::Init(INT_PTR nBlockSize)
 {
-	m_nBlockSize = nBlockSize;
+	if (m_nBlockSize != nBlockSize) {
+		m_nBlockSize = nBlockSize;
+		m_szBuffer   = (char *)realloc(m_szBuffer, nBlockSize);
+	}
 
-	m_szBuffer   = (char *)malloc(nBlockSize);
 	m_nSize      = 0;
 
 	return m_szBuffer != NULL;
@@ -30,12 +33,17 @@ void CFileBackend::Done()
 {
 	Close();
 
+	m_nSize    = 0;
+}
+
+void CFileBackend::Free()
+{
 	if (m_szBuffer) {
 		free(m_szBuffer);
 		m_szBuffer = NULL;
 	}
 
-	m_nSize    = 0;
+	m_nBlockSize = 0;
 }
 
 bool CFileBackend::Open(LPCTSTR szFileName)
