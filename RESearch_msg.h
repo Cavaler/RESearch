@@ -11,6 +11,8 @@ enum eStringTable {
 	MQuoteSearch,
 	MQuoteReplace,
 	MEllipsis,
+	MKB,
+	MMB,
 
 	MSearchResults,
 
@@ -150,11 +152,7 @@ enum eStringTable {
 	MAllCPMenu,
 
 	MFileSearchSettings,
-	MReadAtOnceLimit,
-	MKB,
-	MMaskDelimiter,
-	MMaskNegation,
-	MAddAsterisk,
+	MBufferSize,
 	MDefaultMaskCase,
 	MMaskSensitive,
 	MMaskInsensitive,
