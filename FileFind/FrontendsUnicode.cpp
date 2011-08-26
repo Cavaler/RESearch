@@ -41,4 +41,38 @@ bool CSearchRegExpFrontend::Process(IBackend *pBackend)
 	return false;
 }
 
+//////////////////////////////////////////////////////////////////////////
+
+bool CSearchSeveralLineRegExpFrontend::Process(IBackend *pBackend)
+{
+	CSingleByteSplitLineProcessor Proc(pBackend);
+
+	do {
+		int nResult = do_pcre_execA(FPattern, FPatternExtra, Proc.Buffer(), Proc.Size(), 0, 0, REParamA.Match(), REParamA.Count());
+		if (nResult >= 0) return true;
+		g_nFoundLine++;
+	} while (Proc.GetNextLine());
+
+	return false;
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+bool CSearchMultiLineRegExpFrontend::Process(IBackend *pBackend)
+{
+	do {
+		const char *szBuffer = pBackend->Buffer();
+		INT_PTR nSize  = pBackend->Size();
+
+		int nResult = do_pcre_execA(FPattern, FPatternExtra, szBuffer, nSize, 0, 0, REParamA.Match(), REParamA.Count());
+		if (nResult >= 0) return true;
+
+		if (pBackend->Last()) break;
+		if (!pBackend->Move(nSize > 1024 ? nSize - 1024 : nSize)) break;
+
+	} while (true);
+
+	return false;
+}
+
 #endif

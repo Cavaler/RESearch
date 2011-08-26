@@ -5,7 +5,7 @@
 
 #ifndef UNICODE
 
-bool RunSearch(LPCTSTR szFileName, IFrontend *pFrontend)
+bool RunSearch(LPCTSTR szFileName, IFrontend *pFrontend, bool /*bUTF8*/)
 {
 	shared_ptr<CFileBackend> pBackend = new CFileBackend();
 	if (!pBackend->Init(FBufferSize*1024*1024)) return false;

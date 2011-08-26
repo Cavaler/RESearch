@@ -341,31 +341,33 @@ void SearchFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 	if (FText.empty()) IsFound=TRUE; else 
 	if (FindData->nFileSizeLow==0) IsFound=FALSE; else 
 	switch (FSearchAs) {
-#ifdef DEBUG
-	case SA_PLAINTEXT		:{
+#ifdef _DEBUG
+	case SA_PLAINTEXT:{
 		CSearchPlainTextFrontend Frontend;
-#ifndef UNICODE
-		IsFound = RunSearch(FindData->cFileName, &Frontend);
-#else
 		IsFound = RunSearch(FindData->cFileName, &Frontend, false);
-#endif
 		break;
-							 }
-	case SA_REGEXP		:{
+					  }
+	case SA_REGEXP:{
 		CSearchRegExpFrontend Frontend;
-#ifndef UNICODE
-		IsFound = RunSearch(FindData->cFileName, &Frontend);
-#else
 		IsFound = RunSearch(FindData->cFileName, &Frontend, true);
-#endif
 		break;
-							 }
+				   }
+	case SA_SEVERALLINE:{
+		CSearchSeveralLineRegExpFrontend Frontend;
+		IsFound = RunSearch(FindData->cFileName, &Frontend, true);
+		break;
+						}
+	case SA_MULTILINE:{
+		CSearchMultiLineRegExpFrontend Frontend;
+		IsFound = RunSearch(FindData->cFileName, &Frontend, true);
+		break;
+					  }
 #else
 	case SA_PLAINTEXT		:IsFound=FindMemoryMapped(FindData->cFileName,FindPlainText);break;
 	case SA_REGEXP			:IsFound=FindMemoryMapped(FindData->cFileName,FindRegExp);break;
-#endif
 	case SA_SEVERALLINE		:IsFound=FindMemoryMapped(FindData->cFileName,FindSeveralLineRegExp);break;
 	case SA_MULTILINE		:IsFound=FindMemoryMapped(FindData->cFileName,FindMultiLineRegExp);break;
+#endif
 	case SA_MULTITEXT		:IsFound=FindMemoryMapped(FindData->cFileName,FindMultiPlainText);break;
 	default:IsFound=FALSE;
 	}
