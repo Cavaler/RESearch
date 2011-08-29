@@ -41,3 +41,20 @@ protected:
 	bool GetNextLastLine();
 	bool BackendMove(INT_PTR nLength);
 };
+
+//	Needed only for Unicode PLain-text Grep
+class CUnicodeSplitLineProcessor : ISplitLineProcessor
+{
+public:
+	CUnicodeSplitLineProcessor(IBackend *pBackend);
+
+	virtual bool			GetNextLine();
+	virtual const char *	Buffer();
+	virtual INT_PTR			Size();
+
+protected:
+	IBackend *m_pBackend;
+
+	const wchar_t *m_szBuffer;
+	const wchar_t *m_szEOL;
+};

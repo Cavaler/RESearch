@@ -105,6 +105,16 @@ INT_PTR	CFileBackend::Size()
 	return m_pDecoder ? m_pDecoder->Size() : m_nSize;
 }
 
+const wchar_t *CFileBackend::BufferW()
+{
+	return (const wchar_t *)Buffer();
+}
+
+INT_PTR	CFileBackend::SizeW()
+{
+	return Size()/2;
+}
+
 bool CFileBackend::Last()
 {
 	return m_bEOF;

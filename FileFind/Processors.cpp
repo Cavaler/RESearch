@@ -155,3 +155,60 @@ INT_PTR	CSingleByteSeveralLineProcessor::Size()
 {
 	return m_szEOL - m_szBuffer;
 }
+
+//////////////////////////////////////////////////////////////////////////
+
+CUnicodeSplitLineProcessor::CUnicodeSplitLineProcessor(IBackend *pBackend)
+: m_pBackend(pBackend)
+{
+	m_szBuffer = m_pBackend->BufferW();
+
+	m_szEOL = m_szBuffer;
+
+	int nSize = m_pBackend->SizeW();
+	SkipNoCRLF(m_szEOL, &nSize);
+}
+
+bool CUnicodeSplitLineProcessor::GetNextLine()
+{
+	int nSize = m_pBackend->SizeW() - (m_szEOL - m_pBackend->BufferW());
+	if (nSize < 2) {
+		if (!m_pBackend->Last()) {
+			if (!m_pBackend->Move(m_szEOL - m_pBackend->BufferW())) return false;
+			m_szEOL = m_pBackend->BufferW();
+			nSize = m_pBackend->SizeW();
+		} else {
+			if (nSize == 0) return false;
+		}
+	}
+
+	SkipCRLF(m_szEOL, &nSize);
+	m_szBuffer = m_szEOL;
+	//	Нашли начало строки
+
+	SkipNoCRLF(m_szEOL, &nSize);
+	if (nSize == 0) {
+		if (!m_pBackend->Last()) {
+			if (!m_pBackend->Move(m_szBuffer - m_pBackend->BufferW())) return false;
+			m_szBuffer = m_pBackend->BufferW();
+			nSize = m_pBackend->SizeW();
+
+			m_szEOL = m_szBuffer;
+			SkipNoCRLF(m_szEOL, &nSize);
+		} else {
+			if (m_szBuffer == m_szEOL) return false;
+		}
+	}
+
+	return true;
+}
+
+const char *CUnicodeSplitLineProcessor::Buffer()
+{
+	return (const char *)m_szBuffer;
+}
+
+INT_PTR	CUnicodeSplitLineProcessor::Size()
+{
+	return m_szEOL - m_szBuffer;
+}

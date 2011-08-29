@@ -5,8 +5,10 @@
 class IBackend
 {
 public:		//	Search functions
-	virtual const char *Buffer() = 0;		//	OEM or UTF-8
+	virtual const char *Buffer() = 0;	//	OEM or UTF-8
 	virtual INT_PTR	Size() = 0;			//	Bytes
+	virtual const wchar_t *BufferW() = 0;	//	Unicode
+	virtual INT_PTR	SizeW() = 0;			//	Characters
 	virtual bool	Last() = 0;
 
 	virtual bool	Move(INT_PTR nLength) = 0;
