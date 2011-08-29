@@ -24,3 +24,9 @@ class CSearchMultiLineRegExpFrontend : public IFrontend
 public:
 	virtual bool	Process(IBackend *pBackend);
 };
+
+class CSearchMultiTextFrontend : public IFrontend
+{
+public:
+	virtual bool	Process(IBackend *pBackend);
+};

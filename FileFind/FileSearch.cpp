@@ -362,13 +362,18 @@ void SearchFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 		IsFound = RunSearch(FindData->cFileName, &Frontend, true);
 		break;
 					  }
+	case SA_MULTITEXT:{
+		CSearchMultiTextFrontend Frontend;
+		IsFound = RunSearch(FindData->cFileName, &Frontend, true);
+		break;
+					  }
 #else
 	case SA_PLAINTEXT		:IsFound=FindMemoryMapped(FindData->cFileName,FindPlainText);break;
 	case SA_REGEXP			:IsFound=FindMemoryMapped(FindData->cFileName,FindRegExp);break;
 	case SA_SEVERALLINE		:IsFound=FindMemoryMapped(FindData->cFileName,FindSeveralLineRegExp);break;
 	case SA_MULTILINE		:IsFound=FindMemoryMapped(FindData->cFileName,FindMultiLineRegExp);break;
-#endif
 	case SA_MULTITEXT		:IsFound=FindMemoryMapped(FindData->cFileName,FindMultiPlainText);break;
+#endif
 	default:IsFound=FALSE;
 	}
 

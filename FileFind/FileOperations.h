@@ -6,3 +6,4 @@
 #include "Frontends.h"
 
 bool RunSearch(LPCTSTR szFileName, IFrontend *pFrontend, bool bUTF8);
+bool RunGrep  (LPCTSTR szFileName, IFrontend *pFrontend, bool bUTF8);
