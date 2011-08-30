@@ -28,8 +28,7 @@ class CPassthroughDecoder : public CSameWidthDecoder
 {
 public:
 	virtual bool	Decode(const char *szBuffer, INT_PTR &nLength);
-	virtual bool	Encode(const char *szBuffer, INT_PTR &nLength);
-	virtual IDecoder *GetDecoder();
+	virtual IDecoder *GetEncoder();
 };
 
 class CUTF8Traverse {

@@ -239,7 +239,7 @@ bool CFileBackend::WriteThru(const char *szBuffer, INT_PTR nLength, INT_PTR nSki
 	}
 
 	if ((m_pEncoder == NULL) && (m_pDecoder != NULL))
-		m_pEncoder = m_pDecoder->GetDecoder();
+		m_pEncoder = m_pDecoder->GetEncoder();
 
 	if (m_pEncoder != NULL) {
 		m_pEncoder->Decode(szBuffer, nLength);

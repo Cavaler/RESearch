@@ -7,7 +7,7 @@ public:
 	CSingleByteToOEMDecoder(UINT nCP, UINT nOEM = CP_OEMCP);
 
 	virtual bool	Decode(const char *szBuffer, INT_PTR &nLength);
-	virtual IDecoder *GetDecoder();
+	virtual IDecoder *GetEncoder();
 
 protected:
 	UINT m_nCP;
@@ -20,7 +20,7 @@ public:
 	CTableToOEMDecoder(const char *szDecodeTable, const char *szEncodeTable);
 
 	virtual bool	Decode(const char *szBuffer, INT_PTR &nLength);
-	virtual IDecoder *GetDecoder();
+	virtual IDecoder *GetEncoder();
 
 protected:
 	const char *m_szDecodeTable;
@@ -35,7 +35,7 @@ public:
 	virtual bool	Decode(const char *szBuffer, INT_PTR &nLength);
 	virtual INT_PTR	DecodedOffset (INT_PTR nOffset);
 	virtual INT_PTR	OriginalOffset(INT_PTR nOffset);
-	virtual IDecoder *GetDecoder();
+	virtual IDecoder *GetEncoder();
 
 protected:
 	UINT m_nOEM;
@@ -47,10 +47,9 @@ public:
 	CReverseUnicodeToOEMDecoder(UINT nOEM = CP_OEMCP);
 
 	virtual bool	Decode(const char *szBuffer, INT_PTR &nLength);
-	virtual bool	Encode(const char *szBuffer, INT_PTR &nLength);
 	virtual INT_PTR	DecodedOffset (INT_PTR nOffset);
 	virtual INT_PTR	OriginalOffset(INT_PTR nOffset);
-	virtual IDecoder *GetDecoder();
+	virtual IDecoder *GetEncoder();
 
 protected:
 	UINT m_nOEM;
@@ -64,7 +63,7 @@ public:
 	virtual bool	Decode(const char *szBuffer, INT_PTR &nLength);
 	virtual INT_PTR	DecodedOffset (INT_PTR nOffset);
 	virtual INT_PTR	OriginalOffset(INT_PTR nOffset);
-	virtual IDecoder *GetDecoder();
+	virtual IDecoder *GetEncoder();
 
 protected:
 	UINT m_nOEM;

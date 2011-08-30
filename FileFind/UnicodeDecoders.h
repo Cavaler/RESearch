@@ -9,7 +9,7 @@ public:
 	virtual bool	Decode(const char *szBuffer, INT_PTR &nLength);
 	virtual INT_PTR	DecodedOffset (INT_PTR nOffset);
 	virtual INT_PTR	OriginalOffset(INT_PTR nOffset);
-	virtual IDecoder *GetDecoder();
+	virtual IDecoder *GetEncoder();
 
 protected:
 	UINT m_nCP;
@@ -21,7 +21,7 @@ public:
 	virtual bool	Decode(const char *szBuffer, INT_PTR &nLength);
 	virtual INT_PTR	DecodedOffset (INT_PTR nOffset);
 	virtual INT_PTR	OriginalOffset(INT_PTR nOffset);
-	virtual IDecoder *GetDecoder();
+	virtual IDecoder *GetEncoder();
 
 protected:
 	CUTF8Traverse m_UT;
@@ -31,7 +31,7 @@ class CReverseUnicodeToUnicodeDecoder : public CSameWidthDecoder
 {
 public:
 	virtual bool	Decode(const char *szBuffer, INT_PTR &nLength);
-	virtual IDecoder *GetDecoder();
+	virtual IDecoder *GetEncoder();
 };
 
 void ReverseUnicode(char *szBuffer, INT_PTR nLength);
@@ -50,7 +50,7 @@ public:
 	virtual INT_PTR		DecodedOffset (INT_PTR nOffset) { return m_pDecoder->DecodedOffset (nOffset); }
 	virtual INT_PTR		OriginalOffset(INT_PTR nOffset) { return m_pDecoder->OriginalOffset(nOffset); }
 
-	virtual IDecoder *	GetDecoder();
+	virtual IDecoder *	GetEncoder();
 
 protected:
 	IDecoder * m_pDecoder;

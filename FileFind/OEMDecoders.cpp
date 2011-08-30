@@ -32,7 +32,7 @@ bool CSingleByteToOEMDecoder::Decode(const char *szBuffer, INT_PTR &nLength)
 	return true;
 }
 
-IDecoder *CSingleByteToOEMDecoder::GetDecoder()
+IDecoder *CSingleByteToOEMDecoder::GetEncoder()
 {
 	return new CSingleByteToOEMDecoder(m_nOEM, m_nCP);
 }
@@ -60,7 +60,7 @@ bool CTableToOEMDecoder::Decode(const char *szBuffer, INT_PTR &nLength)
 	return true;
 }
 
-IDecoder *CTableToOEMDecoder::GetDecoder()
+IDecoder *CTableToOEMDecoder::GetEncoder()
 {
 	return new CTableToOEMDecoder(m_szEncodeTable, m_szDecodeTable);
 }
@@ -101,7 +101,7 @@ INT_PTR CUnicodeToOEMDecoder::OriginalOffset(INT_PTR nOffset)
 	return nOffset * 2;
 }
 
-IDecoder *CUnicodeToOEMDecoder::GetDecoder()
+IDecoder *CUnicodeToOEMDecoder::GetEncoder()
 {
 	return new CSingleByteToUnicodeDecoder(m_nOEM);
 }
@@ -133,25 +133,6 @@ bool CReverseUnicodeToOEMDecoder::Decode(const char *szBuffer, INT_PTR &nLength)
 	return true;
 }
 
-bool CReverseUnicodeToOEMDecoder::Encode(const char *szBuffer, INT_PTR &nLength)
-{
-	Clear();
-	if (nLength == 0) return true;
-
-	m_nSize = nLength*2;
-	m_szBuffer = (char *)malloc(m_nSize);
-	if (m_szBuffer == NULL) return false;
-
-	for (INT_PTR nChar = 0; nChar < m_nSize/2; nChar++) {
-		wchar_t wcSingle;
-		MultiByteToWideChar(m_nOEM, 0, szBuffer+nChar, 1, &wcSingle, 1);
-		m_szBuffer[nChar*2  ] = (wcSingle >> 8) & 0xFF;
-		m_szBuffer[nChar*2+1] = wcSingle & 0xFF;
-	}
-
-	return true;
-}
-
 INT_PTR CReverseUnicodeToOEMDecoder::DecodedOffset (INT_PTR nOffset)
 {
 	if (nOffset & 1) return -1;
@@ -163,7 +144,7 @@ INT_PTR CReverseUnicodeToOEMDecoder::OriginalOffset(INT_PTR nOffset)
 	return nOffset * 2;
 }
 
-IDecoder *CReverseUnicodeToOEMDecoder::GetDecoder()
+IDecoder *CReverseUnicodeToOEMDecoder::GetEncoder()
 {
 	return new CAnyToReverseUnicode(new CSingleByteToUnicodeDecoder(m_nOEM));
 }
@@ -212,7 +193,7 @@ INT_PTR CUTF8ToOEMDecoder::OriginalOffset(INT_PTR nOffset)
 	return m_UT.CharToByte(nOffset);
 }
 
-IDecoder *CUTF8ToOEMDecoder::GetDecoder()
+IDecoder *CUTF8ToOEMDecoder::GetEncoder()
 {
 	return new CSingleByteToUTF8Decoder(m_nOEM);
 }

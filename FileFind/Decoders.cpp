@@ -63,20 +63,7 @@ bool CPassthroughDecoder::Decode(const char *szBuffer, INT_PTR &nLength)
 	return true;
 }
 
-bool CPassthroughDecoder::Encode(const char *szBuffer, INT_PTR &nLength)
-{
-	Clear();
-
-	m_szBuffer = (char *)malloc(nLength);
-	if (m_szBuffer == NULL) return false;
-
-	memmove(m_szBuffer, szBuffer, nLength);
-	m_nSize = nLength;
-
-	return true;
-}
-
-IDecoder *CPassthroughDecoder::GetDecoder()
+IDecoder *CPassthroughDecoder::GetEncoder()
 {
 	return new CPassthroughDecoder();
 }

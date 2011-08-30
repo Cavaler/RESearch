@@ -42,7 +42,7 @@ public:
 	virtual INT_PTR		DecodedOffset (INT_PTR nOffset) = 0;
 	virtual INT_PTR		OriginalOffset(INT_PTR nOffset) = 0;
 
-	virtual IDecoder *	GetDecoder() = 0;
+	virtual IDecoder *	GetEncoder() = 0;
 };
 
 class ISplitLineProcessor

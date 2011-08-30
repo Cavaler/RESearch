@@ -36,7 +36,7 @@ INT_PTR	CSingleByteToUnicodeDecoder::OriginalOffset(INT_PTR nOffset)
 	return nOffset / 2;
 }
 
-IDecoder *CSingleByteToUnicodeDecoder::GetDecoder()
+IDecoder *CSingleByteToUnicodeDecoder::GetEncoder()
 {
 	return new CUnicodeToOEMDecoder(m_nCP);
 }
@@ -75,7 +75,7 @@ INT_PTR	CUTF8ToUnicodeDecoder::OriginalOffset(INT_PTR nOffset)
 	return m_UT.CharToByte(nOffset/2);
 }
 
-IDecoder *CUTF8ToUnicodeDecoder::GetDecoder()
+IDecoder *CUTF8ToUnicodeDecoder::GetEncoder()
 {
 	return new CUnicodeToUTF8Decoder();
 }
@@ -118,7 +118,7 @@ bool CReverseUnicodeToUnicodeDecoder::Decode(const char *szBuffer, INT_PTR &nLen
 	return true;
 }
 
-IDecoder *CReverseUnicodeToUnicodeDecoder::GetDecoder()
+IDecoder *CReverseUnicodeToUnicodeDecoder::GetEncoder()
 {
 	return new CReverseUnicodeToUnicodeDecoder();
 }
@@ -142,7 +142,7 @@ bool CAnyToReverseUnicode::Decode(const char *szBuffer, INT_PTR &nLength)
 	return true;
 }
 
-IDecoder *CAnyToReverseUnicode::GetDecoder()
+IDecoder *CAnyToReverseUnicode::GetEncoder()
 {
 	return NULL;
 }

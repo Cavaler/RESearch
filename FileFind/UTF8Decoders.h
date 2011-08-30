@@ -9,7 +9,7 @@ public:
 	virtual bool	Decode(const char *szBuffer, INT_PTR &nLength);
 	virtual INT_PTR	DecodedOffset (INT_PTR nOffset);
 	virtual INT_PTR	OriginalOffset(INT_PTR nOffset);
-	virtual IDecoder *GetDecoder();
+	virtual IDecoder *GetEncoder();
 
 protected:
 	UINT m_nCP;
@@ -22,7 +22,7 @@ public:
 	virtual bool	Decode(const char *szBuffer, INT_PTR &nLength);
 	virtual INT_PTR	DecodedOffset (INT_PTR nOffset);
 	virtual INT_PTR	OriginalOffset(INT_PTR nOffset);
-	virtual IDecoder *GetDecoder();
+	virtual IDecoder *GetEncoder();
 
 protected:
 	CUTF8Traverse m_UT;
@@ -34,7 +34,7 @@ public:
 	virtual bool	Decode(const char *szBuffer, INT_PTR &nLength);
 	virtual INT_PTR	DecodedOffset (INT_PTR nOffset);
 	virtual INT_PTR	OriginalOffset(INT_PTR nOffset);
-	virtual IDecoder *GetDecoder();
+	virtual IDecoder *GetEncoder();
 
 protected:
 	CUTF8Traverse m_UT;
