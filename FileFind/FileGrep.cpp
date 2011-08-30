@@ -1,24 +1,8 @@
 #include "StdAfx.h"
 #include "..\RESearch.h"
 
-#include "FileOperations.h"
-
 ::CHandle g_hOutput;
 int     g_nLines;
-
-struct sBufferedLine {
-	sBufferedLine(const TCHAR *_Buffer, const TCHAR *_BufEnd) : szBuffer(_Buffer), szBufEnd(_BufEnd) {}
-	sBufferedLine(const tstring &_Data) : strData(_Data) {
-		szBuffer = strData.data();
-		szBufEnd = szBuffer + strData.length();
-	}
-
-	inline int Length() const {return szBufEnd - szBuffer;}
-	const TCHAR *szBuffer;
-	const TCHAR *szBufEnd;
-
-	tstring strData;
-};
 
 void AddGrepLine(const TCHAR *szLine, bool bEOL = true) {
 	DWORD dwWritten;
@@ -26,28 +10,47 @@ void AddGrepLine(const TCHAR *szLine, bool bEOL = true) {
 	if (bEOL) WriteFile(g_hOutput, _T("\r\n"), 2, &dwWritten, NULL);
 }
 
-void AddGrepLine(const tstring &szLine, bool bEOL = true) {
+void AddGrepLine(const tstring &strLine, bool bEOL = true) {
 	DWORD dwWritten;
-	WriteFile(g_hOutput, szLine.data(), szLine.size()*sizeof(TCHAR), &dwWritten, NULL);
+	WriteFile(g_hOutput, strLine.data(), strLine.size()*sizeof(TCHAR), &dwWritten, NULL);
 	if (bEOL) WriteFile(g_hOutput, _T("\r\n"), 2, &dwWritten, NULL);
 }
 
-void AddGrepResultLine(const sBufferedLine &Line, int nLineNumber) {
+void AddGrepResultLine(const string &strLine, int nLineNumber) {
 	if (FGAddLineNumbers) {
 		AddGrepLine(FormatStr(_T("%d:"), nLineNumber), false);
 	}
-	AddGrepLine(tstring(Line.szBuffer, Line.szBufEnd));
+#ifdef UNICODE
+	if (FSearchAs == SA_REGEXP) {
+		AddGrepLine(UTF8ToUnicode(strLine));
+	} else {
+		DWORD dwWritten;
+		WriteFile(g_hOutput, strLine.data(), strLine.size(), &dwWritten, NULL);
+		AddGrepLine(L"");
+	}
+#else
+	AddGrepLine(strLine);
+#endif
 }
 
-bool GrepLineFound(const sBufferedLine &strBuf) {
+bool GrepLineFound(const string &strBuf) {
 	BOOL bResult;
 
+#ifdef UNICODE
 	if (FSearchAs == SA_REGEXP) {
-		bResult = do_pcre_exec(FPattern, FPatternExtra, strBuf.szBuffer, strBuf.Length(), 0, 0, NULL, 0) >= 0;
+		bResult = do_pcre_execA(FPattern, FPatternExtra, strBuf.data(), strBuf.length(), 0, 0, NULL, 0) >= 0;
 	} else {
-		TCHAR *Table = (FCaseSensitive) ? NULL : UpCaseTable;
-		bResult = BMHSearch(strBuf.szBuffer, strBuf.Length(), FTextUpcase.data(), FTextUpcase.size(), Table) >= 0;
+		TCHAR *szTable = (FCaseSensitive) ? NULL : UpCaseTable;
+		bResult = BMHSearch((WCHAR *)strBuf.data(), strBuf.length()/2, FTextUpcase.data(), FTextUpcase.size(), szTable) >= 0;
 	}
+#else
+	if (FSearchAs == SA_REGEXP) {
+		bResult = do_pcre_exec(FPattern, FPatternExtra, strBuf.data(), strBuf.length(), 0, 0, NULL, 0) >= 0;
+	} else {
+		TCHAR *szTable = (FCaseSensitive) ? NULL : UpCaseTable;
+		bResult = BMHSearch(strBuf.data(), strBuf.length(), FTextUpcase.data(), FTextUpcase.size(), szTable) >= 0;
+	}
+#endif
 
 	return (bResult != 0) != (FSInverse != 0);
 }
@@ -76,7 +79,7 @@ bool CGrepFrontend::Process(IBackend *pBackend)
 	m_pProc = new CSingleByteSplitLineProcessor(pBackend);
 #endif
 
-	deque<sBufferedLine> arrStringBuffer;
+	deque<string> arrStringBuffer;
 	int nFoundCount = 0;
 	int nFirstBufferLine = 0;
 	int nLastMatched = -1;
@@ -86,7 +89,7 @@ bool CGrepFrontend::Process(IBackend *pBackend)
 		const char *szBuffer = m_pProc->Buffer();
 		INT_PTR nSize  = m_pProc->Size();
 
-		arrStringBuffer.push_back(sBufferedLine(szBuffer, szBuffer+nSize));
+		arrStringBuffer.push_back(string(szBuffer, szBuffer+nSize));
 
 		if (GrepLineFound(arrStringBuffer.back())) {
 			nFoundCount++;
@@ -162,18 +165,6 @@ void GrepFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 		CGrepFrontend Frontend(false);
 		RunSearch(FindData->cFileName, &Frontend, false);
 	}
-
-/*	CFileMapping mapFile;
-	if (!mapFile.Open(FindData->cFileName)) {
-//		const TCHAR *Lines[]={GetMsg(MREReplace),GetMsg(MFileOpenError),FindData->cFileName,GetMsg(MOk)};
-//		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"FSOpenError",Lines,4,1);
-		return;
-	}
-
-	DWORD FileSize = mapFile.Size();
-	if (FAdvanced && FASearchHead && (FileSize > (int)FASearchHeadLimit)) FileSize=FASearchHeadLimit;
-	if ((FSearchAs == SA_PLAINTEXT) && (FileSize < FText.length())) return;
-*/
 }
 
 bool PrepareFileGrepPattern() {

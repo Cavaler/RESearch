@@ -210,5 +210,5 @@ const char *CUnicodeSplitLineProcessor::Buffer()
 
 INT_PTR	CUnicodeSplitLineProcessor::Size()
 {
-	return m_szEOL - m_szBuffer;
+	return (m_szEOL - m_szBuffer)*2;
 }

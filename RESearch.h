@@ -164,7 +164,6 @@ inline bool Interrupted256(int nValue) {
 #include "Presets.h"
 #include "ViewFind\ViewFind.h"
 #include "EditFind\EditFind.h"
-#include "FileFind\EncodedFile.h"
 #include "FileFind\FileFind.h"
 #include "FileTools\FileTools.h"
 

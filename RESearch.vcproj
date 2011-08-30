@@ -1473,14 +1473,6 @@
 			Name="FileFind Sources"
 			>
 			<File
-				RelativePath=".\FileFind\EncodedFile.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\FileFind\EncodedFile.h"
-				>
-			</File>
-			<File
 				RelativePath="FileFind\FileCommon.cpp"
 				>
 				<FileConfiguration

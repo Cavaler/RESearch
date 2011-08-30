@@ -1,7 +1,6 @@
-/* Copyright (C) 2000,Kostromitinov Pavel */
-#ifndef __FILEFIND_H
-#define __FILEFIND_H
-#include "..\RESearch.h"
+#pragma once
+
+#include "FileFind\FileOperations.h"
 
 enum SearchAs {SA_PLAINTEXT,SA_REGEXP,SA_SEVERALLINE,SA_MULTILINE,SA_MULTITEXT,SA_MULTIREGEXP};
 enum SearchIn {SI_ALLDRIVES,SI_ALLLOCAL,SI_FROMROOT,SI_FROMCURRENT,SI_CURRENTONLY,SI_SELECTED};
@@ -204,5 +203,3 @@ private:
 	void UpdateList();
 };
 EXTERN CTemporaryPanel *LastTempPanel VALUE(NULL);
-
-#endif
