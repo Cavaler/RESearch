@@ -1,6 +1,8 @@
 #include "StdAfx.h"
 #include "..\RESearch.h"
 
+#include "FileOperations.h"
+
 ::CHandle g_hOutput;
 int     g_nLines;
 
@@ -50,8 +52,29 @@ bool GrepLineFound(const sBufferedLine &strBuf) {
 	return (bResult != 0) != (FSInverse != 0);
 }
 
-bool GrepBuffer(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems, const TCHAR *szBuffer, int FileSize) {
-	const TCHAR *szBufEnd = szBuffer;
+class CGrepFrontend : public IFrontend
+{
+public:
+	CGrepFrontend(bool bUTF8 = true) : m_pProc(NULL), m_bUTF8(bUTF8) {}
+	~CGrepFrontend() { if (m_pProc) delete m_pProc; }
+
+	virtual bool	Process(IBackend *pBackend);
+
+protected:
+	ISplitLineProcessor *m_pProc;
+	bool m_bUTF8;
+};
+
+bool CGrepFrontend::Process(IBackend *pBackend)
+{
+#ifdef UNICODE
+	if (m_bUTF8)
+		m_pProc = new CSingleByteSplitLineProcessor(pBackend);
+	else
+		m_pProc = new CUnicodeSplitLineProcessor(pBackend);
+#else
+	m_pProc = new CSingleByteSplitLineProcessor(pBackend);
+#endif
 
 	deque<sBufferedLine> arrStringBuffer;
 	int nFoundCount = 0;
@@ -59,24 +82,22 @@ bool GrepBuffer(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems, const T
 	int nLastMatched = -1;
 
 	int nContextLines = FGAddContext ? FGContextLines : 0;
-	while (FileSize) {
-		szBuffer = szBufEnd;
-		SkipNoCRLF(szBufEnd, &FileSize);
+	do {
+		const char *szBuffer = m_pProc->Buffer();
+		INT_PTR nSize  = m_pProc->Size();
 
-		arrStringBuffer.push_back(sBufferedLine(szBuffer, szBufEnd));
+		arrStringBuffer.push_back(sBufferedLine(szBuffer, szBuffer+nSize));
 
 		if (GrepLineFound(arrStringBuffer.back())) {
-			if (++nFoundCount == 1) {
-				AddFile(FindData, PanelItems);
-			}
+			nFoundCount++;
 			nLastMatched = arrStringBuffer.size()-1;
 
 			switch (FGrepWhat) {
 			case GREP_NAMES:
-				AddGrepLine(FindData->cFileName);
+				AddGrepLine(pBackend->FileName());
 				return true;
 			case GREP_NAMES_LINES:
-				if (nFoundCount == 1) AddGrepLine(FindData->cFileName);
+				if (nFoundCount == 1) AddGrepLine(pBackend->FileName());
 				break;
 			}
 		} else {
@@ -106,12 +127,11 @@ bool GrepBuffer(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems, const T
 			}
 		}
 
-		SkipCRLF(szBufEnd, &FileSize);
-	}
+	} while (m_pProc->GetNextLine());
 
 	switch (FGrepWhat) {
 	case GREP_NAMES_COUNT:
-		if (nFoundCount > 0) AddGrepLine(FormatStr(_T("%s:%d"), FindData->cFileName, nFoundCount).c_str());
+		if (nFoundCount > 0) AddGrepLine(FormatStr(_T("%s:%d"), pBackend->FileName(), nFoundCount).c_str());
 		break;
 	case GREP_NAMES_LINES:
 	case GREP_LINES:
@@ -135,7 +155,15 @@ void GrepFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 		return;
 	}
 
-	CFileMapping mapFile;
+	if (FSearchAs == SA_REGEXP) {
+		CGrepFrontend Frontend(true);
+		RunSearch(FindData->cFileName, &Frontend, true);
+	} else {
+		CGrepFrontend Frontend(false);
+		RunSearch(FindData->cFileName, &Frontend, false);
+	}
+
+/*	CFileMapping mapFile;
 	if (!mapFile.Open(FindData->cFileName)) {
 //		const TCHAR *Lines[]={GetMsg(MREReplace),GetMsg(MFileOpenError),FindData->cFileName,GetMsg(MOk)};
 //		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,"FSOpenError",Lines,4,1);
@@ -145,77 +173,7 @@ void GrepFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 	DWORD FileSize = mapFile.Size();
 	if (FAdvanced && FASearchHead && (FileSize > (int)FASearchHeadLimit)) FileSize=FASearchHeadLimit;
 	if ((FSearchAs == SA_PLAINTEXT) && (FileSize < FText.length())) return;
-
-
-	EncodedFile::CEncodedFileT encFile(mapFile, FileSize);
-
-	//	1 - Autodetect
-
-	vector<TCHAR> arrData;
-	eLikeUnicode nDetect = LikeUnicode(mapFile, FileSize);
-	if (nDetect != UNI_NONE) {
-		encFile.SetSourceDetect(nDetect);
-		if (encFile.Size() > 0) {
-			if (encFile.Run<WIN32_FIND_DATA *, panelitem_vector &>(GrepBuffer, FindData, PanelItems)) return;
-		}
-#ifdef TRY_ENCODINGS_WITH_BOM
-		if (!FAllCharTables) return;
-#else
-		return;
-#endif
-	}
-
-	//	2 - OEM / Default
-
-	encFile.SetSourceCP(GetDefCP());
-	if (encFile.Run<WIN32_FIND_DATA *, panelitem_vector &>(GrepBuffer, FindData, PanelItems)) return;
-
-	if (!FAllCharTables) return;
-
-	//	3 - Tables
-
-#ifdef UNICODE
-	for (cp_set::iterator it = g_setAllCPs.begin(); it != g_setAllCPs.end(); it++) {
-		UINT nCP = *it;
-		if (IsDefCP(nCP)) continue;
-		if ((nCP == CP_UNICODE) || (nCP == CP_REVERSEBOM)) continue;
-
-		encFile.SetSourceCP(nCP);
-		if (encFile.Run<WIN32_FIND_DATA *, panelitem_vector &>(GrepBuffer, FindData, PanelItems)) return;
-	}
-#else
-	for (size_t nTable=0; nTable < XLatTables.size(); nTable++) {
-		encFile.SetSourceTable(XLatTables[nTable].DecodeTable);
-		if (encFile.Run<WIN32_FIND_DATA *, panelitem_vector &>(GrepBuffer, FindData, PanelItems)) return;
-	}
-#endif
-
-	//	4 - Unicode
-
-	if ((nDetect != UNI_LE)
-#ifdef UNICODE
-		&& (g_setAllCPs.find(CP_UNICODE) != g_setAllCPs.end())
-#endif
-	) {
-		encFile.SetSourceUnicode(true);
-		if (encFile.Run<WIN32_FIND_DATA *, panelitem_vector &>(GrepBuffer, FindData, PanelItems)) return;
-	}
-
-	if ((nDetect != UNI_BE)
-#ifdef UNICODE
-		&& (g_setAllCPs.find(CP_REVERSEBOM) != g_setAllCPs.end())
-#endif
-	) {
-		encFile.SetSourceUnicode(false);
-		if (encFile.Run<WIN32_FIND_DATA *, panelitem_vector &>(GrepBuffer, FindData, PanelItems)) return;
-	}
-#ifndef UNICODE
-	if (nDetect != UNI_UTF8) {
-		encFile.SetSourceUTF8();
-		if (encFile.Run<WIN32_FIND_DATA *, panelitem_vector &>(GrepBuffer, FindData, PanelItems)) return;
-	}
-#endif
-
+*/
 }
 
 bool PrepareFileGrepPattern() {

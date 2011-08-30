@@ -23,6 +23,10 @@ public:		//	Replace functions
 
 	//	Write a new data instead of old one
 	virtual bool	WriteThru(const char *szBuffer, INT_PTR nLength, INT_PTR nSkipLength) = 0;
+
+public:
+
+	virtual LPCTSTR	FileName() = 0;
 };
 
 //	Source encoding is determined by created instance

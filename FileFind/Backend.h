@@ -27,10 +27,13 @@ public:
 	virtual bool	Move(INT_PTR nLength);
 	virtual bool	WriteBack(INT_PTR nLength);
 	virtual bool	WriteThru(const char *szBuffer, INT_PTR nLength, INT_PTR nSkipLength);
+	virtual LPCTSTR	FileName();
 
 	static void Free();
 
 protected:
+	tstring		m_strFileName;
+
 	HANDLE		m_hFile;
 	bool		m_bEOF;
 	bool		ReadUp(INT_PTR nRest);

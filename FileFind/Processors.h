@@ -2,7 +2,7 @@
 #include "IFileOperations.h"
 
 //	Handles all single-byte as well as UTF-8
-class CSingleByteSplitLineProcessor : ISplitLineProcessor
+class CSingleByteSplitLineProcessor : public ISplitLineProcessor
 {
 public:
 	CSingleByteSplitLineProcessor(IBackend *pBackend);
@@ -18,7 +18,7 @@ protected:
 	const char *m_szEOL;
 };
 
-class CSingleByteSeveralLineProcessor : ISplitLineProcessor
+class CSingleByteSeveralLineProcessor : public ISplitLineProcessor
 {
 public:
 	CSingleByteSeveralLineProcessor(IBackend *pBackend, int nLines, INT_PTR nMaxSize);
@@ -42,8 +42,8 @@ protected:
 	bool BackendMove(INT_PTR nLength);
 };
 
-//	Needed only for Unicode PLain-text Grep
-class CUnicodeSplitLineProcessor : ISplitLineProcessor
+//	Needed only for Unicode Plain-text Grep
+class CUnicodeSplitLineProcessor : public ISplitLineProcessor
 {
 public:
 	CUnicodeSplitLineProcessor(IBackend *pBackend);

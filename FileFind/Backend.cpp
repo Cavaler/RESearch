@@ -51,6 +51,8 @@ bool CFileBackend::Open(LPCTSTR szFileName)
 	m_hFile = CreateFile(szFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, NULL, NULL);
 	if (m_hFile == INVALID_HANDLE_VALUE) return false;
 
+	m_strFileName = szFileName;
+
 	ReadUp(0);
 
 	return true;
@@ -143,4 +145,9 @@ bool CFileBackend::WriteBack(INT_PTR nLength)
 bool CFileBackend::WriteThru(const char *szBuffer, INT_PTR nLength, INT_PTR nSkipLength)
 {
 	return false;
+}
+
+LPCTSTR CFileBackend::FileName()
+{
+	return m_strFileName.c_str();
 }
