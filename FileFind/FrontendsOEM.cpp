@@ -80,6 +80,45 @@ bool CSearchMultiLineRegExpFrontend::Process(IBackend *pBackend)
 
 //////////////////////////////////////////////////////////////////////////
 
+bool CReplacePlainTextFrontend::Process(IBackend *pBackend)
+{
+	TCHAR *szTable = (FCaseSensitive) ? NULL : UpCaseTable;
+
+	tstring TextUpcase = (FCaseSensitive) ? FText : UpCaseString(FText);
+	PrepareBMHSearch(TextUpcase.data(), TextUpcase.length());
+
+	REParamA.Clear();
+
+	do {
+		const char *szBuffer = pBackend->Buffer();
+		INT_PTR nSize  = pBackend->Size();
+
+		int nOffset;
+		while ((nOffset = BMHSearch(szBuffer, nSize, TextUpcase.data(), TextUpcase.size(), szTable)) >= 0)
+		{
+			if (!pBackend->WriteBack(szBuffer - pBackend->Buffer() + nOffset)) break;
+
+			REParamA.AddSource(szBuffer+nOffset, TextUpcase.size());
+			REParamA.AddFNumbers(FileNumber, FindNumber, ReplaceNumber);
+			string strReplace = CSOA::CreateReplaceString(FRReplace.c_str(), "\n", -1, REParamA);
+
+			pBackend->WriteThru(strReplace.data(), strReplace.size(), TextUpcase.size());
+
+			szBuffer += nOffset + TextUpcase.size();
+			nSize    -= nOffset + TextUpcase.size();
+			FindNumber++;
+		}
+
+		if (pBackend->Last()) break;
+		if (!pBackend->Move(pBackend->Size()-FText.size())) break;
+
+	} while (true);
+
+	return FindNumber > 0;
+}
+
+//////////////////////////////////////////////////////////////////////////
+
 bool PrepareAndFind(IBackend *pBackend, const string &strText)
 {
 	TCHAR *szTable = (FCaseSensitive) ? NULL : UpCaseTable;

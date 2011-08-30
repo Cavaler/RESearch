@@ -277,6 +277,33 @@ bool ProcessBuffer(const char *Buffer,int BufLen,WIN32_FIND_DATA *FindData) {
 	return false;
 }
 
+bool RunReplace(LPCTSTR szFileName)
+{
+	FRConfirmLineThisFile = FRConfirmLineThisRun;
+	FileConfirmed = !FRConfirmFileThisRun;
+	FindNumber = ReplaceNumber = 0;
+#ifndef UNICODE
+	m_pReplaceTable = NULL;
+#endif
+
+	switch (FSearchAs) {
+	case SA_PLAINTEXT:{
+		CReplacePlainTextFrontend Frontend;
+		return RunReplace(szFileName, g_strNewFileName.c_str(), &Frontend, false);
+					  }
+/*	case SA_REGEXP:{
+		CReplaceRegExpFrontend Frontend;
+		return RunSearch(szFileName, &Frontend, true);
+				   }
+	case SA_SEVERALLINE:{
+		CReplaceSeveralLineRegExpFrontend Frontend;
+		return RunSearch(szFileName, &Frontend, true);
+						}*/
+	}
+
+	return false;
+}
+
 char *AddExtension(char *FileName,char *Extension) {
 	char *New=(char *)malloc(strlen(FileName)+strlen(Extension)+1);
 	return strcat(strcpy(New,FileName),Extension);
@@ -296,18 +323,20 @@ tstring GetUniqueFileName(const TCHAR *szCurrent, const TCHAR *szExt) {
 	} while (true);
 }
 
-bool ReplaceSingleFile_Normal(WIN32_FIND_DATA *FindData, CFileMapping &mapFile) {
-	bool bProcess = ProcessBuffer(mapFile, FindData->nFileSizeLow, FindData);
-	mapFile.Close();
+bool ReplaceSingleFile_Normal(WIN32_FIND_DATA &FindData)
+{
+	bool bProcess = RunReplace(FindData.cFileName);
 
 	if (bProcess) {
-		if (!ReplaceFile(FindData->cFileName, g_strNewFileName.c_str(),
+#ifndef _DEBUG
+		if (!ReplaceFile(FindData.cFileName, g_strNewFileName.c_str(),
 			(FRSaveOriginal) ? g_strBackupFileName.c_str() : NULL,
 			REPLACEFILE_IGNORE_MERGE_ERRORS, NULL, NULL)) {
 
-				const TCHAR *Lines[]={GetMsg(MREReplace),GetMsg(MFileBackupError),FindData->cFileName,GetMsg(MOk)};
+				const TCHAR *Lines[]={GetMsg(MREReplace),GetMsg(MFileBackupError),FindData.cFileName,GetMsg(MOk)};
 				StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING|FMSG_ERRORTYPE,_T("FRBackupError"),Lines,4,1);
 		}
+#endif
 	} else {
 		DeleteFile(g_strNewFileName.c_str());
 	}
@@ -316,22 +345,19 @@ bool ReplaceSingleFile_Normal(WIN32_FIND_DATA *FindData, CFileMapping &mapFile) 
 }
 
 //	Using slow but reliable mechanism for files with hardlinks
-bool ReplaceSingleFile_CopyFirst(WIN32_FIND_DATA *FindData, CFileMapping &mapFile) {
-	if (!CopyFile(FindData->cFileName, g_strBackupFileName.c_str(), FALSE)) {
-		return ReplaceSingleFile_Normal(FindData, mapFile);
+bool ReplaceSingleFile_CopyFirst(WIN32_FIND_DATA &FindData)
+{
+	if (!CopyFile(FindData.cFileName, g_strBackupFileName.c_str(), FALSE)) {
+		return ReplaceSingleFile_Normal(FindData);
 	}
 
-	mapFile.Close();
-	mapFile.Open(g_strBackupFileName.c_str());
-	g_strNewFileName = FindData->cFileName;
-
-	bool bProcess = ProcessBuffer(mapFile, FindData->nFileSizeLow, FindData);
-	mapFile.Close();
+	g_strNewFileName = FindData.cFileName;
+	bool bProcess = RunReplace(g_strBackupFileName.c_str());
 
 	if (bProcess) {
 		if (!FRSaveOriginal) DeleteFile(g_strBackupFileName.c_str());
 	} else {
-		MoveFileEx(g_strBackupFileName.c_str(), FindData->cFileName, MOVEFILE_REPLACE_EXISTING|MOVEFILE_COPY_ALLOWED);
+		MoveFileEx(g_strBackupFileName.c_str(), FindData.cFileName, MOVEFILE_REPLACE_EXISTING|MOVEFILE_COPY_ALLOWED);
 	}
 
 	return bProcess;
@@ -352,17 +378,18 @@ void ReplaceSingleFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) 
 		: GetUniqueFileName(FindData->cFileName, _T(".bak"));
 	g_strNewFileName = GetUniqueFileName(FindData->cFileName, _T(".new"));
 
-	CFileMapping mapFile;
-	if (mapFile.Open(FindData->cFileName)) {
+	HANDLE hFile = CreateFile(FindData->cFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, NULL, NULL);
+	if (hFile != INVALID_HANDLE_VALUE) {
 
 		BY_HANDLE_FILE_INFORMATION hfInfo;
-		GetFileInformationByHandle(mapFile.GetFileHandle(), &hfInfo);
+		GetFileInformationByHandle(hFile, &hfInfo);
+		CloseHandle(hFile);
 
 		bool bProcess;
 		if (hfInfo.nNumberOfLinks > 1) {
-			bProcess = ReplaceSingleFile_CopyFirst(FindData, mapFile);
+			bProcess = ReplaceSingleFile_CopyFirst(*FindData);
 		} else {
-			bProcess = ReplaceSingleFile_Normal(FindData, mapFile);
+			bProcess = ReplaceSingleFile_Normal(*FindData);
 		}
 
 		if (bProcess) {
@@ -384,7 +411,7 @@ bool PrepareFileReplacePattern() {
 }
 
 int ReplacePrompt(BOOL Plugin) {
-	CFarDialog Dialog(76,24,_T("FileReplaceDlg"));
+	CFarDialog Dialog(76, 25, _T("FileReplaceDlg"));
 	Dialog.SetWindowProc(FileSearchDialogProc, 0);
 	Dialog.SetUseID(true);
 	Dialog.SetCancelID(MCancel);
@@ -409,20 +436,21 @@ int ReplacePrompt(BOOL Plugin) {
 	Dialog.Add(new CFarRadioButtonItem(5,10,0,MRegExp,			 (int *)&FSearchAs,SA_REGEXP));
 	Dialog.Add(new CFarRadioButtonItem(5,11,0,MSeveralLineRegExp,(int *)&FSearchAs,SA_SEVERALLINE));
 	Dialog.Add(new CFarCheckBoxItem(5,12,0,MCaseSensitive,&FCaseSensitive));
+	Dialog.Add(new CFarCheckBoxItem(5,13,0,MAllCharTables,&FAllCharTables));
 
-	Dialog.Add(new CFarTextItem(5,14,0,MSearchIn));
+	Dialog.Add(new CFarTextItem(5,15,0,MSearchIn));
 	if (Plugin) {
 		if (FSearchIn<SI_FROMCURRENT) FSearchIn=SI_FROMCURRENT;
-		Dialog.Add(new CFarComboBoxItem(15,14,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearchPlugin, false),(int *)&FSearchIn,NULL,3));
+		Dialog.Add(new CFarComboBoxItem(15,15,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearchPlugin, false),(int *)&FSearchIn,NULL,3));
 	} else {
-		Dialog.Add(new CFarComboBoxItem(15,14,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearch, false),(int *)&FSearchIn));
+		Dialog.Add(new CFarComboBoxItem(15,15,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearch, false),(int *)&FSearchIn));
 	}
 
-	Dialog.Add(new CFarCheckBoxItem(5,16,0,MViewModified,&FROpenModified));
-	Dialog.Add(new CFarCheckBoxItem(5,17,0,MConfirmFile,&FRConfirmFile));
-	Dialog.Add(new CFarCheckBoxItem(5,18,0,MConfirmLine,&FRConfirmLine));
-	Dialog.Add(new CFarCheckBoxItem(40,16,0,MSaveOriginal,&FRSaveOriginal));
-	Dialog.Add(new CFarCheckBoxItem(42,17,0,MOverwriteBackup,&FROverwriteBackup));
+	Dialog.Add(new CFarCheckBoxItem(5,17,0,MViewModified,&FROpenModified));
+	Dialog.Add(new CFarCheckBoxItem(5,18,0,MConfirmFile,&FRConfirmFile));
+	Dialog.Add(new CFarCheckBoxItem(5,19,0,MConfirmLine,&FRConfirmLine));
+	Dialog.Add(new CFarCheckBoxItem(40,17,0,MSaveOriginal,&FRSaveOriginal));
+	Dialog.Add(new CFarCheckBoxItem(42,18,0,MOverwriteBackup,&FROverwriteBackup));
 
 	Dialog.AddButtons(MOk,MCancel);
 	Dialog.Add(new CFarButtonItem(60,9,0,0,MBtnPresets));

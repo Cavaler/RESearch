@@ -30,3 +30,9 @@ class CSearchMultiTextFrontend : public IFrontend
 public:
 	virtual bool	Process(IBackend *pBackend);
 };
+
+class CReplacePlainTextFrontend : public IFrontend
+{
+public:
+	virtual bool	Process(IBackend *pBackend);
+};

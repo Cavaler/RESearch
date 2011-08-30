@@ -4,10 +4,25 @@
 char *CFileBackend::m_szBuffer = NULL;
 INT_PTR CFileBackend::m_nBlockSize = 0;
 
+DWORD I64Ceil(__int64 i64)
+{
+	if (i64 > 0xFFFFFFFF) return 0xFFFFFFFF;
+	if (i64 < 0) return 0;
+	return (DWORD) i64;
+}
+
+#ifdef _WIN64
+#define ICeil(i64) I64Ceil(i64)
+#else
+#define ICeil(i64) ((DWORD)(i64))
+#endif
+
 CFileBackend::CFileBackend()
 : m_hFile		(INVALID_HANDLE_VALUE)
 , m_pDecoder	(NULL)
 , m_nSize		(0)
+, m_hOutFile	(INVALID_HANDLE_VALUE)
+, m_pEncoder	(NULL)
 {
 }
 
@@ -56,7 +71,28 @@ bool CFileBackend::Open(LPCTSTR szFileName, INT_PTR nMaxSize)
 	m_nSizeLimit = dwSizeLow + (((__int64)dwSizeHigh)<<32);
 	if ((nMaxSize > 0) && (nMaxSize < m_nSizeLimit)) m_nSizeLimit = nMaxSize;
 
+	m_nOriginalSizeLimit = m_nSizeLimit;
+
 	m_strFileName = szFileName;
+
+	ReadUp(0);
+
+	return true;
+}
+
+bool CFileBackend::Open(LPCTSTR szInFileName, LPCTSTR szOutFileName)
+{
+	m_hFile = CreateFile(szInFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, NULL, NULL);
+	if (m_hFile == INVALID_HANDLE_VALUE) return false;
+
+	DWORD dwSizeHigh;
+	DWORD dwSizeLow = GetFileSize(m_hFile, &dwSizeHigh);
+	m_nSizeLimit = dwSizeLow + (((__int64)dwSizeHigh)<<32);
+
+	m_nOriginalSizeLimit = m_nSizeLimit;
+
+	m_strFileName = szInFileName;
+	m_strOutFileName = szOutFileName;
 
 	ReadUp(0);
 
@@ -67,9 +103,10 @@ bool CFileBackend::SetDecoder(IDecoder *pDecoder, INT_PTR nSkip)
 {
 	m_pDecoder = pDecoder;
 
-	SetFilePointer(m_hFile, nSkip, NULL, SEEK_SET);
+	SetFilePointer(m_hFile, nSkip, NULL, FILE_BEGIN);
 
 	m_bEOF = false;
+	m_nSizeLimit = m_nOriginalSizeLimit;
 
 	return ReadUp(0);
 }
@@ -79,9 +116,14 @@ bool CFileBackend::ReadUp(INT_PTR nRest)
 	DWORD dwToRead = m_nBlockSize-nRest;
 	if (dwToRead > m_nSizeLimit) dwToRead = (DWORD)m_nSizeLimit;
 
+	LARGE_INTEGER liZero = {0, 0};
+	LARGE_INTEGER liCurrent;
+	SetFilePointerEx(m_hFile, liZero, &liCurrent, FILE_CURRENT);
+	m_nBlockOffset = liCurrent.QuadPart;
+
 	DWORD dwRead;
-	ReadFile(m_hFile, m_szBuffer+nRest, dwToRead, &dwRead, NULL);
-	
+	if (!ReadFile(m_hFile, m_szBuffer+nRest, dwToRead, &dwRead, NULL)) return false;
+
 	m_nSize = dwRead + nRest;
 	m_nSizeLimit -= dwRead;
 
@@ -91,7 +133,7 @@ bool CFileBackend::ReadUp(INT_PTR nRest)
 		INT_PTR nOrigSize = m_nSize;
 		if (!m_pDecoder->Decode(m_szBuffer, m_nSize)) return false;
 		if (nOrigSize != m_nSize)
-			SetFilePointer(m_hFile, m_nSize-nOrigSize, NULL, SEEK_CUR);
+			SetFilePointer(m_hFile, m_nSize-nOrigSize, NULL, FILE_CURRENT);
 	}
 
 	return true;
@@ -99,10 +141,23 @@ bool CFileBackend::ReadUp(INT_PTR nRest)
 
 void CFileBackend::Close()
 {
-	if (m_hFile == INVALID_HANDLE_VALUE) return;
+	if (m_hOutFile != INVALID_HANDLE_VALUE) {
 
-	CloseHandle(m_hFile);
-	m_hFile = INVALID_HANDLE_VALUE;
+		LARGE_INTEGER liZero = {0, 0};
+		LARGE_INTEGER liCurrent;
+		SetFilePointerEx(m_hFile, liZero, &liCurrent, FILE_CURRENT);
+		m_nBlockOffset = liCurrent.QuadPart;
+
+		CatchUpOutput();
+
+		CloseHandle(m_hOutFile);
+		m_hOutFile = INVALID_HANDLE_VALUE;
+	}
+
+	if (m_hFile != INVALID_HANDLE_VALUE) {
+		CloseHandle(m_hFile);
+		m_hFile = INVALID_HANDLE_VALUE;
+	}
 
 	m_pDecoder = NULL;
 }
@@ -147,14 +202,102 @@ bool CFileBackend::Move(INT_PTR nLength)
 	return ReadUp(nRest);
 }
 
-bool CFileBackend::WriteBack(INT_PTR nLength)
+bool CFileBackend::WriteBack(INT_PTR nOffset)
 {
-	return false;
+	if (!OpenOutput()) return false;
+	if (!CatchUpOutput()) return false;
+
+	if (m_pDecoder) {
+		nOffset = m_pDecoder->OriginalOffset(nOffset);
+		if (nOffset < 0) return false;
+	}
+
+	const char *szStart = m_szBuffer;
+	szStart +=           m_nBackedUp-m_nBlockOffset;
+	nOffset -= (INT_PTR)(m_nBackedUp-m_nBlockOffset);
+
+	DWORD dwWritten;
+	if (!WriteFile(m_hOutFile, szStart, nOffset, &dwWritten, NULL)) return false;
+
+	m_nBackedUp += nOffset;
+
+	return true;
 }
 
 bool CFileBackend::WriteThru(const char *szBuffer, INT_PTR nLength, INT_PTR nSkipLength)
 {
-	return false;
+	if (!OpenOutput()) return false;
+	if (!CatchUpOutput()) return false;
+
+	if (m_pDecoder) {
+		INT_PTR nBackedUp = m_pDecoder->DecodedOffset ((INT_PTR)(m_nBackedUp - m_nBlockOffset));
+		if (nBackedUp < 0) return false;
+		INT_PTR nSkipEnd  = m_pDecoder->OriginalOffset((INT_PTR)(nBackedUp + nSkipLength));
+		if (nSkipEnd < 0) return false;
+
+		nSkipLength = nSkipEnd - (INT_PTR)(m_nBackedUp - m_nBlockOffset);
+	}
+
+	if ((m_pEncoder == NULL) && (m_pDecoder != NULL))
+		m_pEncoder = m_pDecoder->GetDecoder();
+
+	if (m_pEncoder != NULL) {
+		m_pEncoder->Decode(szBuffer, nLength);
+		szBuffer = m_pEncoder->Buffer();
+		nLength  = m_pEncoder->Size();
+	}
+
+	DWORD dwWritten;
+	if (!WriteFile(m_hOutFile, szBuffer, nLength, &dwWritten, NULL)) return false;
+	if (dwWritten != nLength) return false;
+
+	m_nBackedUp += nSkipLength;
+
+	return true;
+}
+
+bool CFileBackend::CatchUpOutput()
+{
+	if (m_nBackedUp >= m_nBlockOffset) return true;
+
+	LARGE_INTEGER liZero = {0, 0};
+	LARGE_INTEGER liCurrent;
+	SetFilePointerEx(m_hFile, liZero, &liCurrent, FILE_CURRENT);
+
+	LARGE_INTEGER liStart;
+	liStart.QuadPart = m_nBackedUp;
+	SetFilePointerEx(m_hFile, liStart, NULL, FILE_BEGIN);
+
+	vector<BYTE> arrBuffer(m_nBlockSize);
+	do {
+		DWORD dwToRead = I64Ceil(m_nBlockOffset - m_nBackedUp);
+		if (dwToRead > ICeil(m_nBlockSize)) dwToRead = ICeil(m_nBlockSize);
+
+		DWORD dwRead;
+		if (!ReadFile(m_hFile, &arrBuffer[0], dwToRead, &dwRead, NULL)) break;
+
+		DWORD dwWritten;
+		if (!WriteFile(m_hOutFile, &arrBuffer[0], dwRead, &dwWritten, NULL)) break;
+
+		m_nBackedUp += dwToRead;
+
+	} while (m_nBackedUp < m_nBlockOffset);
+
+	SetFilePointerEx(m_hFile, liCurrent, NULL, FILE_BEGIN);
+
+	return true;
+}
+
+bool CFileBackend::OpenOutput()
+{
+	if (m_hOutFile != INVALID_HANDLE_VALUE) return true;
+
+	m_hOutFile = CreateFile(m_strOutFileName.c_str(), GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, NULL, NULL);
+	if (m_hOutFile == INVALID_HANDLE_VALUE) return false;
+
+	m_nBackedUp = 0;
+
+	return true;
 }
 
 LPCTSTR CFileBackend::FileName()

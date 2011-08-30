@@ -18,8 +18,8 @@ public:		//	Replace functions
 	//	There is a virtual 'current' position in input buffer
 	//	We assume we never go back
 
-	//	Write back a part of input buffer
-	virtual bool	WriteBack(INT_PTR nLength) = 0;
+	//	Write back a part of input buffer up to this offset
+	virtual bool	WriteBack(INT_PTR nOffset) = 0;
 
 	//	Write a new data instead of old one
 	virtual bool	WriteThru(const char *szBuffer, INT_PTR nLength, INT_PTR nSkipLength) = 0;

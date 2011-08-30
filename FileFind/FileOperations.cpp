@@ -5,12 +5,8 @@
 
 #ifndef UNICODE
 
-bool RunSearch(LPCTSTR szFileName, IFrontend *pFrontend, bool /*bUTF8*/)
+bool RunSearchANSI(CFileBackend *pBackend, IFrontend *pFrontend)
 {
-	shared_ptr<CFileBackend> pBackend = new CFileBackend();
-	if (!pBackend->Init(FBufferSize*1024*1024)) return false;
-	if (!pBackend->Open(szFileName, FASearchHead ? FASearchHeadLimit : -1)) return false;
-
 	shared_ptr<IDecoder> pDecoder;
 
 	eLikeUnicode nDetect = LikeUnicode(pBackend->Buffer(), pBackend->Size());
@@ -53,6 +49,25 @@ bool RunSearch(LPCTSTR szFileName, IFrontend *pFrontend, bool /*bUTF8*/)
 	if (pBackend->SetDecoder(pDecoder) && pFrontend->Process(pBackend)) return true;
 
 	return false;
+}
+
+
+bool RunSearch(LPCTSTR szFileName, IFrontend *pFrontend, bool /*bUTF8*/)
+{
+	shared_ptr<CFileBackend> pBackend = new CFileBackend();
+	if (!pBackend->Init(FBufferSize*1024*1024)) return false;
+	if (!pBackend->Open(szFileName, FASearchHead ? FASearchHeadLimit : -1)) return false;
+
+	return RunSearchANSI(pBackend, pFrontend);
+}
+
+bool RunReplace(LPCTSTR szInFileName, LPCTSTR szOutFileName, IFrontend *pFrontend, bool /*bUTF8*/)
+{
+	shared_ptr<CFileBackend> pBackend = new CFileBackend();
+	if (!pBackend->Init(FBufferSize*1024*1024)) return false;
+	if (!pBackend->Open(szInFileName, szOutFileName)) return false;
+
+	return RunSearchANSI(pBackend, pFrontend);
 }
 
 #else
