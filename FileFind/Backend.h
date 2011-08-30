@@ -10,7 +10,7 @@ public:
 	//	Methods ordered by life cycle
 	bool Init(INT_PTR nBlockSize);
 
-	bool Open(LPCTSTR szFileName);
+	bool Open(LPCTSTR szFileName, INT_PTR nMaxSize = -1);
 
 	bool SetDecoder(IDecoder *pDecoder, INT_PTR nSkip = 0);
 
@@ -35,6 +35,7 @@ protected:
 	tstring		m_strFileName;
 
 	HANDLE		m_hFile;
+	__int64		m_nSizeLimit;
 	bool		m_bEOF;
 	bool		ReadUp(INT_PTR nRest);
 

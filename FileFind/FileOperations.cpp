@@ -9,7 +9,7 @@ bool RunSearch(LPCTSTR szFileName, IFrontend *pFrontend, bool /*bUTF8*/)
 {
 	shared_ptr<CFileBackend> pBackend = new CFileBackend();
 	if (!pBackend->Init(FBufferSize*1024*1024)) return false;
-	if (!pBackend->Open(szFileName)) return false;
+	if (!pBackend->Open(szFileName, FASearchHead ? FASearchHeadLimit : -1)) return false;
 
 	shared_ptr<IDecoder> pDecoder;
 
@@ -169,7 +169,7 @@ bool RunSearch(LPCTSTR szFileName, IFrontend *pFrontend, bool bUTF8)
 {
 	shared_ptr<CFileBackend> pBackend = new CFileBackend();
 	if (!pBackend->Init(FBufferSize*1024*1024)) return false;
-	if (!pBackend->Open(szFileName)) return false;
+	if (!pBackend->Open(szFileName, FASearchHead ? FASearchHeadLimit : -1)) return false;
 
 	return (bUTF8) ? RunSearchUTF8(pBackend, pFrontend) : RunSearchUnicode(pBackend, pFrontend);
 }

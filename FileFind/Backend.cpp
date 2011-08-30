@@ -46,10 +46,15 @@ void CFileBackend::Free()
 	m_nBlockSize = 0;
 }
 
-bool CFileBackend::Open(LPCTSTR szFileName)
+bool CFileBackend::Open(LPCTSTR szFileName, INT_PTR nMaxSize)
 {
 	m_hFile = CreateFile(szFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, NULL, NULL);
 	if (m_hFile == INVALID_HANDLE_VALUE) return false;
+
+	DWORD dwSizeHigh;
+	DWORD dwSizeLow = GetFileSize(m_hFile, &dwSizeHigh);
+	m_nSizeLimit = dwSizeLow + (((__int64)dwSizeHigh)<<32);
+	if ((nMaxSize > 0) && (nMaxSize < m_nSizeLimit)) m_nSizeLimit = nMaxSize;
 
 	m_strFileName = szFileName;
 
@@ -71,11 +76,16 @@ bool CFileBackend::SetDecoder(IDecoder *pDecoder, INT_PTR nSkip)
 
 bool CFileBackend::ReadUp(INT_PTR nRest)
 {
-	DWORD dwRead;
-	ReadFile(m_hFile, m_szBuffer+nRest, m_nBlockSize-nRest, &dwRead, NULL);
-	m_nSize = dwRead + nRest;
+	DWORD dwToRead = m_nBlockSize-nRest;
+	if (dwToRead > m_nSizeLimit) dwToRead = (DWORD)m_nSizeLimit;
 
-	m_bEOF = m_nSize < m_nBlockSize;
+	DWORD dwRead;
+	ReadFile(m_hFile, m_szBuffer+nRest, dwToRead, &dwRead, NULL);
+	
+	m_nSize = dwRead + nRest;
+	m_nSizeLimit -= dwRead;
+
+	m_bEOF = (m_nSizeLimit == 0) || (dwRead < dwToRead);
 
 	if (m_pDecoder) {
 		INT_PTR nOrigSize = m_nSize;
