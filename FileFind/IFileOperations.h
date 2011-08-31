@@ -51,6 +51,9 @@ public:
 	virtual bool		GetNextLine() = 0;
 	virtual const char *Buffer() = 0;
 	virtual INT_PTR		Size() = 0;
+
+	virtual bool	WriteBack(INT_PTR nOffset) = 0;
+	virtual bool	WriteThru(const char *szBuffer, INT_PTR nLength, INT_PTR nSkipLength) = 0;
 };
 
 class IFrontend

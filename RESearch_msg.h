@@ -110,6 +110,7 @@ enum eStringTable {
 	MConfirmLine,
 	MSaveOriginal,
 	MOverwriteBackup,
+	MReplaceToNew,
 	MConfirmRequest,
 	MInFile,
 	MTheFile,

@@ -291,14 +291,14 @@ bool RunReplace(LPCTSTR szFileName)
 		CReplacePlainTextFrontend Frontend;
 		return RunReplace(szFileName, g_strNewFileName.c_str(), &Frontend, false);
 					  }
-/*	case SA_REGEXP:{
+	case SA_REGEXP:{
 		CReplaceRegExpFrontend Frontend;
-		return RunSearch(szFileName, &Frontend, true);
+		return RunReplace(szFileName, g_strNewFileName.c_str(), &Frontend, true);
 				   }
 	case SA_SEVERALLINE:{
 		CReplaceSeveralLineRegExpFrontend Frontend;
-		return RunSearch(szFileName, &Frontend, true);
-						}*/
+		return RunReplace(szFileName, g_strNewFileName.c_str(), &Frontend, true);
+						}
 	}
 
 	return false;
@@ -328,15 +328,15 @@ bool ReplaceSingleFile_Normal(WIN32_FIND_DATA &FindData)
 	bool bProcess = RunReplace(FindData.cFileName);
 
 	if (bProcess) {
-#ifndef _DEBUG
-		if (!ReplaceFile(FindData.cFileName, g_strNewFileName.c_str(),
-			(FRSaveOriginal) ? g_strBackupFileName.c_str() : NULL,
-			REPLACEFILE_IGNORE_MERGE_ERRORS, NULL, NULL)) {
+		if (!FRReplaceToNew) {
+			if (!ReplaceFile(FindData.cFileName, g_strNewFileName.c_str(),
+				(FRSaveOriginal) ? g_strBackupFileName.c_str() : NULL,
+				REPLACEFILE_IGNORE_MERGE_ERRORS, NULL, NULL)) {
 
-				const TCHAR *Lines[]={GetMsg(MREReplace),GetMsg(MFileBackupError),FindData.cFileName,GetMsg(MOk)};
-				StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING|FMSG_ERRORTYPE,_T("FRBackupError"),Lines,4,1);
+					const TCHAR *Lines[]={GetMsg(MREReplace),GetMsg(MFileBackupError),FindData.cFileName,GetMsg(MOk)};
+					StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING|FMSG_ERRORTYPE,_T("FRBackupError"),Lines,4,1);
+			}
 		}
-#endif
 	} else {
 		DeleteFile(g_strNewFileName.c_str());
 	}
@@ -347,7 +347,7 @@ bool ReplaceSingleFile_Normal(WIN32_FIND_DATA &FindData)
 //	Using slow but reliable mechanism for files with hardlinks
 bool ReplaceSingleFile_CopyFirst(WIN32_FIND_DATA &FindData)
 {
-	if (!CopyFile(FindData.cFileName, g_strBackupFileName.c_str(), FALSE)) {
+	if (FRReplaceToNew || !CopyFile(FindData.cFileName, g_strBackupFileName.c_str(), FALSE)) {
 		return ReplaceSingleFile_Normal(FindData);
 	}
 
@@ -451,6 +451,7 @@ int ReplacePrompt(BOOL Plugin) {
 	Dialog.Add(new CFarCheckBoxItem(5,19,0,MConfirmLine,&FRConfirmLine));
 	Dialog.Add(new CFarCheckBoxItem(40,17,0,MSaveOriginal,&FRSaveOriginal));
 	Dialog.Add(new CFarCheckBoxItem(42,18,0,MOverwriteBackup,&FROverwriteBackup));
+	Dialog.Add(new CFarCheckBoxItem(40,19,0,MReplaceToNew,&FRReplaceToNew));
 
 	Dialog.AddButtons(MOk,MCancel);
 	Dialog.Add(new CFarButtonItem(60,9,0,0,MBtnPresets));

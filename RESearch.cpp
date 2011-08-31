@@ -166,6 +166,8 @@ BOOL ProcessFRLine(TCHAR *Line,BOOL *ShowDialog,INT_PTR *Item) {
 		case 'O':FRSaveOriginal=FALSE;break;
 		case 'b':FROverwriteBackup=TRUE;break;
 		case 'B':FROverwriteBackup=FALSE;break;
+		case 'w':FRReplaceToNew=TRUE;break;
+		case 'W':FRReplaceToNew=FALSE;break;
 		case 'd':*ShowDialog=TRUE;break;
 		case 'D':*ShowDialog=FALSE;break;
 		case '0':FSearchIn=SI_ALLDRIVES;break;

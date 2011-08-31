@@ -80,45 +80,6 @@ bool CSearchMultiLineRegExpFrontend::Process(IBackend *pBackend)
 
 //////////////////////////////////////////////////////////////////////////
 
-bool CReplacePlainTextFrontend::Process(IBackend *pBackend)
-{
-	TCHAR *szTable = (FCaseSensitive) ? NULL : UpCaseTable;
-
-	tstring TextUpcase = (FCaseSensitive) ? FText : UpCaseString(FText);
-	PrepareBMHSearch(TextUpcase.data(), TextUpcase.length());
-
-	REParamA.Clear();
-
-	do {
-		const char *szBuffer = pBackend->Buffer();
-		INT_PTR nSize  = pBackend->Size();
-
-		int nOffset;
-		while ((nOffset = BMHSearch(szBuffer, nSize, TextUpcase.data(), TextUpcase.size(), szTable)) >= 0)
-		{
-			if (!pBackend->WriteBack(szBuffer - pBackend->Buffer() + nOffset)) break;
-
-			REParamA.AddSource(szBuffer+nOffset, TextUpcase.size());
-			REParamA.AddFNumbers(FileNumber, FindNumber, ReplaceNumber);
-			string strReplace = CSOA::CreateReplaceString(FRReplace.c_str(), "\n", -1, REParamA);
-
-			pBackend->WriteThru(strReplace.data(), strReplace.size(), TextUpcase.size());
-
-			szBuffer += nOffset + TextUpcase.size();
-			nSize    -= nOffset + TextUpcase.size();
-			FindNumber++;
-		}
-
-		if (pBackend->Last()) break;
-		if (!pBackend->Move(pBackend->Size()-FText.size())) break;
-
-	} while (true);
-
-	return FindNumber > 0;
-}
-
-//////////////////////////////////////////////////////////////////////////
-
 bool PrepareAndFind(IBackend *pBackend, const string &strText)
 {
 	TCHAR *szTable = (FCaseSensitive) ? NULL : UpCaseTable;
@@ -132,4 +93,88 @@ bool PrepareAndFind(IBackend *pBackend, const string &strText)
 	return BMHSearch(szBuffer, nSize, strTextUpcase.data(), strTextUpcase.size(), szTable) >= 0;
 }
 
+//////////////////////////////////////////////////////////////////////////
+
+bool CReplacePlainTextFrontend::Process(IBackend *pBackend)
+{
+	TCHAR *szTable = (FCaseSensitive) ? NULL : UpCaseTable;
+
+	tstring TextUpcase = (FCaseSensitive) ? FText : UpCaseString(FText);
+	PrepareBMHSearch(TextUpcase.data(), TextUpcase.length());
+
+	REParam.Clear();
+
+	do {
+		const char *szBuffer = pBackend->Buffer();
+		INT_PTR nSize = pBackend->Size();
+
+		int nOffset;
+		while ((nOffset = BMHSearch(szBuffer, nSize, TextUpcase.data(), TextUpcase.size(), szTable)) >= 0)
+		{
+			if (!pBackend->WriteBack(szBuffer - pBackend->Buffer() + nOffset)) break;
+
+			REParam.AddSource(szBuffer+nOffset, TextUpcase.size());
+			REParam.AddFNumbers(FileNumber, FindNumber, ReplaceNumber);
+			string strReplace = CSO::CreateReplaceString(FRReplace.c_str(), "\n", -1, REParam);
+
+			if (!pBackend->WriteThru(strReplace.data(), strReplace.size(), TextUpcase.size())) break;
+
+			szBuffer += nOffset + TextUpcase.size();
+			nSize    -= nOffset + TextUpcase.size();
+			FindNumber++;
+			ReplaceNumber++;
+		}
+
+		if (pBackend->Last()) break;
+		if (!pBackend->Move(pBackend->Size()-FText.size())) break;
+
+	} while (true);
+
+	return FindNumber > 0;
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+bool CReplaceRegExpFrontend::Process(IBackend *pBackend)
+{
+	CSingleByteSplitLineProcessor Proc(pBackend);
+
+	REParam.Clear();
+	REParam.AddRE(FPattern);
+
+	do {
+		const char *szBuffer = Proc.Buffer();
+		INT_PTR nSize = Proc.Size();
+
+		int nResult;
+		while ((nResult = do_pcre_exec(FPattern, FPatternExtra, szBuffer, nSize, 0, 0, REParam.Match(), REParam.Count())) >= 0)
+		{
+			int nOffset, nLength;
+			REParam.FillStartLength(&nOffset, &nLength);
+
+			if (!Proc.WriteBack(szBuffer - Proc.Buffer() + nOffset)) break;
+
+			REParamA.AddSource(szBuffer, nOffset+nLength);
+			REParamA.AddFNumbers(FileNumber, FindNumber, ReplaceNumber);
+			string strReplace = CSO::CreateReplaceString(FRReplace.c_str(), "\n", -1, REParam);
+
+			if (!Proc.WriteThru(strReplace.data(), strReplace.size(), nLength)) break;
+
+			szBuffer += nOffset + nLength;
+			nSize    -= nOffset + nLength;
+			FindNumber++;
+			ReplaceNumber++;
+		}
+
+	} while (Proc.GetNextLine());
+
+	return FindNumber > 0;
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+bool CReplaceSeveralLineRegExpFrontend::Process(IBackend *pBackend)
+{
+	return false;
+}
 #endif

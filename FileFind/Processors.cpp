@@ -59,6 +59,16 @@ INT_PTR	CSingleByteSplitLineProcessor::Size()
 	return m_szEOL - m_szBuffer;
 }
 
+bool CSingleByteSplitLineProcessor::WriteBack(INT_PTR nOffset)
+{
+	return m_pBackend->WriteBack((m_szBuffer - m_pBackend->Buffer()) + nOffset);
+}
+
+bool CSingleByteSplitLineProcessor::WriteThru(const char *szBuffer, INT_PTR nLength, INT_PTR nSkipLength)
+{
+	return m_pBackend->WriteThru(szBuffer, nLength, nSkipLength);
+}
+
 //////////////////////////////////////////////////////////////////////////
 
 CSingleByteSeveralLineProcessor::CSingleByteSeveralLineProcessor(IBackend *pBackend, int nLines, INT_PTR nMaxSize)
@@ -154,6 +164,16 @@ const char *CSingleByteSeveralLineProcessor::Buffer()
 INT_PTR	CSingleByteSeveralLineProcessor::Size()
 {
 	return m_szEOL - m_szBuffer;
+}
+
+bool CSingleByteSeveralLineProcessor::WriteBack(INT_PTR nOffset)
+{
+	return m_pBackend->WriteBack((m_szBuffer - m_pBackend->Buffer()) + nOffset);
+}
+
+bool CSingleByteSeveralLineProcessor::WriteThru(const char *szBuffer, INT_PTR nLength, INT_PTR nSkipLength)
+{
+	return m_pBackend->WriteThru(szBuffer, nLength, nSkipLength);
 }
 
 //////////////////////////////////////////////////////////////////////////

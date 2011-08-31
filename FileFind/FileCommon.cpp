@@ -195,11 +195,14 @@ int FPreparePattern(bool bAcceptEmpty) {
 	case SA_MULTILINE:{
 		if (FText.empty()) return TRUE;
 		tstring strPattern = REParam.FillNamedReferences(FText);
-		return PreparePattern(&FPattern, &FPatternExtra, strPattern, FCaseSensitive, NULL)
+
 #ifdef UNICODE
-			&& PreparePattern(&FPatternA, &FPatternExtraA, DefFromUnicode(strPattern), FCaseSensitive, DefCharTables())
+		return PreparePattern(&FPattern, &FPatternExtra, strPattern, FCaseSensitive, NULL)
+			&& PreparePattern(&FPatternA, &FPatternExtraA, DefFromUnicode(strPattern), FCaseSensitive, DefCharTables());
+#else
+		setlocale(LC_ALL, FormatStr(_T(".%d"), GetOEMCP()).c_str());
+		return PreparePattern(&FPattern, &FPatternExtra, strPattern, FCaseSensitive, OEMCharTables);
 #endif
-			;
 					  }
 	default:
 		return FALSE;

@@ -75,6 +75,7 @@ bool CSearchMultiLineRegExpFrontend::Process(IBackend *pBackend)
 	return false;
 }
 
+//////////////////////////////////////////////////////////////////////////
 
 bool PrepareAndFind(IBackend *pBackend, const wstring &strText)
 {

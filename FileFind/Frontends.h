@@ -37,3 +37,15 @@ class CReplacePlainTextFrontend : public IFrontend
 public:
 	virtual bool	Process(IBackend *pBackend);
 };
+
+class CReplaceRegExpFrontend : public IFrontend
+{
+public:
+	virtual bool	Process(IBackend *pBackend);
+};
+
+class CReplaceSeveralLineRegExpFrontend : public IFrontend
+{
+public:
+	virtual bool	Process(IBackend *pBackend);
+};
