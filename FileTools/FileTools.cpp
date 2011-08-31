@@ -357,7 +357,7 @@ BOOL RenameFilesPrompt() {
 	Dialog.Add(new CFarEditItem(5,7,70,DIF_HISTORY,_T("ReplaceText"), ReplaceText));
 
 	Dialog.Add(new CFarCheckBoxItem(25,4,0,MRegExp,(BOOL *)&FSearchAs));
-	Dialog.Add(new CFarCheckBoxItem(52,4,0,MCaseSensitiveS,&FCaseSensitive));
+	Dialog.Add(new CFarCheckBoxItem(52,4,0,MCaseSensitive,&FCaseSensitive));
 	Dialog.Add(new CFarCheckBoxItem(25,6,0,MRepeating,&FRepeating));
 	Dialog.Add(new CFarTextItem(5,8,DIF_BOXCOLOR|DIF_SEPARATOR,_T("")));
 

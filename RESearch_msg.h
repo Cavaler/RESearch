@@ -51,7 +51,6 @@ enum eStringTable {
 	MAsRegExp,
 	MText,
 	MCaseSensitive,
-	MCaseSensitiveS,
 	MPlainText,
 	MRegExp,
 	MSeveralLineRegExp,
