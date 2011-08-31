@@ -258,6 +258,7 @@
 				RuntimeLibrary="0"
 				StructMemberAlignment="2"
 				EnableFunctionLevelLinking="true"
+				EnableEnhancedInstructionSet="2"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="StdAfx.h"
@@ -363,6 +364,7 @@
 				RuntimeLibrary="0"
 				StructMemberAlignment="4"
 				EnableFunctionLevelLinking="true"
+				EnableEnhancedInstructionSet="2"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="StdAfx.h"
@@ -668,6 +670,7 @@
 				RuntimeLibrary="0"
 				StructMemberAlignment="2"
 				EnableFunctionLevelLinking="true"
+				EnableEnhancedInstructionSet="2"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="StdAfx.h"
@@ -774,6 +777,7 @@
 				RuntimeLibrary="0"
 				StructMemberAlignment="4"
 				EnableFunctionLevelLinking="true"
+				EnableEnhancedInstructionSet="2"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="StdAfx.h"
@@ -1717,6 +1721,10 @@
 				</File>
 				<File
 					RelativePath=".\FileFind\FileOperations.h"
+					>
+				</File>
+				<File
+					RelativePath=".\FileFind\Frontends.cpp"
 					>
 				</File>
 				<File

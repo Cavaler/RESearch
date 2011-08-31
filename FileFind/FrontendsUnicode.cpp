@@ -75,4 +75,18 @@ bool CSearchMultiLineRegExpFrontend::Process(IBackend *pBackend)
 	return false;
 }
 
+
+bool PrepareAndFind(IBackend *pBackend, const wstring &strText)
+{
+	TCHAR *szTable = (FCaseSensitive) ? NULL : UpCaseTable;
+
+	tstring strTextUpcase = (FCaseSensitive) ? strText : UpCaseString(strText);
+	PrepareBMHSearch(strTextUpcase.data(), strTextUpcase.length());
+
+	const wchar_t *szBuffer = pBackend->BufferW();
+	INT_PTR nSize  = pBackend->SizeW();
+
+	return BMHSearch(szBuffer, nSize, strTextUpcase.data(), strTextUpcase.size(), szTable) >= 0;
+}
+
 #endif

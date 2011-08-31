@@ -25,6 +25,7 @@ public:
 	virtual bool	Process(IBackend *pBackend);
 };
 
+bool PrepareAndFind(IBackend *pBackend, const tstring &strText);
 class CSearchMultiTextFrontend : public IFrontend
 {
 public:
