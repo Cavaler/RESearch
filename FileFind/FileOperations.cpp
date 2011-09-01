@@ -189,4 +189,14 @@ bool RunSearch(LPCTSTR szFileName, IFrontend *pFrontend, bool bUTF8)
 	return (bUTF8) ? RunSearchUTF8(pBackend, pFrontend) : RunSearchUnicode(pBackend, pFrontend);
 }
 
+
+bool RunReplace(LPCTSTR szInFileName, LPCTSTR szOutFileName, IFrontend *pFrontend, bool bUTF8)
+{
+	shared_ptr<CFileBackend> pBackend = new CFileBackend();
+	if (!pBackend->Init(FBufferSize*1024*1024)) return false;
+	if (!pBackend->Open(szInFileName, szOutFileName)) return false;
+
+	return (bUTF8) ? RunSearchUTF8(pBackend, pFrontend) : RunSearchUnicode(pBackend, pFrontend);
+}
+
 #endif

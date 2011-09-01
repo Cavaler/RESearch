@@ -181,4 +181,5 @@ bool CReplaceSeveralLineRegExpFrontend::Process(IBackend *pBackend)
 
 	return ReplaceRegExpProcess(Proc);
 }
+
 #endif

@@ -72,13 +72,13 @@ bool CUnicodeToUTF8Decoder::Decode(const char *szBuffer, INT_PTR &nLength)
 
 INT_PTR	CUnicodeToUTF8Decoder::DecodedOffset (INT_PTR nOffset)
 {
-	return m_UT.CharToByte(nOffset)*2;
+	if (nOffset & 1) return -1;
+	return m_UT.CharToByte(nOffset/2);
 }
 
 INT_PTR	CUnicodeToUTF8Decoder::OriginalOffset(INT_PTR nOffset)
 {
-	if (nOffset & 1) return -1;
-	return m_UT.ByteToChar(nOffset/2);
+	return m_UT.ByteToChar(nOffset)*2;
 }
 
 IDecoder *CUnicodeToUTF8Decoder::GetEncoder()
@@ -113,13 +113,13 @@ bool CReverseUnicodeToUTF8Decoder::Decode(const char *szBuffer, INT_PTR &nLength
 
 INT_PTR	CReverseUnicodeToUTF8Decoder::DecodedOffset (INT_PTR nOffset)
 {
-	return m_UT.CharToByte(nOffset)*2;
+	if (nOffset & 1) return -1;
+	return m_UT.CharToByte(nOffset/2);
 }
 
 INT_PTR	CReverseUnicodeToUTF8Decoder::OriginalOffset(INT_PTR nOffset)
 {
-	if (nOffset & 1) return -1;
-	return m_UT.ByteToChar(nOffset/2);
+	return m_UT.ByteToChar(nOffset)*2;
 }
 
 IDecoder *CReverseUnicodeToUTF8Decoder::GetEncoder()

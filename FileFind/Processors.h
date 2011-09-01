@@ -58,6 +58,9 @@ public:
 	virtual const char *	Buffer();
 	virtual INT_PTR			Size();
 
+	virtual bool	WriteBack(INT_PTR nOffset);
+	virtual bool	WriteThru(const char *szBuffer, INT_PTR nLength, INT_PTR nSkipLength);
+
 protected:
 	IBackend *m_pBackend;
 

@@ -232,3 +232,13 @@ INT_PTR	CUnicodeSplitLineProcessor::Size()
 {
 	return (m_szEOL - m_szBuffer)*2;
 }
+
+bool CUnicodeSplitLineProcessor::WriteBack(INT_PTR nOffset)
+{
+	return m_pBackend->WriteBack((m_szBuffer - m_pBackend->BufferW())*2 + nOffset);
+}
+
+bool CUnicodeSplitLineProcessor::WriteThru(const char *szBuffer, INT_PTR nLength, INT_PTR nSkipLength)
+{
+	return m_pBackend->WriteThru(szBuffer, nLength, nSkipLength);
+}
