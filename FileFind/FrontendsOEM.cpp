@@ -48,9 +48,6 @@ bool CSearchSeveralLineRegExpFrontend::Process(IBackend *pBackend)
 	CSingleByteSeveralLineProcessor Proc(pBackend, SeveralLines, SeveralLinesKB);
 
 	do {
-		string strSeveral(Proc.Buffer(), Proc.Size());
-		strSeveral = ANSIFromUnicode(OEMToUnicode(strSeveral));
-
 		int nResult = do_pcre_exec(FPattern, FPatternExtra, Proc.Buffer(), Proc.Size(), 0, 0, REParamA.Match(), REParamA.Count());
 		if (nResult >= 0) return true;
 		g_nFoundLine++;
@@ -135,10 +132,8 @@ bool CReplacePlainTextFrontend::Process(IBackend *pBackend)
 
 //////////////////////////////////////////////////////////////////////////
 
-bool CReplaceRegExpFrontend::Process(IBackend *pBackend)
+bool ReplaceRegExpProcess(ISplitLineProcessor &Proc)
 {
-	CSingleByteSplitLineProcessor Proc(pBackend);
-
 	REParam.Clear();
 	REParam.AddRE(FPattern);
 
@@ -154,8 +149,8 @@ bool CReplaceRegExpFrontend::Process(IBackend *pBackend)
 
 			if (!Proc.WriteBack(szBuffer - Proc.Buffer() + nOffset)) break;
 
-			REParamA.AddSource(szBuffer, nOffset+nLength);
-			REParamA.AddFNumbers(FileNumber, FindNumber, ReplaceNumber);
+			REParam.AddSource(szBuffer, nOffset+nLength);
+			REParam.AddFNumbers(FileNumber, FindNumber, ReplaceNumber);
 			string strReplace = CSO::CreateReplaceString(FRReplace.c_str(), "\n", -1, REParam);
 
 			if (!Proc.WriteThru(strReplace.data(), strReplace.size(), nLength)) break;
@@ -171,10 +166,19 @@ bool CReplaceRegExpFrontend::Process(IBackend *pBackend)
 	return FindNumber > 0;
 }
 
+bool CReplaceRegExpFrontend::Process(IBackend *pBackend)
+{
+	CSingleByteSplitLineProcessor Proc(pBackend);
+
+	return ReplaceRegExpProcess(Proc);
+}
+
 //////////////////////////////////////////////////////////////////////////
 
 bool CReplaceSeveralLineRegExpFrontend::Process(IBackend *pBackend)
 {
-	return false;
+	CSingleByteSeveralLineProcessor Proc(pBackend, SeveralLines, SeveralLinesKB);
+
+	return ReplaceRegExpProcess(Proc);
 }
 #endif
