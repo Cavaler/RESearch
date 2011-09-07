@@ -1,6 +1,6 @@
 #pragma once
 
-#include "FileFind\FileOperations.h"
+#include "FileOperations.h"
 
 enum SearchAs {SA_PLAINTEXT,SA_REGEXP,SA_SEVERALLINE,SA_MULTILINE,SA_MULTITEXT,SA_MULTIREGEXP};
 enum SearchIn {SI_ALLDRIVES,SI_ALLLOCAL,SI_FROMROOT,SI_FROMCURRENT,SI_CURRENTONLY,SI_SELECTED};
@@ -142,6 +142,8 @@ int  FPrepareMaskPattern();
 int  FPreparePattern(bool bAcceptEmpty);
 
 BOOL ConfirmFile(int Title,const TCHAR *FileName);
+bool ConfirmFileReadonly(const TCHAR *FileName);
+bool ConfirmReplacement(const TCHAR *Found, const TCHAR *Replaced, const TCHAR *FileName);
 
 void FReadRegistry(HKEY Key);
 void FWriteRegistry(HKEY Key);
