@@ -17,6 +17,7 @@ public:		//	Replace functions
 
 	//	There is a virtual 'current' position in input buffer
 	//	We assume we never go back
+	virtual bool	CheckWriteReady() = 0;
 
 	//	Write back a part of input buffer up to this offset
 	virtual bool	WriteBack(INT_PTR nOffset) = 0;

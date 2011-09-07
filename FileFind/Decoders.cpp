@@ -69,6 +69,87 @@ IDecoder *CPassthroughDecoder::GetEncoder()
 }
 
 //////////////////////////////////////////////////////////////////////////
+// CSingleByteCRLFDecoder
+
+CSingleByteCRLFDecoder::CSingleByteCRLFDecoder(IDecoder *pBackDecoder)
+: m_pBackDecoder(pBackDecoder)
+{
+}
+
+bool CSingleByteCRLFDecoder::Decode(const char *szBuffer, INT_PTR &nLength)
+{
+	if (!m_pBackDecoder->Decode(szBuffer, nLength)) return false;
+
+	Clear();
+
+	m_szBuffer = (char *)malloc(m_pBackDecoder->Size());
+	if (m_szBuffer == NULL) return false;
+	m_mapSkipped.clear();
+	m_nSize = 0;
+
+	const char *szDecBuffer = m_pBackDecoder->Buffer();
+	INT_PTR nDecSize = m_pBackDecoder->Size();
+	char *szOurBuffer = m_szBuffer;
+
+	const char *szCR;
+	while (szCR = (const char *)memchr(szDecBuffer, '\r', nDecSize)) {
+		INT_PTR nSkip = szCR-szDecBuffer;
+
+		memmove(szOurBuffer, szDecBuffer, nSkip);
+		szOurBuffer += nSkip;
+		m_nSize     += nSkip;
+
+		m_mapSkipped[szOurBuffer-m_szBuffer]++;
+
+		szDecBuffer += nSkip+1;
+		nDecSize    -= nSkip+1;
+	}
+
+	memmove(szOurBuffer, szDecBuffer, nDecSize);
+	m_nSize += nDecSize;
+
+	return true;
+}
+
+INT_PTR	CSingleByteCRLFDecoder::DecodedOffset(INT_PTR nOffset)
+{
+	nOffset = m_pBackDecoder->DecodedOffset(nOffset);
+	if (nOffset < 0) return nOffset;
+
+	for each (const skip_map::value_type &Skip in m_mapSkipped) {
+		if (nOffset <= Skip.first)
+			break;
+		else if (nOffset >= Skip.first+Skip.second)
+			nOffset -= Skip.second;
+		else {	// Weird case of \r\r\n
+			nOffset = Skip.first;
+			break;
+		}
+	}
+
+	return nOffset;
+}
+
+INT_PTR	CSingleByteCRLFDecoder::OriginalOffset(INT_PTR nOffset)
+{
+	INT_PTR nNewOffset = nOffset;
+
+	for each (const skip_map::value_type &Skip in m_mapSkipped) {
+		if (Skip.first <= nOffset)
+			nNewOffset += Skip.second;
+		else
+			break;
+	}
+
+	return m_pBackDecoder->OriginalOffset(nNewOffset);
+}
+
+IDecoder *CSingleByteCRLFDecoder::GetEncoder()
+{
+	return m_pBackDecoder->GetEncoder();
+}
+
+//////////////////////////////////////////////////////////////////////////
 // CUTF8Traverse
 
 void CUTF8Traverse::SetString(const char *szBuffer, INT_PTR nLength)

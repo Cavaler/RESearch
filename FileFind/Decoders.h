@@ -31,6 +31,23 @@ public:
 	virtual IDecoder *GetEncoder();
 };
 
+class CSingleByteCRLFDecoder : public CDecoder
+{
+public:
+	CSingleByteCRLFDecoder(IDecoder *pBackDecoder);
+
+	virtual bool	Decode(const char *szBuffer, INT_PTR &nLength);
+	virtual INT_PTR	DecodedOffset (INT_PTR nOffset);
+	virtual INT_PTR	OriginalOffset(INT_PTR nOffset);
+	virtual IDecoder *GetEncoder();
+
+protected:
+	IDecoder *m_pBackDecoder;
+
+	typedef map<INT_PTR, int> skip_map;
+	skip_map m_mapSkipped;
+};
+
 class CUTF8Traverse {
 public:
 	void SetString(const char *szBuffer, INT_PTR nLength);

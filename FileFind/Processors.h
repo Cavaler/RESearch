@@ -1,5 +1,6 @@
 #pragma once
 #include "IFileOperations.h"
+#include "shared_ptr.h"
 
 //	Handles all single-byte as well as UTF-8
 class CSingleByteSplitLineProcessor : public ISplitLineProcessor
@@ -37,6 +38,8 @@ protected:
 	IBackend *m_pBackend;
 	int m_nLines;
 	INT_PTR m_nMaxSize;
+
+	shared_ptr<IDecoder> m_pOwnDecoder;
 
 	const char *m_szBuffer;
 	const char *m_szEOL;

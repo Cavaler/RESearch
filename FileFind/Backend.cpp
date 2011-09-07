@@ -1,5 +1,5 @@
 #include "StdAfx.h"
-#include "Backend.h"
+#include "..\RESearch.h"
 
 char *CFileBackend::m_szBuffer = NULL;
 INT_PTR CFileBackend::m_nBlockSize = 0;
@@ -102,6 +102,7 @@ bool CFileBackend::Open(LPCTSTR szInFileName, LPCTSTR szOutFileName)
 bool CFileBackend::SetDecoder(IDecoder *pDecoder, INT_PTR nSkip)
 {
 	m_pDecoder = pDecoder;
+	m_nSkip    = nSkip;
 
 	SetFilePointer(m_hFile, nSkip, NULL, FILE_BEGIN);
 
@@ -109,6 +110,16 @@ bool CFileBackend::SetDecoder(IDecoder *pDecoder, INT_PTR nSkip)
 	m_nSizeLimit = m_nOriginalSizeLimit;
 
 	return ReadUp(0);
+}
+
+IDecoder *CFileBackend::GetDecoder()
+{
+	return m_pDecoder;
+}
+
+bool CFileBackend::ResetDecoder(IDecoder *pDecoder)
+{
+	return SetDecoder(pDecoder, m_nSkip);
 }
 
 bool CFileBackend::ReadUp(INT_PTR nRest)
@@ -202,6 +213,14 @@ bool CFileBackend::Move(INT_PTR nLength)
 	return ReadUp(nRest);
 }
 
+bool CFileBackend::CheckWriteReady()
+{
+	if (!OpenOutput()) return false;
+	if (!CatchUpOutput()) return false;
+
+	return true;
+}
+
 bool CFileBackend::WriteBack(INT_PTR nOffset)
 {
 	if (!OpenOutput()) return false;
@@ -291,6 +310,8 @@ bool CFileBackend::CatchUpOutput()
 bool CFileBackend::OpenOutput()
 {
 	if (m_hOutFile != INVALID_HANDLE_VALUE) return true;
+
+	if (!ConfirmFile(MREReplace, m_strFileName.c_str())) return false;
 
 	m_hOutFile = CreateFile(m_strOutFileName.c_str(), GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, NULL, NULL);
 	if (m_hOutFile == INVALID_HANDLE_VALUE) return false;

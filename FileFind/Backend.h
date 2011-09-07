@@ -14,6 +14,8 @@ public:
 	bool Open(LPCTSTR szInFileName, LPCTSTR szOutFileName);
 
 	bool SetDecoder(IDecoder *pDecoder, INT_PTR nSkip = 0);
+	IDecoder *GetDecoder();
+	bool ResetDecoder(IDecoder *pDecoder);
 
 	void Close();
 
@@ -26,6 +28,7 @@ public:
 	virtual INT_PTR	SizeW();
 	virtual bool	Last();
 	virtual bool	Move(INT_PTR nLength);
+	virtual bool	CheckWriteReady();
 	virtual bool	WriteBack(INT_PTR nOffset);
 	virtual bool	WriteThru(const char *szBuffer, INT_PTR nLength, INT_PTR nSkipLength);
 	virtual LPCTSTR	FileName();
@@ -47,6 +50,7 @@ protected:
 	static char	   *m_szBuffer;
 	static INT_PTR	m_nBlockSize;
 	IDecoder   *m_pDecoder;
+	INT_PTR		m_nSkip;
 
 	__int64		m_nBlockOffset;
 	INT_PTR		m_nSize;
