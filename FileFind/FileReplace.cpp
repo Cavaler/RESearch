@@ -33,6 +33,10 @@ bool ConfirmReplacement(const TCHAR *Found, const TCHAR *Replaced, const TCHAR *
 	if (!FRConfirmLineThisFile) return true;
 	if (g_bInterrupted) return false;
 
+	if (g_bIgnoreIdentReplace) {
+		if (_tcscmp(Found, Replaced) == 0) return false;
+	}
+
 	const TCHAR *Lines[]={
 		GetMsg(MREReplace),GetMsg(MAskReplace),Found,GetMsg(MAskWith),Replaced,
 		GetMsg(MInFile),FileName,GetMsg(MReplace),GetMsg(MAll),GetMsg(MAllFiles),GetMsg(MSkip),GetMsg(MCancel)
