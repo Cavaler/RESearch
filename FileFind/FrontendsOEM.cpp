@@ -21,7 +21,7 @@ bool CSearchPlainTextFrontend::Process(IBackend *pBackend)
 		if (pBackend->Last()) break;
 		if (!pBackend->Move(nSize-FText.size())) break;
 
-	} while (true);
+	} while (!Interrupted());
 
 	return false;
 }
@@ -36,7 +36,7 @@ bool CSearchRegExpFrontend::Process(IBackend *pBackend)
 		int nResult = do_pcre_exec(FPattern, FPatternExtra, Proc.Buffer(), Proc.Size(), 0, 0, REParamA.Match(), REParamA.Count());
 		if (nResult >= 0) return true;
 		g_nFoundLine++;
-	} while (Proc.GetNextLine());
+	} while (!Interrupted() && Proc.GetNextLine());
 
 	return false;
 }
@@ -51,7 +51,7 @@ bool CSearchSeveralLineRegExpFrontend::Process(IBackend *pBackend)
 		int nResult = do_pcre_exec(FPattern, FPatternExtra, Proc.Buffer(), Proc.Size(), 0, 0, REParamA.Match(), REParamA.Count());
 		if (nResult >= 0) return true;
 		g_nFoundLine++;
-	} while (Proc.GetNextLine());
+	} while (!Interrupted() && Proc.GetNextLine());
 
 	return false;
 }
@@ -70,7 +70,7 @@ bool CSearchMultiLineRegExpFrontend::Process(IBackend *pBackend)
 		if (pBackend->Last()) break;
 		if (!pBackend->Move(nSize > 1024 ? nSize - 1024 : nSize)) break;
 
-	} while (true);
+	} while (!Interrupted());
 
 	return false;
 }
@@ -125,7 +125,7 @@ bool CReplacePlainTextFrontend::Process(IBackend *pBackend)
 		if (pBackend->Last()) break;
 		if (!pBackend->Move(pBackend->Size()-FText.size())) break;
 
-	} while (true);
+	} while (!Interrupted());
 
 	return FindNumber > 0;
 }
@@ -161,7 +161,7 @@ bool ReplaceRegExpProcess(ISplitLineProcessor &Proc)
 			ReplaceNumber++;
 		}
 
-	} while (Proc.GetNextLine());
+	} while (!Interrupted() && Proc.GetNextLine());
 
 	return FindNumber > 0;
 }
