@@ -479,7 +479,11 @@ BOOL ClockPresent=FALSE;
 
 void FindIfClockPresent() {
 	HKEY Key;
+#ifdef UNICODE
+	RegCreateKeyEx(HKEY_CURRENT_USER,_T("Software\\Far2\\Screen"),0,NULL,0,KEY_ALL_ACCESS,NULL,&Key,NULL);
+#else
 	RegCreateKeyEx(HKEY_CURRENT_USER,_T("Software\\Far\\Screen"),0,NULL,0,KEY_ALL_ACCESS,NULL,&Key,NULL);
+#endif
 	if (Key==INVALID_HANDLE_VALUE) return;
 	QueryRegIntValue(Key,_T("ViewerEditorClock"),&ClockPresent,0,0,1);
 	RegCloseKey(Key);
