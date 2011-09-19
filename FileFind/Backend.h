@@ -18,6 +18,7 @@ public:
 	bool ResetDecoder(IDecoder *pDecoder);
 
 	void Close();
+	void Abort();
 
 	void Done();
 

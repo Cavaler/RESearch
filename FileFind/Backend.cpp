@@ -28,7 +28,7 @@ CFileBackend::CFileBackend()
 
 CFileBackend::~CFileBackend()
 {
-	Close();
+	if (g_bInterrupted) Abort(); else Close();
 	Done();
 }
 
@@ -46,7 +46,7 @@ bool CFileBackend::Init(INT_PTR nBlockSize)
 
 void CFileBackend::Done()
 {
-	Close();
+	if (g_bInterrupted) Abort(); else Close();
 
 	m_nSize    = 0;
 }
@@ -163,6 +163,23 @@ void CFileBackend::Close()
 
 		CloseHandle(m_hOutFile);
 		m_hOutFile = INVALID_HANDLE_VALUE;
+	}
+
+	if (m_hFile != INVALID_HANDLE_VALUE) {
+		CloseHandle(m_hFile);
+		m_hFile = INVALID_HANDLE_VALUE;
+	}
+
+	m_pDecoder = NULL;
+}
+
+void CFileBackend::Abort()
+{
+	if (m_hOutFile != INVALID_HANDLE_VALUE) {
+		CloseHandle(m_hOutFile);
+		m_hOutFile = INVALID_HANDLE_VALUE;
+
+		DeleteFile(m_strOutFileName.c_str());
 	}
 
 	if (m_hFile != INVALID_HANDLE_VALUE) {
