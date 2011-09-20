@@ -48,7 +48,7 @@ bool ConfirmReplacement(const TCHAR *Found, const TCHAR *Replaced, const TCHAR *
 	size_t nReplaceLen = MakeSameWidth(arrReplaced);
 
 	size_t nWidth = max(nFoundLen, nReplaceLen);
-	if (nWidth < 50) nWidth = 50;
+	if (nWidth < 60) nWidth = 60;
 
 	size_t nCount = arrFound.size()+arrReplaced.size();
 
@@ -70,8 +70,9 @@ bool ConfirmReplacement(const TCHAR *Found, const TCHAR *Replaced, const TCHAR *
 	Dialog.Add(new CFarButtonItem(0, 7 + nCount, DIF_CENTERGROUP|DIF_NOBRACKETS, FALSE, MAll));
 	Dialog.Add(new CFarButtonItem(0, 7 + nCount, DIF_CENTERGROUP|DIF_NOBRACKETS, FALSE, MAllFiles));
 	Dialog.Add(new CFarButtonItem(0, 7 + nCount, DIF_CENTERGROUP|DIF_NOBRACKETS, FALSE, MSkip));
+	Dialog.Add(new CFarButtonItem(0, 7 + nCount, DIF_CENTERGROUP|DIF_NOBRACKETS, FALSE, MSkipFile));
 	Dialog.Add(new CFarButtonItem(0, 7 + nCount, DIF_CENTERGROUP|DIF_NOBRACKETS, FALSE, MCancel));
-	int Result = Dialog.Display(5, -5, -4, -3, -2, -1);
+	int Result = Dialog.Display(6, -6, -5, -4, -3, -2, -1);
 
 //	const TCHAR *Lines[]={
 //		GetMsg(MREReplace),GetMsg(MAskReplace),Found,GetMsg(MAskWith),Replaced,
@@ -81,16 +82,18 @@ bool ConfirmReplacement(const TCHAR *Found, const TCHAR *Replaced, const TCHAR *
 
 	switch (Result) {
 	case 2:
-		FRConfirmLineThisRun=FALSE;
+		FRConfirmLineThisRun=false;
 	case 1:
-		FRConfirmLineThisFile=FALSE;
+		FRConfirmLineThisFile=false;
 	case 0:
 		return true;
 	case 3:
 		break;
 	case 4:
+		FRSkipThisFile = true;
+	case 5:
 	case -1:
-		g_bInterrupted = TRUE;
+		g_bInterrupted = true;
 		break;
 	}
 	return false;
@@ -188,6 +191,7 @@ bool ReplaceSingleFile_CopyFirst(WIN32_FIND_DATA &FindData)
 void ReplaceSingleFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems)
 {
 	FRConfirmLineThisFile = FRConfirmLineThisRun;
+	FRSkipThisFile = false;
 	FileConfirmed = !FRConfirmFileThisRun;
 	FindNumber = ReplaceNumber = 0;
 #ifndef UNICODE
@@ -226,6 +230,9 @@ void ReplaceSingleFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems)
 
 		if (bProcess) {
 			AddFile(FindData, PanelItems);
+		} else {
+			if (FRSkipThisFile)
+				g_bInterrupted = false;
 		}
 	} else {
 		const TCHAR *Lines[]={GetMsg(MREReplace),GetMsg(MFileOpenError),FindData->cFileName,GetMsg(MOk)};

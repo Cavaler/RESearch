@@ -243,6 +243,7 @@ enum eStringTable {
 	MAll,
 	MAllFiles,
 	MSkip,
+	MSkipFile,
 	MShowAll,
 
 	MAskRename,

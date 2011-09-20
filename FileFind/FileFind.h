@@ -96,8 +96,8 @@ EXTERN tstring ReplaceText;
 EXTERN CFarListData g_WhereToSearch;
 EXTERN CFarListData g_WhereToSearchPlugin;
 
-EXTERN int  FileConfirmed,FRConfirmFileThisRun,FRConfirmReadonlyThisRun;
-EXTERN int  FRConfirmLineThisRun,FRConfirmLineThisFile;
+EXTERN bool FileConfirmed,FRConfirmFileThisRun,FRConfirmReadonlyThisRun;
+EXTERN bool FRConfirmLineThisRun, FRConfirmLineThisFile, FRSkipThisFile;
 
 EXTERN panelitem_vector g_PanelItems;
 EXTERN int g_nFoundLine;

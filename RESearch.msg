@@ -243,6 +243,7 @@ MReplace			"Re&place"						"&Заменить"
 MAll				"&All"							"&Все"
 MAllFiles			"All &files"					"Все &файлы"
 MSkip				"&Skip"							"&Пропустить"
+MSkipFile			"S&kip file"					"&Пропустить файл"
 MShowAll			"Show &all"						"Показать &все"
 
 MAskRename			"Rename"						"Переименовать"
