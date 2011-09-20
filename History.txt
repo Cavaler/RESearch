@@ -7,8 +7,20 @@ Regular Expression Search and Replace
 
 Planned:
 	- Search in share-opened files
-	* File Replace encoding in dialog itself (Unicode)
 	? Searching in streams
+
+    - "Could not find" with "Replace with: $0, [X] remove non-matched"
+    * Center text in Replace confirmation as one block
+    * Skip whole file in Replace confirmation
+    * Rename preview - truncate pats from both files
+    - ONE EctlSetString and others for several replaces
+    + Diff background in file replace confirm (exists in edit confirm)
+
+Version 7.50 beta 1 (20.09.2011)
+	! MAJOR rewrite of File Search / Replace / Grep
+	  All three are now based on same backend, working with all encodings
+	* Confirmation of replace in read-only file is given earlier, before opening it
+	* Updated English hotkeys (from HaRT)
 
 Version 7.44.1 (08.08.2011)
 	- Fixed crash in File Search in Unicode
