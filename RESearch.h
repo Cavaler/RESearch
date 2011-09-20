@@ -104,6 +104,14 @@ BOOL SavePresets(char *Which,char **StringNames,int StringCount,char **IntNames,
 void ShowErrorMsg(const TCHAR *sz1, const TCHAR *sz2 = NULL, const TCHAR *szHelp = NULL);
 void ShowHResultError(int nError, HRESULT hResult, const TCHAR *szHelp = NULL);
 
+EXTERN CONSOLE_SCREEN_BUFFER_INFO ConInfo;
+void RefreshConsoleInfo();
+
+void   QuoteString (const TCHAR *Source, int Length, vector<tstring> &arrQuoted, int MaxWidth);
+size_t QuoteStrings(const TCHAR *Source, vector<tstring> &arrQuoted, int MaxWidth, int nMaxHeight = -1);
+
+size_t MakeSameWidth(vector<tstring> &arrQuoted);
+
 #ifdef UNICODE
 EXTERN TCHAR UpCaseTable[65537];
 void BuildUpCaseTable(UINT nCP, char *pTable);

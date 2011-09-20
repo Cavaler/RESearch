@@ -37,12 +37,49 @@ bool ConfirmReplacement(const TCHAR *Found, const TCHAR *Replaced, const TCHAR *
 		if (_tcscmp(Found, Replaced) == 0) return false;
 	}
 
-	const TCHAR *Lines[]={
-		GetMsg(MREReplace),GetMsg(MAskReplace),Found,GetMsg(MAskWith),Replaced,
-		GetMsg(MInFile),FileName,GetMsg(MReplace),GetMsg(MAll),GetMsg(MAllFiles),GetMsg(MSkip),GetMsg(MCancel)
-	};
+	RefreshConsoleInfo();
 
-	switch (StartupInfo.Message(StartupInfo.ModuleNumber,0,_T("FRAskReplace"),Lines,12,5)) {
+	vector<tstring> arrFound;
+	QuoteStrings(Found,    arrFound,    ConInfo.dwSize.X - 12, ConInfo.dwSize.Y/2-7);
+	size_t nFoundLen   = MakeSameWidth(arrFound);
+
+	vector<tstring> arrReplaced;
+	QuoteStrings(Replaced, arrReplaced, ConInfo.dwSize.X - 12, ConInfo.dwSize.Y/2-7);
+	size_t nReplaceLen = MakeSameWidth(arrReplaced);
+
+	size_t nWidth = max(nFoundLen, nReplaceLen);
+	if (nWidth < 50) nWidth = 50;
+
+	size_t nCount = arrFound.size()+arrReplaced.size();
+
+	CFarDialog Dialog(nWidth+12, nCount+10, _T("FRAskReplace"));
+	Dialog.AddFrame(MREReplace);
+	
+	Dialog.Add(new CFarTextItem(-1, 2, 0, MAskReplace));
+	for (size_t I = 0; I<arrFound.size(); I++)
+		Dialog.Add(new CFarTextItem(-1, 3 + I, DIF_SETCOLOR|0x30, arrFound[I]));
+
+	Dialog.Add(new CFarTextItem(-1, 3 + arrFound.size(), 0, MAskWith));
+	for (size_t I = 0; I<arrReplaced.size();I++)
+		Dialog.Add(new CFarTextItem(-1, 4 + arrFound.size() + I, DIF_SETCOLOR|0xB0, arrReplaced[I]));
+
+	Dialog.Add(new CFarTextItem(-1, 4 + nCount, 0, MInFile));
+	Dialog.Add(new CFarTextItem(-1, 5 + nCount,  DIF_SETCOLOR|0x20, FileName));
+
+	Dialog.Add(new CFarButtonItem(0, 7 + nCount, DIF_CENTERGROUP|DIF_NOBRACKETS, TRUE,  MReplace));
+	Dialog.Add(new CFarButtonItem(0, 7 + nCount, DIF_CENTERGROUP|DIF_NOBRACKETS, FALSE, MAll));
+	Dialog.Add(new CFarButtonItem(0, 7 + nCount, DIF_CENTERGROUP|DIF_NOBRACKETS, FALSE, MAllFiles));
+	Dialog.Add(new CFarButtonItem(0, 7 + nCount, DIF_CENTERGROUP|DIF_NOBRACKETS, FALSE, MSkip));
+	Dialog.Add(new CFarButtonItem(0, 7 + nCount, DIF_CENTERGROUP|DIF_NOBRACKETS, FALSE, MCancel));
+	int Result = Dialog.Display(5, -5, -4, -3, -2, -1);
+
+//	const TCHAR *Lines[]={
+//		GetMsg(MREReplace),GetMsg(MAskReplace),Found,GetMsg(MAskWith),Replaced,
+//		GetMsg(MInFile),FileName,GetMsg(MReplace),GetMsg(MAll),GetMsg(MAllFiles),GetMsg(MSkip),GetMsg(MCancel)
+//	};
+//	Result = StartupInfo.Message(StartupInfo.ModuleNumber,0,_T("FRAskReplace"),Lines,12,5)
+
+	switch (Result) {
 	case 2:
 		FRConfirmLineThisRun=FALSE;
 	case 1:
@@ -68,41 +105,6 @@ BOOL WriteBuffer(HANDLE hFile,const void *Buffer,DWORD BufLen,const TCHAR *FileN
 		return FALSE;
 	} else return TRUE;
 }
-/*
-BOOL DoFileReplace(HANDLE &hFile,const char *&Found,int FoundLen,const char *Replace,int ReplaceLength,const char *&Skip,int SkipLen,WIN32_FIND_DATA *FindData) {
-	if (hFile==INVALID_HANDLE_VALUE) {
-		if (!ConfirmFile(MREReplace,FindData->cFileName)) return FALSE;
-		if (FindData->dwFileAttributes&FILE_ATTRIBUTE_READONLY) {
-			if (!ConfirmFileReadonly(FindData->cFileName)) return FALSE;
-		}
-
-		hFile = CreateFile(g_strNewFileName.c_str(), GENERIC_READ|GENERIC_WRITE, 0, NULL, CREATE_ALWAYS,
-			FindData->dwFileAttributes, INVALID_HANDLE_VALUE);
-
-		if (hFile==INVALID_HANDLE_VALUE) {
-			const TCHAR *Lines[]={GetMsg(MREReplace), GetMsg(MFileOpenError), g_strNewFileName.c_str(), GetMsg(MOk)};
-			StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("FRCreateError"),Lines,4,1);
-			return FALSE;
-		}
-	}
-
-	if (!WriteBuffer(hFile,Skip,SkipLen,FindData->cFileName)) return FALSE;
-
-	bool bIgnore = g_bIgnoreIdentReplace &&
-		(FoundLen == ReplaceLength) && (memcmp(Found, Replace, FoundLen) == 0);
-
-	if (!bIgnore && ConfirmReplacement(string(Found, FoundLen).c_str(),Replace,FindData->cFileName)) {
-		if (!WriteBuffer(hFile,Replace,ReplaceLength,FindData->cFileName)) return FALSE;
-		ReplaceNumber++;
-	} else {
-		if (!WriteBuffer(hFile,Found,FoundLen,FindData->cFileName)) return FALSE;
-		if (bIgnore) ReplaceNumber++;
-	}
-
-	Skip = Found+FoundLen;
-	Found += (FoundLen)?FoundLen:1;
-	return TRUE;
-}*/
 
 bool RunReplace(LPCTSTR szFileName)
 {

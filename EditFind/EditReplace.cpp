@@ -117,28 +117,6 @@ void DoEditReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, cons
 	}
 }
 
-void QuoteString(const TCHAR *Source, int Length, vector<tstring> &arrQuoted, int MaxWidth) {
-	tstring str;
-
-	if (Length>MaxWidth) {
-		str = tstring(Source, (MaxWidth-5)/2) + _T("...") + tstring(Source + Length-(MaxWidth-5)/2);
-	} else {
-		str = tstring(Source, Length);
-	}
-	arrQuoted.push_back(str);
-}
-
-void QuoteStrings(const TCHAR *Source, vector<tstring> &arrQuoted, int MaxWidth) {
-	do {
-		const TCHAR *Pos = _tcschr(Source,'\n');
-		if (Pos) {
-			QuoteString(Source, Pos-Source, arrQuoted, MaxWidth);
-			Source = Pos + 1;
-		} else break;
-	} while (TRUE);
-	QuoteString(Source, _tcslen(Source), arrQuoted, MaxWidth);
-}
-
 #ifdef UNICODE
 eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &EndPos, const TCHAR *Original, const tstring &Replace) {
 #else
@@ -183,22 +161,20 @@ eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &
 		bShowNoFound = true;
 
 		vector<tstring> arrFound;
-		QuoteStrings(tstring(Original + StartPos, Width).c_str(), arrFound, EdInfo.WindowSizeX-12);
+		QuoteStrings(tstring(Original + StartPos, Width).c_str(), arrFound, EdInfo.WindowSizeX-12, EdInfo.WindowSizeY/2-6);
+		size_t nFoundLen   = MakeSameWidth(arrFound);
 
 		vector<tstring> arrReplaced;
-		QuoteStrings(Replace.c_str(), arrReplaced, EdInfo.WindowSizeX-12);
+		QuoteStrings(Replace.c_str(), arrReplaced, EdInfo.WindowSizeX-12, EdInfo.WindowSizeY/2-6);
+		size_t nReplaceLen = MakeSameWidth(arrReplaced);
 
-		int L, H, TotalCount = arrFound.size() + arrReplaced.size();					// Calculate dialog width
-		size_t Len = 40;
-		for (size_t I = 0; I<arrFound.size();I++)
-			if (arrFound[I].length()>Len) Len = arrFound[I].length();
+		size_t nLen = max(nFoundLen, nReplaceLen);
+		if (nLen < 40) nLen = 40;
+		if ((int)nLen > EdInfo.WindowSizeX-2) nLen = EdInfo.WindowSizeX-2;
 
-		for (size_t I = 0; I<arrReplaced.size();I++)
-			if (arrReplaced[I].length()>Len) Len = arrReplaced[I].length();
+		int H, TotalCount = arrFound.size() + arrReplaced.size();
 
-		if ((int)Len > EdInfo.WindowSizeX-2) Len = EdInfo.WindowSizeX-2;
-
-		L = Position.CurLine-Position.TopScreenLine;		// Calculate dialog position
+		int L = Position.CurLine-Position.TopScreenLine;		// Calculate dialog position
 		if (L<1 + EdInfo.WindowSizeY/2) {
 			H = (EdInfo.WindowSizeY + L-9)/2;
 		} else {
@@ -215,7 +191,7 @@ eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &
 		StartupInfo.EditorControl(ECTL_SELECT, &Select);
 		StartupInfo.EditorControl(ECTL_REDRAW, NULL);
 
-		CFarDialog Dialog(-1, H + 1, Len + 8, H + 8+TotalCount, _T("ERAskReplace"));
+		CFarDialog Dialog(-1, H + 1, nLen + 8, H + 8+TotalCount, _T("ERAskReplace"));
 		Dialog.AddFrame(MREReplace);
 		Dialog.Add(new CFarTextItem(-1, 2, 0, MAskReplace));
 		for (size_t I = 0; I<arrFound.size();I++)

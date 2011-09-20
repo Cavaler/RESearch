@@ -732,6 +732,61 @@ void RunExternalEditor(tstring &strText) {
 	}
 }
 
+void RefreshConsoleInfo() {
+	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &ConInfo);
+}
+
+void QuoteString(const TCHAR *Source, int Length, vector<tstring> &arrQuoted, int MaxWidth)
+{
+	tstring str;
+
+	if (Length>MaxWidth) {
+		size_t nLeft = (MaxWidth-5)/2;
+		str = tstring(Source, nLeft) + _T("...") + tstring(Source + Length-nLeft, nLeft);
+	} else {
+		str = tstring(Source, Length);
+	}
+	arrQuoted.push_back(str);
+}
+
+size_t QuoteStrings(const TCHAR *Source, vector<tstring> &arrQuoted, int MaxWidth, int nMaxHeight)
+{
+	do {
+		const TCHAR *Pos = _tcschr(Source,'\n');
+		if (Pos) {
+			QuoteString(Source, Pos-Source, arrQuoted, MaxWidth);
+			Source = Pos + 1;
+		} else break;
+	} while (TRUE);
+
+	QuoteString(Source, _tcslen(Source), arrQuoted, MaxWidth);
+
+	if ((nMaxHeight > 0) && ((int)arrQuoted.size() > nMaxHeight)) {
+		size_t nOffs = nMaxHeight/2;
+		arrQuoted.erase (arrQuoted.begin()+nOffs, arrQuoted.begin()+nOffs+(arrQuoted.size()-nMaxHeight)+1);
+		arrQuoted.insert(arrQuoted.begin()+nOffs, _T("..."));
+	}
+
+	size_t nMaxLength = 0;
+	for each (const tstring &str in arrQuoted)
+		nMaxLength = max(str.size(), nMaxLength);
+
+	return nMaxLength;
+}
+
+size_t MakeSameWidth(vector<tstring> &arrQuoted)
+{
+	size_t nMaxLength = 0;
+	for each (const tstring &str in arrQuoted)
+		nMaxLength = max(str.size(), nMaxLength);
+
+	for (size_t nLine = 0; nLine < arrQuoted.size(); nLine++) {
+		arrQuoted[nLine] += tstring(nMaxLength-arrQuoted[nLine].size(), ' ');
+	}
+
+	return nMaxLength;
+}
+
 hack_string::hack_string(const char *szData, size_t nSize) {
 	_Bx._Ptr = (char *)szData;
 	_Myres = string::_BUF_SIZE*2;
