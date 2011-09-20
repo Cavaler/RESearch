@@ -7,6 +7,8 @@ enum eReplaceResult {RR_OK, RR_SKIP, RR_CANCEL};
 
 int LastReplaceLine, LastReplacePos;
 
+bool bShowNoFound;
+
 void DoEditReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, const tstring &Replace) {
 	EditorSetPosition Position = {-1,-1,-1,-1,-1,-1};
 	EditorGetString GetString = {-1};
@@ -175,8 +177,10 @@ eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &
 
 		if (g_bIgnoreIdentReplace && (tstring(Original+StartPos, Width) == Replace)) {
 			ReplaceNumber++;
+			bShowNoFound = false;
 			return RR_SKIP;
 		}
+		bShowNoFound = true;
 
 		vector<tstring> arrFound;
 		QuoteStrings(tstring(Original + StartPos, Width).c_str(), arrFound, EdInfo.WindowSizeX-12);
@@ -233,6 +237,7 @@ eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &
 	switch (Result) {
 	case 1:
 		NoAsking = TRUE;
+		bShowNoFound = false;
 		Select.BlockType = BTYPE_NONE;
 		StartupInfo.EditorControl(ECTL_SELECT, &Select);
 	case 0:
@@ -388,6 +393,7 @@ BOOL EditorReplaceAgain() {
 	EditorStartUndo();
 
 	StartEdInfo = EdInfo;
+	bShowNoFound = !NoAsking;
 
 #ifndef UNICODE
 	m_pReplaceTable = (EdInfo.AnsiMode) ? &XLatTables[XLatTables.size()-1] :
@@ -432,7 +438,8 @@ BOOL EditorReplaceAgain() {
 
 	EditorEndUndo();
 
-	if (NoAsking||g_bInterrupted) return TRUE;
+	if (!bShowNoFound || g_bInterrupted) return TRUE;
+
 	ShowErrorMsg(GetMsg(MCannotFind), EText.c_str(), _T("ECannotFind"));
 	return FALSE;
 }
