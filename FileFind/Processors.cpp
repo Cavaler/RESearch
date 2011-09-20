@@ -84,26 +84,42 @@ CSingleByteSeveralLineProcessor::CSingleByteSeveralLineProcessor(IBackend *pBack
 	m_szEOL = m_szBuffer;
 	int nSize = m_pBackend->Size();
 
-	for (int nLine = 0; nLine < m_nLines; nLine++) {
+	for (size_t nLine = 0; nLine < m_nLines; nLine++) {
 		m_arrLines.push_back(m_szEOL);
 		SkipNoCRLF(m_szEOL, &nSize);
 		if (nLine == m_nLines-1) break;
 		SkipCRLF(m_szEOL, &nSize);
 		if (nSize == 0) break;
+
+		if (Overflow()) break;
 	}
 
 	m_bAtEnd = (nSize == 0) && m_pBackend->Last();
+}
+
+bool CSingleByteSeveralLineProcessor::Overflow()
+{
+	return Size() >= SeveralLinesKB*1024;
 }
 
 bool CSingleByteSeveralLineProcessor::GetNextLine()
 {
 	if (m_bAtEnd) return GetNextLastLine();
 
-	if (m_arrLines.size() == m_nLines) {
-		m_arrLines.erase(m_arrLines.begin());
-		m_szBuffer = m_arrLines[0];
-	}
+	m_arrLines.erase(m_arrLines.begin());
+	m_szBuffer = m_arrLines.empty() ? m_szEOL : m_arrLines[0];
 
+	if (Overflow()) return true;
+
+	if (!GetNextInLine()) return false;
+
+	while ((m_arrLines.size() < m_nLines) && !Overflow() && !m_bAtEnd) GetNextInLine();
+
+	return true;
+}
+
+bool CSingleByteSeveralLineProcessor::GetNextInLine()
+{
 	int nSize = m_pBackend->Size() - (m_szEOL - m_pBackend->Buffer());
 	if (nSize < 2) {
 		if (!m_pBackend->Last()) {

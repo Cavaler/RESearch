@@ -36,7 +36,7 @@ public:
 
 protected:
 	IBackend *m_pBackend;
-	int m_nLines;
+	size_t  m_nLines;
 	INT_PTR m_nMaxSize;
 
 	shared_ptr<IDecoder> m_pOwnDecoder;
@@ -47,8 +47,11 @@ protected:
 	bool m_bAtEnd;
 	vector<const char *> m_arrLines;
 
+	bool GetNextInLine();
 	bool GetNextLastLine();
 	bool BackendMove(INT_PTR nLength);
+
+	bool Overflow();
 };
 
 //	Needed only for Unicode Plain-text Grep
