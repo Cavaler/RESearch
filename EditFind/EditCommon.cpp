@@ -489,7 +489,8 @@ void FindIfClockPresent() {
 	RegCloseKey(Key);
 }
 
-void ShowCurrentLine(int CurLine,int TotalLines,int TotalColumns) {
+void ShowCurrentLine(int CurLine,int TotalLines,int TotalColumns)
+{
 	if ((CurLine<LastLine) || (CurLine>=LastLine+1000) || (GetTickCount() > LastTickCount+1000)) {
 		int Position = (ClockPresent) ? 19 : 25;
 		if (TotalColumns > 80) Position += (TotalColumns-81);
@@ -506,6 +507,10 @@ void ShowCurrentLine(int CurLine,int TotalLines,int TotalColumns) {
 		StartupInfo.Text(Position, 0, 0x30, strText.c_str());
 		StartupInfo.Text(0,0,0x30,NULL);
 		LastLine=CurLine;
+
+		strText = GetMsg(MMenuHeader) + FormatStr(_T(": %d/%d"), CurLine, TotalLines);
+		SetConsoleTitle(strText.c_str());
+
 		LastTickCount=GetTickCount();
 	}
 }
