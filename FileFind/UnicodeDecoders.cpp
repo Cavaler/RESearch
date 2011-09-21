@@ -17,8 +17,7 @@ bool CSingleByteToUnicodeDecoder::Decode(const char *szBuffer, INT_PTR &nLength)
 	int nSize = MultiByteToWideChar(m_nCP, 0, szBuffer, nLength, NULL, 0);
 	if (nSize == 0) return false;
 
-	m_szBuffer = (char *)malloc(nSize*2);
-	if (m_szBuffer == NULL) return false;
+	if (!AllocBuffer(nSize*2)) return false;
 
 	m_nSize = MultiByteToWideChar(m_nCP, 0, szBuffer, nLength, (wchar_t *)m_szBuffer, nSize)*2;
 
@@ -110,8 +109,7 @@ bool CReverseUnicodeToUnicodeDecoder::Decode(const char *szBuffer, INT_PTR &nLen
 	if (nLength == 0) return true;
 
 	m_nSize = nLength;
-	m_szBuffer = (char *)malloc(m_nSize);
-	if (m_szBuffer == NULL) return false;
+	if (!AllocBuffer(m_nSize)) return false;
 
 	ReverseUnicode(szBuffer, nLength, m_szBuffer);
 

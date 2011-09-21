@@ -6,22 +6,35 @@
 
 CDecoder::CDecoder()
 : m_szBuffer(NULL)
+, m_nAllocSize(0)
 , m_nSize(0)
 {
 }
 
 void CDecoder::Clear()
 {
-	if (m_szBuffer) {
-		free(m_szBuffer);
-		m_szBuffer = NULL;
-	}
 	m_nSize = 0;
+}
+
+bool CDecoder::AllocBuffer(INT_PTR nSize)
+{
+	if (nSize <= m_nAllocSize) return true;
+
+	//	realloc() involves memory copy, we don't need it
+	free(m_szBuffer);
+	m_szBuffer = (char *)malloc(nSize);
+	if (m_szBuffer == NULL) {
+		m_nAllocSize = 0;
+		return false;
+	}
+
+	m_nAllocSize = nSize;
+	return true;
 }
 
 CDecoder::~CDecoder()
 {
-	Clear();
+	if (m_szBuffer) free(m_szBuffer);
 }
 
 const char *CDecoder::Buffer()
@@ -54,8 +67,7 @@ bool CPassthroughDecoder::Decode(const char *szBuffer, INT_PTR &nLength)
 {
 	Clear();
 
-	m_szBuffer = (char *)malloc(nLength);
-	if (m_szBuffer == NULL) return false;
+	if (!AllocBuffer(nLength)) return false;
 
 	memmove(m_szBuffer, szBuffer, nLength);
 	m_nSize = nLength;
@@ -82,8 +94,8 @@ bool CSingleByteCRLFDecoder::Decode(const char *szBuffer, INT_PTR &nLength)
 
 	Clear();
 
-	m_szBuffer = (char *)malloc(m_pBackDecoder->Size());
-	if (m_szBuffer == NULL) return false;
+	if (!AllocBuffer(m_pBackDecoder->Size())) return false;
+
 	m_mapSkipped.clear();
 	m_nSize = 0;
 

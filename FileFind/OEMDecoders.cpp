@@ -24,8 +24,7 @@ bool CSingleByteToOEMDecoder::Decode(const char *szBuffer, INT_PTR &nLength)
 	nSize = WideCharToMultiByte(m_nOEM, 0, &arrWsz[0], arrWsz.size(), NULL, 0, NULL, NULL);
 	if (nSize == 0) return false;
 
-	m_szBuffer = (char *)malloc(nSize);
-	if (m_szBuffer == NULL) return false;
+	if (!AllocBuffer(nSize)) return false;
 
 	m_nSize = WideCharToMultiByte(m_nOEM, 0, &arrWsz[0], arrWsz.size(), m_szBuffer, nSize, NULL, NULL);
 
@@ -51,7 +50,7 @@ bool CTableToOEMDecoder::Decode(const char *szBuffer, INT_PTR &nLength)
 	Clear();
 	if (nLength == 0) return true;
 
-	m_szBuffer = (char *)malloc(nLength);
+	if (!AllocBuffer(nLength)) return false;
 	m_nSize = nLength;
 
 	for (INT_PTR nChar = 0; nChar < nLength; nChar++)
@@ -82,8 +81,7 @@ bool CUnicodeToOEMDecoder::Decode(const char *szBuffer, INT_PTR &nLength)
 	int nSize = WideCharToMultiByte(m_nOEM, 0, (wchar_t *)szBuffer, nLength/2, NULL, 0, NULL, NULL);
 	if (nSize == 0) return false;
 
-	m_szBuffer = (char *)malloc(nSize);
-	if (m_szBuffer == NULL) return false;
+	if (!AllocBuffer(nSize)) return false;
 
 	m_nSize = WideCharToMultiByte(m_nOEM, 0, (wchar_t *)szBuffer, nLength/2, m_szBuffer, nSize, NULL, NULL);
 
@@ -122,8 +120,7 @@ bool CReverseUnicodeToOEMDecoder::Decode(const char *szBuffer, INT_PTR &nLength)
 
 	m_nSize = nLength/2;
 
-	m_szBuffer = (char *)malloc(m_nSize);
-	if (m_szBuffer == NULL) return false;
+	if (!AllocBuffer(m_nSize)) return false;
 
 	for (INT_PTR nChar = 0; nChar < m_nSize; nChar++) {
 		wchar_t wcSingle = (szBuffer[nChar*2]<<8) + szBuffer[nChar*2+1];
@@ -175,8 +172,7 @@ bool CUTF8ToOEMDecoder::Decode(const char *szBuffer, INT_PTR &nLength)
 	nSize = WideCharToMultiByte(m_nOEM, 0, &arrWsz[0], arrWsz.size(), NULL, 0, NULL, NULL);
 	if (nSize == 0) return false;
 
-	m_szBuffer = (char *)malloc(nSize);
-	if (m_szBuffer == NULL) return false;
+	if (!AllocBuffer(nSize)) return false;
 
 	m_nSize = WideCharToMultiByte(m_nOEM, 0, &arrWsz[0], arrWsz.size(), m_szBuffer, nSize, NULL, NULL);
 

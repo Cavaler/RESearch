@@ -13,8 +13,11 @@ public:
 
 protected:
 	char	   *m_szBuffer;
+	INT_PTR		m_nAllocSize;
 	INT_PTR		m_nSize;
+
 	void		Clear();
+	bool		AllocBuffer(INT_PTR nSize);
 };
 
 class CSameWidthDecoder : public CDecoder

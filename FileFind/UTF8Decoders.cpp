@@ -23,8 +23,7 @@ bool CSingleByteToUTF8Decoder::Decode(const char *szBuffer, INT_PTR &nLength)
 	nSize = WideCharToMultiByte(CP_UTF8, 0, &arrWsz[0], arrWsz.size(), NULL, 0, NULL, NULL);
 	if (nSize == 0) return false;
 
-	m_szBuffer = (char *)malloc(nSize);
-	if (m_szBuffer == NULL) return false;
+	if (!AllocBuffer(nSize)) return false;
 
 	m_nSize = WideCharToMultiByte(CP_UTF8, 0, &arrWsz[0], arrWsz.size(), m_szBuffer, nSize, NULL, NULL);
 
@@ -60,8 +59,7 @@ bool CUnicodeToUTF8Decoder::Decode(const char *szBuffer, INT_PTR &nLength)
 	m_nSize = WideCharToMultiByte(CP_UTF8, 0, (WCHAR *)szBuffer, nLength/2, NULL, 0, NULL, NULL);
 	if (m_nSize == 0) return false;
 
-	m_szBuffer = (char *)malloc(m_nSize);
-	if (m_szBuffer == NULL) return false;
+	if (!AllocBuffer(m_nSize)) return false;
 
 	m_nSize = WideCharToMultiByte(CP_UTF8, 0, (WCHAR *)szBuffer, nLength/2, m_szBuffer, m_nSize, NULL, NULL);
 
@@ -101,8 +99,7 @@ bool CReverseUnicodeToUTF8Decoder::Decode(const char *szBuffer, INT_PTR &nLength
 	m_nSize = WideCharToMultiByte(CP_UTF8, 0, (WCHAR *)&szLE[0], nLength/2, NULL, 0, NULL, NULL);
 	if (m_nSize == 0) return false;
 
-	m_szBuffer = (char *)malloc(m_nSize);
-	if (m_szBuffer == NULL) return false;
+	if (!AllocBuffer(m_nSize)) return false;
 
 	m_nSize = WideCharToMultiByte(CP_UTF8, 0, (WCHAR *)&szLE[0], nLength/2, m_szBuffer, m_nSize, NULL, NULL);
 
