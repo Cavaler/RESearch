@@ -34,7 +34,7 @@ BOOL EditorListAllAgain() {
 	Info.arrLines.clear();
 
 	for (int CurrentLine = 0; CurrentLine < EdInfo.TotalLines; CurrentLine++) {
-		if (Interrupted256(CurrentLine)) break;
+		if (Interrupted()) break;
 		int FirstLine = CurrentLine, StartPos = 0, EndPos = -1;
 		int LastLine = (ESeveralLine) ? EdInfo.TotalLines-1 : CurrentLine;
 

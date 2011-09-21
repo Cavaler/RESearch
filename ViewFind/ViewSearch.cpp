@@ -131,7 +131,7 @@ BOOL ViewerSearchAgain() {
 
 		int nLineOffset = Info.LeftPos;
 		do {
-			if (Interrupted256(nCurrentLine)) break;
+			if (Interrupted()) break;
 			strLine = GetNextLine(VInfo, szData, mapInput.Size()-nOffset, nSkip);
 			if (strLine.empty() && (nSkip == 0)) break;
 			if (!ECaseSensitive) strLine = UpCaseString(strLine);

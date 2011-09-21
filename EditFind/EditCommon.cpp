@@ -218,7 +218,7 @@ BOOL SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos) {
 	if (EReverse) {
 		for (Line=LastLine;Line>=FirstLine;Line--) {
 			ShowCurrentLine(Line,EdInfo.TotalLines,EdInfo.WindowSizeX);
-			if (Interrupted256(Line)) return FALSE;
+			if (Interrupted()) return FALSE;
 
 			int CurLastLine = min(LastLine+SeveralLines-1, LastLine);
 			FillLineBuffer(Line, CurLastLine);
@@ -241,7 +241,7 @@ BOOL SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos) {
 		int FirstLineLength;
 		for (Line=FirstLine;Line<=LastLine;Line++) {
 			ShowCurrentLine(Line,EdInfo.TotalLines,EdInfo.WindowSizeX);
-			if (Interrupted256(Line)) return FALSE;
+			if (Interrupted()) return FALSE;
 
 			FillLineBuffer(Line, min(LastLine, Line+SeveralLines-1));
 			Lines = (!g_LineBuffer.empty()) ? &g_LineBuffer[0] : _T("");
