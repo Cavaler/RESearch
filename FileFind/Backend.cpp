@@ -49,6 +49,8 @@ void CFileBackend::Done()
 {
 	if (g_bInterrupted) Abort(); else Close();
 
+	if (m_pEncoder) delete m_pEncoder;
+
 	m_nSize    = 0;
 }
 

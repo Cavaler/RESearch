@@ -2,7 +2,12 @@
 
 //	Everything operates on char * since even for Unicode mode we use UTF-8
 
-class IBackend
+class IVirtual {
+public:
+	virtual ~IVirtual() {}
+};
+
+class IBackend : public IVirtual
 {
 public:		//	Search functions
 	virtual const char *Buffer() = 0;	//	OEM or UTF-8
@@ -33,7 +38,7 @@ public:
 //	Source encoding is determined by created instance
 //	Target encoding in OEM for ANSI mode and UTF-8 for Unicode
 
-class IDecoder
+class IDecoder : public IVirtual
 {
 public:
 	virtual bool		Decode(const char *szBuffer, INT_PTR &nLength) = 0;
@@ -46,7 +51,7 @@ public:
 	virtual IDecoder *	GetEncoder() = 0;
 };
 
-class ISplitLineProcessor
+class ISplitLineProcessor : public IVirtual
 {
 public:
 	virtual bool		GetNextLine() = 0;
@@ -57,7 +62,7 @@ public:
 	virtual bool	WriteThru(const char *szBuffer, INT_PTR nLength, INT_PTR nSkipLength) = 0;
 };
 
-class IFrontend
+class IFrontend : public IVirtual
 {
 public:
 	virtual bool	Process(IBackend *pBackend) = 0;

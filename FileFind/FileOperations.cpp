@@ -1,7 +1,6 @@
 #include "StdAfx.h"
 #include "..\RESearch.h"
 #include "FileOperations.h"
-#include "shared_ptr.h"
 
 #ifndef UNICODE
 
