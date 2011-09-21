@@ -474,7 +474,6 @@ void SynchronizeWithFile(bool bReplace) {
 }
 
 int LastLine=0;
-DWORD LastTickCount=0;
 BOOL ClockPresent=FALSE;
 
 void FindIfClockPresent() {
@@ -491,7 +490,7 @@ void FindIfClockPresent() {
 
 void ShowCurrentLine(int CurLine,int TotalLines,int TotalColumns)
 {
-	if ((CurLine<LastLine) || (CurLine>=LastLine+1000) || (GetTickCount() > LastTickCount+1000)) {
+	if ((CurLine<LastLine) || (CurLine>=LastLine+1000) || (GetTickCount() > LastTickCount+250)) {
 		int Position = (ClockPresent) ? 19 : 25;
 		if (TotalColumns > 80) Position += (TotalColumns-81);
 #ifdef UNICODE
@@ -508,8 +507,7 @@ void ShowCurrentLine(int CurLine,int TotalLines,int TotalColumns)
 		StartupInfo.Text(0,0,0x30,NULL);
 		LastLine=CurLine;
 
-		strText = GetMsg(MMenuHeader) + FormatStr(_T(": %d/%d"), CurLine, TotalLines);
-		SetConsoleTitle(strText.c_str());
+		SetConsoleTitle(FormatStr(GetMsg(MEditConsoleTitle), CurLine, TotalLines).c_str());
 
 		LastTickCount=GetTickCount();
 	}

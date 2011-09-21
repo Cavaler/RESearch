@@ -69,7 +69,8 @@ enum eStringTable {
 	MFilesScanned,
 	MFilesFound,
 	MNoFilesFound,
-	MConsoleTitle,
+	MFileConsoleTitle,
+	MEditConsoleTitle,
 
 	MREGrep,
 	MGrepNames,

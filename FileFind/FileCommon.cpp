@@ -304,7 +304,11 @@ void ShortenFileName(const TCHAR *szFrom, TCHAR *szTo) {
 	}
 }
 
-void ShowProgress(const TCHAR *Directory, panelitem_vector &PanelItems) {
+void ShowProgress(const TCHAR *Directory, panelitem_vector &PanelItems)
+{
+	if (GetTickCount() < LastTickCount+250) return;
+	LastTickCount = GetTickCount();
+
 	TCHAR Scanned[80], Found[80];
 
 	_stprintf_s(Scanned, 80, GetMsg(MFilesScanned), FilesScanned);
@@ -329,6 +333,8 @@ void ShowProgress(const TCHAR *Directory, panelitem_vector &PanelItems) {
 		szFileName[ 5], szFileName[ 6], szFileName[ 7], szFileName[ 8], szFileName[ 9],
 		szFileName[10], szFileName[11], szFileName[12], szFileName[13], szFileName[14]};
 	StartupInfo.Message(StartupInfo.ModuleNumber, 0, NULL, Lines, 5+nItems, 0);
+
+	SetConsoleTitle(FormatStr(GetMsg(MFileConsoleTitle), PanelItems.size(), Directory).c_str());
 }
 
 BOOL AdvancedApplies(WIN32_FIND_DATA *FindData) {
@@ -377,10 +383,6 @@ int DoScanDirectory(TCHAR *Directory, panelitem_vector &PanelItems, ProcessFileP
 	int Len = AddSlashLen(Directory);
 	HANDLE hScreen=StartupInfo.SaveScreen(0,0,-1,-1);
 
-	TCHAR ConsoleTitle[MAX_PATH*2];
-	_stprintf_s(ConsoleTitle, arrsizeof(ConsoleTitle), GetMsg(MConsoleTitle), Directory);
-	SetConsoleTitle(ConsoleTitle);
-
 	_tcscat(Directory, _T("*"));
 	if ((HSearch=FindFirstFile(Directory,&FindData))!=INVALID_HANDLE_VALUE) do {
 //		Sleep(0);
@@ -399,7 +401,8 @@ int DoScanDirectory(TCHAR *Directory, panelitem_vector &PanelItems, ProcessFileP
 	FindClose(HSearch);
 
 	Directory[Len]=0;
-	if (!FindDataCount) ShowProgress(Directory, PanelItems);
+	ShowProgress(Directory, PanelItems);
+
 	for (int I=0;I<FindDataCount;I++) {
 		g_bInterrupted|=Interrupted();if (g_bInterrupted) break;
 		if (!FAdvanced||AdvancedApplies(&FindDataArray[I])) {

@@ -69,7 +69,8 @@ MAllCharTables		"U&se all character tables"				"Использовать все кодовые таблицы
 MFilesScanned		"Files scanned: %d"						"Просмотрено файлов: %d"
 MFilesFound			"Files found: %d"						"Найдено файлов: %d"
 MNoFilesFound		"No files found"						"Файлы не найдены"
-MConsoleTitle		"Searching - {%s}"						"Поиск - {%s}"
+MFileConsoleTitle	"Searching (%d) - {%s}"					"Поиск (%d) - {%s}"
+MEditConsoleTitle	"Searching - %d of %d"					"Поиск - %d из %d"
 
 MREGrep				"Grep"									"Grep"
 MGrepNames			"Output file &names only"				"Выводить только &имена файлов"

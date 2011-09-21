@@ -81,6 +81,7 @@ void OEMMatchDone();
 EXTERN int FileNumber;
 EXTERN int FindNumber;
 EXTERN int ReplaceNumber;
+EXTERN DWORD LastTickCount VALUE(0);
 
 EXTERN int REErrorField  VALUE(-1);
 EXTERN int REErrorOffset VALUE(-1);
