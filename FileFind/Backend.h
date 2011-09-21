@@ -60,4 +60,9 @@ protected:
 	HANDLE		m_hOutFile;
 	__int64		m_nBackedUp;
 	IDecoder   *m_pEncoder;
+
+	vector<BYTE> m_arrWriteBuffer;
+	INT_PTR		m_nBuffered;
+	BOOL		BufferOutput(LPCVOID lpBuffer, DWORD dwWrite);
+	BOOL		FlushBuffer();
 };

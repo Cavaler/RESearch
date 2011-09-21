@@ -22,6 +22,7 @@ CFileBackend::CFileBackend()
 , m_pDecoder	(NULL)
 , m_nSize		(0)
 , m_hOutFile	(INVALID_HANDLE_VALUE)
+, m_nBuffered   (0)
 , m_pEncoder	(NULL)
 {
 }
@@ -160,6 +161,7 @@ void CFileBackend::Close()
 		m_nBlockOffset = liCurrent.QuadPart;
 
 		CatchUpOutput();
+		FlushBuffer();
 
 		CloseHandle(m_hOutFile);
 		m_hOutFile = INVALID_HANDLE_VALUE;
@@ -252,8 +254,7 @@ bool CFileBackend::WriteBack(INT_PTR nOffset)
 	szStart +=           m_nBackedUp-m_nBlockOffset;
 	nOffset -= (INT_PTR)(m_nBackedUp-m_nBlockOffset);
 
-	DWORD dwWritten;
-	if (!WriteFile(m_hOutFile, szStart, nOffset, &dwWritten, NULL)) return false;
+	if (!BufferOutput(szStart, nOffset)) return false;
 
 	m_nBackedUp += nOffset;
 
@@ -283,9 +284,7 @@ bool CFileBackend::WriteThru(const char *szBuffer, INT_PTR nLength, INT_PTR nSki
 		nLength  = m_pEncoder->Size();
 	}
 
-	DWORD dwWritten;
-	if (!WriteFile(m_hOutFile, szBuffer, nLength, &dwWritten, NULL)) return false;
-	if (dwWritten != nLength) return false;
+	if (!BufferOutput(szBuffer, nLength)) return false;
 
 	m_nBackedUp += nSkipLength;
 
@@ -335,7 +334,41 @@ bool CFileBackend::OpenOutput()
 
 	m_nBackedUp = 0;
 
+	m_arrWriteBuffer.resize(1024*1024);
+	m_nBuffered = 0;
+
 	return true;
+}
+
+BOOL CFileBackend::BufferOutput(LPCVOID lpBuffer, DWORD dwWrite)
+{
+	if (m_nBuffered + dwWrite <= m_arrWriteBuffer.size()) {
+		memmove(&m_arrWriteBuffer[m_nBuffered], lpBuffer, dwWrite);
+		m_nBuffered += dwWrite;
+		return TRUE;
+	}
+
+	if (!FlushBuffer()) return FALSE;
+
+	if (dwWrite >= m_arrWriteBuffer.size()/16) {
+		DWORD dwWritten;
+		if (!WriteFile(m_hOutFile, lpBuffer, dwWrite, &dwWritten, NULL)) return FALSE;
+		if (dwWritten != dwWrite) return FALSE;
+		return TRUE;
+	} else {
+		return BufferOutput(lpBuffer, dwWrite);
+	}
+}
+
+BOOL CFileBackend::FlushBuffer()
+{
+	DWORD dwWritten;
+
+	if (!WriteFile(m_hOutFile, &m_arrWriteBuffer[0], m_nBuffered, &dwWritten, NULL)) return FALSE;
+	if (dwWritten != m_nBuffered) return FALSE;
+	m_nBuffered = 0;
+
+	return TRUE;
 }
 
 LPCTSTR CFileBackend::FileName()
