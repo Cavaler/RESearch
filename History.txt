@@ -9,12 +9,18 @@ Planned:
 	- Search in share-opened files
 	? Searching in streams
 
-    - "Could not find" with "Replace with: $0, [X] remove non-matched"
-    * Center text in Replace confirmation as one block
-    * Skip whole file in Replace confirmation
-    * Rename preview - truncate pats from both files
-    - ONE EctlSetString and others for several replaces
-    + Diff background in file replace confirm (exists in edit confirm)
+Performance issues:
+    - ONE EctlSetString and others for several replaces in one line
+
+Version 7.50 beta 2 (21.09.2011)
+	! Greatly reduced File Replace time, especially for a lot of changes
+	* Don't show "Couldn't find" message in some cases in Editor Replace
+	+ Quoted text in confirmation dialogs centered as one block
+	* Replace confirmation from panels looks like one in Editor
+	* "Skip File" in Panels Replace confirmation
+	- "Cancel" or Esc didn't really interrupt trying different encodings
+	* Rename Preview has file names aligned, and equally truncated
+	* Editor progress shown in console title
 
 Version 7.50 beta 1 (20.09.2011)
 	! MAJOR rewrite of File Search / Replace / Grep
