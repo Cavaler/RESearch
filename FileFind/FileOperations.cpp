@@ -28,6 +28,7 @@ bool RunSearchANSI(CFileBackend *pBackend, IFrontend *pFrontend)
 	pDecoder = new CPassthroughDecoder();
 	if (!pBackend->SetDecoder(pDecoder)) return false;
 	if (pFrontend->Process(pBackend)) return true;
+	if (Interrupted()) return false;
 
 	if (!FAllCharTables) return false;
 
@@ -37,16 +38,20 @@ bool RunSearchANSI(CFileBackend *pBackend, IFrontend *pFrontend)
 
 		pDecoder = new CTableToOEMDecoder(szDecodeTable, szEncodeTable);
 		if (pBackend->SetDecoder(pDecoder) && pFrontend->Process(pBackend)) return true;
+		if (Interrupted()) return false;
 	}
 
 	pDecoder = new CUnicodeToOEMDecoder();
 	if (pBackend->SetDecoder(pDecoder) && pFrontend->Process(pBackend)) return true;
+	if (Interrupted()) return false;
 
 	pDecoder = new CUTF8ToOEMDecoder();
 	if (pBackend->SetDecoder(pDecoder) && pFrontend->Process(pBackend)) return true;
+	if (Interrupted()) return false;
 
 	pDecoder = new CReverseUnicodeToOEMDecoder();
 	if (pBackend->SetDecoder(pDecoder) && pFrontend->Process(pBackend)) return true;
+	if (Interrupted()) return false;
 
 	return false;
 }
@@ -96,6 +101,7 @@ bool RunSearchUTF8(CFileBackend *pBackend, IFrontend *pFrontend)
 		pDecoder = new CSingleByteToUTF8Decoder(GetDefCP());
 		if (!pBackend->SetDecoder(pDecoder)) return false;
 		if (pFrontend->Process(pBackend)) return true;
+		if (Interrupted()) return false;
 	}
 
 	if (!FAllCharTables) return false;
@@ -106,21 +112,25 @@ bool RunSearchUTF8(CFileBackend *pBackend, IFrontend *pFrontend)
 
 		pDecoder = new CSingleByteToUTF8Decoder(nCP);
 		if (pBackend->SetDecoder(pDecoder) && pFrontend->Process(pBackend)) return true;
+		if (Interrupted()) return false;
 	}
 
 	if (g_setAllCPs.find(CP_UNICODE) != g_setAllCPs.end()) {
 		pDecoder = new CUnicodeToUTF8Decoder();
 		if (pBackend->SetDecoder(pDecoder) && pFrontend->Process(pBackend)) return true;
+		if (Interrupted()) return false;
 	}
 
 	if (g_setAllCPs.find(CP_UTF8) != g_setAllCPs.end()) {
 		pDecoder = new CPassthroughDecoder();
 		if (pBackend->SetDecoder(pDecoder) && pFrontend->Process(pBackend)) return true;
+		if (Interrupted()) return false;
 	}
 
 	if (g_setAllCPs.find(CP_REVERSEBOM) != g_setAllCPs.end()) {
 		pDecoder = new CReverseUnicodeToUTF8Decoder();
 		if (pBackend->SetDecoder(pDecoder) && pFrontend->Process(pBackend)) return true;
+		if (Interrupted()) return false;
 	}
 
 	return false;
@@ -150,6 +160,7 @@ bool RunSearchUnicode(CFileBackend *pBackend, IFrontend *pFrontend)
 		pDecoder = new CSingleByteToUnicodeDecoder(GetDefCP());
 		if (!pBackend->SetDecoder(pDecoder)) return false;
 		if (pFrontend->Process(pBackend)) return true;
+		if (Interrupted()) return false;
 	}
 
 	if (!FAllCharTables) return false;
@@ -160,21 +171,25 @@ bool RunSearchUnicode(CFileBackend *pBackend, IFrontend *pFrontend)
 
 		pDecoder = new CSingleByteToUnicodeDecoder(nCP);
 		if (pBackend->SetDecoder(pDecoder) && pFrontend->Process(pBackend)) return true;
+		if (Interrupted()) return false;
 	}
 
 	if (g_setAllCPs.find(CP_UNICODE) != g_setAllCPs.end()) {
 		pDecoder = new CPassthroughDecoder();
 		if (pBackend->SetDecoder(pDecoder) && pFrontend->Process(pBackend)) return true;
+		if (Interrupted()) return false;
 	}
 
 	if (g_setAllCPs.find(CP_UTF8) != g_setAllCPs.end()) {
 		pDecoder = new CUTF8ToUnicodeDecoder();
 		if (pBackend->SetDecoder(pDecoder) && pFrontend->Process(pBackend)) return true;
+		if (Interrupted()) return false;
 	}
 
 	if (g_setAllCPs.find(CP_REVERSEBOM) != g_setAllCPs.end()) {
 		pDecoder = new CReverseUnicodeToUnicodeDecoder();
 		if (pBackend->SetDecoder(pDecoder) && pFrontend->Process(pBackend)) return true;
+		if (Interrupted()) return false;
 	}
 
 	return false;
