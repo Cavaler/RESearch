@@ -171,6 +171,8 @@ template<class CHAR>
 CREParameters<CHAR>::CREParameters()
 : m_re(NULL), m_szString(NULL)
 {
+	for (int n = 0; n < 25; n++)
+		m_StrParamPtr[n] = m_mapStrParam.end();
 }
 
 template<class CHAR>
@@ -187,20 +189,31 @@ bool CREParameters<CHAR>::Empty() {
 }
 
 template<class CHAR>
+void CREParameters<CHAR>::AddSingleCharParam(char C, const CHAR *sz)
+{
+	named_parameter_ptr &ptr = m_StrParamPtr[C - 'A'];
+	if (ptr == m_mapStrParam.end()) {
+		ptr = m_mapStrParam.insert(named_parameters::value_type(cstring(1, C), sz)).first;
+	} else {
+		ptr->second = sz;
+	}
+}
+
+template<class CHAR>
 void CREParameters<CHAR>::AddENumbers(int nL, int nN, int nS, int nR) {
 	CHAR szNumber[16];
-	m_mapStrParam[CSO::_T2("L")] = CSO::ctoa(nL, szNumber);
-	m_mapStrParam[CSO::_T2("N")] = CSO::ctoa(nN, szNumber);
-	m_mapStrParam[CSO::_T2("S")] = CSO::ctoa(nS, szNumber);
-	m_mapStrParam[CSO::_T2("R")] = CSO::ctoa(nR, szNumber);
+	AddSingleCharParam('L', CSO::ctoa(nL, szNumber));
+	AddSingleCharParam('N', CSO::ctoa(nN, szNumber));
+	AddSingleCharParam('S', CSO::ctoa(nS, szNumber));
+	AddSingleCharParam('R', CSO::ctoa(nR, szNumber));
 }
 
 template<class CHAR>
 void CREParameters<CHAR>::AddFNumbers(int nF, int nS, int nR) {
 	CHAR szNumber[16];
-	m_mapStrParam[CSO::_T2("F")] = CSO::ctoa(nF, szNumber);
-	m_mapStrParam[CSO::_T2("S")] = CSO::ctoa(nS, szNumber);
-	m_mapStrParam[CSO::_T2("R")] = CSO::ctoa(nR, szNumber);
+	AddSingleCharParam('F', CSO::ctoa(nF, szNumber));
+	AddSingleCharParam('S', CSO::ctoa(nS, szNumber));
+	AddSingleCharParam('R', CSO::ctoa(nR, szNumber));
 }
 
 template<class CHAR>

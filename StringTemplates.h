@@ -37,6 +37,7 @@ public:
 	typedef CStringOperations<CHAR> CSO;
 	typedef typename CSO::cstring cstring;
 	typedef map<cstring, cstring> named_parameters;
+	typedef typename named_parameters::iterator named_parameter_ptr;
 	typedef set<cstring> parameters_list;
 
 	CREParameters();
@@ -69,8 +70,11 @@ public:
 
 	cstring FillNamedReferences(const cstring &strPattern, bool bQuote=true);
 
+	void AddSingleCharParam(char C, const CHAR *sz);
+
 public:
 	named_parameters m_mapStrParam;
+	named_parameter_ptr	m_StrParamPtr[26];
 	parameters_list  m_setInitParam;	// for script::init()
 
 	pcre *m_re;
