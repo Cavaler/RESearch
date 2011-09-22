@@ -87,6 +87,8 @@ BOOL ViewerSearchAgain() {
 	StartupInfo.ViewerControl(VCTL_GETINFO, &VInfo);
 	g_bInterrupted = FALSE;
 
+	CDebugTimer tm(_T("ViewSearch() took %d ms"));
+
 	map<int, ViewerSearchInfo>::iterator it = g_ViewerInfo.find(VInfo.ViewerID);
 	if (it == g_ViewerInfo.end()) {
 		ViewerSearchInfo Info;
@@ -159,6 +161,8 @@ BOOL ViewerSearchAgain() {
 			nCurrentLine++;
 		} while (nOffset < (long)mapInput.Size());
 	}
+
+	tm.Stop();
 
 	if (!g_bInterrupted) {
 		const TCHAR *Lines[]={GetMsg(MRESearch),GetMsg(MCannotFind),EText.c_str(),GetMsg(MOk)};

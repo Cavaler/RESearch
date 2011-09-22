@@ -435,7 +435,11 @@ OperationResult RenameFiles(panelitem_vector &PanelItems, BOOL ShowDialog) {
 	m_arrPendingRename.clear();
 	m_arrLastRename.clear();
 
-	if (ScanDirectories(PanelItems, RenameFile)) {
+	CDebugTimer tm(_T("FileRename() took %d ms"));
+	int nResult = ScanDirectories(PanelItems, RenameFile);
+	tm.Stop();
+
+	if (nResult) {
 		if (FRPreviewRename) RenamePreview(PanelItems);
 		if (!FROpenModified) return OR_OK; else
 		return (PanelItems.empty()) ? NoFilesFound() : OR_PANEL;
