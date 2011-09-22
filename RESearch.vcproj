@@ -73,6 +73,7 @@
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_DEBUG"
 				Culture="2057"
+				AdditionalIncludeDirectories="$(OUTDIR)"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -172,6 +173,7 @@
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_DEBUG"
 				Culture="2057"
+				AdditionalIncludeDirectories="$(OUTDIR)"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -277,6 +279,7 @@
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="NDEBUG"
 				Culture="2057"
+				AdditionalIncludeDirectories="$(OUTDIR)"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -382,6 +385,7 @@
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="NDEBUG"
 				Culture="2057"
+				AdditionalIncludeDirectories="$(OUTDIR)"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -482,6 +486,7 @@
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_DEBUG"
 				Culture="2057"
+				AdditionalIncludeDirectories="$(OUTDIR)"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -582,6 +587,7 @@
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_DEBUG"
 				Culture="2057"
+				AdditionalIncludeDirectories="$(OUTDIR)"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -688,6 +694,7 @@
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="NDEBUG"
 				Culture="2057"
+				AdditionalIncludeDirectories="$(OUTDIR)"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -794,6 +801,7 @@
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="NDEBUG"
 				Culture="2057"
+				AdditionalIncludeDirectories="$(OUTDIR)"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -880,8 +888,6 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;$(NoInherit)"
 						UsePrecompiledHeader="0"
 					/>
 				</FileConfiguration>
@@ -890,8 +896,6 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;$(NoInherit)"
 						UsePrecompiledHeader="0"
 					/>
 				</FileConfiguration>
@@ -916,8 +920,6 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;$(NoInherit)"
 						UsePrecompiledHeader="0"
 					/>
 				</FileConfiguration>
@@ -926,8 +928,6 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;PCRE_STATIC;FAR_USE_NAMESPACE;$(NoInherit)"
 						UsePrecompiledHeader="0"
 					/>
 				</FileConfiguration>
@@ -1147,38 +1147,6 @@
 			<File
 				RelativePath="RESearch.cpp"
 				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="2"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="2"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug Unicode|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="2"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug Unicode|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="2"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="RESearch.idl"
@@ -1505,78 +1473,6 @@
 			<File
 				RelativePath="RESearch.rc"
 				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCResourceCompilerTool"
-						PreprocessorDefinitions=""
-						AdditionalIncludeDirectories="$(OUTDIR)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCResourceCompilerTool"
-						PreprocessorDefinitions=""
-						AdditionalIncludeDirectories="$(OUTDIR)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCResourceCompilerTool"
-						PreprocessorDefinitions=""
-						AdditionalIncludeDirectories="$(OUTDIR)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCResourceCompilerTool"
-						PreprocessorDefinitions=""
-						AdditionalIncludeDirectories="$(OUTDIR)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug Unicode|Win32"
-					>
-					<Tool
-						Name="VCResourceCompilerTool"
-						PreprocessorDefinitions=""
-						AdditionalIncludeDirectories="$(OUTDIR)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug Unicode|x64"
-					>
-					<Tool
-						Name="VCResourceCompilerTool"
-						PreprocessorDefinitions=""
-						AdditionalIncludeDirectories="$(OUTDIR)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release Unicode|Win32"
-					>
-					<Tool
-						Name="VCResourceCompilerTool"
-						PreprocessorDefinitions=""
-						AdditionalIncludeDirectories="$(OUTDIR)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release Unicode|x64"
-					>
-					<Tool
-						Name="VCResourceCompilerTool"
-						PreprocessorDefinitions=""
-						AdditionalIncludeDirectories="$(OUTDIR)"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="RESearchEng.hlf"
