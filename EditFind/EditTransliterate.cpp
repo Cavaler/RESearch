@@ -1,6 +1,37 @@
 #include "StdAfx.h"
 #include "..\RESearch.h"
 
+void EditorTransliterateString(EditorGetString &String, int nStartPos = 0, int nLastPos = -1)
+{
+	tstring strOrigData = ToString(String);
+	tstring strData = strOrigData;
+
+	if ((nLastPos < 0) || (nLastPos > (int)strData.length()))
+		nLastPos = strData.length();
+
+	for (int nChar = nStartPos; nChar < nLastPos; nChar++) {
+		size_t nIndex = ETSource.find(strData[nChar]);
+		if (nIndex != string::npos) {
+			if (nIndex >= ETTarget.length()) {
+				if (!ETTarget.empty()) {
+					strData[nChar] = ETTarget[ETTarget.length()-1];
+				}
+			} else {
+				strData[nChar] = ETTarget[nIndex];
+			}
+		}
+	}
+
+	if (strData != strOrigData) {
+		EditorSetString SetString = {-1};
+
+		SetString.StringText = strData.data();
+		SetString.StringLength = strData.length();
+		SetString.StringEOL = String.StringEOL;
+		EctlSetString(&SetString);
+	}
+}
+
 BOOL EditorTransliterateAgain() {
 	RefreshEditorInfo();
 	StartEdInfo = EdInfo;
@@ -9,34 +40,26 @@ BOOL EditorTransliterateAgain() {
 
 	EditorSetPosition Position = {0, 0, 0, -1, -1, -1};
 	EditorGetString String = {-1};
-	EditorSetString SetString = {-1};
 
 	EditorStartUndo();
 
-	for (int nLine = 0; nLine < EdInfo.TotalLines; nLine++) {
-		Position.CurLine = nLine;
-		EctlSetPosition(&Position);
-		EctlGetString(&String);
-		tstring strData(String.StringText, String.StringLength);
+	if (EInSelection) {
+		for (int nLine = EdInfo.BlockStartLine; nLine < EdInfo.TotalLines; nLine++) {
+			Position.CurLine = nLine;
+			EctlSetPosition(&Position);
+			EctlGetString(&String);
 
-		for (size_t nChar = 0; nChar < strData.length(); nChar++) {
-			size_t nIndex = ETSource.find(strData[nChar]);
-			if (nIndex != string::npos) {
-				if (nIndex >= ETTarget.length()) {
-					if (!ETTarget.empty()) {
-						strData[nChar] = ETTarget[ETTarget.length()-1];
-					}
-				} else {
-					strData[nChar] = ETTarget[nIndex];
-				}
-			}
+			if (String.SelStart==-1) break;
+
+			EditorTransliterateString(String, String.SelStart, String.SelEnd);
 		}
+	} else {
+		for (int nLine = 0; nLine < EdInfo.TotalLines; nLine++) {
+			Position.CurLine = nLine;
+			EctlSetPosition(&Position);
+			EctlGetString(&String);
 
-		if (strData != tstring(String.StringText, String.StringLength)) {
-			SetString.StringText = strData.data();
-			SetString.StringLength = strData.length();
-			SetString.StringEOL = String.StringEOL;
-			EctlSetString(&SetString);
+			EditorTransliterateString(String);
 		}
 	}
 
@@ -47,13 +70,18 @@ BOOL EditorTransliterateAgain() {
 	return TRUE;
 }
 
-BOOL EditorTransliterate() {
+BOOL EditorTransliterate()
+{
+	EInSelection = EAutoFindInSelection && (EdInfo.BlockType != BTYPE_NONE);
+
 	CFarDialog Dialog(76,13,_T("TransliterateDlg"));
 	Dialog.AddFrame(MTransliterate);
 	Dialog.Add(new CFarTextItem(5,2,0,MTransSource));
 	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,_T("SourceChars"),SearchText));
 	Dialog.Add(new CFarTextItem(5,4,0,MTransTarget));
 	Dialog.Add(new CFarEditItem(5,5,70,DIF_HISTORY,_T("TargetChars"),ReplaceText));
+
+	Dialog.Add(new CFarCheckBoxItem(5, 7, (EdInfo.BlockType != BTYPE_NONE) ? 0 : DIF_DISABLE, MInSelection, &EInSelection));
 
 	Dialog.AddButtons(MOk,MCancel);
 	Dialog.Add(new CFarButtonItem(60,7,0,0,MBtnPresets));
