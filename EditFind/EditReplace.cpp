@@ -8,6 +8,7 @@ enum eReplaceResult {RR_OK, RR_SKIP, RR_CANCEL};
 int LastReplaceLine, LastReplacePos;
 
 bool bShowNoFound;
+bool bCachedReplace;
 
 void DoEditReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, const tstring &Replace) {
 	EditorSetPosition Position = {-1,-1,-1,-1,-1,-1};
@@ -31,11 +32,15 @@ void DoEditReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, cons
 
 	Position.CurLine = FirstLine;
 	EctlSetPosition(&Position);
-	EctlGetString(&GetString);
+	if (bCachedReplace) {
+		GetString.StringText   = g_LineBuffer.empty() ? NULL : &g_LineBuffer[0];
+		GetString.StringLength = g_LineBuffer.size();
+	} else {
+		EctlGetString(&GetString);
+	}
 	tstring strGetString = ToString(GetString);
 
-	tstring DefEOL = GetString.StringEOL;
-	tstring EndEOL = DefEOL;
+	tstring EndEOL = g_DefEOL;
 
 	// Creating full replace line
 	int OriginalEndLength;
@@ -65,7 +70,7 @@ void DoEditReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, cons
 
 	RefreshEditorInfo();
 	EditorSetString SetString = {-1, NewString.c_str(), NULL, NULL};
-//	Position.CurLine = EdInfo.CurLine;
+
 	while (TRUE) {
 		const TCHAR *CR = (const TCHAR *)_tmemchr(SetString.StringText, '\r', NewString.length());
 		const TCHAR *LF = (const TCHAR *)_tmemchr(SetString.StringText, '\n', NewString.length());
@@ -76,7 +81,7 @@ void DoEditReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, cons
 		} else {
 			if (!LF) break;
 			CR = LF;
-			EOL = DefEOL.c_str();
+			EOL = g_DefEOL.c_str();
 			NextLine = CR + 1;
 		}
 
@@ -94,7 +99,16 @@ void DoEditReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, cons
 
 	SetString.StringLength = NewString.length();
 	SetString.StringEOL = EndEOL.empty() ? NULL : EndEOL.c_str();
-	EctlSetString(&SetString);
+
+	if (bCachedReplace && (g_LineOffsets.size() == 1)) {
+		g_LineBuffer.resize(SetString.StringLength);
+		if (SetString.StringLength > 0)
+			memmove(&g_LineBuffer[0], SetString.StringText, SetString.StringLength*sizeof(TCHAR));
+
+		if (!NoAsking) EctlSetString(&SetString);
+	} else {
+		EctlSetString(&SetString);
+	}
 
 	if (EInSelection) {
 		SelEndLine += Position.CurLine-LastLine;
@@ -255,10 +269,13 @@ BOOL ReplaceInText(int FirstLine, int StartPos, int LastLine, int EndPos) {
 #ifdef UNICODE
 		eReplaceResult Result = EditorReplaceOK(MatchFirstLine, MatchStartPos, MatchLastLine, MatchEndPos, REParam.m_szString, Replace);
 #else
-		string Replace = Replace_O2E;
-		EditorToOEM(Replace);
-		tstring Original = REParam.Original();
-		EditorToOEM(Original);
+		string Original, Replace;
+		if (!NoAsking) {
+			Replace = Replace_O2E;
+			EditorToOEM(Replace);
+			Original = REParam.Original();
+			EditorToOEM(Original);
+		}
 
 		eReplaceResult Result = EditorReplaceOK(MatchFirstLine, MatchStartPos, MatchLastLine, MatchEndPos, Original.c_str(), Replace, Replace_O2E);
 #endif
@@ -287,7 +304,7 @@ BOOL ReplaceInTextByLine(int FirstLine, int StartPos, int LastLine, int EndPos, 
 		int MatchLastLine = Line, MatchEndPos = (Line == LastLine)||EachLineLimited?EndPos:-1;
 		int FoundStartPos = MatchStartPos, FoundEndPos = MatchEndPos;
 
-		while (SearchInText(MatchFirstLine, FoundStartPos, MatchLastLine, FoundEndPos)) {
+		while (SearchInText(MatchFirstLine, FoundStartPos, MatchLastLine, FoundEndPos, bCachedReplace)) {
 			Matched = TRUE;
 			// Assuming that MatchedLine starts from the needed line
 			RefreshEditorInfo();
@@ -319,7 +336,7 @@ BOOL ReplaceInTextByLine(int FirstLine, int StartPos, int LastLine, int EndPos, 
 			if (Result == RR_CANCEL) return TRUE;
 			if (!EReverse) LastLine += MatchLastLine-FoundLastLine;
 
-			if (ERRemoveEmpty&&(Result == RR_OK)&&(MatchFirstLine == MatchLastLine)) {
+			if (ERRemoveEmpty && (Result == RR_OK) && (MatchFirstLine == MatchLastLine)) {
 				EditorSetPosition Position = {MatchFirstLine,-1,-1,-1,-1,-1};
 				EctlSetPosition(&Position);
 				EditorGetString String = {-1};
@@ -344,7 +361,22 @@ BOOL ReplaceInTextByLine(int FirstLine, int StartPos, int LastLine, int EndPos, 
 			FindNumber++;
 		}
 
-		if (ERRemoveNoMatch&&!Matched) {
+		if (bCachedReplace && Matched && NoAsking) {
+			EditorSetString SetString;
+			SetString.StringNumber = -1;
+			if (g_LineBuffer.empty()) {
+				SetString.StringText   = NULL;
+				SetString.StringLength = 0;
+			} else {
+				SetString.StringText = &g_LineBuffer[0];
+				SetString.StringLength = g_LineBuffer.size();
+			}
+			SetString.StringEOL = g_DefEOL.c_str();
+
+			EctlSetString(&SetString);
+		}
+
+		if (ERRemoveNoMatch && !Matched) {
 			EditorSetPosition Position = {Line,-1,-1,-1,-1,-1};
 			EctlSetPosition(&Position);
 			StartupInfo.EditorControl(ECTL_DELETESTRING, NULL);
@@ -379,7 +411,8 @@ BOOL EditorReplaceAgain() {
 #endif
 
 	LastReplaceLine = EdInfo.CurLine;
-	LastReplacePos = EdInfo.CurPos;
+	LastReplacePos  = EdInfo.CurPos;
+	bCachedReplace  = false;
 
 	if (EInSelection) {		// ***************** REPLACE IN SELECTION
 		SaveSelection();
@@ -402,7 +435,8 @@ BOOL EditorReplaceAgain() {
 			ReplaceStartLine = EdInfo.CurLine;
 		}
 
-		if ((!ESeveralLine)||ERRemoveEmpty||ERRemoveNoMatch) {
+		if (!ESeveralLine || ERRemoveEmpty || ERRemoveNoMatch) {
+			bCachedReplace = true;
 			ReplaceInTextByLine(FirstLine, StartPos, LastLine, EndPos, FALSE);
 		} else {
 			ReplaceInText(FirstLine, StartPos, LastLine, EndPos);
@@ -466,6 +500,8 @@ LONG_PTR WINAPI EditorReplaceDialogProc(CFarDialog *pDlg, int nMsg, int nParam1,
 
 BOOL EditorReplace()
 {
+	g_LineBuffer.reserve(SeveralLinesKB*1024);
+
 	EditorFillNamedParameters();
 
 	EInSelection = EAutoFindInSelection && (EdInfo.BlockType != BTYPE_NONE);

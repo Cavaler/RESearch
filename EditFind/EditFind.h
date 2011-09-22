@@ -68,6 +68,7 @@ EXTERN int SelStartLine,SelStartPos,SelEndLine,SelEndPos,SelType;
 EXTERN vector<TCHAR>	g_LineBuffer;
 EXTERN vector<int>		g_LineOffsets;
 EXTERN size_t			g_FirstLine;
+EXTERN tstring			g_DefEOL;
 
 EXTERN EditorInfo EdInfo;
 #ifdef UNICODE

@@ -187,6 +187,7 @@ void FillLineBuffer(size_t FirstLine, size_t LastLine) {
 		for (Position.CurLine = (int)(g_FirstLine+g_LineOffsets.size()); Position.CurLine <= (int)LastLine; Position.CurLine++) {
 			EctlSetPosition(&Position);
 			EctlGetString(&String);
+			g_DefEOL = String.StringEOL ? String.StringEOL : _T("");
 
 			g_LineOffsets.push_back(g_LineBuffer.size());
 			g_LineBuffer.insert(g_LineBuffer.end(), String.StringText, String.StringText+String.StringLength);
@@ -202,8 +203,13 @@ void FillLineBuffer(size_t FirstLine, size_t LastLine) {
 	}
 
 	if (FirstLine == LastLine) {
-		while (!g_LineBuffer.empty() && ((g_LineBuffer.back() == '\r') || (g_LineBuffer.back() == '\n')))
-			g_LineBuffer.erase(g_LineBuffer.end()-1);
+		while (!g_LineBuffer.empty()) {
+			TCHAR szLast = g_LineBuffer[g_LineBuffer.size()-1];
+			if ((szLast  == '\r') || (szLast  == '\n'))
+				g_LineBuffer.erase(g_LineBuffer.end()-1);
+			else
+				break;
+		}
 	}
 }
 
