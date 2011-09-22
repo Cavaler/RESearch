@@ -58,6 +58,8 @@ BOOL EditorSearchAgain()
 	EctlForceSetPosition(NULL);
 	if (!EPreparePattern(SearchText)) return FALSE;
 
+	CDebugTimer tm(_T("EditSearch() took %d ms"));
+
 	StartEdInfo = EdInfo;
 
 	g_bInterrupted = false;
@@ -128,6 +130,8 @@ BOOL EditorSearchAgain()
 	}
 
 	RestorePosition(StartEdInfo);
+
+	tm.Stop();
 
 	if (!g_bInterrupted) {
 		const TCHAR *Lines[]={GetMsg(MRESearch),GetMsg(MCannotFind),EText.c_str(),GetMsg(MOk)};

@@ -7,6 +7,8 @@ BOOL EditorFilterAgain() {
 	EditorSetPosition Position={0,-1,-1,-1,-1,-1};
 	EditorGetString String={-1};
 
+	CDebugTimer tm(_T("EditFilter() took %d ms"));
+
 	EditorStartUndo();
 
 	if (EReverse) {

@@ -5,6 +5,8 @@ BOOL EditorTransliterateAgain() {
 	RefreshEditorInfo();
 	StartEdInfo = EdInfo;
 
+	CDebugTimer tm(_T("EditTransliterate() took %d ms"));
+
 	EditorSetPosition Position = {0, 0, 0, -1, -1, -1};
 	EditorGetString String = {-1};
 	EditorSetString SetString = {-1};

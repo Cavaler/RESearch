@@ -368,6 +368,8 @@ BOOL EditorReplaceAgain() {
 
 	EditorStartUndo();
 
+	CDebugTimer tm(_T("EditReplace() took %d ms"));
+
 	StartEdInfo = EdInfo;
 	bShowNoFound = !NoAsking;
 
@@ -413,6 +415,8 @@ BOOL EditorReplaceAgain() {
 	EctlForceSetPosition(&Position);
 
 	EditorEndUndo();
+
+	tm.Stop();
 
 	if (!bShowNoFound || g_bInterrupted) return TRUE;
 

@@ -25,6 +25,8 @@ BOOL EditorListAllAgain() {
 	EctlForceSetPosition(NULL);
 	StartEdInfo = EdInfo;
 
+	CDebugTimer tm(_T("EditListAll() took %d ms"));
+
 #ifdef UNICODE
 	sFindAllInfo &Info = FindAllInfos[CanonicalLCName(EditorFileName.c_str())];
 #else
@@ -63,6 +65,8 @@ BOOL EditorListAllAgain() {
 			CurrentLine = LastLine;
 		}
 	}
+
+	tm.Stop();
 
 	if (!g_bInterrupted && (Info.arrLines.size() == 0)) {
 		const TCHAR *Lines[]={GetMsg(MRESearch),GetMsg(MCannotFind),EText.c_str(),GetMsg(MOk)};
