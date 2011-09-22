@@ -207,12 +207,12 @@ void FillLineBuffer(size_t FirstLine, size_t LastLine) {
 	}
 }
 
-BOOL SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos) {
+BOOL SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,bool bSkipClear) {
 	int Line,MatchStart,MatchLength;
 	TCHAR *Lines;
 	int LinesLength;
 
-	ClearLineBuffer();
+	if (!bSkipClear) ClearLineBuffer();
 	RefreshEditorInfo();
 
 	if (EReverse) {

@@ -105,7 +105,7 @@ void EditorSeekToBeginEnd();
 void PatchEditorInfo(EditorInfo &EdInfo);
 
 BOOL SearchInLine(const TCHAR *Line,int Length,int Start,int End,int *MatchStart,int *MatchLength);
-BOOL SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos);
+BOOL SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,bool bSkipClear=false);
 void AdjustPosition(TCHAR *Lines, int &FirstLine,int &StartPos);
 void Relative2Absolute(int Line,TCHAR *Lines,int MatchStart,int MatchLength,int &FirstLine,int &StartPos,int &LastLine,int &EndPos);
 
