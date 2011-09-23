@@ -9,8 +9,10 @@ Planned:
 	- Search in share-opened files
 	? Searching in streams
 
-Performance issues:
-    - ONE EctlSetString and others for several replaces in one line
+Version 7.50 beta 3 (22.09.2011)
+	* Most operations internal timing is available - use debug info viewer such as DbgView.exe
+	+ Editor Replace optimized for single-line scenario
+	* Transliterate in Selection
 
 Version 7.50 beta 2 (21.09.2011)
 	! Greatly reduced File Replace time, especially for a lot of changes
