@@ -313,8 +313,7 @@ bool CFileBackend::CatchUpOutput()
 		DWORD dwRead;
 		if (!ReadFile(m_hFile, &arrBuffer[0], dwToRead, &dwRead, NULL)) break;
 
-		DWORD dwWritten;
-		if (!WriteFile(m_hOutFile, &arrBuffer[0], dwRead, &dwWritten, NULL)) break;
+		if (!BufferOutput(&arrBuffer[0], dwRead)) break;
 
 		m_nBackedUp += dwToRead;
 
