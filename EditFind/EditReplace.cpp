@@ -101,6 +101,7 @@ void DoEditReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, cons
 	SetString.StringEOL = EndEOL.empty() ? NULL : EndEOL.c_str();
 
 	if (bCachedReplace && (g_LineOffsets.size() == 1)) {
+		g_FirstLine = Position.CurLine;
 		g_LineBuffer.resize(SetString.StringLength);
 		if (SetString.StringLength > 0)
 			memmove(&g_LineBuffer[0], SetString.StringText, SetString.StringLength*sizeof(TCHAR));
@@ -172,7 +173,7 @@ eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &
 			bShowNoFound = false;
 			return RR_SKIP;
 		}
-		bShowNoFound = true;
+//		bShowNoFound = true;
 
 		vector<tstring> arrFound;
 		QuoteStrings(tstring(Original + StartPos, Width).c_str(), arrFound, EdInfo.WindowSizeX-12, EdInfo.WindowSizeY/2-6);
@@ -435,7 +436,9 @@ BOOL EditorReplaceAgain() {
 			ReplaceStartLine = EdInfo.CurLine;
 		}
 
-		if (!ESeveralLine || ERRemoveEmpty || ERRemoveNoMatch) {
+		if (ERRemoveEmpty || ERRemoveNoMatch) {
+			ReplaceInTextByLine(FirstLine, StartPos, LastLine, EndPos, FALSE);
+		} else if (!ESeveralLine) {
 			bCachedReplace = true;
 			ReplaceInTextByLine(FirstLine, StartPos, LastLine, EndPos, FALSE);
 		} else {
