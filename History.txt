@@ -9,6 +9,11 @@ Planned:
 	- Search in share-opened files
 	? Searching in streams
 
+Version 7.50 beta 4 (26.09.2011)
+	- Fixed critical bug in File Replace
+	- Fixed bug with [X] Remove empty / [X] Remove not matching in Editor Replace
+	- Fixed bug with several-line "Replace with:" in Editor Replace
+
 Version 7.50 beta 3 (22.09.2011)
 	* Most operations internal timing is available - use debug info viewer such as DbgView.exe
 	+ Editor Replace optimized for single-line scenario
