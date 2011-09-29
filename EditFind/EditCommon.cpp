@@ -651,7 +651,7 @@ tstring EctlGetString(int nLine) {
 }
 
 tstring ToString(EditorGetString &String) {
-	return tstring(String.StringText, String.StringLength);
+	return CSO::MakeString(String.StringText, String.StringLength);
 }
 
 void EctlSetString(EditorSetString *String) {

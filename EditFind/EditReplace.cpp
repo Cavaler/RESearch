@@ -49,8 +49,8 @@ void DoEditReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, cons
 	if (LastLine == FirstLine) {
 		OriginalEndLength = GetString.StringLength-EndPos;
 
-		NewString = tstring(GetString.StringText, StartPos) + Replace +
-			tstring(GetString.StringText + EndPos, GetString.StringLength-EndPos);
+		NewString = CSO::MakeString(GetString.StringText, StartPos) + Replace +
+			CSO::MakeString(GetString.StringText + EndPos, GetString.StringLength-EndPos);
 	} else {
 		GetString.StringNumber = -1;
 		Position.CurLine = LastLine;
