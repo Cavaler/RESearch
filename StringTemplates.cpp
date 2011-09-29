@@ -50,16 +50,10 @@ CStringOperations<CHAR>::CreateReplaceString(const CHAR *Replace, const CHAR *EO
 			Replace--;AddChar(String, (CHAR)Char);
 				 }
 		case 'x':{
-			int Char=0;Replace++;
-			for (int I=0;I<2;I++) {
-				if (isxdigit((unsigned char)*Replace)) {
-					Char=Char*16+*Replace;
-					if (*Replace<='9') Char-='0'; else
-						if (*Replace<='F') Char+=10-'A'; else Char+=10-'a';
-					Replace++;
-				} else break;
-			}
-			Replace--;AddChar(String, (CHAR)Char);break;
+			Replace++;
+			CHAR c = ExpandHexDigits(Replace);
+			AddChar(String, c);
+			break;
 				 }
 
 		case 'l':OneCaseConvert=CCV_LOWER;break;
@@ -87,6 +81,48 @@ CStringOperations<CHAR>::CreateReplaceString(const CHAR *Replace, const CHAR *EO
 		if (*Replace) Replace++; else break;
 	}
 	return String;
+}
+
+template<class CHAR>
+int GetHexDigit(const CHAR c)
+{
+	if ((c >= '0') && (c <= '9')) return c - '0';
+	if ((c >= 'A') && (c <= 'F')) return c - 'A' + 10;
+	if ((c >= 'a') && (c <= 'f')) return c - 'a' + 10;
+	return -1;
+}
+
+template<class CHAR>
+typename CHAR CStringOperations<CHAR>::ExpandHexDigits(const CHAR *&Replace)
+{
+	int nChar = 0;
+
+	if (*Replace == '{') {
+		Replace++;
+		bool bOK = true;
+		while ((*Replace != '}') && (*Replace != 0)) {
+			if (bOK) {
+				int nHex = GetHexDigit(*Replace);
+				if (nHex >= 0)
+					nChar = nChar*16 + nHex;
+				else
+					bOK = false;
+			}
+			Replace++;
+		}
+		if (*Replace != 0) Replace++;
+	} else {
+		for (int nDigit=0; nDigit < 2; nDigit++) {
+			int nHex = GetHexDigit(*Replace);
+			if (nHex >= 0)
+				nChar = nChar*16 + nHex;
+			else
+				break;
+			Replace++;
+		}
+	}
+
+	return (CHAR)nChar;
 }
 
 template<class CHAR>

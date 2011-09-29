@@ -15,6 +15,7 @@ public:
 	static void QuoteAny(cstring &str, const CHAR *szList);
 
 	static cstring ExpandParameter(const CHAR *&Replace, CREParameters<CHAR> &Param);
+	static CHAR    ExpandHexDigits(const CHAR *&Replace);
 	static cstring CreateReplaceString(const CHAR *Replace, const CHAR *EOL, int Engine, CREParameters<CHAR> &Param);
 
 	static void QuoteRegExpString (cstring &strText) {
