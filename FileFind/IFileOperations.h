@@ -60,6 +60,7 @@ public:
 
 	virtual bool	WriteBack(INT_PTR nOffset) = 0;
 	virtual bool	WriteThru(const char *szBuffer, INT_PTR nLength, INT_PTR nSkipLength) = 0;
+	virtual void	SkipTo   (INT_PTR nOffset) = 0;
 };
 
 class IFrontend : public IVirtual

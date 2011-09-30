@@ -69,6 +69,10 @@ bool CSingleByteSplitLineProcessor::WriteThru(const char *szBuffer, INT_PTR nLen
 	return m_pBackend->WriteThru(szBuffer, nLength, nSkipLength);
 }
 
+void CSingleByteSplitLineProcessor::SkipTo(INT_PTR nOffset)
+{
+}
+
 //////////////////////////////////////////////////////////////////////////
 
 CSingleByteSeveralLineProcessor::CSingleByteSeveralLineProcessor(IBackend *pBackend, int nLines, INT_PTR nMaxSize)
@@ -94,6 +98,7 @@ CSingleByteSeveralLineProcessor::CSingleByteSeveralLineProcessor(IBackend *pBack
 		if (Overflow()) break;
 	}
 
+	m_nSkipOffset = 0;
 	m_bAtEnd = (nSize == 0) && m_pBackend->Last();
 }
 
@@ -104,6 +109,17 @@ bool CSingleByteSeveralLineProcessor::Overflow()
 
 bool CSingleByteSeveralLineProcessor::GetNextLine()
 {
+	bool bAnySkipped = false;
+	while ((m_arrLines.size() > 1) && (m_arrLines[1] < m_szBuffer+m_nSkipOffset)) {
+		m_arrLines.erase(m_arrLines.begin());
+		bAnySkipped = true;
+	}
+	m_nSkipOffset = 0;
+	if (bAnySkipped) {
+		m_szBuffer = m_arrLines[0];
+		return true;
+	}
+
 	if (m_bAtEnd) return GetNextLastLine();
 
 	m_arrLines.erase(m_arrLines.begin());
@@ -188,12 +204,19 @@ INT_PTR	CSingleByteSeveralLineProcessor::Size()
 
 bool CSingleByteSeveralLineProcessor::WriteBack(INT_PTR nOffset)
 {
+	m_nSkipOffset = nOffset;
 	return m_pBackend->WriteBack((m_szBuffer - m_pBackend->Buffer()) + nOffset);
 }
 
 bool CSingleByteSeveralLineProcessor::WriteThru(const char *szBuffer, INT_PTR nLength, INT_PTR nSkipLength)
 {
+	m_nSkipOffset += nSkipLength;
 	return m_pBackend->WriteThru(szBuffer, nLength, nSkipLength);
+}
+
+void CSingleByteSeveralLineProcessor::SkipTo(INT_PTR nOffset)
+{
+	m_nSkipOffset = nOffset;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -261,4 +284,8 @@ bool CUnicodeSplitLineProcessor::WriteBack(INT_PTR nOffset)
 bool CUnicodeSplitLineProcessor::WriteThru(const char *szBuffer, INT_PTR nLength, INT_PTR nSkipLength)
 {
 	return m_pBackend->WriteThru(szBuffer, nLength, nSkipLength);
+}
+
+void CUnicodeSplitLineProcessor::SkipTo(INT_PTR nOffset)
+{
 }

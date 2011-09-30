@@ -169,6 +169,7 @@ bool ReplaceRegExpProcess(IBackend *pBackend, ISplitLineProcessor &Proc)
 				ReplaceNumber++;
 			} else {
 				if (Interrupted()) break;
+				Proc.SkipTo(szBuffer - Proc.Buffer() + nOffset + nLength);
 			}
 
 			szBuffer += nOffset + nLength;

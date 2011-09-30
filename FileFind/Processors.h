@@ -14,6 +14,7 @@ public:
 
 	virtual bool	WriteBack(INT_PTR nOffset);
 	virtual bool	WriteThru(const char *szBuffer, INT_PTR nLength, INT_PTR nSkipLength);
+	virtual void	SkipTo   (INT_PTR nOffset);
 
 protected:
 	IBackend *m_pBackend;
@@ -33,6 +34,7 @@ public:
 
 	virtual bool	WriteBack(INT_PTR nOffset);
 	virtual bool	WriteThru(const char *szBuffer, INT_PTR nLength, INT_PTR nSkipLength);
+	virtual void	SkipTo   (INT_PTR nOffset);
 
 protected:
 	IBackend *m_pBackend;
@@ -46,6 +48,7 @@ protected:
 
 	bool m_bAtEnd;
 	vector<const char *> m_arrLines;
+	INT_PTR m_nSkipOffset;
 
 	bool GetNextInLine();
 	bool GetNextLastLine();
@@ -66,6 +69,7 @@ public:
 
 	virtual bool	WriteBack(INT_PTR nOffset);
 	virtual bool	WriteThru(const char *szBuffer, INT_PTR nLength, INT_PTR nSkipLength);
+	virtual void	SkipTo   (INT_PTR nOffset);
 
 protected:
 	IBackend *m_pBackend;
