@@ -59,6 +59,11 @@ INT_PTR	CSingleByteSplitLineProcessor::Size()
 	return m_szEOL - m_szBuffer;
 }
 
+INT_PTR	CSingleByteSplitLineProcessor::Start()
+{
+	return 0;
+}
+
 bool CSingleByteSplitLineProcessor::WriteBack(INT_PTR nOffset)
 {
 	return m_pBackend->WriteBack((m_szBuffer - m_pBackend->Buffer()) + nOffset);
@@ -85,8 +90,8 @@ CSingleByteSeveralLineProcessor::CSingleByteSeveralLineProcessor(IBackend *pBack
 	pFileBackend->ResetDecoder(m_pOwnDecoder);
 
 	m_szBuffer = m_pBackend->Buffer();
-	m_szEOL = m_szBuffer;
-	int nSize = m_pBackend->Size();
+	m_szEOL    = m_szBuffer;
+	int nSize  = m_pBackend->Size();
 
 	for (size_t nLine = 0; nLine < m_nLines; nLine++) {
 		m_arrLines.push_back(m_szEOL);
@@ -98,7 +103,9 @@ CSingleByteSeveralLineProcessor::CSingleByteSeveralLineProcessor(IBackend *pBack
 		if (Overflow()) break;
 	}
 
-	m_nSkipOffset = 0;
+	m_nSkipOffset  = 0;
+	m_nStartOffset = 0;
+
 	m_bAtEnd = (nSize == 0) && m_pBackend->Last();
 }
 
@@ -114,12 +121,15 @@ bool CSingleByteSeveralLineProcessor::GetNextLine()
 		m_arrLines.erase(m_arrLines.begin());
 		bAnySkipped = true;
 	}
-	m_nSkipOffset = 0;
 	if (bAnySkipped) {
-		m_szBuffer = m_arrLines[0];
+		m_nStartOffset = m_szBuffer+m_nSkipOffset - m_arrLines[0];
+		m_nSkipOffset  = 0;
+		m_szBuffer     = m_arrLines[0];
 		return true;
 	}
 
+	m_nSkipOffset  = 0;
+	m_nStartOffset = 0;
 	if (m_bAtEnd) return GetNextLastLine();
 
 	m_arrLines.erase(m_arrLines.begin());
@@ -202,6 +212,11 @@ INT_PTR	CSingleByteSeveralLineProcessor::Size()
 	return m_szEOL - m_szBuffer;
 }
 
+INT_PTR	CSingleByteSeveralLineProcessor::Start()
+{
+	return m_nStartOffset;
+}
+
 bool CSingleByteSeveralLineProcessor::WriteBack(INT_PTR nOffset)
 {
 	m_nSkipOffset = nOffset;
@@ -274,6 +289,11 @@ const char *CUnicodeSplitLineProcessor::Buffer()
 INT_PTR	CUnicodeSplitLineProcessor::Size()
 {
 	return (m_szEOL - m_szBuffer)*2;
+}
+
+INT_PTR	CUnicodeSplitLineProcessor::Start()
+{
+	return 0;
 }
 
 bool CUnicodeSplitLineProcessor::WriteBack(INT_PTR nOffset)

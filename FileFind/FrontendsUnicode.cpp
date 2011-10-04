@@ -146,10 +146,11 @@ bool ReplaceRegExpProcess(IBackend *pBackend, ISplitLineProcessor &Proc)
 
 	do {
 		const char *szBuffer = Proc.Buffer();
-		INT_PTR nSize = Proc.Size();
+		INT_PTR nSize  = Proc.Size();
+		INT_PTR nStart = Proc.Start();
 
 		int nResult;
-		while ((nResult = do_pcre_execA(FPattern, FPatternExtra, szBuffer, nSize, 0, 0, REParamA.Match(), REParamA.Count())) >= 0)
+		while ((nResult = do_pcre_execA(FPattern, FPatternExtra, szBuffer, nSize, nStart, 0, REParamA.Match(), REParamA.Count())) >= 0)
 		{
 			if (!pBackend->CheckWriteReady()) return false;
 
@@ -172,8 +173,9 @@ bool ReplaceRegExpProcess(IBackend *pBackend, ISplitLineProcessor &Proc)
 				Proc.SkipTo(szBuffer - Proc.Buffer() + nOffset + nLength);
 			}
 
-			szBuffer += nOffset + nLength;
-			nSize    -= nOffset + nLength;
+//			szBuffer += nOffset + nLength;
+//			nSize    -= nOffset + nLength;
+			nStart    = nOffset + nLength;
 		}
 
 	} while (!Interrupted() && Proc.GetNextLine());

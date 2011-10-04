@@ -11,6 +11,7 @@ public:
 	virtual bool			GetNextLine();
 	virtual const char *	Buffer();
 	virtual INT_PTR			Size();
+	virtual INT_PTR		    Start();
 
 	virtual bool	WriteBack(INT_PTR nOffset);
 	virtual bool	WriteThru(const char *szBuffer, INT_PTR nLength, INT_PTR nSkipLength);
@@ -31,6 +32,7 @@ public:
 	virtual bool			GetNextLine();
 	virtual const char *	Buffer();
 	virtual INT_PTR			Size();
+	virtual INT_PTR		    Start();
 
 	virtual bool	WriteBack(INT_PTR nOffset);
 	virtual bool	WriteThru(const char *szBuffer, INT_PTR nLength, INT_PTR nSkipLength);
@@ -49,6 +51,7 @@ protected:
 	bool m_bAtEnd;
 	vector<const char *> m_arrLines;
 	INT_PTR m_nSkipOffset;
+	INT_PTR m_nStartOffset;
 
 	bool GetNextInLine();
 	bool GetNextLastLine();
@@ -66,6 +69,7 @@ public:
 	virtual bool			GetNextLine();
 	virtual const char *	Buffer();
 	virtual INT_PTR			Size();
+	virtual INT_PTR		    Start();
 
 	virtual bool	WriteBack(INT_PTR nOffset);
 	virtual bool	WriteThru(const char *szBuffer, INT_PTR nLength, INT_PTR nSkipLength);
