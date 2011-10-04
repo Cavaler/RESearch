@@ -164,17 +164,15 @@ bool ReplaceRegExpProcess(IBackend *pBackend, ISplitLineProcessor &Proc)
 			FindNumber++;
 
 			if (ConfirmReplacement(REParam.GetParam(0).c_str(), strReplace.c_str(), pBackend->FileName())) {
-				if (!Proc.WriteBack(szBuffer - Proc.Buffer() + nOffset)) break;
+				if (!Proc.WriteBack(nOffset)) break;
 				if (!Proc.WriteThru(strReplace.data(), strReplace.size(), nLength)) break;
 
 				ReplaceNumber++;
 			} else {
 				if (Interrupted()) break;
-				Proc.SkipTo(szBuffer - Proc.Buffer() + nOffset + nLength);
+				Proc.SkipTo(nOffset + nLength);
 			}
 
-//			szBuffer += nOffset + nLength;
-//			nSize    -= nOffset + nLength;
 			nStart    = nOffset + nLength;
 		}
 
