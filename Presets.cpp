@@ -214,7 +214,7 @@ void CPresetCollection::Save() {
 }
 
 int CPresetCollection::ShowMenu(bool bExecute, int nDefaultID) {
-	int piBreakKeys[]={VK_INSERT, VK_DELETE, VK_F4, (PKF_CONTROL<<16)|VK_UP, (PKF_CONTROL<<16)|VK_DOWN, 0};
+	int piBreakKeys[]={VK_INSERT, VK_DELETE, VK_F4, (PKF_CONTROL<<16)|VK_UP, (PKF_CONTROL<<16)|VK_DOWN, (PKF_CONTROL<<16)|VK_RETURN, 0};
 	vector<tstring> arrItems;
 
 	do {
@@ -228,7 +228,7 @@ int CPresetCollection::ShowMenu(bool bExecute, int nDefaultID) {
 
 		int nBreakKey;
 		tstring strTitle = FormatStr(_T("%s presets"), Name());
-		int nResult = ChooseMenu(arrItems, strTitle.c_str(), _T("Ins,Del,F4,Ctrl-\x18\x19"), _T("Presets"), m_nCurrent,
+		int nResult = ChooseMenu(arrItems, strTitle.c_str(), _T("Ins,Del,F4,Ctrl-\x18\x19,Ctrl-Enter"), _T("Presets"), m_nCurrent,
 			FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT, piBreakKeys, &nBreakKey);
 		if (nResult >= 0) m_nCurrent = nResult;
 
@@ -280,6 +280,11 @@ int CPresetCollection::ShowMenu(bool bExecute, int nDefaultID) {
 				at(m_nCurrent) = pPreset;
 				Save();
 				m_nCurrent++;
+			}
+			break;
+		case 5:			//	VK_CTRLENTER
+			if ((m_nCurrent >= 0) && (m_nCurrent < (int)size())) {
+				at(m_nCurrent)->ExecutePreset();
 			}
 			break;
 		}
@@ -472,11 +477,11 @@ int CountPresets(CBatchActionCollection &Coll, CPreset *pPreset)
 }
 
 bool CBatchAction::EditItems() {
-	int piBreakKeys[]={VK_INSERT, (PKF_CONTROL<<16)|VK_UP, (PKF_CONTROL<<16)|VK_DOWN, VK_DELETE, VK_F4, 0};
+	int piBreakKeys[]={VK_INSERT, (PKF_CONTROL<<16)|VK_UP, (PKF_CONTROL<<16)|VK_DOWN, VK_DELETE, VK_F4, (PKF_CONTROL<<16)|VK_RETURN, 0};
 	vector<tstring> arrItems;
 
 	do {
-		arrItems.resize(size());
+		arrItems.resize(size()+1);
 		for (size_t nPreset = 0; nPreset < size(); nPreset++) {
 			CPreset *pPreset = m_Type[at(nPreset)];
 			if (pPreset == NULL) {
@@ -490,7 +495,7 @@ bool CBatchAction::EditItems() {
 		int nBreakKey;
 		tstring strTitle = FormatStr(GetMsg(MBatchCommands), m_strName.c_str());
 
-		int nResult = ChooseMenu(arrItems, strTitle.c_str(), _T("Ins,Ctrl-\x18\x19,Del"), _T("Batch"), m_nCurrent,
+		int nResult = ChooseMenu(arrItems, strTitle.c_str(), _T("Ins,Ctrl-\x18\x19,Ctrl-Enter,Del"), _T("Batch"), m_nCurrent,
 			FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT, piBreakKeys, &nBreakKey);
 		if (nResult >= 0) m_nCurrent = nResult;
 
@@ -540,6 +545,16 @@ bool CBatchAction::EditItems() {
 
 				if (pColl->EditPreset(pPreset))
 					pColl->Save();
+			}
+			break;
+		case 5:			//	VK_CTRLENTER
+			if ((m_nCurrent >= 0) && (m_nCurrent < (int)size())) {
+				BatchActionIndex Index = at(m_nCurrent);
+				CPresetCollection *pColl = m_Type(Index.first);
+				CPreset *pPreset = (*pColl)(Index.second);
+				if (pPreset == NULL) break;
+
+				pPreset->ExecutePreset();
 			}
 			break;
 		}

@@ -114,7 +114,9 @@ OperationResult EditorTransliterateExecutor() {
 	ETSource = SearchText;
 	ETTarget = ReplaceText;
 
-	return EditorTransliterateAgain() ? OR_OK : OR_CANCEL;
+	BOOL bResult = EditorTransliterateAgain();
+	StartupInfo.EditorControl(ECTL_REDRAW, NULL);
+	return bResult ? OR_OK : OR_CANCEL;
 }
 
 BOOL CETPresetCollection::EditPreset(CPreset *pPreset) {

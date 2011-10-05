@@ -90,7 +90,10 @@ OperationResult EditorFilterExecutor() {
 	if (!EPreparePattern(SearchText)) return OR_FAILED;
 
 	EText = SearchText;
-	return EditorFilterAgain() ? OR_OK : OR_CANCEL;
+
+	BOOL bResult = EditorFilterAgain();
+	StartupInfo.EditorControl(ECTL_REDRAW, NULL);
+	return bResult ? OR_OK : OR_CANCEL;
 }
 
 BOOL CEFPresetCollection::EditPreset(CPreset *pPreset) {

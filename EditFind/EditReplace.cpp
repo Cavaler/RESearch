@@ -617,7 +617,9 @@ OperationResult EditorReplaceExecutor() {
 
 	EditorSeekToBeginEnd();
 
-	return EditorReplaceAgain() ? OR_OK : OR_CANCEL;
+	BOOL bResult = EditorReplaceAgain();
+	StartupInfo.EditorControl(ECTL_REDRAW, NULL);
+	return bResult ? OR_OK : OR_CANCEL;
 }
 
 BOOL CERPresetCollection::EditPreset(CPreset *pPreset) {
