@@ -8,10 +8,18 @@ Regular Expression Search and Replace
 Planned:
 	- Search in share-opened files
 	? Searching in streams
+	? Preset can start from current position
+
+Version 7.50 beta 6 (05.10.2011)
+	* pcre updated to 8.13
+	- Another critical bug in Several-line File Replace fixed
+	- Fixed beginning-of-line matching in File Replace
+	- Fix for editor presets not starting at file beginning
+	* Ctrl-Enter immediately runs selected preset from Presets menu or from Edit Batch menu
 
 Version 7.50 beta 5 (30.09.2011)
 	* Long hex symbols (like \x{0123}) work properly in replace string
-	- Fixed critical bug with Several-line File Replace 
+	- Fixed critical bug with Several-line File Replace
 
 Version 7.50 beta 4 (26.09.2011)
 	- Fixed critical bug in File Replace
