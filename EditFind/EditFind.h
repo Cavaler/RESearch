@@ -69,6 +69,8 @@ EXTERN vector<TCHAR>	g_LineBuffer;
 EXTERN vector<int>		g_LineOffsets;
 EXTERN size_t			g_FirstLine;
 EXTERN tstring			g_DefEOL;
+void FillLineBuffer(size_t FirstLine, size_t LastLine);
+void ClearLineBuffer();
 
 EXTERN EditorInfo EdInfo;
 #ifdef UNICODE

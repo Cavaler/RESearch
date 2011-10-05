@@ -394,10 +394,12 @@ BOOL _EditorReplaceAgain() {
 	return EditorReplaceAgain();
 }
 
-BOOL EditorReplaceAgain() {
+BOOL EditorReplaceAgain()
+{
 	RefreshEditorInfo();
 	PatchEditorInfo(EdInfo);
 	EctlForceSetPosition(NULL);
+	ClearLineBuffer();
 
 	EditorStartUndo();
 

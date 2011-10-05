@@ -56,6 +56,8 @@ BOOL EditorSearchAgain()
 	RefreshEditorInfo();
 	PatchEditorInfo(EdInfo);
 	EctlForceSetPosition(NULL);
+	ClearLineBuffer();
+
 	if (!EPreparePattern(SearchText)) return FALSE;
 
 	CDebugTimer tm(_T("EditSearch() took %d ms"));
