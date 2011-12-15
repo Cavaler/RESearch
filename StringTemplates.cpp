@@ -52,7 +52,7 @@ CStringOperations<CHAR>::CreateReplaceString(const CHAR *Replace, const CHAR *EO
 		case 'x':{
 			Replace++;
 			CHAR c = ExpandHexDigits(Replace);
-			AddChar(String, c);
+			Replace--;AddChar(String, c);
 			break;
 				 }
 
