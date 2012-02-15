@@ -162,6 +162,8 @@ bool FromUnicodeBE(const char *Buffer, int Size, vector<TCHAR> &arrData);
 bool FromUTF8(const char *Buffer, int Size, vector<char> &arrData);
 bool FromUTF8(const char *Buffer, int Size, vector<wchar_t> &arrData);
 
+//	All sizes are in characters
+
 template<class CHAR> void SkipNoCRLF(const CHAR *&Buffer,int *Size);
 template<class CHAR> void SkipCRLF(const CHAR *&Buffer,int *Size);
 template<class CHAR> void SkipWholeLine(const CHAR *&Buffer,int *Size);
