@@ -10,6 +10,9 @@ Planned:
 	? Searching in streams
 	? Preset can start from current position
 
+Version 7.51 (15.02.2012)
+	- Fixed per-line operations in Unicode version
+
 Version 7.50.1 (07.02.2012)
 	! Since there were no bugreports for a long time, I assume it's now stable, not beta
 	- Fixed '\x' in replace string
