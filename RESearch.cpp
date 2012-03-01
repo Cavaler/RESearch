@@ -71,7 +71,7 @@ void WINAPI FAR_EXPORT(SetStartupInfo)(const PluginStartupInfo *Info) {
 
 void BadCmdLine() {
 	const TCHAR *Lines[]={GetMsg(MRESearch),GetMsg(MInvalidCmdLine),GetMsg(MOk)};
-	StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("REInvalidCmdLine"),Lines,3,1);
+	StartupInfo.Message(FMSG_WARNING,_T("REInvalidCmdLine"),Lines,3,1);
 }
 
 BOOL ProcessFFLine(TCHAR *Line, BOOL *ShowDialog, INT_PTR *Item) {
@@ -343,7 +343,7 @@ int ShowFileMenu(int &nBreakCode) {
 
 	int nBreakKeys[] = {VK_F4, 0};
 
-	int nResult = StartupInfo.Menu(StartupInfo.ModuleNumber, -1, -1, 0, FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT|FMENU_USEEXT,
+	int nResult = StartupInfo.Menu(-1, -1, 0, FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT|FMENU_USEEXT,
 		GetMsg(MMenuHeader), NULL, _T("FileMenu"), nBreakKeys, &nBreakCode, 
 		(const FarMenuItem *)&MenuItems[0], MenuItems.size());
 
@@ -385,7 +385,7 @@ int ShowEditorMenu(int &nBreakCode) {
 
 	int nBreakKeys[] = {VK_F4, 0};
 
-	int nResult = StartupInfo.Menu(StartupInfo.ModuleNumber, -1, -1, 0, FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT|FMENU_USEEXT,
+	int nResult = StartupInfo.Menu(-1, -1, 0, FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT|FMENU_USEEXT,
 		GetMsg(MMenuHeader), NULL, _T("EditorMenu"), nBreakKeys, &nBreakCode,
 		(const FarMenuItem *)&MenuItems[0], MenuItems.size());
 
@@ -412,7 +412,7 @@ int ShowViewerMenu(int &nBreakCode)
 
 	int nBreakKeys[] = {VK_F4, 0};
 
-	int nResult = StartupInfo.Menu(StartupInfo.ModuleNumber,-1,-1,0,FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT|FMENU_USEEXT,
+	int nResult = StartupInfo.Menu(-1,-1,0,FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT|FMENU_USEEXT,
 		GetMsg(MMenuHeader), NULL, _T("ViewerMenu"), nBreakKeys, &nBreakCode, 
 		(const FarMenuItem *)&MenuItems[0], MenuItems.size());
 
@@ -833,7 +833,7 @@ int ConfigureCP()
 	int nItem = 0;
 	do {
 		arrCPItems[nItem].Selected = true;
-		int nResult = StartupInfo.Menu(StartupInfo.ModuleNumber, -1, -1, 0, FMENU_WRAPMODE, GetMsg(MAllCPMenu), L"Ins, Enter/Esc",
+		int nResult = StartupInfo.Menu(-1, -1, 0, FMENU_WRAPMODE, GetMsg(MAllCPMenu), L"Ins, Enter/Esc",
 			L"Help", nBreakKeys, &nBreakCode, &arrCPItems[0], arrCPItems.size());
 		arrCPItems[nItem].Selected = false;
 		nItem = nResult;

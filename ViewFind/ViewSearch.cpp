@@ -166,7 +166,7 @@ BOOL ViewerSearchAgain() {
 
 	if (!g_bInterrupted) {
 		const TCHAR *Lines[]={GetMsg(MRESearch),GetMsg(MCannotFind),EText.c_str(),GetMsg(MOk)};
-		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("VCannotFind"),Lines,4,1);
+		StartupInfo.Message(FMSG_WARNING,_T("VCannotFind"),Lines,4,1);
 	}
 	return TRUE;
 }

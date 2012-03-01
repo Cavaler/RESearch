@@ -13,7 +13,7 @@ bool ConfirmFileReadonly(const TCHAR *FileName)
 		GetMsg(MREReplace),GetMsg(MTheFile),FileName,GetMsg(MModifyReadonlyRequest),
 		GetMsg(MOk),GetMsg(MAll),GetMsg(MSkip),GetMsg(MCancel)
 	};
-	switch (StartupInfo.Message(StartupInfo.ModuleNumber,0,_T("FRConfirmReadonly"),Lines,8,4)) {
+	switch (StartupInfo.Message(0,_T("FRConfirmReadonly"),Lines,8,4)) {
 	case 1:
 		FRConfirmReadonlyThisRun = FALSE;
 	case 0:
@@ -78,7 +78,7 @@ bool ConfirmReplacement(const TCHAR *Found, const TCHAR *Replaced, const TCHAR *
 //		GetMsg(MREReplace),GetMsg(MAskReplace),Found,GetMsg(MAskWith),Replaced,
 //		GetMsg(MInFile),FileName,GetMsg(MReplace),GetMsg(MAll),GetMsg(MAllFiles),GetMsg(MSkip),GetMsg(MCancel)
 //	};
-//	Result = StartupInfo.Message(StartupInfo.ModuleNumber,0,_T("FRAskReplace"),Lines,12,5)
+//	Result = StartupInfo.Message(0,_T("FRAskReplace"),Lines,12,5)
 
 	switch (Result) {
 	case 2:
@@ -104,7 +104,7 @@ BOOL WriteBuffer(HANDLE hFile,const void *Buffer,DWORD BufLen,const TCHAR *FileN
 	if (!WriteFile(hFile,Buffer,BufLen,&WrittenBytes,NULL)||
 		(WrittenBytes!=BufLen)) {
 		const TCHAR *Lines[]={GetMsg(MREReplace),GetMsg(MFileWriteError),FileName,GetMsg(MOk)};
-		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("FRWriteError"),Lines,4,1);
+		StartupInfo.Message(FMSG_WARNING,_T("FRWriteError"),Lines,4,1);
 		return FALSE;
 	} else return TRUE;
 }
@@ -159,7 +159,7 @@ bool ReplaceSingleFile_Normal(WIN32_FIND_DATA &FindData)
 				REPLACEFILE_IGNORE_MERGE_ERRORS, NULL, NULL)) {
 
 					const TCHAR *Lines[]={GetMsg(MREReplace),GetMsg(MFileBackupError),FindData.cFileName,GetMsg(MOk)};
-					StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING|FMSG_ERRORTYPE,_T("FRBackupError"),Lines,4,1);
+					StartupInfo.Message(FMSG_WARNING|FMSG_ERRORTYPE,_T("FRBackupError"),Lines,4,1);
 			}
 		}
 	} else {
@@ -236,7 +236,7 @@ void ReplaceSingleFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems)
 		}
 	} else {
 		const TCHAR *Lines[]={GetMsg(MREReplace),GetMsg(MFileOpenError),FindData->cFileName,GetMsg(MOk)};
-		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("FSOpenError"),Lines,4,1);
+		StartupInfo.Message(FMSG_WARNING,_T("FSOpenError"),Lines,4,1);
 		return;
 	}
 }

@@ -332,7 +332,7 @@ void ShowProgress(const TCHAR *Directory, panelitem_vector &PanelItems)
 		szFileName[ 0], szFileName[ 1], szFileName[ 2], szFileName[ 3], szFileName[ 4], 
 		szFileName[ 5], szFileName[ 6], szFileName[ 7], szFileName[ 8], szFileName[ 9],
 		szFileName[10], szFileName[11], szFileName[12], szFileName[13], szFileName[14]};
-	StartupInfo.Message(StartupInfo.ModuleNumber, 0, NULL, Lines, 5+nItems, 0);
+	StartupInfo.Message(0, NULL, Lines, 5+nItems, 0);
 
 	SetConsoleTitle(FormatStr(GetMsg(MFileConsoleTitle), PanelItems.size(), Directory).c_str());
 }
@@ -563,7 +563,7 @@ OperationResult NoFilesFound() {
 	if (g_bInterrupted) return OR_OK;
 
 	const TCHAR *Lines[]={GetMsg(MRESearch),GetMsg(MNoFilesFound),GetMsg(MOk)};
-	StartupInfo.Message(StartupInfo.ModuleNumber, 0, _T("NoFilesFound"), Lines, 3, 1);
+	StartupInfo.Message(0, _T("NoFilesFound"), Lines, 3, 1);
 	return OR_OK;
 }
 
@@ -572,7 +572,7 @@ BOOL ConfirmFile(int Title,const TCHAR *FileName) {
 	const TCHAR *Lines[]={
 		GetMsg(Title),GetMsg(MConfirmRequest),FileName,GetMsg(MOk),GetMsg(MAll),GetMsg(MSkip),GetMsg(MCancel)
 	};
-	switch (StartupInfo.Message(StartupInfo.ModuleNumber,0,_T("FRConfirmFile"),Lines,7,4)) {
+	switch (StartupInfo.Message(0,_T("FRConfirmFile"),Lines,7,4)) {
 	case 1:FRConfirmFileThisRun=FALSE;
 	case 0:return (FileConfirmed=TRUE);
 	case -1:

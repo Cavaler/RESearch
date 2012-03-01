@@ -137,7 +137,7 @@ BOOL EditorSearchAgain()
 
 	if (!g_bInterrupted) {
 		const TCHAR *Lines[]={GetMsg(MRESearch),GetMsg(MCannotFind),EText.c_str(),GetMsg(MOk)};
-		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("ECannotFind"),Lines,4,1);
+		StartupInfo.Message(FMSG_WARNING,_T("ECannotFind"),Lines,4,1);
 	}
 
 	if (EInSelection) RestoreSelection();

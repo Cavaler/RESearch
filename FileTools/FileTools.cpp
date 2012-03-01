@@ -106,7 +106,7 @@ BOOL ConfirmWholeFileRename(const TCHAR *From, const TCHAR *To) {
 		GetMsg(MMenuRename),GetMsg(MAskRename),From,GetMsg(MAskTo),To,
 		GetMsg(MOk),GetMsg(MAll),GetMsg(MSkip),GetMsg(MCancel)
 	};
-	switch (StartupInfo.Message(StartupInfo.ModuleNumber,0,_T("FRAskRename"),Lines,9,4)) {
+	switch (StartupInfo.Message(0,_T("FRAskRename"),Lines,9,4)) {
 	case 1:FRConfirmFileThisRun=FALSE;
 	case 0:return (FileConfirmed=TRUE);
 	case -1:
@@ -124,7 +124,7 @@ BOOL ConfirmRename(const TCHAR *From,const TCHAR *To) {
 		GetMsg(MMenuRename),GetMsg(MAskRename),From,GetMsg(MAskTo),To,
 		GetMsg(MOk),GetMsg(MAll),GetMsg(MAllFiles),GetMsg(MSkip),GetMsg(MCancel)
 	};
-	switch (StartupInfo.Message(StartupInfo.ModuleNumber,0,_T("FRAskRename"),Lines,10,5)) {
+	switch (StartupInfo.Message(0,_T("FRAskRename"),Lines,10,5)) {
 	case 2:FRConfirmLineThisRun=FALSE;
 	case 1:FRConfirmLineThisFile=FALSE;
 	case 0:return TRUE;
@@ -171,7 +171,7 @@ bool PerformSingleRename(rename_pair &Item) {
 		if (FTAskOverwrite) {
 			const TCHAR *Lines[]={GetMsg(MMenuRename),GetMsg(MFile),Item.second.c_str(),
 				GetMsg(MAskOverwrite),Item.first.c_str(),GetMsg(MOk),GetMsg(MAll),GetMsg(MSkip),GetMsg(MCancel)};
-			switch (StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("FRenameOverwrite"),Lines,9,4)) {
+			switch (StartupInfo.Message(FMSG_WARNING,_T("FRenameOverwrite"),Lines,9,4)) {
 			case 1:
 				FTAskOverwrite=false;
 			case 0:
@@ -193,7 +193,7 @@ bool PerformSingleRename(rename_pair &Item) {
 		if (FTAskCreatePath) {
 			const TCHAR *Lines[]={GetMsg(MMenuRename),GetMsg(MFile),Item.second.c_str(),
 				GetMsg(MAskCreatePath),GetMsg(MOk),GetMsg(MAll),GetMsg(MSkip),GetMsg(MCancel)};
-			switch (StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("FRenameCreatePath"),Lines,8,4)) {
+			switch (StartupInfo.Message(FMSG_WARNING,_T("FRenameCreatePath"),Lines,8,4)) {
 			case 1:
 				FTAskCreatePath=false;
 			case 0:
@@ -214,7 +214,7 @@ bool PerformSingleRename(rename_pair &Item) {
 	if (Error != ERROR_SUCCESS) {
 		const TCHAR *Lines[]={GetMsg(MMenuRename),GetMsg(MRenameError),Item.first.c_str(),
 			GetMsg(MAskTo),Item.second.c_str(),GetMsg(MOk),GetMsg(MCancel)};
-		if (StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("FRenameError"),Lines,7,2)==1) g_bInterrupted=TRUE;
+		if (StartupInfo.Message(FMSG_WARNING,_T("FRenameError"),Lines,7,2)==1) g_bInterrupted=TRUE;
 		return false;
 	}
 

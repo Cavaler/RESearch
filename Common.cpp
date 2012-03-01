@@ -116,7 +116,7 @@ BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const tstring &Text
 		ErrPos[ErrOffset]='^';
 
 		const TCHAR *Lines[]={GetMsg(MRegExpError),ErrPtr,_T("\x01"),Text.c_str(),ErrPos.c_str(),GetMsg(MOk)};
-		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("RegExpError"),Lines,6,1);
+		StartupInfo.Message(FMSG_WARNING,_T("RegExpError"),Lines,6,1);
 
 		REErrorOffset = ErrOffset;
 		return FALSE;
@@ -144,7 +144,7 @@ BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,
 		tstring strText = OEMToUnicode(Text);
 		const TCHAR *Lines[]={GetMsg(MRegExpError),strErrPtr.c_str(),_T("\x01"),strText.c_str(),ErrPos.c_str(),GetMsg(MOk)};
 		ErrPos[ErrOffset]='^';
-		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("RegExpError"),Lines,6,1);
+		StartupInfo.Message(FMSG_WARNING,_T("RegExpError"),Lines,6,1);
 		return FALSE;
 	} else {
 		if (PatternExtra) {
@@ -521,7 +521,7 @@ void EditorEndUndo() {
 
 void ShowErrorMsg(const TCHAR *sz1, const TCHAR *sz2, const TCHAR *szHelp) {
 	const TCHAR *Lines[]={GetMsg(MREReplace),sz1,sz2,GetMsg(MOk)};
-	StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,szHelp,Lines,4,1);
+	StartupInfo.Message(FMSG_WARNING,szHelp,Lines,4,1);
 }
 
 void ShowHResultError(int nError, HRESULT hResult, const TCHAR *szHelp) {

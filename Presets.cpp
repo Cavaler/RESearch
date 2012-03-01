@@ -252,7 +252,7 @@ int CPresetCollection::ShowMenu(bool bExecute, int nDefaultID) {
 			if ((m_nCurrent >= 0) && (m_nCurrent < (int)size())) {
 				const TCHAR *Lines[]={_T("Delete"), GetMsg(MDeletePresetQuery),
 					at(m_nCurrent)->Name().c_str(), GetMsg(MOk), GetMsg(MCancel)};
-				if (StartupInfo.Message(StartupInfo.ModuleNumber, FMSG_WARNING, _T("DeletePreset"), Lines, 5, 2)==0) {
+				if (StartupInfo.Message(FMSG_WARNING, _T("DeletePreset"), Lines, 5, 2)==0) {
 					delete at(m_nCurrent);
 					erase(begin() + m_nCurrent);
 					Save();
@@ -540,7 +540,7 @@ bool CBatchAction::EditItems() {
 
 				if (pPreset->m_bAddToMenu || (CountPresets(*Collection(), pPreset) > 1)) {
 					const TCHAR *Lines[] = { GetMsg(MWarning),GetMsg(MUsedPreset),GetMsg(MOk),GetMsg(MCancel) };
-					if (StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T(""),Lines,4,2) != 0) break;
+					if (StartupInfo.Message(FMSG_WARNING,_T(""),Lines,4,2) != 0) break;
 				}
 
 				if (pColl->EditPreset(pPreset))
@@ -621,7 +621,7 @@ void CBatchActionCollection::ShowMenu() {
 				CBatchAction *pBatch = at(nResult);
 				const TCHAR *Lines[]={_T("Execute"), GetMsg(MExecuteBatchQuery),
 					pBatch->m_strName.c_str(), GetMsg(MOk), GetMsg(MCancel)};
-				if (StartupInfo.Message(StartupInfo.ModuleNumber, FMSG_WARNING, _T("ExecuteBatch"), Lines, 5, 2) != 0) break;
+				if (StartupInfo.Message(FMSG_WARNING, _T("ExecuteBatch"), Lines, 5, 2) != 0) break;
 
 				pBatch->Execute();
 			}
@@ -642,7 +642,7 @@ void CBatchActionCollection::ShowMenu() {
 			if (m_nCurrent < (int)size()) {
 				const TCHAR *Lines[]={_T("Delete"), GetMsg(MDeleteBatchQuery),
 					at(m_nCurrent)->m_strName.c_str(), GetMsg(MOk), GetMsg(MCancel)};
-				if (StartupInfo.Message(StartupInfo.ModuleNumber, FMSG_WARNING, _T("DeleteBatch"), Lines, 5, 2)==0) {
+				if (StartupInfo.Message(FMSG_WARNING, _T("DeleteBatch"), Lines, 5, 2)==0) {
 					delete at(m_nCurrent);
 					erase(begin() + m_nCurrent);
 					WriteRegistry();

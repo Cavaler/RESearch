@@ -236,7 +236,7 @@ tstring EvaluateReplaceString(TREParameters &Param, const TCHAR *Replace, const 
 		CFileMapping mapScript;
 		if (!mapScript.Open(Replace)) {
 			const TCHAR *Lines[]={GetMsg(MREReplace),GetMsg(MFileOpenError),Replace,GetMsg(MOk)};
-			StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("FSOpenError"),Lines,4,1);
+			StartupInfo.Message(FMSG_WARNING,_T("FSOpenError"),Lines,4,1);
 			g_bInterrupted = TRUE;
 			return _T("");
 		}

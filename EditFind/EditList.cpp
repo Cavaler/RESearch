@@ -70,7 +70,7 @@ BOOL EditorListAllAgain() {
 
 	if (!g_bInterrupted && (Info.arrLines.size() == 0)) {
 		const TCHAR *Lines[]={GetMsg(MRESearch),GetMsg(MCannotFind),EText.c_str(),GetMsg(MOk)};
-		StartupInfo.Message(StartupInfo.ModuleNumber,FMSG_WARNING,_T("ECannotFind"),Lines,4,1);
+		StartupInfo.Message(FMSG_WARNING,_T("ECannotFind"),Lines,4,1);
 		RestorePosition(StartEdInfo);
 		return TRUE;
 	}
