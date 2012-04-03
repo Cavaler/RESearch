@@ -57,7 +57,7 @@ string, but a set of them. For full information, see included pcrepattern.html f
 ~PCRE library~@PCRE@ documentation.
     Most commonly used patterns are:
 
-    #.# (dot) matches any single character, #except# newline
+    #.# (dot) matches any single character, possibly #except# newline (can be ~configured~@CommonConfig@)
     #^#       matches beginning of line
     #$#       matches end of line
     #[abi-l]# matches either 'a' or 'b' or any letter from 'i' to 'l'
