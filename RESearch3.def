@@ -1,0 +1,14 @@
+LIBRARY
+EXPORTS
+	SetStartupInfoW
+	GetPluginInfoW
+	GetOpenPluginInfoW
+	OpenPluginW
+	ProcessKeyW
+	GetFindDataW
+	SetDirectoryW
+	PutFilesW
+	ClosePluginW
+	ConfigureW
+	GetGlobalInfoW
+	ExitFARW

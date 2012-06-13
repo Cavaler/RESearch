@@ -188,8 +188,11 @@ class CTemporaryPanel {
 public:
 	CTemporaryPanel(panelitem_vector &PanelItems,TCHAR *CalledFolder);
 	~CTemporaryPanel();
-
+#ifdef FAR3
+	void GetOpenPanelInfo(OpenPanelInfo *Info);
+#else
 	void GetOpenPluginInfo(OpenPluginInfo *Info);
+#endif
 	int  GetFindData(PluginPanelItem **PanelItem,int *ItemsNumber,int OpMode);
 	int _SetDirectory(TCHAR *Name,int OpMode);
 	int PutFiles(PluginPanelItem *AddItems,int AddNumber,int Move,int OpMode);

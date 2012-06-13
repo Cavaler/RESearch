@@ -8,7 +8,7 @@
 // Generated from the TEXTINCLUDE 2 resource.
 //
 #include "afxres.h"
-
+#include "version.h"
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
@@ -29,12 +29,14 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 
 1 TEXTINCLUDE 
 BEGIN
-    "resource.h\0"
+    "resource.h"
+    "\0"
 END
 
 2 TEXTINCLUDE 
 BEGIN
     "#include ""afxres.h""\r\n"
+    "#include ""version.h""\r\n"
     "\0"
 END
 
@@ -47,14 +49,27 @@ END
 #endif    // APSTUDIO_INVOKED
 
 
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// TYPELIB
+//
+
+1                       TYPELIB                 "RESearch.tlb"
+#endif    // Neutral resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 7,5,1,0
- PRODUCTVERSION 7,5,1,0
+ FILEVERSION PLUGIN_VERSION_MAJOR,PLUGIN_VERSION_MINOR,PLUGIN_VERSION_REVISION,0
+ PRODUCTVERSION PLUGIN_VERSION_MAJOR,PLUGIN_VERSION_MINOR,PLUGIN_VERSION_REVISION,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -69,14 +84,14 @@ BEGIN
     BEGIN
         BLOCK "000004e4"
         BEGIN
-            VALUE "CompanyName", "Pavel Kostromitinov"
-            VALUE "FileDescription", "Regular Expression Search plugin for FAR"
-            VALUE "FileVersion", "7, 5, 1, 0"
-            VALUE "InternalName", "RESearch"
-            VALUE "LegalCopyright", "Copyright © Pavel Kostromitinov, 1999-2012"
+            VALUE "CompanyName", PLUGIN_AUTHOR
+            VALUE "FileDescription", PLUGIN_DESCRIPTION
+            VALUE "FileVersion", PLUGIN_VERSION_STRING
+            VALUE "InternalName", PLUGIN_NAME
+            VALUE "LegalCopyright", "Copyright © Pavel Kostromitinov, 2005-2012"
             VALUE "OriginalFilename", "RESearch.dll"
-            VALUE "ProductName", "RESearch plugin for FAR"
-            VALUE "ProductVersion", "7.51"
+            VALUE "ProductName", PLUGIN_DESCRIPTION
+            VALUE "ProductVersion", PLUGIN_VERSION_STRING
         END
     END
     BLOCK "VarFileInfo"
@@ -85,31 +100,6 @@ BEGIN
     END
 END
 
-#endif    // Neutral resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-/////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
-LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
-#pragma code_page(1252)
-#endif //_WIN32
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// TYPELIB
-//
-
-1                       TYPELIB                 "RESearch.tlb"
-#endif    // English (U.S.) resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-
-#ifndef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
 //
 // Generated from the TEXTINCLUDE 3 resource.
