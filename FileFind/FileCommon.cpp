@@ -318,7 +318,7 @@ void ShowProgress(const TCHAR *Directory, panelitem_vector &PanelItems)
 
 	int nItems = (PanelItems.size() > 15) ? 15 : PanelItems.size();
 	for (int nItem = 0; nItem < nItems; nItem++) {
-		ShortenFileName(FarFileName(PanelItems[nItem+PanelItems.size()-nItems].FindData), szFileName[nItem]);
+		ShortenFileName(FarPanelFileName(PanelItems[nItem+PanelItems.size()-nItems]), szFileName[nItem]);
 		int nLength = _tcslen(szFileName[nItem]);
 		if (nLength > ScanProgressX) ScanProgressX = nLength;
 	}
@@ -455,17 +455,17 @@ int ScanPluginDirectories(CPanelInfo &Info,panelitem_vector &PanelItems,ProcessF
 	g_bScanningLocalTime = true;
 
 	for (int I=0;I<Number;I++) {
-		if (Items[I].FindData.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) {
+		if (FarPanelAttr(Items[I]) & FILE_ATTRIBUTE_DIRECTORY) {
 			TCHAR CurDir[MAX_PATH];
-			if (_tcscmp(FarFileName(Items[I].FindData), _T("..")) == 0) continue;
-			GetFullPathName(FarFileName(Items[I].FindData),MAX_PATH,CurDir,NULL);
+			if (_tcscmp(FarPanelFileName(Items[I]), _T("..")) == 0) continue;
+			GetFullPathName(FarPanelFileName(Items[I]),MAX_PATH,CurDir,NULL);
 			if (!DoScanDirectory(CurDir, PanelItems, ProcessFile)) break;
 		} else {
-			if (!MultipleMasksApply(FarFileName(Items[I].FindData))) continue;
+			if (!MultipleMasksApply(FarPanelFileName(Items[I]))) continue;
 			g_bInterrupted|=Interrupted();if (g_bInterrupted) break;
 
-			WIN32_FIND_DATA CurFindData = FFDtoWFD(Items[I].FindData);
-			GetFullPathName(FarFileName(Items[I].FindData), arrsizeof(CurFindData.cFileName), CurFindData.cFileName, NULL);
+			WIN32_FIND_DATA CurFindData = PanelToWFD(Items[I]);
+			GetFullPathName(FarPanelFileName(Items[I]), arrsizeof(CurFindData.cFileName), CurFindData.cFileName, NULL);
 			ProcessFile(&CurFindData,PanelItems);
 			FilesScanned++;
 		}
@@ -527,19 +527,19 @@ int ScanDirectories(panelitem_vector &PanelItems,ProcessFileProc ProcessFile) {
 		int Len=AddSlashLen(PInfoCurDir);
 
 		for (int I=0; I<PInfo.SelectedItemsNumber; I++) {
-			WIN32_FIND_DATA CurFindData = FFDtoWFD(PInfo.SelectedItems[I].FindData);
+			WIN32_FIND_DATA CurFindData = PanelToWFD(PInfo.SelectedItems[I]);
 
 			if (CurFindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
 				if (_tcscmp(CurFindData.cFileName, _T(".."))) {
 					// Test if directory itself applies
 					if (MultipleMasksApply(CurFindData.cFileName)) {
-						_tcscat(_tcscpy(CurFindData.cFileName, PInfoCurDir), FarFileName(PInfo.SelectedItems[I].FindData));
+						_tcscat(_tcscpy(CurFindData.cFileName, PInfoCurDir), FarPanelFileName(PInfo.SelectedItems[I]));
 						ProcessFile(&CurFindData,PanelItems);
 						FilesScanned++;
 					}
 
 					// Scan subdirectory
-					_tcscpy(PInfoCurDir+Len, FarFileName(PInfo.SelectedItems[I].FindData));
+					_tcscpy(PInfoCurDir+Len, FarPanelFileName(PInfo.SelectedItems[I]));
 					if (!DoScanDirectory(PInfoCurDir, PanelItems, ProcessFile)) break;
 					PInfoCurDir[Len]=0;
 				}
@@ -547,7 +547,7 @@ int ScanDirectories(panelitem_vector &PanelItems,ProcessFileProc ProcessFile) {
 				if (!MultipleMasksApply(CurFindData.cFileName)) continue;
 				g_bInterrupted|=Interrupted();
 				if (g_bInterrupted) break;
-				_tcscat(_tcscpy(CurFindData.cFileName, PInfoCurDir), FarFileName(PInfo.SelectedItems[I].FindData));
+				_tcscat(_tcscpy(CurFindData.cFileName, PInfoCurDir), FarPanelFileName(PInfo.SelectedItems[I]));
 				FileFillNamedParameters(CurFindData.cFileName);
 				ProcessFile(&CurFindData, PanelItems);
 				FilesScanned++;

@@ -42,10 +42,11 @@ struct sREData {
 	int      nCurrentPart;
 };
 
-void UpdateStrings(HANDLE hDlg, sREData *pData) {
-	tstring strSource = GetDlgItemText(hDlg, 2);
+void UpdateStrings(CFarDialog *pDlg, sREData *pData)
+{
+	tstring strSource = pDlg->GetDlgItemText(2);
 	tstring strRE = BuildRE(strSource, pData->mapParts);
-	StartupInfo.SendDlgMessage(hDlg, DM_SETTEXTPTR, 4, (LONG_PTR)strRE.data());
+	pDlg->SendDlgMessage(DM_SETTEXTPTR, 4, (LONG_PTR)strRE.data());
 
 	pcre *re;
 	if (!PreparePattern(&re, NULL, strRE, ECaseSensitive)) return;
@@ -56,22 +57,23 @@ void UpdateStrings(HANDLE hDlg, sREData *pData) {
 
 	if (pcre_exec(re, NULL, strSource.c_str(), strSource.length(), 0, 0, ThisREParam.Match(), ThisREParam.Count()) < 0) return;
 
-	tstring strReplace = GetDlgItemText(hDlg, 6);
+	tstring strReplace = pDlg->GetDlgItemText(6);
 	tstring strResult = CSO::CreateReplaceString(strReplace.c_str(), _T("\n"), -1, ThisREParam);
-	StartupInfo.SendDlgMessage(hDlg, DM_SETTEXTPTR, 8, (LONG_PTR)strResult.data());
+	pDlg->SendDlgMessage(DM_SETTEXTPTR, 8, (LONG_PTR)strResult.data());
 }
 
-LONG_PTR WINAPI REBuilderDialogProc(HANDLE hDlg, int nMsg, int nParam1, LONG_PTR lParam2) {
-	sREData *pData = (sREData *)StartupInfo.SendDlgMessage(hDlg, DM_GETDLGDATA, 0, 0);
+LONG_PTR WINAPI REBuilderDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LONG_PTR lParam2)
+{
+	sREData *pData = (sREData *)pDlg->SendDlgMessage(DM_GETDLGDATA, 0, 0);
 
 	switch (nMsg) {
 	case DN_INITDIALOG:
-		StartupInfo.SendDlgMessage(hDlg, DM_SETDLGDATA, 0, lParam2);
+		pDlg->SendDlgMessage(DM_SETDLGDATA, 0, lParam2);
 		break;
 	case DN_DRAWDLGITEM:
 		if (nParam1 == 2) {
 			EditorSelect Select;
-			StartupInfo.SendDlgMessage(hDlg, DM_GETSELECTION, 2, (LONG_PTR)&Select);
+			pDlg->SendDlgMessage(DM_GETSELECTION, 2, (LONG_PTR)&Select);
 			pData->mapParts.erase(pData->nCurrentPart);
 
 			if ((Select.BlockType == BTYPE_STREAM) && (Select.BlockWidth > 0)) {
@@ -92,9 +94,25 @@ LONG_PTR WINAPI REBuilderDialogProc(HANDLE hDlg, int nMsg, int nParam1, LONG_PTR
 				pData->nCurrentPart = -1;
 			}
 
-			UpdateStrings(hDlg, pData);
+			UpdateStrings(pDlg, pData);
 		}
 		break;
+#ifdef FAR3
+	case DN_CONTROLINPUT:
+		INPUT_RECORD *record = (INPUT_RECORD *)lParam2;
+		if ((record->EventType == KEY_EVENT) && (record->Event.KeyEvent.bKeyDown)) {
+			if (record->Event.KeyEvent.wVirtualKeyCode == VK_RETURN) {
+				pData->nCurrentPart = -1;
+				return TRUE;
+			}
+			if (record->Event.KeyEvent.wVirtualKeyCode == VK_ESCAPE) {
+				pData->nCurrentPart = -1;
+				pData->mapParts.clear();
+				return TRUE;
+			}
+		}
+		break;
+#else
 	case DN_KEY:
 		if ((nParam1 == 2) && (lParam2 == KEY_ENTER)) {
 			pData->nCurrentPart = -1;
@@ -106,8 +124,9 @@ LONG_PTR WINAPI REBuilderDialogProc(HANDLE hDlg, int nMsg, int nParam1, LONG_PTR
 			return TRUE;
 		}
 		break;
+#endif
 	}
-	return StartupInfo.DefDlgProc(hDlg, nMsg, nParam1, lParam2);
+	return pDlg->DefDlgProc(nMsg, nParam1, lParam2);
 }
 
 bool RunREBuilder(tstring &strSearch, tstring &strReplace)

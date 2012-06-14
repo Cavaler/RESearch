@@ -1,5 +1,10 @@
 #include "StdAfx.h"
 #include "RESearch.h"
+#include <initguid.h>
+DEFINE_GUID(GUID_RESearch,			0xf250c12a, 0x78e2, 0x4abc, 0xa7, 0x84, 0x3f, 0xdd, 0x31, 0x56, 0xe4, 0x15);
+DEFINE_GUID(GUID_RESearchConfig,	0x25a28ca1, 0x23e7, 0x4019, 0xad, 0x5e, 0xd3, 0xf3, 0x1b, 0x7c, 0x2c, 0xfe);
+DEFINE_GUID(GUID_RESearchRun,		0x9340f8e5, 0xf4a1, 0x4be2, 0xa1, 0x46, 0x0a, 0x49, 0x68, 0xa3, 0xd1, 0x6c);
+#include "version.h"
 
 CComModule _Module;
 
@@ -19,14 +24,28 @@ BOOL __stdcall DllMain(HINSTANCE hInst, ULONG reason, LPVOID)
 	return TRUE;
 }
 
-void WINAPI FAR_EXPORT(GetPluginInfo)(PluginInfo *Info) {
+void WINAPI FAR_EXPORT(GetPluginInfo)(PluginInfo *Info)
+{
 	static const TCHAR *ConfigStrings[1];
 	static const TCHAR *MenuStrings[1];
 	ConfigStrings[0] = GetMsg(MRESearch);
-	MenuStrings[0] = GetMsg(MRESearch);
+	MenuStrings[0]   = GetMsg(MRESearch);
 
 	Info->StructSize=sizeof(PluginInfo);
 	Info->Flags=PF_EDITOR|PF_VIEWER|PF_FULLCMDLINE;
+
+#ifdef FAR3
+	static const GUID   ConfigGuids[1] = { GUID_RESearchConfig };
+	static const GUID   MenuGuids[1]   = { GUID_RESearchRun };
+
+	Info->PluginConfig.Strings = ConfigStrings;
+	Info->PluginConfig.Guids   = ConfigGuids;
+	Info->PluginConfig.Count   = 1;
+	Info->PluginMenu.Strings   = MenuStrings;
+	Info->PluginMenu.Guids     = MenuGuids;
+	Info->PluginMenu.Count     = 1;
+	Info->DiskMenu.Count       = 0;
+#else
 	Info->DiskMenuStrings=NULL;
 #ifndef UNICODE
 	Info->DiskMenuNumbers=NULL;
@@ -36,11 +55,18 @@ void WINAPI FAR_EXPORT(GetPluginInfo)(PluginInfo *Info) {
 	Info->PluginMenuStringsNumber=1;
 	Info->PluginConfigStrings=ConfigStrings;
 	Info->PluginConfigStringsNumber=1;
+#endif
+
 	Info->CommandPrefix=_T("ff:fr:rn:qr");
 }
 
-void WINAPI FAR_EXPORT(SetStartupInfo)(const PluginStartupInfo *Info) {
+void WINAPI FAR_EXPORT(SetStartupInfo)(const PluginStartupInfo *Info)
+{
 	StartupInfo=*Info;
+#ifdef FAR3
+	StartupInfo.m_GUID = GUID_RESearch;
+#endif
+
 	PrepareLocaleStuff();
 	ReadRegistry();
 
@@ -303,7 +329,8 @@ BOOL ProcessCommandLine(TCHAR *Line,BOOL *ShowDialog,INT_PTR *Item) {
 	return ProcessFFLine(Line+1,ShowDialog,Item);
 }
 
-int ShowFileMenu(int &nBreakCode) {
+int ShowFileMenu(int &nBreakCode)
+{
 	vector<CFarMenuItemEx> MenuItems;
 
 	MenuItems.push_back(CFarMenuItemEx(MMenuSearch));
@@ -480,7 +507,7 @@ HANDLE OpenPluginFromFileMenu(int Item, BOOL ShowDialog) {
 		if (!g_bFromCmdLine) {
 			do {
 				Item = ShowFileMenu(nBreakCode);
-				if (Item == -1) return INVALID_HANDLE_VALUE;
+				if (Item == -1) return NO_PANEL_HANDLE;
 			} while ((nBreakCode >= 0) && (Item < 15));
 		}
 
@@ -551,7 +578,7 @@ HANDLE OpenPluginFromFileMenu(int Item, BOOL ShowDialog) {
 		StartupInfo.Control(INVALID_HANDLE_VALUE,FCTL_UPDATEPANEL,(void *)~NULL);
 		StartupInfo.Control(INVALID_HANDLE_VALUE,FCTL_REDRAWPANEL,NULL);
 #endif
-		return INVALID_HANDLE_VALUE;
+		return NO_PANEL_HANDLE;
 	}
 }
 
@@ -595,7 +622,7 @@ HANDLE OpenPluginFromEditorMenu(int nItem) {
 	do {
 		do {
 			nItem = ShowEditorMenu(nBreakCode);
-			if (nItem == -1) return INVALID_HANDLE_VALUE;
+			if (nItem == -1) return NO_PANEL_HANDLE;
 		} while ((nBreakCode >= 0) && (nItem < 10));
 
 		switch (nItem) {
@@ -655,7 +682,7 @@ HANDLE OpenPluginFromEditorMenu(int nItem) {
 		}
 	} while (nBreakCode >= 0);
 
-	return INVALID_HANDLE_VALUE;
+	return NO_PANEL_HANDLE;
 }
 
 OperationResult OpenPluginFromViewerPreset(int nItem, int nBreakCode) {
@@ -673,7 +700,7 @@ HANDLE OpenPluginFromViewerMenu(int nItem)
 	do {
 		do {
 			nItem = ShowViewerMenu(nBreakCode);
-			if (nItem == -1) return INVALID_HANDLE_VALUE;
+			if (nItem == -1) return NO_PANEL_HANDLE;
 		} while ((nBreakCode >= 0) && (nItem < 3));
 
 		switch (nItem) {
@@ -706,9 +733,29 @@ HANDLE OpenPluginFromViewerMenu(int nItem)
 		}
 	} while (nBreakCode >= 0);
 
-	return INVALID_HANDLE_VALUE;
+	return NO_PANEL_HANDLE;
 }
 
+#ifdef FAR3
+HANDLE WINAPI OpenW(const struct OpenInfo *Info)
+{
+	BOOL ShowDialog = TRUE;
+
+	switch (Info->OpenFrom) {
+	case OPEN_PLUGINSMENU:
+		return OpenPluginFromFileMenu(0, ShowDialog);
+
+	case OPEN_EDITOR:
+		return OpenPluginFromEditorMenu(0);
+
+	case OPEN_VIEWER:
+		return OpenPluginFromViewerMenu(0);
+
+	default:
+		return NO_PANEL_HANDLE;
+	}
+}
+#else
 #ifdef UNICODE
 HANDLE WINAPI OpenPluginW(int OpenFrom, INT_PTR Item) {
 #else
@@ -747,9 +794,11 @@ HANDLE WINAPI OpenPlugin(int OpenFrom, INT_PTR Item) {
 #endif
 		return INVALID_HANDLE_VALUE;
 
-	default:return INVALID_HANDLE_VALUE;
+	default:
+		return INVALID_HANDLE_VALUE;
 	}
 }
+#endif
 
 BOOL AtoI(char *String,int *Number,int Min,int Max) {
 	int I;
@@ -791,28 +840,28 @@ BOOL CALLBACK EnumCPProc(LPTSTR lpCodePageString) {
 	return TRUE;
 }
 
-void AddCP(int nCP, LPCTSTR szText, vector<int> &arrCPs, vector<CFarMenuItem> &arrCPItems)
+void AddCP(int nCP, LPCTSTR szText, vector<int> &arrCPs, vector<CFarMenuItemEx> &arrCPItems)
 {
 	arrCPs.push_back(nCP);
 	arrCPItems.push_back(FormatStrW(L"%5d | %s", nCP, szText));
 
 	if (g_setAllCPs.find(nCP) != g_setAllCPs.end()) {
-		arrCPItems[arrCPItems.size()-1].Checked = true;
+		arrCPItems[arrCPItems.size()-1].Check();
 	}
 }
 
 int ConfigureCP()
 {
 	vector<int> arrCPs;
-	vector<CFarMenuItem> arrCPItems;
+	vector<CFarMenuItemEx> arrCPItems;
 
-	AddCP(GetOEMCP(), L"OEM", arrCPs, arrCPItems);
-	AddCP(GetACP(), L"ANSI", arrCPs, arrCPItems);
+	AddCP(GetOEMCP(),    L"OEM",   arrCPs, arrCPItems);
+	AddCP(GetACP(),      L"ANSI",  arrCPs, arrCPItems);
 	arrCPItems.push_back(true);	arrCPs.push_back(0);
-	AddCP(CP_UTF7, L"UTF-7", arrCPs, arrCPItems);
-	AddCP(CP_UTF8, L"UTF-8", arrCPs, arrCPItems);
-	AddCP(CP_UNICODE, L"UTF-16 (Little endian)", arrCPs, arrCPItems);
-	AddCP(CP_REVERSEBOM, L"UTF-16 (Big endian)", arrCPs, arrCPItems);
+	AddCP(CP_UTF7,       L"UTF-7", arrCPs, arrCPItems);
+	AddCP(CP_UTF8,       L"UTF-8", arrCPs, arrCPItems);
+	AddCP(CP_UNICODE,    L"UTF-16 (Little endian)", arrCPs, arrCPItems);
+	AddCP(CP_REVERSEBOM, L"UTF-16 (Big endian)",    arrCPs, arrCPItems);
 	arrCPItems.push_back(true);	arrCPs.push_back(0);
 
 	g_arrEnumCPs.clear();
@@ -832,10 +881,10 @@ int ConfigureCP()
 
 	int nItem = 0;
 	do {
-		arrCPItems[nItem].Selected = true;
-		int nResult = StartupInfo.Menu(-1, -1, 0, FMENU_WRAPMODE, GetMsg(MAllCPMenu), L"Ins, Enter/Esc",
-			L"Help", nBreakKeys, &nBreakCode, &arrCPItems[0], arrCPItems.size());
-		arrCPItems[nItem].Selected = false;
+		arrCPItems[nItem].Select(true);
+		int nResult = StartupInfo.Menu(-1, -1, 0, FMENU_WRAPMODE|FMENU_USEEXT, GetMsg(MAllCPMenu), L"Ins, Enter/Esc",
+			L"Help", nBreakKeys, &nBreakCode, (FarMenuItem *)&arrCPItems[0], arrCPItems.size());
+		arrCPItems[nItem].Select(false);
 		nItem = nResult;
 
 		if (nBreakCode == -1) {
@@ -846,11 +895,11 @@ int ConfigureCP()
 		}
 
 		if (arrCPs[nItem] != 0) {
-			if (arrCPItems[nItem].Checked) {
-				arrCPItems[nItem].Checked = false;
+			if (arrCPItems[nItem].Checked()) {
+				arrCPItems[nItem].Check(false);
 				setCPs.erase(arrCPs[nItem]);
 			} else {
-				arrCPItems[nItem].Checked = true;
+				arrCPItems[nItem].Check(true);
 				setCPs.insert(arrCPs[nItem]);
 			}
 		}
@@ -1023,7 +1072,22 @@ int WINAPI FAR_EXPORT(Configure)(int ItemNumber) {
 	} while (TRUE);
 }
 
+#ifdef FAR3
+void WINAPI GetGlobalInfoW(struct GlobalInfo *Info)
+{
+	Info->StructSize = sizeof(GlobalInfo);
+	Info->MinFarVersion = FARMANAGERVERSION;
+	Info->Version = MAKEFARVERSION(PLUGIN_VERSION_MAJOR, PLUGIN_VERSION_MINOR, PLUGIN_VERSION_REVISION, 0, VS_RELEASE);
+	Info->Guid = GUID_RESearch;
+	Info->Title = _T(PLUGIN_NAME);
+	Info->Description = _T(PLUGIN_DESCRIPTION);
+	Info->Author = _T(PLUGIN_AUTHOR);
+}
+
+void WINAPI ExitFARW(const ExitInfo *Info) {
+#else
 void WINAPI FAR_EXPORT(ExitFAR)() {
+#endif
 	WriteRegistry();
 	ECleanup(FALSE);
 	FCleanup(FALSE);

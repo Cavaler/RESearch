@@ -28,6 +28,18 @@ bool ConfirmFileReadonly(const TCHAR *FileName)
 	return false;
 }
 
+LONG_PTR WINAPI ConfirmReplacementDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LONG_PTR lParam2)
+{
+	switch (nMsg) {
+	case DN_CTLCOLORDLGITEM:
+//		switch (nParam1) {
+//		}
+		break;
+	}
+
+	return pDlg->DefDlgProc(nMsg, nParam1, lParam2);
+}
+
 bool ConfirmReplacement(const TCHAR *Found, const TCHAR *Replaced, const TCHAR *FileName)
 {
 	if (!FRConfirmLineThisFile) return true;
@@ -53,18 +65,19 @@ bool ConfirmReplacement(const TCHAR *Found, const TCHAR *Replaced, const TCHAR *
 	size_t nCount = arrFound.size()+arrReplaced.size();
 
 	CFarDialog Dialog(nWidth+12, nCount+10, _T("FRAskReplace"));
+	Dialog.SetWindowProc(ConfirmReplacementDialogProc, NULL);
 	Dialog.AddFrame(MREReplace);
-	
+
 	Dialog.Add(new CFarTextItem(-1, 2, 0, MAskReplace));
 	for (size_t I = 0; I<arrFound.size(); I++)
-		Dialog.Add(new CFarTextItem(-1, 3 + I, DIF_SETCOLOR|0x30, arrFound[I]));
+		Dialog.Add(new CFarTextItem(-1, 3 + I, 0/*DIF_SETCOLOR|0x30*/, arrFound[I]));
 
 	Dialog.Add(new CFarTextItem(-1, 3 + arrFound.size(), 0, MAskWith));
 	for (size_t I = 0; I<arrReplaced.size();I++)
-		Dialog.Add(new CFarTextItem(-1, 4 + arrFound.size() + I, DIF_SETCOLOR|0xB0, arrReplaced[I]));
+		Dialog.Add(new CFarTextItem(-1, 4 + arrFound.size() + I, 0/*DIF_SETCOLOR|0xB0*/, arrReplaced[I]));
 
 	Dialog.Add(new CFarTextItem(-1, 4 + nCount, 0, MInFile));
-	Dialog.Add(new CFarTextItem(-1, 5 + nCount,  DIF_SETCOLOR|0x20, FileName));
+	Dialog.Add(new CFarTextItem(-1, 5 + nCount,  0/*DIF_SETCOLOR|0x20*/, FileName));
 
 	Dialog.Add(new CFarButtonItem(0, 7 + nCount, DIF_CENTERGROUP|DIF_NOBRACKETS, TRUE,  MReplace));
 	Dialog.Add(new CFarButtonItem(0, 7 + nCount, DIF_CENTERGROUP|DIF_NOBRACKETS, FALSE, MAll));

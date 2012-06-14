@@ -190,11 +190,12 @@ public:
 	~CTemporaryPanel();
 #ifdef FAR3
 	void GetOpenPanelInfo(OpenPanelInfo *Info);
+	int ProcessPanelInput(const INPUT_RECORD *pInput);
 #else
 	void GetOpenPluginInfo(OpenPluginInfo *Info);
 #endif
 	int  GetFindData(PluginPanelItem **PanelItem,int *ItemsNumber,int OpMode);
-	int _SetDirectory(TCHAR *Name,int OpMode);
+	int _SetDirectory(const TCHAR *Name,int OpMode);
 	int PutFiles(PluginPanelItem *AddItems,int AddNumber,int Move,int OpMode);
 	int ProcessKey(int Key,unsigned int ControlState);
 	void ClosePlugin();
@@ -204,6 +205,9 @@ private:
 	vector<CPluginPanelItem> m_arrItems;
 	tstring m_strBaseFolder;
 	KeyBarTitles KeyBar;
+#ifdef FAR3
+	KeyBarLabel KeyBarLabels[1];
+#endif
 
 	CFarPanelMode m_Mode;
 

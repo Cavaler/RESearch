@@ -73,8 +73,8 @@ void ChangeSelection(int How) {
 	CPanelInfo PInfo;
 	PInfo.GetInfo(false);
 
-	for (int I=0;I<PInfo.ItemsNumber;I++) {
-		if (MultipleMasksApply(FarFileName(PInfo.PanelItems[I].FindData))) {
+	for (int I=0; I<PInfo.ItemsNumber; I++) {
+		if (MultipleMasksApply(FarPanelFileName(PInfo.PanelItems[I]))) {
 			switch (How) {
 			case MSelect:
 				PInfo.PanelItems[I].Flags|=PPIF_SELECTED;
@@ -482,18 +482,18 @@ BOOL PerformRenameSelectedFiles(CPanelInfo &PInfo, panelitem_vector &PanelItems)
 
 	BOOL bRestoreSelection = FRLeaveSelection;
 	if ((PInfo.SelectedItemsNumber==0)&&(PInfo.ItemsNumber>0)&&
-		(_tcscmp(FarFileName(PInfo.PanelItems[PInfo.CurrentItem].FindData),_T(".."))==0)) {
+		(_tcscmp(FarPanelFileName(PInfo.PanelItems[PInfo.CurrentItem]),_T(".."))==0)) {
 
 		bRestoreSelection = FALSE;
 		for (int I=0;I<PInfo.ItemsNumber;I++) {
 			if (I==PInfo.CurrentItem) continue;
 			if (g_bInterrupted) break;
 
-			LPCTSTR szFileName = FarFileName(PInfo.PanelItems[I].FindData);
+			LPCTSTR szFileName = FarPanelFileName(PInfo.PanelItems[I]);
 			FileFillNamedParameters(CatFile(PInfo.CurDir, szFileName).c_str());
 			arrOrigNames.push_back(szFileName);
 
-			RenameFile(&FFDtoWFD(PInfo.PanelItems[I].FindData),PanelItems);
+			RenameFile(&PanelToWFD(PInfo.PanelItems[I]), PanelItems);
 		}
 	} else {
 		if ((PInfo.SelectedItemsNumber == 1) && ((PInfo.SelectedItems[0].Flags & PPIF_SELECTED) == 0))
@@ -501,11 +501,11 @@ BOOL PerformRenameSelectedFiles(CPanelInfo &PInfo, panelitem_vector &PanelItems)
 		for (int I=0;I<PInfo.SelectedItemsNumber;I++) {
 			if (g_bInterrupted) break;
 
-			LPCTSTR szFileName = FarFileName(PInfo.SelectedItems[I].FindData);
+			LPCTSTR szFileName = FarPanelFileName(PInfo.SelectedItems[I]);
 			FileFillNamedParameters(CatFile(PInfo.CurDir, szFileName).c_str());
 			arrOrigNames.push_back(szFileName);
 
-			RenameFile(&FFDtoWFD(PInfo.SelectedItems[I].FindData),PanelItems);
+			RenameFile(&PanelToWFD(PInfo.SelectedItems[I]), PanelItems);
 		}
 	}
 
@@ -521,7 +521,7 @@ BOOL PerformRenameSelectedFiles(CPanelInfo &PInfo, panelitem_vector &PanelItems)
 		PNewInfo.GetInfo(false);
 
 		for (size_t nFile = 0; nFile < PanelItems.size(); nFile++) {
-			int nItem = PNewInfo.Find(FarFileName(PanelItems[nFile].FindData));
+			int nItem = PNewInfo.Find(FarPanelFileName(PanelItems[nFile]));
 			if (nItem >= 0)
 				PNewInfo.PanelItems[nItem].Flags |= PPIF_SELECTED;
 		}
@@ -730,7 +730,7 @@ OperationResult RenumberFiles() {
 
 	vector<tstring> arrFileNames;
 	for (int nItem = 0; nItem < PInfo.SelectedItemsNumber; nItem++)
-		arrFileNames.push_back(FarFileName(PInfo.SelectedItems[nItem].FindData));
+		arrFileNames.push_back(FarPanelFileName(PInfo.SelectedItems[nItem]));
 
 	int BreakKeys[] = {
 		VK_F2, VK_F7, (PKF_CONTROL<<16)|VK_UP, (PKF_CONTROL<<16)|VK_DOWN,

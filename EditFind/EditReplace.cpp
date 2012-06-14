@@ -69,7 +69,7 @@ void DoEditReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, cons
 	}
 
 	RefreshEditorInfo();
-	EditorSetString SetString = {-1, NewString.c_str(), NULL, NULL};
+	CEditorSetString SetString(-1, NewString.c_str(), NULL);
 
 	while (TRUE) {
 		const TCHAR *CR = (const TCHAR *)_tmemchr(SetString.StringText, '\r', NewString.length());
@@ -130,6 +130,18 @@ void DoEditReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, cons
 		StartupInfo.EditorControl(ECTL_REDRAW, NULL);
 		StartupInfo.EditorControl(ECTL_SELECT, &Select);
 	}
+}
+
+LONG_PTR WINAPI ReplaceOKDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LONG_PTR lParam2)
+{
+	switch (nMsg) {
+	case DN_CTLCOLORDLGITEM:
+		//		switch (nParam1) {
+		//		}
+		break;
+	}
+
+	return pDlg->DefDlgProc(nMsg, nParam1, lParam2);
 }
 
 #ifdef UNICODE
@@ -207,13 +219,14 @@ eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &
 		StartupInfo.EditorControl(ECTL_REDRAW, NULL);
 
 		CFarDialog Dialog(-1, H + 1, nLen + 8, H + 8+TotalCount, _T("ERAskReplace"));
+		Dialog.SetWindowProc(ReplaceOKDialogProc, NULL);
 		Dialog.AddFrame(MREReplace);
 		Dialog.Add(new CFarTextItem(-1, 2, 0, MAskReplace));
 		for (size_t I = 0; I<arrFound.size();I++)
-			Dialog.Add(new CFarTextItem(-1, 3 + I, DIF_SETCOLOR|0x30, arrFound[I]));
+			Dialog.Add(new CFarTextItem(-1, 3 + I, 0/*DIF_SETCOLOR|0x30*/, arrFound[I]));
 		Dialog.Add(new CFarTextItem(-1, 3 + arrFound.size(), 0, MAskWith));
 		for (size_t I = 0; I<arrReplaced.size();I++)
-			Dialog.Add(new CFarTextItem(-1, 4 + arrFound.size() + I, DIF_SETCOLOR|0xB0, arrReplaced[I]));
+			Dialog.Add(new CFarTextItem(-1, 4 + arrFound.size() + I, 0/*DIF_SETCOLOR|0xB0*/, arrReplaced[I]));
 		Dialog.Add(new CFarButtonItem(0, 5 + TotalCount, DIF_CENTERGROUP|DIF_NOBRACKETS, TRUE, MReplace));
 		Dialog.Add(new CFarButtonItem(0, 5 + TotalCount, DIF_CENTERGROUP|DIF_NOBRACKETS, FALSE, MAll));
 		Dialog.Add(new CFarButtonItem(0, 5 + TotalCount, DIF_CENTERGROUP|DIF_NOBRACKETS, FALSE, MSkip));

@@ -213,7 +213,8 @@ void CPresetCollection::Save() {
 		at(nPreset)->Save(hKey, nPreset);
 }
 
-int CPresetCollection::ShowMenu(bool bExecute, int nDefaultID) {
+int CPresetCollection::ShowMenu(bool bExecute, int nDefaultID)
+{
 	int piBreakKeys[]={VK_INSERT, VK_DELETE, VK_F4, (PKF_CONTROL<<16)|VK_UP, (PKF_CONTROL<<16)|VK_DOWN, (PKF_CONTROL<<16)|VK_RETURN, 0};
 	vector<tstring> arrItems;
 

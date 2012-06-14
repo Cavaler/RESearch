@@ -2,13 +2,13 @@ LIBRARY
 EXPORTS
 	SetStartupInfoW
 	GetPluginInfoW
-	GetOpenPluginInfoW
-	OpenPluginW
-	ProcessKeyW
+	GetOpenPanelInfoW
+	OpenW
+	ProcessPanelInputW
 	GetFindDataW
 	SetDirectoryW
 	PutFilesW
-	ClosePluginW
+	ClosePanelW
 	ConfigureW
 	GetGlobalInfoW
 	ExitFARW

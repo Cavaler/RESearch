@@ -509,8 +509,17 @@ void ShowCurrentLine(int CurLine,int TotalLines,int TotalColumns)
 		int nWidth  = (strTotal.length() < 6) ? 13 : strTotal.length()*2+2;
 		tstring strText = FormatStr(_T("%*s"), nWidth, FormatStr(_T("%d/%d"), CurLine, TotalLines).c_str());
 
+#ifdef FAR3
+		FarColor Color;
+		Color.Flags = FCF_4BITMASK;
+		Color.BackgroundColor = 0x00;
+		Color.ForegroundColor = 0x03;
+		StartupInfo.Text(Position, 0, &Color, strText.c_str());
+		StartupInfo.Text(0, 0, &Color, NULL);
+#else
 		StartupInfo.Text(Position, 0, 0x30, strText.c_str());
 		StartupInfo.Text(0,0,0x30,NULL);
+#endif
 		LastLine=CurLine;
 
 		SetConsoleTitle(FormatStr(GetMsg(MEditConsoleTitle), CurLine, TotalLines).c_str());
