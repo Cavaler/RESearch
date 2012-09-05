@@ -167,12 +167,12 @@ bool ReplaceSingleFile_Normal(WIN32_FIND_DATA &FindData)
 
 	if (bProcess) {
 		if (!FRReplaceToNew) {
-			if (!ReplaceFile(FindData.cFileName, g_strNewFileName.c_str(),
+			while (!ReplaceFile(FindData.cFileName, g_strNewFileName.c_str(),
 				(FRSaveOriginal) ? g_strBackupFileName.c_str() : NULL,
-				REPLACEFILE_IGNORE_MERGE_ERRORS, NULL, NULL)) {
-
-					const TCHAR *Lines[]={GetMsg(MREReplace),GetMsg(MFileBackupError),FindData.cFileName,GetMsg(MOk)};
-					StartupInfo.Message(FMSG_WARNING|FMSG_ERRORTYPE,_T("FRBackupError"),Lines,4,1);
+				REPLACEFILE_IGNORE_MERGE_ERRORS, NULL, NULL))
+			{
+				const TCHAR *Lines[]={GetMsg(MREReplace),GetMsg(MFileBackupError),FindData.cFileName,GetMsg(MOk),GetMsg(MBtnRetry)};
+				if (StartupInfo.Message(FMSG_WARNING|FMSG_ERRORTYPE,_T("FRBackupError"),Lines,5,2) == 0) break;
 			}
 		}
 	} else {

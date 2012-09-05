@@ -6,6 +6,7 @@ enum eStringTable {
 	MBtnPresets,
 	MBtnAdvanced,
 	MBtnBatch,
+	MBtnRetry,
 	MError,
 	MWarning,
 	MQuoteSearch,
