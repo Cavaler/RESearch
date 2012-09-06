@@ -162,8 +162,31 @@ BOOL FindRename(const TCHAR *FileName, int &MatchStart, int &MatchLength)
 	return FALSE;
 }
 
-bool PerformSingleRename(rename_pair &Item) {
-	if (MoveFile(Item.first.c_str(), Item.second.c_str())) return true;
+void PostPerformRename(rename_pair &Item)
+{
+	for (size_t nItem = 0; nItem < m_arrPendingRename.size(); nItem++) {
+		rename_pair &Pair = m_arrPendingRename[nItem];
+
+		//	Not ">=" since we don't want to replace Item itself if it is still in there
+		if ((Pair.first.length() > Item.first.length()) &&
+			(Pair.first.substr(0, Item.first.length()+1) == Item.first + _T("\\")))
+		{
+			Pair.first = Item.second + Pair.first.substr(Item.first.length());
+		}
+		if ((Pair.second.length() > Item.first.length()) &&
+			(Pair.second.substr(0, Item.first.length()+1) == Item.first + _T("\\")))
+		{
+			Pair.second = Item.second + Pair.second.substr(Item.first.length());
+		}
+	}
+}
+
+bool PerformSingleRename(rename_pair &Item)
+{
+	if (MoveFile(Item.first.c_str(), Item.second.c_str())) {
+		PostPerformRename(Item);
+		return true;
+	}
 
 	DWORD Error = GetLastError();
 	switch (Error) {
@@ -218,10 +241,13 @@ bool PerformSingleRename(rename_pair &Item) {
 		return false;
 	}
 
+	PostPerformRename(Item);
+
 	return true;
 }
 
-bool PerformSingleRename(rename_pair &Item, panelitem_vector &PanelItems) {
+bool PerformSingleRename(rename_pair &Item, panelitem_vector &PanelItems)
+{
 	if (PerformSingleRename(Item)) {
 		m_arrLastRename.push_back(Item);
 		AddFile(Item.second.c_str(), PanelItems);
@@ -236,7 +262,8 @@ void PerformFinalRename(panelitem_vector &PanelItems) {
 	}
 }
 
-void RenamePreview(panelitem_vector &PanelItems) {
+void RenamePreview(panelitem_vector &PanelItems)
+{
 	vector<tstring> arrItems;
 	int nBreakKey, nResult = 0;
 	int BreakKeys[] = {VK_INSERT, VK_DELETE, 0};
