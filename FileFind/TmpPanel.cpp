@@ -188,10 +188,12 @@ int CTemporaryPanel::PutFiles(PluginPanelItem *AddItems,int AddNumber,int Move,i
 }
 
 #ifdef FAR3
-#pragma message("Not implemented in FAR3")
 int CTemporaryPanel::ProcessPanelInput(const INPUT_RECORD *pInput)
 {
-	return TRUE;
+	if (pInput->EventType != KEY_EVENT)
+		return FALSE;
+
+	return ProcessKey(pInput->Event.KeyEvent.wVirtualKeyCode, pInput->Event.KeyEvent.dwControlKeyState);
 }
 #endif
 
