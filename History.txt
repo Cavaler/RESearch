@@ -10,6 +10,11 @@ Planned:
 	? Searching in streams
 	? Preset can start from current position
 
+Version 7.60 (06.09.2012)
+	! Forst public Far3 build, very unreliable
+	+ Large speed increase for Unicode RegExps
+    - Fixed Rename Files with Preview when parent and child are both renamed
+
 Version 7.51 (15.02.2012)
 	- Fixed per-line operations in Unicode version
 
