@@ -792,10 +792,10 @@ HANDLE WINAPI OpenPlugin(int OpenFrom, INT_PTR Item) {
 		StartupInfo.Control(INVALID_HANDLE_VALUE,FCTL_UPDATEPANEL,NULL);
 		StartupInfo.Control(INVALID_HANDLE_VALUE,FCTL_REDRAWPANEL,NULL);
 #endif
-		return INVALID_HANDLE_VALUE;
+		return NO_PANEL_HANDLE;
 
 	default:
-		return INVALID_HANDLE_VALUE;
+		return NO_PANEL_HANDLE;
 	}
 }
 #endif
