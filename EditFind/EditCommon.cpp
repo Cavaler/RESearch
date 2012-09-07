@@ -500,7 +500,11 @@ void ShowCurrentLine(int CurLine,int TotalLines,int TotalColumns)
 		int Position = (ClockPresent) ? 19 : 25;
 		if (TotalColumns > 80) Position += (TotalColumns-81);
 #ifdef UNICODE
+#ifdef FAR3
+		Position+=9;
+#else
 		Position+=17;
+#endif
 #else
 		Position+=22;
 #endif
@@ -512,8 +516,8 @@ void ShowCurrentLine(int CurLine,int TotalLines,int TotalColumns)
 #ifdef FAR3
 		FarColor Color;
 		Color.Flags = FCF_4BITMASK;
-		Color.BackgroundColor = 0x00;
-		Color.ForegroundColor = 0x03;
+		Color.BackgroundColor = 0x03;
+		Color.ForegroundColor = 0x00;
 		StartupInfo.Text(Position, 0, &Color, strText.c_str());
 		StartupInfo.Text(0, 0, &Color, NULL);
 #else
