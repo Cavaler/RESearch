@@ -49,7 +49,8 @@ EXTERN CFarListData m_lstEngines CONSTRUCT((NULL, 0));
 BOOL SystemToLocalTime(FILETIME &ft);
 BOOL LocalToSystemTime(FILETIME &ft);
 
-HKEY OpenRegistry(const TCHAR *szSubKey=NULL, bool bCreate=true);
+CFarSettingsKey OpenSettings(const TCHAR *szSubKey = NULL, bool bCreate = true);
+HKEY OpenRegistry(const TCHAR *szSubKey = NULL, bool bCreate = true);
 void ReadRegistry();
 void WriteRegistry();
 void ReadActiveScripts();

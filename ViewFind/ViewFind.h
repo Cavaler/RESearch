@@ -14,8 +14,8 @@ public:
 extern CParameterSet g_VSParamSet;
 EXTERN CVSPresetCollection *VSPresets;
 
-void VReadRegistry(HKEY Key);
-void VWriteRegistry(HKEY Key);
+void VReadRegistry (CFarSettingsKey Key);
+void VWriteRegistry(CFarSettingsKey Key);
 BOOL ViewerSearch();
 BOOL ViewerSearchAgain();
 

@@ -1,4 +1,8 @@
+#ifdef FAR3
+#include <PersistVariablesFar3.h>
+#else
 #include <PersistVariables.h>
+#endif
 
 PERSIST_TYPED_VARIABLE(int, SeveralLines, 32, 1, 65535)
 PERSIST_TYPED_VARIABLE(int, SeveralLinesKB, 16, 1, 1024)

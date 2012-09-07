@@ -1,4 +1,8 @@
+#ifdef FAR3
+#include <PersistVariablesFar3.h>
+#else
 #include <PersistVariables.h>
+#endif
 
 PERSIST_bool_VARIABLE(g_bStripRegExp, true)
 PERSIST_bool_VARIABLE(g_bStripCommon, true)

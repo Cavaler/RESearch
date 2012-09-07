@@ -32,8 +32,8 @@ typedef vector<rename_pair> rename_vector;
 //	Not a map to enforce reverse rename sequence
 EXTERN rename_vector m_arrLastRename;
 
-void FTReadRegistry(HKEY Key);
-void FTWriteRegistry(HKEY Key);
+void FTReadRegistry (CFarSettingsKey Key);
+void FTWriteRegistry(CFarSettingsKey Key);
 void FTCleanup(BOOL PatternOnly);
 
 void ChangeSelection(int How);

@@ -2,7 +2,22 @@
 #define DEFINE_VARS
 #include "RESearch.h"
 
-HKEY OpenRegistry(const TCHAR *szSubKey, bool bCreate) {
+CFarSettingsKey OpenSettings(const TCHAR *szSubKey, bool bCreate)
+{
+	CFarSettingsKey Key;
+	Key.OpenRoot(_T("RESearch"));
+
+	if (szSubKey == NULL) {
+		return Key;
+	} else {
+		CFarSettingsKey SubKey;
+		SubKey.Open(Key, szSubKey, bCreate);
+		return SubKey;
+	}
+}
+
+HKEY OpenRegistry(const TCHAR *szSubKey, bool bCreate)
+{
 	TCHAR szCurrentKey[512];
 	_tcscat(_tcscpy(szCurrentKey, StartupInfo.RootKey), _T("\\RESearch"));
 	if (szSubKey) _tcscat(_tcscat(szCurrentKey, _T("\\")), szSubKey);
@@ -14,14 +29,20 @@ HKEY OpenRegistry(const TCHAR *szSubKey, bool bCreate) {
 	}
 }
 
-void ReadRegistry() {
-	CHKey hKey = OpenRegistry();
+void ReadRegistry()
+{
+	CFarSettingsKey hKey = OpenSettings();
+
 #define DECLARE_PERSIST_LOAD hKey
 #include "PersistVars.h"
 
 #ifdef UNICODE
 	vector<BYTE> arrCPs;
+#ifdef FAR3
+	QuerySettingsBinaryValue(hKey, _T("AllCP"), arrCPs);
+#else
 	QueryRegBinaryValue(hKey, _T("AllCP"), arrCPs);
+#endif
 	if (arrCPs.empty()) {
 		g_setAllCPs.insert(GetOEMCP());
 		g_setAllCPs.insert(GetACP());
@@ -40,17 +61,19 @@ void ReadRegistry() {
 	FReadRegistry(hKey);
 	FTReadRegistry(hKey);
 
+	CHKey chKey;
 	g_pEditorBatchType = new CBatchType(MEditorBatches, ESPresets, ERPresets, EFPresets, ETPresets, NULL);
-	hKey = OpenRegistry(_T("EditorBatches"));
-	g_pEditorBatches = new CBatchActionCollection(*g_pEditorBatchType, hKey);
+	chKey = OpenRegistry(_T("EditorBatches"));
+	g_pEditorBatches = new CBatchActionCollection(*g_pEditorBatchType, chKey);
 
 	g_pPanelBatchType = new CBatchType(MPanelBatches, FSPresets, FRPresets, RnPresets, QRPresets, FGPresets, NULL);
-	hKey = OpenRegistry(_T("PanelBatches"));
-	g_pPanelBatches = new CBatchActionCollection(*g_pPanelBatchType, hKey);
+	chKey = OpenRegistry(_T("PanelBatches"));
+	g_pPanelBatches = new CBatchActionCollection(*g_pPanelBatchType, chKey);
 }
 
-void WriteRegistry() {
-	CHKey hKey = OpenRegistry();
+void WriteRegistry()
+{
+	CFarSettingsKey hKey = OpenSettings();
 
 #define DECLARE_PERSIST_SAVE hKey
 #include "PersistVars.h"
@@ -59,7 +82,11 @@ void WriteRegistry() {
 	vector<DWORD> arrCPs;
 	for (cp_set::iterator it = g_setAllCPs.begin(); it != g_setAllCPs.end(); it++)
 		arrCPs.push_back(*it);
+#ifdef FAR3
+	SetSettingsBinaryValue(hKey, _T("AllCP"), arrCPs.empty() ? NULL : &arrCPs[0], arrCPs.size()*sizeof(DWORD));
+#else
 	SetRegBinaryValue(hKey, _T("AllCP"), arrCPs.empty() ? NULL : &arrCPs[0], arrCPs.size()*sizeof(DWORD));
+#endif
 #endif
 
 	EWriteRegistry(hKey);
@@ -67,11 +94,12 @@ void WriteRegistry() {
 	FWriteRegistry(hKey);
 	FTWriteRegistry(hKey);
 
-	hKey = OpenRegistry(_T("EditorBatches"));
-	g_pEditorBatches->Save(hKey);
+	CHKey chKey;
+	chKey = OpenRegistry(_T("EditorBatches"));
+	g_pEditorBatches->Save(chKey);
 
-	hKey = OpenRegistry(_T("PanelBatches"));
-	g_pPanelBatches->Save(hKey);
+	chKey = OpenRegistry(_T("PanelBatches"));
+	g_pPanelBatches->Save(chKey);
 }
 
 bool CheckUsage(const tstring &strText, bool bRegExp, bool bSeveralLine) {

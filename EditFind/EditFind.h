@@ -138,8 +138,8 @@ void OEMToEditor(string &String);
 #endif
 
 void SynchronizeWithFile(bool bReplace);
-void EReadRegistry(HKEY Key);
-void EWriteRegistry(HKEY Key);
+void EReadRegistry (CFarSettingsKey Key);
+void EWriteRegistry(CFarSettingsKey Key);
 void ECleanup(BOOL PatternOnly);
 
 extern "C" const unsigned char *far_maketables(struct CharTableSet *pTable);

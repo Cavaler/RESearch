@@ -22,7 +22,8 @@ CParameterSet g_ETParamSet(EditorTransliterateExecutor, 2, 0,
 	 "@Text", &EText,  "@Replace", &ERReplace
 					 );
 
-void EReadRegistry(HKEY Key) {
+void EReadRegistry(CFarSettingsKey Key)
+{
 	#define DECLARE_PERSIST_LOAD Key
 	#include "PersistVars.h"
 
@@ -34,7 +35,8 @@ void EReadRegistry(HKEY Key) {
 	ETPresets = new CETPresetCollection(g_ETParamSet);
 }
 
-void EWriteRegistry(HKEY Key) {
+void EWriteRegistry(CFarSettingsKey Key)
+{
 	#define DECLARE_PERSIST_SAVE Key
 	#include "PersistVars.h"
 }

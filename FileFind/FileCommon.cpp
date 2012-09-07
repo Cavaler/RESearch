@@ -38,7 +38,8 @@ CParameterSet g_FAParamSet(NULL, 2, 20,
 	"AttributesCleared", &FAAttributesCleared, "AttributesSet", &FAAttributesSet
 	);
 
-void FReadRegistry(HKEY Key) {
+void FReadRegistry(CFarSettingsKey Key)
+{
 	#define DECLARE_PERSIST_LOAD Key
 	#include "PersistVars.h"
 
@@ -84,7 +85,8 @@ void FReadRegistry(HKEY Key) {
 	g_WhereToSearchPlugin.Append(GetMsg(MSelected));
 }
 
-void FWriteRegistry(HKEY Key) {
+void FWriteRegistry(CFarSettingsKey Key)
+{
 	#define DECLARE_PERSIST_SAVE Key
 	#include "PersistVars.h"
 }

@@ -145,8 +145,8 @@ BOOL ConfirmFile(int Title,const TCHAR *FileName);
 bool ConfirmFileReadonly(const TCHAR *FileName);
 bool ConfirmReplacement(const TCHAR *Found, const TCHAR *Replaced, const TCHAR *FileName);
 
-void FReadRegistry(HKEY Key);
-void FWriteRegistry(HKEY Key);
+void FReadRegistry (CFarSettingsKey Key);
+void FWriteRegistry(CFarSettingsKey Key);
 void FCleanup(BOOL PatternOnly);
 
 #ifndef UNICODE

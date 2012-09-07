@@ -6,9 +6,11 @@ CParameterSet g_VSParamSet(ViewSearchExecutor, 2, 3,
 	"IsRegExp", &ERegExp, "CaseSensitive", &ECaseSensitive, "SeveralLine", &ESeveralLine
 );
 
-void VReadRegistry(HKEY Key) {
+void VReadRegistry(CFarSettingsKey Key)
+{
 	VSPresets = new CVSPresetCollection(g_VSParamSet);
 }
 
-void VWriteRegistry(HKEY Key) {
+void VWriteRegistry(CFarSettingsKey Key)
+{
 }

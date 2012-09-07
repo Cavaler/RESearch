@@ -18,7 +18,8 @@ int g_nStartWithNow;
 
 rename_vector m_arrPendingRename;
 
-void FTReadRegistry(HKEY Key) {
+void FTReadRegistry(CFarSettingsKey Key)
+{
 	#define DECLARE_PERSIST_LOAD Key
 	#include "PersistVars.h"
 
@@ -26,12 +27,14 @@ void FTReadRegistry(HKEY Key) {
 	QRPresets = new CQRPresetCollection(g_QRParamSet);
 }
 
-void FTWriteRegistry(HKEY Key) {
+void FTWriteRegistry(CFarSettingsKey Key)
+{
 	#define DECLARE_PERSIST_SAVE Key
 	#include "PersistVars.h"
 }
 
-void FTCleanup(BOOL PatternOnly) {
+void FTCleanup(BOOL PatternOnly)
+{
 	if (!PatternOnly) {
 		delete RnPresets;
 		delete QRPresets;
