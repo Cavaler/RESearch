@@ -140,24 +140,25 @@ void CPreset::FillMenuItem(CFarMenuItemEx &Item) {
 #endif
 }
 
-void CPreset::Save(HKEY hKey, int nIndex) {
-	CHKey hOwnKey = RegCreateSubkey(hKey, FormatStr(_T("%04d"), nIndex).c_str());
-	if (!hOwnKey) return;
+void CPreset::Save(CFarSettingsKey &hKey, int nIndex)
+{
+	CFarSettingsKey hOwnKey = hKey.Open(FormatStr(_T("%04d"), nIndex).c_str());
+	if (!hOwnKey.Valid()) return;
 
 	map<string, tstring>::iterator it1 = m_mapStrings.begin();
 	while (it1 != m_mapStrings.end()) {
-		if (it1->first[0] != '@') SetRegStringValue(hOwnKey, KeyName(it1->first).c_str(), it1->second);
+		if (it1->first[0] != '@') hOwnKey.SetStringValue(KeyName(it1->first).c_str(), it1->second);
 		it1++;
 	}
 
 	map<string, int>::iterator it2 = m_mapInts.begin();
 	while (it2 != m_mapInts.end()) {
-		if (it2->first[0] != '@') SetRegIntValue(hOwnKey, KeyName(it2->first).c_str(), it2->second);
+		if (it2->first[0] != '@') hOwnKey.SetIntValue(KeyName(it2->first).c_str(), it2->second);
 		it2++;
 	}
 
-	SetRegIntValue(hOwnKey, _T("ID"), m_nID);
-	SetRegBoolValue(hOwnKey, _T("AddToMenu"), m_bAddToMenu);
+	hOwnKey.SetIntValue(_T("ID"), m_nID);
+	hOwnKey.SetBoolValue(_T("AddToMenu"), m_bAddToMenu);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -195,19 +196,15 @@ CPresetCollection::~CPresetCollection() {
 	for (size_t nPreset=0; nPreset < size(); nPreset++) delete at(nPreset);
 }
 
-void CPresetCollection::Save() {
-	TCHAR szCurrentKey[256];
-	_stprintf_s(szCurrentKey, 256, _T("%s\\RESearch\\%sPresets"), StartupInfo.RootKey, Name());
+void CPresetCollection::Save()
+{
+	CFarSettingsKey hRootKey;
+	hRootKey.OpenRoot(_T("RESearch"));
 
-	CHKey hKey = RegCreateSubkey(HKEY_CURRENT_USER, szCurrentKey);
-	if (!hKey) return;
+	CFarSettingsKey hKey = hRootKey.Open(FormatStr(_T("%sPresets"), Name()).c_str());
+	if (!hKey.Valid()) return;
 
-	do {
-		FILETIME ftTime;
-		DWORD dwcbCurrentKey = arrsizeof(szCurrentKey);
-		if (RegEnumKeyEx(hKey, 0, szCurrentKey, &dwcbCurrentKey, NULL, NULL, NULL, &ftTime) != ERROR_SUCCESS) break;
-		RegDeleteKey(hKey,szCurrentKey);
-	} while (TRUE);
+	hKey.DeleteAllKeys();
 
 	for (size_t nPreset=0; nPreset<size(); nPreset++)
 		at(nPreset)->Save(hKey, nPreset);
@@ -433,21 +430,22 @@ CBatchActionCollection *CBatchAction::Collection()
 		return NULL;
 }
 
-void CBatchAction::Save(HKEY hKey, int nIndex) {
-	CHKey hOwnKey = RegCreateSubkey(hKey, FormatStr(_T("%04d"), nIndex).c_str());
-	if (!hOwnKey) return;
+void CBatchAction::Save(CFarSettingsKey &hKey, int nIndex)
+{
+	CFarSettingsKey hOwnKey = hKey.Open(FormatStr(_T("%04d"), nIndex).c_str(), true);
+	if (!hOwnKey.Valid()) return;
 
-	SetRegStringValue(hOwnKey, _T("Name"), m_strName);
-	SetRegBoolValue(hOwnKey, _T("AddToMenu"), m_bAddToMenu);
+	hOwnKey.SetStringValue(_T("Name"), m_strName);
+	hOwnKey.SetBoolValue  (_T("AddToMenu"), m_bAddToMenu);
 
-	RegDeleteAllSubkeys(hOwnKey);
+	hOwnKey.DeleteAllKeys();
 
-	for (size_t nIndex = 0; nIndex < size(); nIndex++) {
-		CHKey hValue = RegCreateSubkey(hOwnKey, FormatStr(_T("%04d"), nIndex).c_str());
-		if (!hValue) continue;
+	for (size_t nActIndex = 0; nActIndex < size(); nActIndex++) {
+		CFarSettingsKey hValue = hOwnKey.Open(FormatStr(_T("%04d"), nActIndex).c_str(), true);
+		if (!hValue.Valid()) continue;
 
-		SetRegIntValue(hValue, _T("Coll"), at(nIndex).first);
-		SetRegIntValue(hValue, _T("ID"), at(nIndex).second);
+		hValue.SetIntValue(_T("Coll"), at(nActIndex).first);
+		hValue.SetIntValue(_T("ID"),   at(nActIndex).second);
 	}
 }
 
@@ -591,8 +589,9 @@ CBatchActionCollection::CBatchActionCollection(CBatchType &Type, HKEY hKey)
 	} while (TRUE);
 }
 
-void CBatchActionCollection::Save(HKEY hKey) {
-	RegDeleteAllSubkeys(hKey);
+void CBatchActionCollection::Save(CFarSettingsKey &hKey)
+{
+	hKey.DeleteAllKeys();
 
 	for (size_t nIndex = 0; nIndex < size(); nIndex++) {
 		at(nIndex)->Save(hKey, nIndex);

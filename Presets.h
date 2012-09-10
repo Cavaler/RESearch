@@ -36,7 +36,7 @@ public:
 	OperationResult ExecutePreset();
 	virtual void Apply();
 	void FillMenuItem(CFarMenuItemEx &Item);
-	void Save(HKEY hKey, int nIndex);
+	void Save(CFarSettingsKey &hKey, int nIndex);
 
 	tstring &Name() {return m_mapStrings[""];}
 
@@ -113,7 +113,7 @@ class CBatchAction : public vector<BatchActionIndex> {		// Collection index and 
 public:
 	CBatchAction(CBatchType &Type);
 	CBatchAction(CBatchType &Type, tstring strName, HKEY hKey);
-	void Save(HKEY hKey, int nIndex);
+	void Save(CFarSettingsKey &hKey, int nIndex);
 
 	bool EditProperties();
 	bool EditItems();
@@ -135,7 +135,7 @@ protected:
 class CBatchActionCollection : public vector<CBatchAction *> {
 public:
 	CBatchActionCollection(CBatchType &Type, HKEY hKey);	// CPresetCollection *
-	void Save(HKEY hKey);
+	void Save(CFarSettingsKey &hKey);
 
 	void ShowMenu();
 

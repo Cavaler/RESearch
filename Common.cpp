@@ -94,12 +94,8 @@ void WriteRegistry()
 	FWriteRegistry(hKey);
 	FTWriteRegistry(hKey);
 
-	CHKey chKey;
-	chKey = OpenRegistry(_T("EditorBatches"));
-	g_pEditorBatches->Save(chKey);
-
-	chKey = OpenRegistry(_T("PanelBatches"));
-	g_pPanelBatches->Save(chKey);
+	g_pEditorBatches->Save(hKey.Open(_T("EditorBatches")));
+	g_pPanelBatches->Save (hKey.Open(_T("PanelBatches" )));
 }
 
 bool CheckUsage(const tstring &strText, bool bRegExp, bool bSeveralLine) {
