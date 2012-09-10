@@ -31,7 +31,8 @@ public:
 class CPreset {
 public:
 	CPreset(CParameterSet &ParamSet);
-	CPreset(CParameterSet &ParamSet, const tstring &strName, HKEY hKey);	// hKey is root key
+	CPreset(CParameterSet &ParamSet, const tstring &strName, CFarSettingsKey &hKey);	// hKey is root key
+	void FillDefaults();
 
 	OperationResult ExecutePreset();
 	virtual void Apply();
@@ -57,7 +58,7 @@ public:
 
 	void Save();
 	int ShowMenu(bool bExecute, int nDefaultID = 0);
-	virtual CPreset *LoadPreset(const tstring &strName, HKEY hKey) = 0;
+	virtual CPreset *LoadPreset(const tstring &strName, CFarSettingsKey &hKey) = 0;
 	virtual CPreset *NewPreset() = 0;
 	virtual BOOL EditPreset(CPreset *pPreset) = 0;
 	virtual int  ID() = 0;	// For batches
@@ -86,7 +87,7 @@ class CPresetCollectionT : public CPresetCollection
 public:
 	CPresetCollectionT(CParameterSet &ParamSet, const TCHAR *strKey, int nTitle)
 		: CPresetCollection(ParamSet, strKey, nTitle) { Load(); } 
-	virtual CPreset *LoadPreset(const tstring &strName, HKEY hKey) { return new _Preset(m_ParamSet, strName, hKey); }
+	virtual CPreset *LoadPreset(const tstring &strName, CFarSettingsKey &hKey) { return new _Preset(m_ParamSet, strName, hKey); }
 	virtual CPreset *NewPreset() { return new _Preset(m_ParamSet); }
 };
 
@@ -112,7 +113,7 @@ public:
 class CBatchAction : public vector<BatchActionIndex> {		// Collection index and ID
 public:
 	CBatchAction(CBatchType &Type);
-	CBatchAction(CBatchType &Type, tstring strName, HKEY hKey);
+	CBatchAction(CBatchType &Type, tstring strName, CFarSettingsKey &hKey);
 	void Save(CFarSettingsKey &hKey, int nIndex);
 
 	bool EditProperties();
@@ -134,7 +135,7 @@ protected:
 
 class CBatchActionCollection : public vector<CBatchAction *> {
 public:
-	CBatchActionCollection(CBatchType &Type, HKEY hKey);	// CPresetCollection *
+	CBatchActionCollection(CBatchType &Type, CFarSettingsKey &hKey);	// CPresetCollection *
 	void Save(CFarSettingsKey &hKey);
 
 	void ShowMenu();

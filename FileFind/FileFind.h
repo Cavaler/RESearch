@@ -11,7 +11,7 @@ enum GrepWhat {GREP_NAMES, GREP_NAMES_COUNT, GREP_LINES, GREP_NAMES_LINES};
 class CFPreset : public CPreset {
 public:
 	CFPreset(CParameterSet &ParamSet);
-	CFPreset(CParameterSet &ParamSet, const tstring &strName, HKEY hKey);
+	CFPreset(CParameterSet &ParamSet, const tstring &strName, CFarSettingsKey &hKey);
 	virtual void Apply();
 };
 

@@ -68,6 +68,7 @@ void WINAPI FAR_EXPORT(SetStartupInfo)(const PluginStartupInfo *Info)
 #endif
 
 	PrepareLocaleStuff();
+	Settings.OpenRoot(_T("RESearch"));
 	ReadRegistry();
 
 	g_pszOKButton = GetMsg(MOk);
@@ -1092,6 +1093,7 @@ void WINAPI FAR_EXPORT(ExitFAR)() {
 	ECleanup(FALSE);
 	FCleanup(FALSE);
 	FTCleanup(FALSE);
+	Settings.Close();
 	StopREThread();
 	CoUninitialize();
 }

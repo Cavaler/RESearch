@@ -58,50 +58,46 @@ CParameterBackup::~CParameterBackup() {
 CPreset::CPreset(CParameterSet &ParamSet)
 : m_ParamSet(ParamSet), m_nID(0)
 {
+	FillDefaults();
+
 	m_mapStrings[""] = _T("New Preset");
 	m_bAddToMenu = false;
+}
 
-	map<string, tstring *>::iterator it1 = ParamSet.m_mapStrings.begin();
-	while (it1 != ParamSet.m_mapStrings.end()) {
+void CPreset::FillDefaults()
+{
+	map<string, tstring *>::iterator it1 = m_ParamSet.m_mapStrings.begin();
+	while (it1 != m_ParamSet.m_mapStrings.end()) {
 		m_mapStrings[it1->first] = *(it1->second);
 		it1++;
 	}
 
-	map<string, int *>::iterator it2 = ParamSet.m_mapInts.begin();
-	while (it2 != ParamSet.m_mapInts.end()) {
+	map<string, int *>::iterator it2 = m_ParamSet.m_mapInts.begin();
+	while (it2 != m_ParamSet.m_mapInts.end()) {
 		m_mapInts[it2->first] = *(it2->second);
 		it2++;
 	}
 }
 
-CPreset::CPreset(CParameterSet &ParamSet, const tstring &strName, HKEY hKey)
+CPreset::CPreset(CParameterSet &ParamSet, const tstring &strName, CFarSettingsKey &hKey)
 : m_ParamSet(ParamSet)
+, m_nID(0)
+, m_bAddToMenu(false)
 {
-	CHKey hOwnKey = RegOpenSubkey(hKey, strName.c_str());
-	if (!hOwnKey) {
-		m_nID = 0;
-		return;
+	FillDefaults();
+
+	CFarSettingsKey hOwnKey = hKey.Open(strName.c_str(), false);
+	if (!hOwnKey.Valid()) return;
+
+	hOwnKey.QueryIntValue (_T("ID"), m_nID);
+	hOwnKey.QueryBoolValue(_T("AddToMenu"), m_bAddToMenu);
+	hOwnKey.QueryStringValue(_T(""), m_mapStrings[""]);
+
+	for (map<string, tstring>::iterator it = m_mapStrings.begin(); it != m_mapStrings.end(); it++) {
+		hOwnKey.QueryStringValue(KeyName(it->first).c_str(), it->second);
 	}
-
-	QueryRegIntValue(hOwnKey, _T("ID"), &m_nID, _ttoi(strName.c_str()));
-	QueryRegBoolValue(hOwnKey, _T("AddToMenu"), &m_bAddToMenu, false);
-
-	DWORD dwIndex = 0;
-	TCHAR szName[256];
-	DWORD dwcbName = arrsizeof(szName), dwType;
-
-	while (RegEnumValue(hOwnKey, dwIndex, szName, &dwcbName, NULL, &dwType, NULL, 0) == ERROR_SUCCESS) {
-		if (dwType == REG_DWORD) {
-			int nValue;
-			QueryRegIntValue(hOwnKey, szName, &nValue, 0);
-			m_mapInts[NameKey(szName)] = nValue;
-		} else if (dwType == REG_SZ) {
-			tstring strValue;
-			QueryRegStringValue(hOwnKey, szName, strValue, _T(""));
-			m_mapStrings[NameKey(szName)] = strValue;
-		}
-		dwcbName = arrsizeof(szName);
-		dwIndex++;
+	for (map<string, int>::iterator it = m_mapInts.begin(); it != m_mapInts.end(); it++) {
+		hOwnKey.QueryIntValue(KeyName(it->first).c_str(), it->second);
 	}
 }
 
@@ -157,7 +153,7 @@ void CPreset::Save(CFarSettingsKey &hKey, int nIndex)
 		it2++;
 	}
 
-	hOwnKey.SetIntValue(_T("ID"), m_nID);
+	hOwnKey.SetIntValue (_T("ID"), m_nID);
 	hOwnKey.SetBoolValue(_T("AddToMenu"), m_bAddToMenu);
 }
 
@@ -173,35 +169,27 @@ CPresetCollection::CPresetCollection(CParameterSet &ParamSet, const TCHAR *strKe
 
 void CPresetCollection::Load()
 {
-	TCHAR szCurrentKey[256];
-	_stprintf_s(szCurrentKey, 256, _T("%s\\RESearch\\%sPresets"), StartupInfo.RootKey, Name());
+	CFarSettingsKey hKey = Settings.Open(FormatStr(_T("%sPresets"), Name()).c_str(), false);
+	if (!hKey.Valid()) return;
 
-	CHKey hKey = RegCreateSubkey(HKEY_CURRENT_USER, szCurrentKey);
-	if (!hKey) return;
-
-	DWORD dwIndex = 0;
+	hKey.StartEnumKeys();
 	do {
-		FILETIME ftTime;
-		DWORD dwcbCurrentKey = arrsizeof(szCurrentKey);
-
-		if (RegEnumKeyEx(hKey, dwIndex, szCurrentKey, &dwcbCurrentKey, NULL, NULL, NULL, &ftTime) != ERROR_SUCCESS) break;
-		push_back(LoadPreset(szCurrentKey, hKey));
-		dwIndex++;
+		tstring strName;
+		if (!hKey.GetNextEnum(strName)) break;
+		push_back(LoadPreset(strName.c_str(), hKey));
 	} while (TRUE);
 
 	ValidateIDs();
 }
 
-CPresetCollection::~CPresetCollection() {
+CPresetCollection::~CPresetCollection()
+{
 	for (size_t nPreset=0; nPreset < size(); nPreset++) delete at(nPreset);
 }
 
 void CPresetCollection::Save()
 {
-	CFarSettingsKey hRootKey;
-	hRootKey.OpenRoot(_T("RESearch"));
-
-	CFarSettingsKey hKey = hRootKey.Open(FormatStr(_T("%sPresets"), Name()).c_str());
+	CFarSettingsKey hKey = Settings.Open(FormatStr(_T("%sPresets"), Name()).c_str());
 	if (!hKey.Valid()) return;
 
 	hKey.DeleteAllKeys();
@@ -399,22 +387,24 @@ CBatchAction::CBatchAction(CBatchType &Type)
 {
 }
 
-CBatchAction::CBatchAction(CBatchType &Type, tstring strName, HKEY hKey)
-: m_Type(Type), m_bAddToMenu(false)
+CBatchAction::CBatchAction(CBatchType &Type, tstring strName, CFarSettingsKey &hKey)
+: m_Type(Type)
+, m_strName(strName)
+, m_bAddToMenu(false)
 {
-	CHKey hOwnKey = RegOpenSubkey(hKey, strName.c_str());
-	if (!hOwnKey) return;
+	CFarSettingsKey hOwnKey = hKey.Open(strName.c_str(), false);
+	if (!hOwnKey.Valid()) return;
 
-	QueryRegStringValue(hOwnKey, _T("Name"), m_strName, strName);
-	QueryRegBoolValue(hOwnKey, _T("AddToMenu"), &m_bAddToMenu, false);
+	hOwnKey.QueryStringValue(_T("Name"), m_strName);
+	hOwnKey.QueryBoolValue(  _T("AddToMenu"), m_bAddToMenu);
 
 	for (size_t nIndex = 0; ; nIndex++) {
-		CHKey hValue = RegOpenSubkey(hOwnKey, FormatStr(_T("%04d"), nIndex).c_str());
-		if (!hValue) break;
+		CFarSettingsKey hValue = hOwnKey.Open(FormatStr(_T("%04d"), nIndex).c_str(), false);
+		if (!hValue.Valid()) break;
 
-		BatchActionIndex NewIndex;
-		QueryRegIntValue(hValue, _T("Coll"), &NewIndex.first, NO_BATCH_INDEX.first);
-		QueryRegIntValue(hValue, _T("ID"), &NewIndex.second, NO_BATCH_INDEX.second);
+		BatchActionIndex NewIndex = NO_BATCH_INDEX;
+		hValue.QueryIntValue(_T("Coll"), NewIndex.first);
+		hValue.QueryIntValue(_T("ID"),   NewIndex.second);
 
 		push_back(NewIndex);
 	}
@@ -574,18 +564,16 @@ CFarMenuItemEx CBatchAction::GetMenuItem() {
 
 //////////////////////////////////////////////////////////////////////////
 
-CBatchActionCollection::CBatchActionCollection(CBatchType &Type, HKEY hKey)
+CBatchActionCollection::CBatchActionCollection(CBatchType &Type, CFarSettingsKey &hKey)
 : m_Type(Type)
 , m_nCurrent(0)
 {
-	TCHAR szKeyName[256];
-	DWORD dwIndex = 0;
-	do {
-		DWORD dwcbKeyName = arrsizeof(szKeyName);
+	hKey.StartEnumKeys();
 
-		if (RegEnumKeyEx(hKey, dwIndex, szKeyName, &dwcbKeyName, NULL, NULL, NULL, NULL) != ERROR_SUCCESS) break;
-		push_back(new CBatchAction(m_Type, szKeyName, hKey));
-		dwIndex++;
+	do {
+		tstring strName;
+		if (!hKey.GetNextEnum(strName)) break;
+		push_back(new CBatchAction(m_Type, strName.c_str(), hKey));
 	} while (TRUE);
 }
 

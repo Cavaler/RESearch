@@ -950,7 +950,7 @@ CFPreset::CFPreset(CParameterSet &ParamSet)
 	m_mapInts["AdvancedID"] = 0;
 }
 
-CFPreset::CFPreset(CParameterSet &ParamSet, const tstring &strName, HKEY hKey)
+CFPreset::CFPreset(CParameterSet &ParamSet, const tstring &strName, CFarSettingsKey &hKey)
 : CPreset(ParamSet, strName, hKey)
 {
 }

@@ -2,36 +2,9 @@
 #define DEFINE_VARS
 #include "RESearch.h"
 
-CFarSettingsKey OpenSettings(const TCHAR *szSubKey, bool bCreate)
-{
-	CFarSettingsKey Key;
-	Key.OpenRoot(_T("RESearch"));
-
-	if (szSubKey == NULL) {
-		return Key;
-	} else {
-		CFarSettingsKey SubKey;
-		SubKey.Open(Key, szSubKey, bCreate);
-		return SubKey;
-	}
-}
-
-HKEY OpenRegistry(const TCHAR *szSubKey, bool bCreate)
-{
-	TCHAR szCurrentKey[512];
-	_tcscat(_tcscpy(szCurrentKey, StartupInfo.RootKey), _T("\\RESearch"));
-	if (szSubKey) _tcscat(_tcscat(szCurrentKey, _T("\\")), szSubKey);
-
-	if (bCreate) {
-		return RegCreateSubkey(HKEY_CURRENT_USER, szCurrentKey);
-	} else {
-		return RegOpenSubkey(HKEY_CURRENT_USER, szCurrentKey);
-	}
-}
-
 void ReadRegistry()
 {
-	CFarSettingsKey hKey = OpenSettings();
+	CFarSettingsKey &hKey = Settings;
 
 #define DECLARE_PERSIST_LOAD hKey
 #include "PersistVars.h"
@@ -61,19 +34,16 @@ void ReadRegistry()
 	FReadRegistry(hKey);
 	FTReadRegistry(hKey);
 
-	CHKey chKey;
 	g_pEditorBatchType = new CBatchType(MEditorBatches, ESPresets, ERPresets, EFPresets, ETPresets, NULL);
-	chKey = OpenRegistry(_T("EditorBatches"));
-	g_pEditorBatches = new CBatchActionCollection(*g_pEditorBatchType, chKey);
+	g_pEditorBatches = new CBatchActionCollection(*g_pEditorBatchType, hKey.Open(_T("EditorBatches")));
 
 	g_pPanelBatchType = new CBatchType(MPanelBatches, FSPresets, FRPresets, RnPresets, QRPresets, FGPresets, NULL);
-	chKey = OpenRegistry(_T("PanelBatches"));
-	g_pPanelBatches = new CBatchActionCollection(*g_pPanelBatchType, chKey);
+	g_pPanelBatches = new CBatchActionCollection(*g_pPanelBatchType, hKey.Open(_T("PanelBatches")));
 }
 
 void WriteRegistry()
 {
-	CFarSettingsKey hKey = OpenSettings();
+	CFarSettingsKey &hKey = Settings;
 
 #define DECLARE_PERSIST_SAVE hKey
 #include "PersistVars.h"
