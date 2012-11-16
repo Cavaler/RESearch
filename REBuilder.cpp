@@ -73,6 +73,9 @@ LONG_PTR WINAPI REBuilderDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LON
 	case DN_DRAWDLGITEM:
 		if (nParam1 == 2) {
 			EditorSelect Select;
+#ifdef FAR3
+			Select.StructSize = sizeof(EditorSelect);
+#endif
 			pDlg->SendDlgMessage(DM_GETSELECTION, 2, (LONG_PTR)&Select);
 			pData->mapParts.erase(pData->nCurrentPart);
 

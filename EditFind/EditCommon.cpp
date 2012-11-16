@@ -96,7 +96,7 @@ BOOL SearchInLine(const TCHAR *Line,int Length,int Start,int End,int *MatchStart
 #endif
 }
 
-void AdjustPosition(TCHAR *Lines, int &FirstLine,int &StartPos)
+void AdjustPosition(TCHAR *Lines, int &FirstLine, int &StartPos)
 {
 	do {
 		TCHAR *NewLine=(TCHAR *)_tmemchr(Lines,'\n',StartPos);
@@ -108,6 +108,21 @@ void AdjustPosition(TCHAR *Lines, int &FirstLine,int &StartPos)
 		} else break;
 	} while (TRUE);
 }
+
+#if defined(FAR3) && defined(_WIN64)
+void AdjustPosition(TCHAR *Lines, intptr_t &FirstLine, intptr_t &StartPos)
+{
+	do {
+		TCHAR *NewLine=(TCHAR *)_tmemchr(Lines,'\n',StartPos);
+		if (NewLine) {
+			int Pos = NewLine-Lines;
+			Lines += Pos+1;
+			StartPos -= Pos+1;
+			FirstLine++;
+		} else break;
+	} while (TRUE);
+}
+#endif
 
 void Relative2Absolute(int Line,TCHAR *Lines,int MatchStart,int MatchLength,int &FirstLine,int &StartPos,int &LastLine,int &EndPos)
 {
@@ -309,13 +324,19 @@ int  TopLine(int FirstLine, int NeededLine, int LastLine) {
 	return nLine;
 }
 
-int RealToTab(int AtPosition) {
+int RealToTab(int AtPosition)
+{
+#ifdef FAR3
+	EditorConvertPos ConvertPos={sizeof(EditorConvertPos), -1, AtPosition, 0};
+#else
 	EditorConvertPos ConvertPos={-1, AtPosition, 0};
+#endif
 	StartupInfo.EditorControl(ECTL_REALTOTAB, &ConvertPos);
 	return ConvertPos.DestPos;
 }
 
-int LeftColumn(int AtPosition) {
+int LeftColumn(int AtPosition)
+{
 	AtPosition = RealToTab(AtPosition);
 
 	if (AtPosition < EdInfo.WindowSizeX-ELRSideOffset) return 0;
@@ -382,7 +403,11 @@ void SaveSelection() {
 
 void RestoreSelection() {
 	if (SelType!=BTYPE_NONE) {
+#ifdef FAR3
+		EditorSelect Select={sizeof(EditorSelect),SelType,SelStartLine,SelStartPos,SelEndPos-SelStartPos,SelEndLine-SelStartLine+1};
+#else
 		EditorSelect Select={SelType,SelStartLine,SelStartPos,SelEndPos-SelStartPos,SelEndLine-SelStartLine+1};
+#endif
 		StartupInfo.EditorControl(ECTL_SELECT,&Select);
 		SelType=BTYPE_NONE;
 	}
@@ -484,7 +509,11 @@ void SynchronizeWithFile(bool bReplace) {
 int LastLine=0;
 BOOL ClockPresent=FALSE;
 
-void FindIfClockPresent() {
+void FindIfClockPresent()
+{
+#ifdef FAR3
+	ClockPresent = FALSE;
+#endif
 	HKEY Key;
 #ifdef UNICODE
 	RegCreateKeyEx(HKEY_CURRENT_USER,_T("Software\\Far2\\Screen"),0,NULL,0,KEY_ALL_ACCESS,NULL,&Key,NULL);
@@ -651,16 +680,25 @@ void OEMToEditor(string &String) {
 
 #endif
 
-void EctlGetString(EditorGetString *String) {
+void EctlGetString(EditorGetString *String)
+{
+#ifdef FAR3
+	String->StructSize = sizeof(EditorGetString);
+#endif
 	StartupInfo.EditorControl(ECTL_GETSTRING, String);
 }
 
-tstring EctlGetString(int nLine) {
+tstring EctlGetString(int nLine)
+{
 	if (nLine >= 0) {
 		EditorSetPosition Position = {nLine,-1,-1,-1,-1,-1};
 		EctlSetPosition(&Position);
 	}
+#ifdef FAR3
+	EditorGetString String = {sizeof(EditorGetString), -1};
+#else
 	EditorGetString String = {-1};
+#endif
 	StartupInfo.EditorControl(ECTL_GETSTRING, &String);
 	return ToString(String);
 }

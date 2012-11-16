@@ -126,7 +126,11 @@ void DoEditReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, cons
 		EctlSetPosition(&Position);
 	} else {
 		EctlForceSetPosition(&Position);
+#ifdef FAR3
+		EditorSelect Select = {sizeof(EditorSelect), BTYPE_NONE};
+#else
 		EditorSelect Select = {BTYPE_NONE};
+#endif
 		StartupInfo.EditorControl(ECTL_REDRAW, NULL);
 		StartupInfo.EditorControl(ECTL_SELECT, &Select);
 	}
@@ -158,7 +162,11 @@ eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &
 	LastReplaceLine = Position.CurLine;
 	LastReplacePos = Position.CurPos;
 
+#ifdef FAR3
+	EditorSelect Select = {sizeof(EditorSelect), BTYPE_STREAM, FirstLine, StartPos, EndPos-StartPos, LastLine-FirstLine + 1};
+#else
 	EditorSelect Select = {BTYPE_STREAM, FirstLine, StartPos, EndPos-StartPos, LastLine-FirstLine + 1};
+#endif
 
 	int Result;
 	if (!NoAsking) {

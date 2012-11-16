@@ -72,7 +72,8 @@ tstring GetNextLine(ViewerInfo &VInfo, char *szData, int nLength, int &nSkip) {
 	}
 }
 
-void SetViewerSelection(__int64 nStart, int nLength, int nCharSize) {
+void SetViewerSelection(__int64 nStart, int nLength, int nCharSize)
+{
 	ViewerSelect VSelect = {nStart / nCharSize, nLength / nCharSize};
 	StartupInfo.ViewerControl(VCTL_SELECT, &VSelect);
 
@@ -81,7 +82,8 @@ void SetViewerSelection(__int64 nStart, int nLength, int nCharSize) {
 	g_bInterrupted = TRUE;
 }
 
-BOOL ViewerSearchAgain() {
+BOOL ViewerSearchAgain()
+{
 	ViewerInfo VInfo;
 	VInfo.StructSize=sizeof(VInfo);
 	StartupInfo.ViewerControl(VCTL_GETINFO, &VInfo);
@@ -106,7 +108,14 @@ BOOL ViewerSearchAgain() {
 	bool bUnicode  = IsUnicode(VInfo.CurMode);
 	int  nCharSize = bUnicode ? 2 : 1;
 
+#ifdef FAR3
+	wchar_t szFileName[MAX_PATH];
+	StartupInfo.ViewerControl(VCTL_GETFILENAME, szFileName);
+	CFileMapping mapInput(szFileName);
+#else
 	CFileMapping mapInput(VInfo.FileName);
+#endif
+
 	if (!mapInput) return FALSE;
 	char *szData = mapInput;
 	if (!szData) return FALSE;

@@ -234,9 +234,9 @@ void AddFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems, bool bSear
 	Item.CustomColumnNumber = 0;
 
 	if (!FText.empty() && !FSInverse)
-		Item.UserData = (DWORD)new TempUserData(g_nFoundLine, g_nFoundColumn, bSearch);
+		Item.UData() = (DWORD)new TempUserData(g_nFoundLine, g_nFoundColumn, bSearch);
 	else
-		Item.UserData = (DWORD)new TempUserData(-1, -1, bSearch);
+		Item.UData() = (DWORD)new TempUserData(-1, -1, bSearch);
 
 	PanelItems.push_back(Item);
 }

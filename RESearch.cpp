@@ -1054,7 +1054,12 @@ void ConfigureEditor() {
 	Dialog.Display(-1);
 }
 
-int WINAPI FAR_EXPORT(Configure)(int ItemNumber) {
+#ifdef FAR3
+intptr_t WINAPI ConfigureW(const struct ConfigureInfo *Info)
+#else
+int WINAPI FAR_EXPORT(Configure)(int ItemNumber)
+#endif
+{
 	const TCHAR *ppszItems[]={
 		GetMsg(MCommonSettings),
 		GetMsg(MFileSearchSettings),
