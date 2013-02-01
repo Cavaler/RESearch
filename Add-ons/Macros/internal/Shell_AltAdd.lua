@@ -1,0 +1,5 @@
+area="Shell"
+key="AltAdd"
+flags="DisableOutput"
+description=""
+code="Keys(\"F11 s l\")"

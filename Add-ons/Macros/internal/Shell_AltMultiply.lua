@@ -1,0 +1,5 @@
+area="Shell"
+key="AltMultiply"
+flags="DisableOutput"
+description=""
+code="Keys(\"F11 s f\")"

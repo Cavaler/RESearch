@@ -1,0 +1,5 @@
+area="Shell"
+key="AltSubtract"
+flags="DisableOutput"
+description=""
+code="Keys(\"F11 s u\")"
