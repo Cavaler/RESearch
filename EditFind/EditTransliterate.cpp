@@ -23,7 +23,7 @@ void EditorTransliterateString(EditorGetString &String, int nStartPos = 0, int n
 	}
 
 	if (strData != strOrigData) {
-		EditorSetString SetString = {-1};
+		CEditorSetString SetString(-1);
 
 		SetString.StringText = strData.data();
 		SetString.StringLength = strData.length();
@@ -38,8 +38,8 @@ BOOL EditorTransliterateAgain() {
 
 	CDebugTimer tm(_T("EditTransliterate() took %d ms"));
 
-	EditorSetPosition Position = {0, 0, 0, -1, -1, -1};
-	EditorGetString String = {-1};
+	EditorSetPosition Position = {ITEM_SS(EditorSetPosition) 0, 0, 0, -1, -1, -1};
+	EditorGetString String = {ITEM_SS(EditorGetString) -1};
 
 	EditorStartUndo();
 

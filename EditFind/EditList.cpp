@@ -41,9 +41,9 @@ BOOL EditorListAllAgain() {
 		int LastLine = (ESeveralLine) ? EdInfo.TotalLines-1 : CurrentLine;
 
 		if (SearchInText(FirstLine, StartPos, LastLine, EndPos)) {
-			EditorSetPosition Position={FirstLine,-1,-1,-1,-1,-1};
+			EditorSetPosition Position={ITEM_SS(EditorSetPosition) FirstLine,-1,-1,-1,-1,-1};
 			EctlSetPosition(&Position);
-			EditorGetString String = {-1};
+			EditorGetString String = {ITEM_SS(EditorGetString) -1};
 			EctlGetString(&String);
 
 			TCHAR szNumber[8];
@@ -107,7 +107,7 @@ BOOL EditorListAllShowResults(bool bImmediate) {
 		sFindOneInfo &OneInfo = Info.arrLines[nResult];
 		EditorSearchOK(OneInfo.FirstLine, OneInfo.StartPos, OneInfo.LastLine, OneInfo.EndPos);
 	} else {
-		EditorSetPosition Position = {EdInfo.CurLine, EdInfo.CurPos, EdInfo.CurTabPos, 
+		EditorSetPosition Position = {ITEM_SS(EditorSetPosition) EdInfo.CurLine, EdInfo.CurPos, EdInfo.CurTabPos, 
 			EdInfo.TopScreenLine, EdInfo.LeftPos, -1};
 		EctlForceSetPosition(&Position);
 	}

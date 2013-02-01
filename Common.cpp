@@ -68,7 +68,8 @@ void WriteRegistry()
 	g_pPanelBatches->Save (hKey.Open(_T("PanelBatches" )));
 }
 
-bool CheckUsage(const tstring &strText, bool bRegExp, bool bSeveralLine) {
+bool CheckUsage(const tstring &strText, bool bRegExp, bool bSeveralLine)
+{
 	if (!g_bShowUsageWarnings) return true;
 
 	if (!bRegExp) {
@@ -92,7 +93,8 @@ bool CheckUsage(const tstring &strText, bool bRegExp, bool bSeveralLine) {
 	return true;
 }
 
-BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const tstring &Text,int CaseSensitive,const unsigned char *pTables) {
+BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const tstring &Text,int CaseSensitive,const unsigned char *pTables)
+{
 	if (Text.empty()) return FALSE;		// WAS: Not needed if empty NOW: what is search for nothing?
 	const TCHAR *ErrPtr;
 	int ErrOffset;
@@ -123,7 +125,8 @@ BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const tstring &Text
 }
 
 #ifdef UNICODE
-BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,int CaseSensitive,const unsigned char *pTables) {
+BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,int CaseSensitive,const unsigned char *pTables)
+{
 	if (Text.empty()) return FALSE;		// WAS: Not needed if empty NOW: what is search for nothing?
 	const char *ErrPtr;
 	int ErrOffset;
@@ -197,7 +200,8 @@ void OEMMatchDone()
 #endif
 }
 
-void HighlightREError(CFarDialog *pDlg) {
+void HighlightREError(CFarDialog *pDlg)
+{
 	if (REErrorOffset < 0) return;
 
 	int nIndex = pDlg->GetIndex(REErrorField);
@@ -211,7 +215,8 @@ void HighlightREError(CFarDialog *pDlg) {
 }
 
 #ifndef UNICODE
-TCHAR ConvertCase_OEM(TCHAR C) {
+TCHAR ConvertCase_OEM(TCHAR C)
+{
 	TCHAR Ansi,Oem;
 
 	OemToCharBuff(&C,&Ansi,1);
@@ -234,7 +239,8 @@ TCHAR ConvertCase_OEM(TCHAR C) {
 	return C;
 }
 
-TCHAR ConvertCase(TCHAR C) {
+TCHAR ConvertCase(TCHAR C)
+{
 	if (OneCaseConvert == CCV_NONE) return C;
 
 	if (m_pReplaceTable) {
@@ -259,7 +265,8 @@ TCHAR ConvertCase(TCHAR C) {
 	return C;
 }
 #else
-TCHAR ConvertCase(TCHAR C) {
+TCHAR ConvertCase(TCHAR C)
+{
 	if (OneCaseConvert == CCV_NONE) return C;
 
 	TCHAR cUp = (TCHAR)CharUpper((LPTSTR)C);
@@ -285,11 +292,13 @@ TCHAR ConvertCase(TCHAR C) {
 
 #ifdef UNICODE
 
-string EvaluateReplaceString(CREParameters<CHAR> &Param, const CHAR *Replace, const CHAR *EOL, int Engine) {
+string EvaluateReplaceString(CREParameters<CHAR> &Param, const CHAR *Replace, const CHAR *EOL, int Engine)
+{
 	return string();
 }
 
-void BuildUpCaseTable(UINT nCP, char *pTable) {
+void BuildUpCaseTable(UINT nCP, char *pTable)
+{
 	for (unsigned short nChar=0; nChar<256; nChar++) {
 		WCHAR wChar, wCharU, wCharL;
 		MultiByteToWideChar(nCP, 0, (char *)&nChar, 1, &wChar, 1);
@@ -303,7 +312,8 @@ void BuildUpCaseTable(UINT nCP, char *pTable) {
 	}
 }
 
-char *GetUpCaseTable(int nCP) {
+char *GetUpCaseTable(int nCP)
+{
 	if (nCP == -1) nCP = (g_bDefaultOEM ? CP_OEMCP : CP_ACP);
 
 	upcase_map::iterator it = UpCaseTables.find(nCP);
@@ -317,7 +327,8 @@ char *GetUpCaseTable(int nCP) {
 	return it->second;
 }
 
-void PrepareLocaleStuff() {
+void PrepareLocaleStuff()
+{
 	for (int nChar=0;nChar<65536;nChar++) UpCaseTable[nChar]=nChar;
 	UpCaseTable[65536]=0;
 	CharUpper(UpCaseTable+1);
@@ -331,7 +342,8 @@ void PrepareLocaleStuff() {
 	ANSICharTables = pcre_maketables();
 }
 
-tstring UpCaseString(const tstring &strText) {
+tstring UpCaseString(const tstring &strText)
+{
 	tstring strUpCase = strText;
 
 	CharUpper((LPTSTR)strUpCase.c_str());	// Bad but efficient
@@ -341,7 +353,8 @@ tstring UpCaseString(const tstring &strText) {
 
 #else
 
-void PrepareLocaleStuff() {
+void PrepareLocaleStuff()
+{
 //	Not .ACP / .OCP - they set locale based on "Standarts and Formats",
 //	not "Language for non-Unicode programs"
 	setlocale(LC_ALL, FormatStr(".%d", GetOEMCP()).c_str());
@@ -362,7 +375,8 @@ void PrepareLocaleStuff() {
 	}
 }
 
-string UpCaseString(const string &strText) {
+string UpCaseString(const string &strText)
+{
 	string strUpCase = strText;
 
 	for (size_t I=0; I<strUpCase.size(); I++)
@@ -387,7 +401,8 @@ typedef int BMHTable[256];
 typedef struct {BMHTable m_Table;} BMHTableRec;
 vector<BMHTableRec> g_BMHTables;
 
-void PrepareBMHSearch(const TCHAR *String,int StringLength,size_t nPattern) {
+void PrepareBMHSearch(const TCHAR *String,int StringLength,size_t nPattern)
+{
 	if (nPattern >= g_BMHTables.size()) g_BMHTables.resize(nPattern+1);
 
 	BMHTable &Table = g_BMHTables[nPattern].m_Table;
@@ -403,7 +418,8 @@ void PrepareBMHSearch(const TCHAR *String,int StringLength,size_t nPattern) {
 		for (int I=0;I<StringLength-1;I++) Table[((UTCHAR *)String)[I]]=StringLength-I-1;
 }
 
-int BMHSearch(const TCHAR *Buffer,int BufferLength,const TCHAR *String,int StringLength,TCHAR *XLatTable,int nPattern) {
+int BMHSearch(const TCHAR *Buffer,int BufferLength,const TCHAR *String,int StringLength,TCHAR *XLatTable,int nPattern)
+{
 	UTCHAR *Buf=(UTCHAR *)Buffer;
 	UTCHAR *Str=(UTCHAR *)String;
 	BMHTable &Table = g_BMHTables[nPattern].m_Table;
@@ -422,7 +438,8 @@ int BMHSearch(const TCHAR *Buffer,int BufferLength,const TCHAR *String,int Strin
 
 #ifdef UNICODE
 
-void PrepareBMHSearchA(const char *String,int StringLength) {
+void PrepareBMHSearchA(const char *String,int StringLength)
+{
 	BMHTableA &Table = g_BMHTableA;//g_BMHTables[nPattern].m_Table;
 	for (int I=0;I<256;I++) Table[I]=StringLength;
 
@@ -432,7 +449,8 @@ void PrepareBMHSearchA(const char *String,int StringLength) {
 		for (int I=0;I<StringLength-1;I++) Table[((BYTE *)String)[I]]=StringLength-I-1;
 }
 
-int BMHSearchA(const char *Buffer,int BufferLength,const char *String,int StringLength,char *XLatTable) {
+int BMHSearchA(const char *Buffer,int BufferLength,const char *String,int StringLength,char *XLatTable)
+{
 	BYTE *Buf=(BYTE *)Buffer;
 	BYTE *Str=(BYTE *)String;
 	BMHTableA &Table = g_BMHTableA;//g_BMHTables[nPattern].m_Table;
@@ -450,7 +468,8 @@ int BMHSearchA(const char *Buffer,int BufferLength,const char *String,int String
 }
 #endif
 
-int ReverseBMHSearch(const TCHAR *Buffer,int BufferLength,const TCHAR *String,int StringLength,TCHAR *XLatTable,int nPattern) {
+int ReverseBMHSearch(const TCHAR *Buffer,int BufferLength,const TCHAR *String,int StringLength,TCHAR *XLatTable,int nPattern)
+{
 	UTCHAR *Buf=(UTCHAR*)Buffer;
 	UTCHAR *Str=(UTCHAR *)String;
 	BMHTable &Table = g_BMHTables[nPattern].m_Table;
@@ -477,7 +496,8 @@ tstring UniToHex(wstring &wstrUnicode) {
 	return strHex;
 }
 
-wstring HexToUni(tstring strHex) {
+wstring HexToUni(tstring strHex)
+{
 	wstring wstrUnicode;
 	size_t nStart = 0;
 	while (nStart < strHex.length()) {
@@ -495,7 +515,8 @@ wstring HexToUni(tstring strHex) {
 	return wstrUnicode;
 }
 
-void EditorStartUndo() {
+void EditorStartUndo()
+{
 #ifdef UNICODE
 	EditorUndoRedo UR;
 	UR.Command = EUR_BEGIN;
@@ -504,7 +525,8 @@ void EditorStartUndo() {
 #endif
 }
 
-void EditorEndUndo() {
+void EditorEndUndo()
+{
 #ifdef UNICODE
 	EditorUndoRedo UR;
 	UR.Command = EUR_END;
@@ -513,12 +535,14 @@ void EditorEndUndo() {
 #endif
 }
 
-void ShowErrorMsg(const TCHAR *sz1, const TCHAR *sz2, const TCHAR *szHelp) {
+void ShowErrorMsg(const TCHAR *sz1, const TCHAR *sz2, const TCHAR *szHelp)
+{
 	const TCHAR *Lines[]={GetMsg(MREReplace),sz1,sz2,GetMsg(MOk)};
 	StartupInfo.Message(FMSG_WARNING,szHelp,Lines,4,1);
 }
 
-void ShowHResultError(int nError, HRESULT hResult, const TCHAR *szHelp) {
+void ShowHResultError(int nError, HRESULT hResult, const TCHAR *szHelp)
+{
 	TCHAR *szMessage;
 	FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER|FORMAT_MESSAGE_FROM_SYSTEM,
 		NULL, hResult, 0, (LPTSTR)&szMessage, 0, NULL);
@@ -558,7 +582,8 @@ int g_offsetcount;
 int g_result;
 
 #ifdef UNICODE
-DWORD WINAPI REThreadProc(LPVOID lpParameter) {
+DWORD WINAPI REThreadProc(LPVOID lpParameter)
+{
 	HANDLE hRE[] = {g_hREReady, g_hREReadyA};
 
 	while (true) {
@@ -579,7 +604,8 @@ DWORD WINAPI REThreadProc(LPVOID lpParameter) {
 	}
 }
 #else
-DWORD WINAPI REThreadProc(LPVOID lpParameter) {
+DWORD WINAPI REThreadProc(LPVOID lpParameter)
+{
 	while (true) {
 		if (WaitForSingleObject(g_hREReady, 60000) == WAIT_TIMEOUT) {
 			CloseHandle(g_hREThread);
@@ -593,12 +619,14 @@ DWORD WINAPI REThreadProc(LPVOID lpParameter) {
 }
 #endif
 
-void StartREThread() {
+void StartREThread()
+{
 	DWORD dwThreadID;
 	g_hREThread = CreateThread(NULL, g_nThreadStackMB*1024*1024, REThreadProc, NULL, /*CREATE_SUSPENDED*/0, &dwThreadID);
 }
 
-void StopREThread() {
+void StopREThread()
+{
 	TerminateThread(g_hREThread, 0);
 	CloseHandle(g_hREThread);
 	g_hREThread = NULL;
@@ -656,7 +684,8 @@ int do_pcre_execA(const pcre *external_re, const pcre_extra *extra_data,
 }
 #endif
 
-BOOL SystemToLocalTime(FILETIME &ft) {
+BOOL SystemToLocalTime(FILETIME &ft)
+{
 	TIME_ZONE_INFORMATION tzi;
 	DWORD dwRes = GetTimeZoneInformation(&tzi);
 	if (dwRes != TIME_ZONE_ID_INVALID) {
@@ -671,7 +700,8 @@ BOOL SystemToLocalTime(FILETIME &ft) {
 	return TRUE;
 }
 
-BOOL LocalToSystemTime(FILETIME &ft) {
+BOOL LocalToSystemTime(FILETIME &ft)
+{
 	TIME_ZONE_INFORMATION tzi;
 	DWORD dwRes = GetTimeZoneInformation(&tzi);
 	if (dwRes != TIME_ZONE_ID_INVALID) {
@@ -686,7 +716,8 @@ BOOL LocalToSystemTime(FILETIME &ft) {
 	return TRUE;
 }
 
-void RunExternalEditor(tstring &strText) {
+void RunExternalEditor(tstring &strText)
+{
 	if ((strText.length() > 3) && (strText[1] == ':') && (strText[2] == '\\')) {
 #ifdef UNICODE
 		StartupInfo.Editor(strText.c_str(), NULL, 0, 0, -1, -1, 0, 0, 1, CP_AUTODETECT);
@@ -726,7 +757,8 @@ void RunExternalEditor(tstring &strText) {
 	}
 }
 
-void RefreshConsoleInfo() {
+void RefreshConsoleInfo()
+{
 	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &ConInfo);
 }
 

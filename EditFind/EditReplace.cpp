@@ -10,9 +10,10 @@ int LastReplaceLine, LastReplacePos;
 bool bShowNoFound;
 bool bCachedReplace;
 
-void DoEditReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, const tstring &Replace) {
-	EditorSetPosition Position = {-1,-1,-1,-1,-1,-1};
-	EditorGetString GetString = {-1};
+void DoEditReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, const tstring &Replace)
+{
+	EditorSetPosition Position = {ITEM_SS(EditorSetPosition) -1,-1,-1,-1,-1,-1};
+	EditorGetString GetString = {ITEM_SS(EditorGetString) -1};
 	int I;
 
 	// Quite a special case
@@ -126,11 +127,7 @@ void DoEditReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, cons
 		EctlSetPosition(&Position);
 	} else {
 		EctlForceSetPosition(&Position);
-#ifdef FAR3
-		EditorSelect Select = {sizeof(EditorSelect), BTYPE_NONE};
-#else
-		EditorSelect Select = {BTYPE_NONE};
-#endif
+		EditorSelect Select = {ITEM_SS(EditorSelect) BTYPE_NONE};
 		StartupInfo.EditorControl(ECTL_REDRAW, NULL);
 		StartupInfo.EditorControl(ECTL_SELECT, &Select);
 	}
@@ -157,16 +154,12 @@ eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &
 
 	LastReplaceLine = LastLine;LastReplacePos = EndPos;
 
-	EditorSetPosition Position;
+	EditorSetPosition Position INIT_SS(EditorSetPosition);
 	GetHighlightPosition(Position, FirstLine, StartPos, LastLine, EndPos);
 	LastReplaceLine = Position.CurLine;
 	LastReplacePos = Position.CurPos;
 
-#ifdef FAR3
-	EditorSelect Select = {sizeof(EditorSelect), BTYPE_STREAM, FirstLine, StartPos, EndPos-StartPos, LastLine-FirstLine + 1};
-#else
-	EditorSelect Select = {BTYPE_STREAM, FirstLine, StartPos, EndPos-StartPos, LastLine-FirstLine + 1};
-#endif
+	EditorSelect Select = {ITEM_SS(EditorSelect) BTYPE_STREAM, FirstLine, StartPos, EndPos-StartPos, LastLine-FirstLine + 1};
 
 	int Result;
 	if (!NoAsking) {
@@ -384,8 +377,8 @@ BOOL ReplaceInTextByLine(int FirstLine, int StartPos, int LastLine, int EndPos, 
 		}
 
 		if (bCachedReplace && Matched && NoAsking) {
-			EditorSetString SetString;
-			SetString.StringNumber = -1;
+			CEditorSetString SetString(-1);
+
 			if (g_LineBuffer.empty()) {
 				SetString.StringText   = NULL;
 				SetString.StringLength = 0;
@@ -470,7 +463,7 @@ BOOL EditorReplaceAgain()
 	}
 
 	RefreshEditorInfo();
-	EditorSetPosition Position = {LastReplaceLine, LastReplacePos, -1,
+	EditorSetPosition Position = {ITEM_SS(EditorSetPosition) LastReplaceLine, LastReplacePos, -1,
 		TopLine(LastReplaceLine), LeftColumn(LastReplacePos),-1};
 	EctlForceSetPosition(&Position);
 

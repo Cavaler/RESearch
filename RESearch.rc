@@ -88,7 +88,7 @@ BEGIN
             VALUE "FileDescription", PLUGIN_DESCRIPTION
             VALUE "FileVersion", PLUGIN_VERSION_STRING
             VALUE "InternalName", PLUGIN_NAME
-            VALUE "LegalCopyright", "Copyright © Pavel Kostromitinov, 2005-2012"
+            VALUE "LegalCopyright", "Copyright © Pavel Kostromitinov, 2000-2013"
             VALUE "OriginalFilename", "RESearch.dll"
             VALUE "ProductName", PLUGIN_DESCRIPTION
             VALUE "ProductVersion", PLUGIN_VERSION_STRING

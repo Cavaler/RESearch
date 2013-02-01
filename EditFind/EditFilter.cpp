@@ -1,11 +1,13 @@
 #include "StdAfx.h"
 #include "..\RESearch.h"
 
-BOOL EditorFilterAgain() {
+BOOL EditorFilterAgain()
+{
 	RefreshEditorInfo();
 	EctlForceSetPosition(NULL);
-	EditorSetPosition Position={0,-1,-1,-1,-1,-1};
-	EditorGetString String={-1};
+
+	EditorSetPosition Position = {ITEM_SS(EditorSetPosition) 0,-1,-1,-1,-1,-1};
+	EditorGetString String = {ITEM_SS(EditorGetString) -1};
 
 	CDebugTimer tm(_T("EditFilter() took %d ms"));
 

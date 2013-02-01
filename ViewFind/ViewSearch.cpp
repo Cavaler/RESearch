@@ -17,7 +17,8 @@ bool IsUnicode(const ViewerMode &Mode) {
 }
 
 #ifndef UNICODE
-string ToOEM(ViewerInfo &VInfo, const char *szData, int nLength) {
+string ToOEM(ViewerInfo &VInfo, const char *szData, int nLength)
+{
 	if (nLength == 0) return "";
 
 	if (VInfo.CurMode.AnsiMode) {
@@ -37,7 +38,8 @@ string ToOEM(ViewerInfo &VInfo, const char *szData, int nLength) {
 }
 #endif
 
-tstring GetNextLine(ViewerInfo &VInfo, char *szData, int nLength, int &nSkip) {
+tstring GetNextLine(ViewerInfo &VInfo, char *szData, int nLength, int &nSkip)
+{
 	if (IsUnicode(VInfo.CurMode)) {
 		const wchar_t *wszData = (const wchar_t *)szData;
 		const wchar_t *wszCur = wszData;
@@ -74,10 +76,10 @@ tstring GetNextLine(ViewerInfo &VInfo, char *szData, int nLength, int &nSkip) {
 
 void SetViewerSelection(__int64 nStart, int nLength, int nCharSize)
 {
-	ViewerSelect VSelect = {nStart / nCharSize, nLength / nCharSize};
+	ViewerSelect VSelect = {ITEM_SS(ViewerSelect) nStart / nCharSize, nLength / nCharSize};
 	StartupInfo.ViewerControl(VCTL_SELECT, &VSelect);
 
-	ViewerSetPosition VPos = {/*VSP_NOREDRAW*/0, (nStart > 256) ? nStart-256 : 0, 0};
+	ViewerSetPosition VPos = {ITEM_SS(ViewerSetPosition) /*VSP_NOREDRAW*/0, (nStart > 256) ? nStart-256 : 0, 0};
 	StartupInfo.ViewerControl(VCTL_SETPOSITION, &VPos);
 	g_bInterrupted = TRUE;
 }
@@ -180,7 +182,8 @@ BOOL ViewerSearchAgain()
 	return TRUE;
 }
 
-BOOL ViewerSearch() {
+BOOL ViewerSearch()
+{
 	ViewerInfo VInfo;
 	VInfo.StructSize=sizeof(VInfo);
 	StartupInfo.ViewerControl(VCTL_GETINFO, &VInfo);
@@ -229,7 +232,8 @@ BOOL ViewerSearch() {
 	return TRUE;
 }
 
-BOOL CVSPresetCollection::EditPreset(CPreset *pPreset) {
+BOOL CVSPresetCollection::EditPreset(CPreset *pPreset)
+{
 	CFarDialog Dialog(76,16,_T("VSPresetDlg"));
 	Dialog.AddFrame(MVSPreset);
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
@@ -254,6 +258,7 @@ BOOL CVSPresetCollection::EditPreset(CPreset *pPreset) {
 	} while (true);
 }
 
-OperationResult ViewSearchExecutor() {
+OperationResult ViewSearchExecutor()
+{
 	return OR_CANCEL;
 }

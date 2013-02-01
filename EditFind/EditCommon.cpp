@@ -172,8 +172,8 @@ void FillLineBuffer(size_t FirstLine, size_t LastLine) {
 		g_FirstLine = (EReverse) ? LastLine : FirstLine;
 	}
 
-	EditorGetString String;
-	EditorSetPosition Position={0,-1,-1,-1,-1,-1};
+	EditorGetString String INIT_SS(EditorGetString);
+	EditorSetPosition Position={ITEM_SS(EditorSetPosition) 0,-1,-1,-1,-1,-1};
 
 	String.StringNumber=-1;
 
@@ -326,11 +326,7 @@ int  TopLine(int FirstLine, int NeededLine, int LastLine) {
 
 int RealToTab(int AtPosition)
 {
-#ifdef FAR3
-	EditorConvertPos ConvertPos={sizeof(EditorConvertPos), -1, AtPosition, 0};
-#else
-	EditorConvertPos ConvertPos={-1, AtPosition, 0};
-#endif
+	EditorConvertPos ConvertPos={ITEM_SS(EditorConvertPos) -1, AtPosition, 0};
 	StartupInfo.EditorControl(ECTL_REALTOTAB, &ConvertPos);
 	return ConvertPos.DestPos;
 }
@@ -384,7 +380,8 @@ void GetHighlightPosition(EditorSetPosition &Position, int FirstLine,int StartPo
 	}
 }
 
-void SaveSelection() {
+void SaveSelection()
+{
 	int I;
 
 	RefreshEditorInfo();
@@ -401,20 +398,18 @@ void SaveSelection() {
 	}
 }
 
-void RestoreSelection() {
+void RestoreSelection()
+{
 	if (SelType!=BTYPE_NONE) {
-#ifdef FAR3
-		EditorSelect Select={sizeof(EditorSelect),SelType,SelStartLine,SelStartPos,SelEndPos-SelStartPos,SelEndLine-SelStartLine+1};
-#else
-		EditorSelect Select={SelType,SelStartLine,SelStartPos,SelEndPos-SelStartPos,SelEndLine-SelStartLine+1};
-#endif
+		EditorSelect Select={ITEM_SS(EditorSelect) SelType,SelStartLine,SelStartPos,SelEndPos-SelStartPos,SelEndLine-SelStartLine+1};
 		StartupInfo.EditorControl(ECTL_SELECT,&Select);
 		SelType=BTYPE_NONE;
 	}
 }
 
-void RestorePosition(const EditorInfo &StartEdInfo) {
-	EditorSetPosition Position;
+void RestorePosition(const EditorInfo &StartEdInfo)
+{
+	EditorSetPosition Position INIT_SS(EditorSetPosition);
 	Position.CurLine = StartEdInfo.CurLine;
 	Position.CurPos = StartEdInfo.CurPos;
 	Position.CurTabPos = StartEdInfo.CurTabPos;
@@ -424,8 +419,11 @@ void RestorePosition(const EditorInfo &StartEdInfo) {
 	EctlForceSetPosition(&Position);
 }
 
-BOOL EPreparePattern(tstring &SearchText) {
+BOOL EPreparePattern(tstring &SearchText)
+{
 	ECleanup(TRUE);
+
+	if (SearchText.empty()) return FALSE;
 
 	if (!CheckUsage(SearchText, ERegExp!=0, ESeveralLine!=0)) return FALSE;
 
@@ -484,7 +482,8 @@ void ECleanup(BOOL PatternOnly)
 	}
 }
 
-void SynchronizeWithFile(bool bReplace) {
+void SynchronizeWithFile(bool bReplace)
+{
 	ECaseSensitive = FCaseSensitive;
 	EReverse = FALSE;
 
@@ -563,7 +562,8 @@ void ShowCurrentLine(int CurLine,int TotalLines,int TotalColumns)
 	}
 }
 
-tstring PickupSelection() {
+tstring PickupSelection()
+{
 	EditorGetString String;
 
 	RefreshEditorInfo();
@@ -694,34 +694,43 @@ tstring EctlGetString(int nLine)
 		EditorSetPosition Position = {nLine,-1,-1,-1,-1,-1};
 		EctlSetPosition(&Position);
 	}
-#ifdef FAR3
-	EditorGetString String = {sizeof(EditorGetString), -1};
-#else
-	EditorGetString String = {-1};
-#endif
+	EditorGetString String = {ITEM_SS(EditorGetString) -1};
 	StartupInfo.EditorControl(ECTL_GETSTRING, &String);
 	return ToString(String);
 }
 
-tstring ToString(EditorGetString &String) {
+tstring ToString(EditorGetString &String)
+{
 	return CSO::MakeString(String.StringText, String.StringLength);
 }
 
-void EctlSetString(EditorSetString *String) {
+void EctlSetString(EditorSetString *String)
+{
+#ifdef FAR3
+	String->StructSize = sizeof(EditorSetString);
+#endif
 	StartupInfo.EditorControl(ECTL_SETSTRING, String);
 }
 
 int _nOldLine = -2;
 
-void EctlSetPosition(EditorSetPosition *Position) {
+void EctlSetPosition(EditorSetPosition *Position)
+{
+#ifdef FAR3
+	Position->StructSize = sizeof(EditorSetPosition);
+#endif
 	if (Position->CurLine == _nOldLine) return;
 	StartupInfo.EditorControl(ECTL_SETPOSITION, Position);
 //	OutputDebugString(FormatStr("ESP %d\r\n", Position->CurLine).c_str());
 	_nOldLine = Position->CurLine;
 }
 
-void EctlForceSetPosition(EditorSetPosition *Position) {
+void EctlForceSetPosition(EditorSetPosition *Position)
+{
 	if (Position) {
+#ifdef FAR3
+		Position->StructSize = sizeof(EditorSetPosition);
+#endif
 		StartupInfo.EditorControl(ECTL_SETPOSITION, Position);
 		_nOldLine = Position->CurLine;
 	} else {
@@ -729,7 +738,11 @@ void EctlForceSetPosition(EditorSetPosition *Position) {
 	}
 }
 
-void RefreshEditorInfo() {
+void RefreshEditorInfo()
+{
+#ifdef FAR3
+	EdInfo.StructSize = sizeof(EditorInfo);
+#endif
 	StartupInfo.EditorControl(ECTL_GETINFO, &EdInfo);
 #ifdef UNICODE
 	size_t FileNameSize=StartupInfo.EditorControl(ECTL_GETFILENAME, NULL);
@@ -754,20 +767,21 @@ void EditorFillNamedParameters()
 #endif
 }
 
-void EditorSeekToBeginEnd() {
+void EditorSeekToBeginEnd()
+{
 	if (EReverse) {
 		RefreshEditorInfo();
 
-		EditorSetPosition Position = {EdInfo.TotalLines, 0, -1, -1, -1, -1};
+		EditorSetPosition Position = {ITEM_SS(EditorSetPosition) EdInfo.TotalLines, 0, -1, -1, -1, -1};
 		EctlSetPosition(&Position);
 
-		EditorSetString String = {-1};
+		CEditorSetString String(-1);
 		EctlSetString(&String);
 
 		Position.CurPos = String.StringLength;
 		EctlSetPosition(&Position);
 	} else {
-		EditorSetPosition Position = {0, 0, 0, -1, -1, -1};
+		EditorSetPosition Position = {ITEM_SS(EditorSetPosition) 0, 0, 0, -1, -1, -1};
 		EctlSetPosition(&Position);
 	}
 }
