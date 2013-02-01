@@ -10,8 +10,17 @@ Planned:
 	? Searching in streams
 	? Preset can start from current position
 
+Known bugs:
+	- Replace changing part of (real) EOL crashes
+
+Version 7.63 (01.02.2013)
+	- Fixes for upated Far3 API
+
+Version 7.62 (12.11.2012)
+	* Far3 version updated for latest API
+
 Version 7.61 (25.09.2012)
-	+ Far3 version stores settings in AppData, not registry
+	+ Far3 version stores settings in native Far3 storage, not registry
 
 Version 7.60 (06.09.2012)
 	! First public Far3 build, very unreliable

@@ -1,12 +1,15 @@
-Regular Expression Search and Replace, version 7.61
+Regular Expression Search and Replace, version 7.63
 by Kostromitinov Pavel, pavel@kostrom.spb.ru
 
 - Search using plain-text and regular expressions in files.
 
 - Search and Replace in editor using regular expressions and even script evaluation
 
+- Grep, Filter operations and much more
+
 - Renaming and selecting files using regular expressions
 
 - All non-editor operations accessible from command line
 
-Updates now available at http://www.kostrom.spb.ru/programs/far.en.html
+Announces:  http://forum.farmanager.com/viewtopic.php?f=11&t=931
+Discussion: http://forum.farmanager.com/viewtopic.php?f=5&t=307
