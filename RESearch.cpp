@@ -101,24 +101,31 @@ void BadCmdLine() {
 	StartupInfo.Message(FMSG_WARNING,_T("REInvalidCmdLine"),Lines,3,1);
 }
 
-BOOL ProcessFFLine(TCHAR *Line, BOOL *ShowDialog, INT_PTR *Item) {
-	TCHAR Switch=Line[0];
-	if (!Switch) {BadCmdLine();return FALSE;}
-	Line++;*ShowDialog=FALSE;*Item=0;
+BOOL ProcessFFLine(const TCHAR *Line, BOOL *ShowDialog, INT_PTR *Item)
+{
+	*Item = 0;
+	TCHAR Switch = Line[0];
+	if (Switch == 0) { *ShowDialog = TRUE; return TRUE; }
+
+	Line++;
+	*ShowDialog = FALSE;
 
 	if ((Switch==' ')||(Switch=='\t')) {
-		FText=Line;*Item=0;return TRUE;
+		FText=Line;
+		*Item=0;
+		return TRUE;
 	}
 
-	TCHAR *NextSwitch=_tcschr(Line,Switch);
-	if (!NextSwitch) {BadCmdLine();return FALSE;}
-	*NextSwitch=0;FMask=Line;
-	*NextSwitch=Switch;Line=NextSwitch+1;
+	const TCHAR *NextSwitch = _tcschr(Line,Switch);
+	if (!NextSwitch) { BadCmdLine(); return FALSE; }
 
-	NextSwitch=_tcsrchr(Line,Switch);
+	FMask = tstring(Line, NextSwitch-Line);
+	Line  = NextSwitch+1;
+
+	NextSwitch = _tcsrchr(Line,Switch);
 	if (NextSwitch) {
-		*NextSwitch=0;FText=Line;
-		*NextSwitch=Switch;Line=NextSwitch+1;
+		FText = tstring(Line, NextSwitch-Line);
+		Line  = NextSwitch+1;
 	} else {
 		FText=Line;
 	}
@@ -150,31 +157,35 @@ BOOL ProcessFFLine(TCHAR *Line, BOOL *ShowDialog, INT_PTR *Item) {
 	return TRUE;
 }
 
-BOOL ProcessFRLine(TCHAR *Line,BOOL *ShowDialog,INT_PTR *Item) {
-	TCHAR Switch=Line[0];
-	if (!Switch) {BadCmdLine();return FALSE;}
-	Line++;*ShowDialog=FALSE;*Item=1;
+BOOL ProcessFRLine(const TCHAR *Line,BOOL *ShowDialog,INT_PTR *Item)
+{
+	*Item = 1;
+	TCHAR Switch = Line[0];
+	if (!Switch) { *ShowDialog = TRUE; return TRUE; }
+
+	Line++;
+	*ShowDialog = FALSE;
 
 	if ((Switch==' ')||(Switch=='\t')) {
 		FText=Line;*Item=0;return TRUE;
 	}
 
-	TCHAR *NextSwitch=_tcschr(Line,Switch);
-	if (!NextSwitch) {BadCmdLine();return FALSE;}
-	*NextSwitch=0;FMask=Line;
-	*NextSwitch=Switch;Line=NextSwitch+1;
+	const TCHAR *NextSwitch = _tcschr(Line,Switch);
+	if (!NextSwitch) { BadCmdLine(); return FALSE; }
+	FMask = tstring(Line, NextSwitch-Line);
+	Line  = NextSwitch+1;
 
-	NextSwitch=_tcschr(Line,Switch);
-	if (!NextSwitch) {BadCmdLine();return FALSE;}
-	*NextSwitch=0;FText=Line;
-	*NextSwitch=Switch;Line=NextSwitch+1;
+	NextSwitch = _tcschr(Line,Switch);
+	if (!NextSwitch) { BadCmdLine(); return FALSE; }
+	FText = tstring(Line, NextSwitch-Line);
+	Line  = NextSwitch+1;
 
 	NextSwitch=_tcsrchr(Line,Switch);
 	if (NextSwitch) {
-		*NextSwitch=0;FRReplace=Line;
-		*NextSwitch=Switch;Line=NextSwitch+1;
+		FRReplace = tstring(Line, NextSwitch-Line);
+		Line = NextSwitch+1;
 	} else {
-		FRReplace=Line;
+		FRReplace = Line;
 	}
 
 	while (NextSwitch&&*Line) {
@@ -211,31 +222,37 @@ BOOL ProcessFRLine(TCHAR *Line,BOOL *ShowDialog,INT_PTR *Item) {
 	return TRUE;
 }
 
-BOOL ProcessRNLine(TCHAR *Line,BOOL *ShowDialog,INT_PTR *Item) {
-	TCHAR Switch=Line[0];
-	if (!Switch) {BadCmdLine();return FALSE;}
-	Line++;*ShowDialog=FALSE;*Item=7;
+BOOL ProcessRNLine(const TCHAR *Line,BOOL *ShowDialog,INT_PTR *Item)
+{
+	*Item = 7;
+	TCHAR Switch = Line[0];
+	if (!Switch) { *ShowDialog = TRUE; return TRUE; }
+
+	Line++;
+	*ShowDialog = FALSE;
 
 	if ((Switch==' ')||(Switch=='\t')) {
-		FText=Line;*Item=0;return TRUE;
+		FText=Line;
+		*Item=0;
+		return TRUE;
 	}
 
-	TCHAR *NextSwitch=_tcschr(Line,Switch);
-	if (!NextSwitch) {BadCmdLine();return FALSE;}
-	*NextSwitch=0;FMask=Line;
-	*NextSwitch=Switch;Line=NextSwitch+1;
+	const TCHAR *NextSwitch = _tcschr(Line,Switch);
+	if (!NextSwitch) { BadCmdLine(); return FALSE; }
+	FMask = tstring(Line, NextSwitch-Line);
+	Line  = NextSwitch+1;
 
-	NextSwitch=_tcschr(Line,Switch);
-	if (!NextSwitch) {BadCmdLine();return FALSE;}
-	*NextSwitch=0;FText=Line;
-	*NextSwitch=Switch;Line=NextSwitch+1;
+	NextSwitch = _tcschr(Line,Switch);
+	if (!NextSwitch) { BadCmdLine(); return FALSE; }
+	FText = tstring(Line, NextSwitch-Line);
+	Line  = NextSwitch+1;
 
-	NextSwitch=_tcsrchr(Line,Switch);
+	NextSwitch = _tcsrchr(Line,Switch);
 	if (NextSwitch) {
-		*NextSwitch=0;FRReplace=Line;
-		*NextSwitch=Switch;Line=NextSwitch+1;
+		FRReplace = tstring(Line, NextSwitch-Line);
+		Line = NextSwitch+1;
 	} else {
-		FRReplace=Line;
+		FRReplace = Line;
 	}
 
 	while (NextSwitch&&*Line) {
@@ -265,20 +282,24 @@ BOOL ProcessRNLine(TCHAR *Line,BOOL *ShowDialog,INT_PTR *Item) {
 	return TRUE;
 }
 
-BOOL ProcessQRLine(TCHAR *Line,BOOL *ShowDialog,INT_PTR *Item) {
-	TCHAR Switch=Line[0];
-	if (!Switch) {BadCmdLine();return FALSE;}
-	Line++;*ShowDialog=FALSE;*Item=8;
+BOOL ProcessQRLine(const TCHAR *Line,BOOL *ShowDialog,INT_PTR *Item)
+{
+	*Item = 8;
+	TCHAR Switch = Line[0];
+	if (!Switch) { *ShowDialog = TRUE; return TRUE; }
 
-	TCHAR *NextSwitch=_tcschr(Line,Switch);
-	if (!NextSwitch) {BadCmdLine();return FALSE;}
-	*NextSwitch=0;FText=Line;
-	*NextSwitch=Switch;Line=NextSwitch+1;
+	Line++;
+	*ShowDialog = FALSE;
 
-	NextSwitch=_tcsrchr(Line,Switch);
+	const TCHAR *NextSwitch = _tcschr(Line,Switch);
+	if (!NextSwitch) { BadCmdLine(); return FALSE; }
+	FText = tstring(Line, NextSwitch-Line);
+	Line  = NextSwitch+1;
+
+	NextSwitch = _tcsrchr(Line,Switch);
 	if (NextSwitch) {
-		*NextSwitch=0;FRReplace=Line;
-		*NextSwitch=Switch;Line=NextSwitch+1;
+		FRReplace = tstring(Line, NextSwitch-Line);
+		Line = NextSwitch+1;
 	} else {
 		FRReplace=Line;
 	}
@@ -304,7 +325,8 @@ BOOL ProcessQRLine(TCHAR *Line,BOOL *ShowDialog,INT_PTR *Item) {
 	return TRUE;
 }
 
-BOOL ProcessCommandLine(TCHAR *Line,BOOL *ShowDialog,INT_PTR *Item) {
+BOOL ProcessCommandLine(const TCHAR *Line,BOOL *ShowDialog,INT_PTR *Item)
+{
 //	f?:/mask/findtext/options
 //	f?:/mask/findtext/replacetext/options
 //	f?: FindText
@@ -318,9 +340,9 @@ BOOL ProcessCommandLine(TCHAR *Line,BOOL *ShowDialog,INT_PTR *Item) {
 	if (_tcsnicmp(Line,_T("qr:"),3)==0) return ProcessQRLine(Line+3,ShowDialog,Item);
 
 	TCHAR Switch=Line[0];
-	if (!Switch) {BadCmdLine();return FALSE;}
+	if (!Switch) { BadCmdLine(); return FALSE; }
 
-	TCHAR *NextSwitch;
+	const TCHAR *NextSwitch;
 	if ((Switch!=' ')&&(Switch!='\t')) {
 		if (NextSwitch=_tcschr(Line+1,Switch))
 			if (NextSwitch=_tcschr(NextSwitch+1,Switch))
@@ -380,7 +402,8 @@ int ShowFileMenu(int &nBreakCode)
 	return nResult;
 }
 
-int ShowEditorMenu(int &nBreakCode) {
+int ShowEditorMenu(int &nBreakCode)
+{
 	vector<CFarMenuItemEx> MenuItems;
 
 	MenuItems.push_back(CFarMenuItemEx(MMenuSearch));
@@ -500,7 +523,8 @@ OperationResult OpenPluginFromFilePreset(int nItem, int nBreakCode)
 	return OR_CANCEL;
 }
 
-HANDLE OpenPluginFromFileMenu(int Item, BOOL ShowDialog) {
+HANDLE OpenPluginFromFileMenu(int Item, BOOL ShowDialog)
+{
 	OperationResult Result = OR_CANCEL;
 	int nBreakCode = -1;
 
@@ -615,7 +639,8 @@ OperationResult OpenPluginFromEditorPreset(int nItem, int nBreakCode)
 	return OR_CANCEL;
 }
 
-HANDLE OpenPluginFromEditorMenu(int nItem) {
+HANDLE OpenPluginFromEditorMenu(int nItem)
+{
 	FindIfClockPresent();
 
 	int nBreakCode = -1;
@@ -686,7 +711,8 @@ HANDLE OpenPluginFromEditorMenu(int nItem) {
 	return NO_PANEL_HANDLE;
 }
 
-OperationResult OpenPluginFromViewerPreset(int nItem, int nBreakCode) {
+OperationResult OpenPluginFromViewerPreset(int nItem, int nBreakCode)
+{
 	OperationResult Result = OR_CANCEL;
 
 	if (FindRunPreset(VSPresets, nItem, nBreakCode, Result)) return OR_OK;
@@ -752,16 +778,26 @@ HANDLE WINAPI OpenW(const struct OpenInfo *Info)
 	case OPEN_VIEWER:
 		return OpenPluginFromViewerMenu(0);
 
-	default:
-		return NO_PANEL_HANDLE;
+	case OPEN_COMMANDLINE:{
+		OpenCommandLineInfo *CmdInfo = (OpenCommandLineInfo *)Info->Data;
+		INT_PTR Item;
+		if (ProcessCommandLine(CmdInfo->CommandLine, &ShowDialog, &Item)) {
+			g_bFromCmdLine = true;
+			return OpenPluginFromFileMenu(Item, ShowDialog);
+		}
+		break;
+						  }
 	}
+
+	return NO_PANEL_HANDLE;
 }
 #else
 #ifdef UNICODE
-HANDLE WINAPI OpenPluginW(int OpenFrom, INT_PTR Item) {
+HANDLE WINAPI OpenPluginW(int OpenFrom, INT_PTR Item)
 #else
-HANDLE WINAPI OpenPlugin(int OpenFrom, INT_PTR Item) {
+HANDLE WINAPI OpenPlugin(int OpenFrom, INT_PTR Item)
 #endif
+{
 	BOOL ShowDialog = TRUE;
 	g_bFromCmdLine = false;
 	g_bInterrupted = FALSE;
