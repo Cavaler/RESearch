@@ -66,6 +66,9 @@ void WriteRegistry()
 
 	g_pEditorBatches->Save(hKey.Open(_T("EditorBatches")));
 	g_pPanelBatches->Save (hKey.Open(_T("PanelBatches" )));
+
+	Settings.Close();
+	Settings.OpenRoot(_T("RESearch"));
 }
 
 bool CheckUsage(const tstring &strText, bool bRegExp, bool bSeveralLine)
