@@ -13,6 +13,9 @@ Planned:
 Known bugs:
 	- Replace changing part of (real) EOL crashes
 
+Version 7.65 (01.03.2013)
+	- Saving settings in Far3 fixed
+
 Version 7.64 (13.02.2013)
 	- Command line works in Far3
 	* Command line without parameters opens dialog
