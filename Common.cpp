@@ -390,6 +390,17 @@ string UpCaseString(const string &strText)
 
 #endif
 
+tstring RemoveAmpersand(const tstring &strText)
+{
+	tstring strResult = strText;
+
+	size_t nPos;
+	while ((nPos = strResult.find('&')) != tstring::npos)
+		strResult.erase(nPos, 1);
+
+	return strResult;
+}
+
 #define BufCased(nChar) ((XLatTable)?(UTCHAR)XLatTable[Buf[nChar]]:Buf[nChar])
 #define BufCasedA(nChar) ((XLatTable)?(BYTE)XLatTable[Buf[nChar]]:Buf[nChar])
 

@@ -1881,6 +1881,22 @@
 			Name="Resource Files"
 			>
 			<File
+				RelativePath="File_Id.Diz"
+				>
+			</File>
+			<File
+				RelativePath=".\Hints.txt"
+				>
+			</File>
+			<File
+				RelativePath="History.txt"
+				>
+			</File>
+			<File
+				RelativePath=".\PluginCall.txt"
+				>
+			</File>
+			<File
 				RelativePath="RESearch.def"
 				>
 				<FileConfiguration
@@ -2390,18 +2406,6 @@
 				>
 			</File>
 		</Filter>
-		<File
-			RelativePath="File_Id.Diz"
-			>
-		</File>
-		<File
-			RelativePath=".\Hints.txt"
-			>
-		</File>
-		<File
-			RelativePath="History.txt"
-			>
-		</File>
 		<File
 			RelativePath=".\RESearch.tlb"
 			>

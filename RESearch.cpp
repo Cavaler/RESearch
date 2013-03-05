@@ -978,7 +978,8 @@ int ConfigureCP()
 }
 #endif
 
-void ConfigureCommon() {
+void ConfigureCommon()
+{
 	CFarDialog Dialog(60,19,_T("CommonConfig"));
 	Dialog.AddFrame(MCommonSettings);
 
@@ -1005,7 +1006,8 @@ void ConfigureCommon() {
 	Dialog.Display(-1);
 }
 
-void ConfigureFile() {
+void ConfigureFile()
+{
 #ifdef UNICODE
 	CFarDialog Dialog(70, 24, _T("FileConfig"));
 #else
@@ -1058,7 +1060,8 @@ void ConfigureFile() {
 #endif
 }
 
-void ConfigureRenumbering(bool bRuntime) {
+void ConfigureRenumbering(bool bRuntime)
+{
 	CFarDialog Dialog(70, bRuntime ? 18 : 16, _T("RenumberConfig"));
 
 	Dialog.AddFrame(MRenumberSettings);
@@ -1083,12 +1086,13 @@ void ConfigureRenumbering(bool bRuntime) {
 	Dialog.Display(-1);
 }
 
-void ConfigureEditor() {
-	CFarDialog Dialog(60, 31, _T("EditorConfig"));
+void ConfigureEditor()
+{
+	CFarDialog Dialog(61, 31, _T("EditorConfig"));
 	Dialog.AddFrame(MEditorSearchSettings);
 
 	Dialog.Add(new CFarTextItem(5,3,0,MShowPositionOffset));
-	Dialog.Add(new CFarEditItem(38,3,42,0,NULL,(int &)EShowPositionOffset,new CFarIntegerRangeValidator(-1024,1024)));
+	Dialog.Add(new CFarEditItem(40,3,44,0,NULL,(int &)EShowPositionOffset,new CFarIntegerRangeValidator(-1024,1024)));
 
 	Dialog.Add(new CFarTextItem(5,4,0,Mfrom));
 	Dialog.Add(new CFarRadioButtonItem(10,4,DIF_GROUP,MTop,(int *)&EShowPosition,SP_TOP));
@@ -1097,11 +1101,11 @@ void ConfigureEditor() {
 	Dialog.Add(new CFarCheckBoxItem(5,7,0,MKeepLineIfVisible,&EKeepLineIfVisible));
 
 	Dialog.Add(new CFarTextItem(5,9,0,MLRSideOffset));
-	Dialog.Add(new CFarEditItem(38,9,42,0,NULL,(int &)ELRSideOffset,new CFarIntegerRangeValidator(0, 1024)));
-	Dialog.Add(new CFarTextItem(44,9,0,MLROffsetChars));
+	Dialog.Add(new CFarEditItem(40,9,44,0,NULL,(int &)ELRSideOffset,new CFarIntegerRangeValidator(0, 1024)));
+	Dialog.Add(new CFarTextItem(46,9,0,MLROffsetChars));
 	Dialog.Add(new CFarTextItem(5, 10,0,MTDSideOffset));
-	Dialog.Add(new CFarEditItem(38,10,42,0,NULL,(int &)ETDSideOffset,new CFarIntegerRangeValidator(0, 1024)));
-	Dialog.Add(new CFarTextItem(44,10,0,MTDOffsetLines));
+	Dialog.Add(new CFarEditItem(40,10,44,0,NULL,(int &)ETDSideOffset,new CFarIntegerRangeValidator(0, 1024)));
+	Dialog.Add(new CFarTextItem(46,10,0,MTDOffsetLines));
 
 	Dialog.Add(new CFarTextItem(5,12,0,MFindTextAtCursor));
 	Dialog.Add(new CFarRadioButtonItem(7,13,DIF_GROUP,MNone,(int *)&EFindTextAtCursor,FT_NONE));

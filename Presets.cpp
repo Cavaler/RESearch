@@ -482,7 +482,7 @@ bool CBatchAction::EditItems() {
 		}
 
 		int nBreakKey;
-		tstring strTitle = FormatStr(GetMsg(MBatchCommands), m_strName.c_str());
+		tstring strTitle = FormatStr(GetMsg(MBatchCommands), RemoveAmpersand(m_strName).c_str());
 
 		int nResult = ChooseMenu(arrItems, strTitle.c_str(), _T("Ins,Ctrl-\x18\x19,Ctrl-Enter,Del"), _T("Batch"), m_nCurrent,
 			FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT, piBreakKeys, &nBreakKey);

@@ -126,6 +126,7 @@ EXTERN CharTableSet *m_pReplaceTable;
 
 void PrepareLocaleStuff();
 tstring UpCaseString(const tstring &strText);
+tstring RemoveAmpersand(const tstring &strText);
 
 UINT GetDefCP();
 UINT IsDefCP(UINT nCP);
