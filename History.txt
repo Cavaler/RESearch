@@ -13,6 +13,13 @@ Planned:
 Known bugs:
 	- Replace changing part of (real) EOL crashes
 
+
+Version 7.66 (05.03.2013)
+	* All-in-one Far3 script (thanks to Shmuel)
+	+ Using Plugin.Call for macros in Far3 (see description in PluginCall.txt)
+	- Russian locale and other UI fixes (thanks to Raistlin)
+	- Fixed some RegExp Builder problems
+
 Version 7.65 (01.03.2013)
 	- Saving settings in Far3 fixed
 
