@@ -110,7 +110,7 @@ MViewModified		"&List modified files"			"Показать &измененные 
 MConfirmFile		"Confirm each &file"			"&Подтверждать каждый файл"
 MConfirmLine		"Confirm each repl&acement"		"Подтверждать каждую &замену"
 MSaveOriginal		"Backup &original file"			"Сохранять &копию файла"
-MOverwriteBackup	"Over&write prev version"		"Пере&записывать пред. версию"
+MOverwriteBackup	"Over&write prev backup"		"Пере&записывать пред. копию"
 MReplaceToNew		"Result in ne&w file"			"Результат в новом файле"
 MConfirmRequest		"Modify file"					"Изменить файл"
 MInFile				"in file"						"в файле"

@@ -76,7 +76,8 @@ void UpdateFSDialog(CFarDialog *pDlg) {
 		pDlg->EnableDlgItem(MQuoteReplace, bRegExp || g_bEscapesInPlainText);
 }
 
-LONG_PTR WINAPI FileSearchDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LONG_PTR lParam2) {
+LONG_PTR WINAPI FileSearchDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LONG_PTR lParam2)
+{
 	int nCtlID = pDlg->GetID(nParam1);
 
 	switch (nMsg) {

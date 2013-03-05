@@ -262,9 +262,38 @@ bool PrepareFileReplacePattern() {
 	return true;
 }
 
-int ReplacePrompt(BOOL Plugin) {
+//////////////////////////////////////////////////////////////////////////
+
+void UpdateFRDialog(CFarDialog *pDlg)
+{
+	bool bSaveOriginal = pDlg->IsDlgItemChecked(MSaveOriginal);
+	pDlg->EnableDlgItem(MOverwriteBackup, bSaveOriginal);
+}
+
+LONG_PTR WINAPI FileReplaceDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LONG_PTR lParam2)
+{
+	int nCtlID = pDlg->GetID(nParam1);
+
+	switch (nMsg) {
+	case DN_INITDIALOG:
+		UpdateFRDialog(pDlg);
+		break;
+	case DN_BTNCLICK:
+		switch (nCtlID) {
+		case MSaveOriginal:
+			UpdateFRDialog(pDlg);
+			break;
+		}
+		break;
+	}
+
+	return FileSearchDialogProc(pDlg, nMsg, nParam1, lParam2);
+}
+
+int ReplacePrompt(BOOL Plugin)
+{
 	CFarDialog Dialog(76, 25, _T("FileReplaceDlg"));
-	Dialog.SetWindowProc(FileSearchDialogProc, 0);
+	Dialog.SetWindowProc(FileReplaceDialogProc, 0);
 	Dialog.SetUseID(true);
 	Dialog.SetCancelID(MCancel);
 
@@ -302,7 +331,7 @@ int ReplacePrompt(BOOL Plugin) {
 	Dialog.Add(new CFarCheckBoxItem(5,18,0,MConfirmFile,&FRConfirmFile));
 	Dialog.Add(new CFarCheckBoxItem(5,19,0,MConfirmLine,&FRConfirmLine));
 	Dialog.Add(new CFarCheckBoxItem(40,17,0,MSaveOriginal,&FRSaveOriginal));
-	Dialog.Add(new CFarCheckBoxItem(42,18,0,MOverwriteBackup,&FROverwriteBackup));
+	Dialog.Add(new CFarCheckBoxItem(40,18,0,MOverwriteBackup,&FROverwriteBackup));
 	Dialog.Add(new CFarCheckBoxItem(40,19,0,MReplaceToNew,&FRReplaceToNew));
 
 	Dialog.AddButtons(MOk,MCancel);
