@@ -182,11 +182,17 @@ BOOL ViewerSearchAgain()
 	return TRUE;
 }
 
+bool RefreshViewerInfo()
+{
+	VInfo.StructSize=sizeof(VInfo);
+	if (StartupInfo.ViewerControl(VCTL_GETINFO, &VInfo) == 0) return false;
+
+	return true;
+}
+
 BOOL ViewerSearch()
 {
-	ViewerInfo VInfo;
-	VInfo.StructSize=sizeof(VInfo);
-	StartupInfo.ViewerControl(VCTL_GETINFO, &VInfo);
+	RefreshViewerInfo();
 	g_ViewerInfo.erase(VInfo.ViewerID);
 
 	CFarDialog Dialog(76,13,_T("SearchDlg"));

@@ -811,15 +811,13 @@ HANDLE WINAPI OpenW(const struct OpenInfo *Info)
 
 		g_bFromCmdLine = true;
 
-		switch (nValue / 100) {
-		case 0:
-			return OpenPluginFromFileMenu  (nValue % 100, ShowDialog);
-		case 1:
-			return OpenPluginFromEditorMenu(nValue % 100);
-		case 2:
-			return OpenPluginFromViewerMenu(nValue % 100);
-		}
-		break;
+		if (RefreshEditorInfo())
+			return OpenPluginFromEditorMenu(nValue);
+		else if (RefreshViewerInfo())
+			return OpenPluginFromViewerMenu(nValue);
+		else
+			return OpenPluginFromFileMenu  (nValue, ShowDialog);
+
 						}
 	}
 

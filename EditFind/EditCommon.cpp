@@ -738,12 +738,12 @@ void EctlForceSetPosition(EditorSetPosition *Position)
 	}
 }
 
-void RefreshEditorInfo()
+bool RefreshEditorInfo()
 {
 #ifdef FAR3
 	EdInfo.StructSize = sizeof(EditorInfo);
 #endif
-	StartupInfo.EditorControl(ECTL_GETINFO, &EdInfo);
+	if (StartupInfo.EditorControl(ECTL_GETINFO, &EdInfo) == 0) return false;
 #ifdef UNICODE
 	size_t FileNameSize=StartupInfo.EditorControl(ECTL_GETFILENAME, NULL);
 	if (FileNameSize) {
@@ -754,6 +754,7 @@ void RefreshEditorInfo()
 		EditorFileName = _T("");
 	}
 #endif
+	return true;
 }
 
 void EditorFillNamedParameters()

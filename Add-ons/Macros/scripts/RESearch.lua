@@ -43,27 +43,27 @@ Macro {
 
 Macro {
   description=""; area="Editor"; key="F7"; flags="";
-  action=function() Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", 100) end;
+  action=function() Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", 0) end;
 }
 
 Macro {
   description=""; area="Editor"; key="CtrlF7"; flags="";
-  action=function() Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", 101) end;
+  action=function() Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", 1) end;
 }
 
 Macro {
   description=""; area="Editor"; key="ShiftF7"; flags="";
-  action=function() Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", 105) end;
+  action=function() Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", 5) end;
 }
 
 
 
 Macro {
   description=""; area="Viewer"; key="F7"; flags="";
-  action=function() Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", 200) end;
+  action=function() Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", 0) end;
 }
 
 Macro {
   description=""; area="Viewer"; key="ShiftF7"; flags="";
-  action=function() Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", 201) end;
+  action=function() Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", 1) end;
 }
