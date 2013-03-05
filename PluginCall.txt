@@ -1,0 +1,11 @@
+Plugin exposed API reference
+
+Numeric:
+Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", NNN)
+  0.. 99  = Panels menu item
+100..199  = Editor menu item + 100
+200..299  = Viewer menu item + 200
+
+String (not implemented yet):
+Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", "Batch <BatchName>")
+Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", "Preset <PresetName>")
