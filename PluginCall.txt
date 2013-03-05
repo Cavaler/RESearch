@@ -1,9 +1,12 @@
 Plugin exposed API reference
 
 Numeric:
-Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", NNN)
-NNN is a menu item number for current mode (Panel / Editor / Viewer)
+
+Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", TTT, NNN)
+	TTT is 0 for Panels, 1 for Editor, 2 for Viewer
+	NNN is a menu item number
 
 String (not implemented yet):
+
 Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", "Batch <BatchName>")
 Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", "Preset <PresetName>")
