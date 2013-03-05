@@ -19,7 +19,7 @@ tstring BuildRE(const tstring &strSource, const part_map &mapParts)
 
 	int nLeftOff = 0;
 	for (part_map::const_iterator it = mapParts.begin(); it != mapParts.end(); it++) {
-		tstring strStart = strSource.substr(nLeftOff, it->first);
+		tstring strStart = strSource.substr(nLeftOff, it->first-nLeftOff);
 		CSO::QuoteRegExpString(strStart);
 		strResult += strStart;
 
@@ -102,15 +102,18 @@ LONG_PTR WINAPI REBuilderDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LON
 		break;
 #ifdef FAR3
 	case DN_CONTROLINPUT:
+		if (pDlg->GetFocus() != 2) break;
 		INPUT_RECORD *record = (INPUT_RECORD *)lParam2;
 		if ((record->EventType == KEY_EVENT) && (record->Event.KeyEvent.bKeyDown)) {
 			if (record->Event.KeyEvent.wVirtualKeyCode == VK_RETURN) {
 				pData->nCurrentPart = -1;
+				UpdateStrings(pDlg, pData);
 				return TRUE;
 			}
 			if (record->Event.KeyEvent.wVirtualKeyCode == VK_ESCAPE) {
 				pData->nCurrentPart = -1;
 				pData->mapParts.clear();
+				UpdateStrings(pDlg, pData);
 				return TRUE;
 			}
 		}
@@ -119,11 +122,13 @@ LONG_PTR WINAPI REBuilderDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LON
 	case DN_KEY:
 		if ((nParam1 == 2) && (lParam2 == KEY_ENTER)) {
 			pData->nCurrentPart = -1;
+			UpdateStrings(pDlg, pData);
 			return TRUE;
 		}
 		if ((nParam1 == 2) && (lParam2 == KEY_ESC)) {
 			pData->nCurrentPart = -1;
 			pData->mapParts.clear();
+			UpdateStrings(pDlg, pData);
 			return TRUE;
 		}
 		break;
