@@ -1,5 +1,0 @@
-area="Shell"
-key="CtrlAltF6"
-flags="DisableOutput"
-description=""
-code="Keys(\"F11 s n\")"

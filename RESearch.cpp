@@ -646,10 +646,12 @@ HANDLE OpenPluginFromEditorMenu(int nItem)
 	int nBreakCode = -1;
 
 	do {
-		do {
-			nItem = ShowEditorMenu(nBreakCode);
-			if (nItem == -1) return NO_PANEL_HANDLE;
-		} while ((nBreakCode >= 0) && (nItem < 10));
+		if (!g_bFromCmdLine) {
+			do {
+				nItem = ShowEditorMenu(nBreakCode);
+				if (nItem == -1) return NO_PANEL_HANDLE;
+			} while ((nBreakCode >= 0) && (nItem < 10));
+		}
 
 		switch (nItem) {
 		case 0:
@@ -725,10 +727,12 @@ HANDLE OpenPluginFromViewerMenu(int nItem)
 	int nBreakCode = -1;
 
 	do {
-		do {
-			nItem = ShowViewerMenu(nBreakCode);
-			if (nItem == -1) return NO_PANEL_HANDLE;
-		} while ((nBreakCode >= 0) && (nItem < 3));
+		if (!g_bFromCmdLine) {
+			do {
+				nItem = ShowViewerMenu(nBreakCode);
+				if (nItem == -1) return NO_PANEL_HANDLE;
+			} while ((nBreakCode >= 0) && (nItem < 3));
+		}
 
 		switch (nItem) {
 		case 0:
@@ -767,6 +771,9 @@ HANDLE OpenPluginFromViewerMenu(int nItem)
 HANDLE WINAPI OpenW(const struct OpenInfo *Info)
 {
 	BOOL ShowDialog = TRUE;
+	g_bFromCmdLine = false;
+	g_bInterrupted = FALSE;
+	ESearchAgainCalled = FALSE;
 
 	switch (Info->OpenFrom) {
 	case OPEN_PLUGINSMENU:
@@ -787,6 +794,33 @@ HANDLE WINAPI OpenW(const struct OpenInfo *Info)
 		}
 		break;
 						  }
+	case OPEN_FROMMACRO:{
+		const OpenMacroInfo *MInfo = (const OpenMacroInfo *)Info->Data;
+		if (MInfo->Count == 0)	break;
+		int nValue;
+		switch (MInfo->Values[0].Type) {
+		case FMVT_INTEGER:
+			nValue = (int)MInfo->Values[0].Integer;
+			break;
+		case FMVT_DOUBLE:
+			nValue = (int)MInfo->Values[0].Double;
+			break;
+		default:
+			return NO_PANEL_HANDLE;
+		}
+
+		g_bFromCmdLine = true;
+
+		switch (nValue / 100) {
+		case 0:
+			return OpenPluginFromFileMenu  (nValue % 100, ShowDialog);
+		case 1:
+			return OpenPluginFromEditorMenu(nValue % 100);
+		case 2:
+			return OpenPluginFromViewerMenu(nValue % 100);
+		}
+		break;
+						}
 	}
 
 	return NO_PANEL_HANDLE;

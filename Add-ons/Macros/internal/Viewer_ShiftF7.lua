@@ -1,5 +1,0 @@
-area="Viewer"
-key="ShiftF7"
-flags="DisableOutput"
-description=""
-code="Keys(\"F11 s a\")"

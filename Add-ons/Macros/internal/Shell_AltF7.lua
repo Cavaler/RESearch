@@ -1,5 +1,0 @@
-area="Shell"
-key="AltF7"
-flags="DisableOutput"
-description=""
-code="Keys(\"F11 s s\")"
