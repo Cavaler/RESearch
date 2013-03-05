@@ -7,3 +7,7 @@ REGEDIT4
 [HKEY_CURRENT_USER\Software\Far2\KeyMacros\Shell\ShiftF7]
 "Sequence"="F11 s r"
 "Description"="Regular Expression Replace"
+
+[HKEY_CURRENT_USER\Software\Far2\KeyMacros\Shell\CtrlAltF7]
+"Sequence"="F11 s g"
+"Description"="Regular Expression Grep"
