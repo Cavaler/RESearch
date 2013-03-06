@@ -465,19 +465,24 @@ int CountPresets(CBatchActionCollection &Coll, CPreset *pPreset)
 	return nCount;
 }
 
-bool CBatchAction::EditItems() {
+bool CBatchAction::EditItems()
+{
 	int piBreakKeys[]={VK_INSERT, (PKF_CONTROL<<16)|VK_UP, (PKF_CONTROL<<16)|VK_DOWN, VK_DELETE, VK_F4, (PKF_CONTROL<<16)|VK_RETURN, 0};
-	vector<tstring> arrItems;
+
+	//	Clean-up nonexistent presets
+	for (size_t nPreset = 0; nPreset < size(); nPreset++) {
+		CPreset *pPreset = m_Type[at(nPreset)];
+		if (pPreset == NULL) {
+			erase(begin()+nPreset);
+			nPreset--;
+			continue;
+		}
+	}
 
 	do {
+		vector<tstring> arrItems;
 		arrItems.resize(size()+1);
 		for (size_t nPreset = 0; nPreset < size(); nPreset++) {
-			CPreset *pPreset = m_Type[at(nPreset)];
-			if (pPreset == NULL) {
-				erase(begin()+nPreset);
-				nPreset--;
-				continue;
-			}
 			arrItems[nPreset] = m_Type[at(nPreset)]->Name();
 		}
 
