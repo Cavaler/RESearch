@@ -774,15 +774,15 @@ void EditorSeekToBeginEnd()
 		RefreshEditorInfo();
 
 		EditorSetPosition Position = {ITEM_SS(EditorSetPosition) EdInfo.TotalLines, 0, -1, -1, -1, -1};
-		EctlSetPosition(&Position);
+		EctlForceSetPosition(&Position);
 
 		CEditorSetString String(-1);
 		EctlSetString(&String);
 
 		Position.CurPos = String.StringLength;
-		EctlSetPosition(&Position);
+		EctlForceSetPosition(&Position);
 	} else {
 		EditorSetPosition Position = {ITEM_SS(EditorSetPosition) 0, 0, 0, -1, -1, -1};
-		EctlSetPosition(&Position);
+		EctlForceSetPosition(&Position);
 	}
 }
