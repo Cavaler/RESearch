@@ -783,6 +783,49 @@ bool GetIntValue(FarMacroValue &Value, int &nValue)
 	}
 }
 
+HANDLE OpenFromMacro(const OpenMacroInfo *MInfo)
+{
+	BOOL ShowDialog = TRUE;
+
+	int nType, nValue;
+
+	if (MInfo->Count == 1) {
+		int nArea = StartupInfo.MacroControl(MCTL_GETAREA, 0, NULL);
+
+		switch (nArea) {
+		case MACROAREA_SHELL:
+			nType = 0;
+			break;
+		case MACROAREA_EDITOR:
+			nType = 1;
+			break;
+		case MACROAREA_VIEWER:
+			nType = 2;
+			break;
+		default:
+			return NO_PANEL_HANDLE;
+		}
+
+		if (!GetIntValue(MInfo->Values[0], nValue)) return NO_PANEL_HANDLE;
+	} else {
+		if (!GetIntValue(MInfo->Values[0], nType )) return NO_PANEL_HANDLE;
+		if (!GetIntValue(MInfo->Values[1], nValue)) return NO_PANEL_HANDLE;
+	}
+
+	g_bFromCmdLine = true;
+
+	switch (nType) {
+	case 0:
+		return OpenPluginFromFileMenu  (nValue, ShowDialog);
+	case 1:
+		return OpenPluginFromEditorMenu(nValue);
+	case 2:
+		return OpenPluginFromViewerMenu(nValue);
+	default:
+		return NO_PANEL_HANDLE;
+	}
+}
+
 HANDLE WINAPI OpenW(const struct OpenInfo *Info)
 {
 	BOOL ShowDialog = TRUE;
@@ -809,27 +852,8 @@ HANDLE WINAPI OpenW(const struct OpenInfo *Info)
 		}
 		break;
 						  }
-	case OPEN_FROMMACRO:{
-		const OpenMacroInfo *MInfo = (const OpenMacroInfo *)Info->Data;
-		if (MInfo->Count < 2) break;
-		
-		int nType, nValue;
-		if (!GetIntValue(MInfo->Values[0], nType )) return NO_PANEL_HANDLE;
-		if (!GetIntValue(MInfo->Values[1], nValue)) return NO_PANEL_HANDLE;
-
-		g_bFromCmdLine = true;
-
-		switch (nType) {
-		case 0:
-			return OpenPluginFromFileMenu  (nValue, ShowDialog);
-		case 1:
-			return OpenPluginFromEditorMenu(nValue);
-		case 2:
-			return OpenPluginFromViewerMenu(nValue);
-		default:
-			return NO_PANEL_HANDLE;
-		}
-						}
+	case OPEN_FROMMACRO:
+		return OpenFromMacro((const OpenMacroInfo *)Info->Data);
 	}
 
 	return NO_PANEL_HANDLE;
