@@ -352,6 +352,13 @@ BOOL ProcessCommandLine(const TCHAR *Line,BOOL *ShowDialog,INT_PTR *Item)
 	return ProcessFFLine(Line+1,ShowDialog,Item);
 }
 
+static LPCWSTR g_szPanelCommands[] = {
+	L"Search", L"Replace", L"Grep", NULL,
+	L"Select", L"Unselect", L"FlipSelection", NULL,
+	L"Rename", L"RenameSelected", L"Renumber", L"UndoRename", NULL,
+	L"ShowLastResults", L"ClearVariables"
+};
+
 int ShowFileMenu(int &nBreakCode)
 {
 	vector<CFarMenuItemEx> MenuItems;
@@ -402,6 +409,12 @@ int ShowFileMenu(int &nBreakCode)
 	return nResult;
 }
 
+static LPCWSTR g_szEditorCommands[] = {
+	L"Search", L"Replace", L"Filter", L"Transliterate", NULL,
+	L"SRAgain", L"SRAgainRev", NULL,
+	L"ShowLastResults", L"ClearVariables"
+};
+
 int ShowEditorMenu(int &nBreakCode)
 {
 	vector<CFarMenuItemEx> MenuItems;
@@ -444,6 +457,10 @@ int ShowEditorMenu(int &nBreakCode)
 
 	return nResult;
 }
+
+static LPCWSTR g_szViewerCommands[] = {
+	L"Search", L"SRAgain", L"ClearVariables"
+};
 
 int ShowViewerMenu(int &nBreakCode)
 {
@@ -523,7 +540,7 @@ OperationResult OpenPluginFromFilePreset(int nItem, int nBreakCode)
 	return OR_CANCEL;
 }
 
-HANDLE OpenPluginFromFileMenu(int Item, BOOL ShowDialog)
+HANDLE OpenPluginFromFileMenu(int Item, BOOL ShowDialog = TRUE)
 {
 	OperationResult Result = OR_CANCEL;
 	int nBreakCode = -1;
@@ -783,27 +800,57 @@ bool GetIntValue(FarMacroValue &Value, int &nValue)
 	}
 }
 
+HANDLE OpenFromStringMacro(int nType, LPCWSTR szParam)
+{
+	if (nType == 0) {
+		for (int nValue = 0; nValue < sizeof(g_szPanelCommands)/sizeof(g_szPanelCommands[0]); nValue++) {
+			if (g_szPanelCommands[nValue] == NULL) continue;
+			if (_wcsicmp(g_szPanelCommands[nValue], szParam) == 0)
+				return OpenPluginFromFileMenu(nValue);
+		}
+	} else if (nType == 1) {
+		for (int nValue = 0; nValue < sizeof(g_szEditorCommands)/sizeof(g_szEditorCommands[0]); nValue++) {
+			if (g_szEditorCommands[nValue] == NULL) continue;
+			if (_wcsicmp(g_szEditorCommands[nValue], szParam) == 0)
+				return OpenPluginFromFileMenu(nValue);
+		}
+	} else if (nType == 2) {
+		for (int nValue = 0; nValue < sizeof(g_szViewerCommands)/sizeof(g_szViewerCommands[0]); nValue++) {
+			if (g_szViewerCommands[nValue] == NULL) continue;
+			if (_wcsicmp(g_szViewerCommands[nValue], szParam) == 0)
+				return OpenPluginFromFileMenu(nValue);
+		}
+	}
+
+	return NO_PANEL_HANDLE;
+}
+
+int GetAreaType()
+{
+	int nArea = StartupInfo.MacroControl(MCTL_GETAREA, 0, NULL);
+
+	switch (nArea) {
+	case MACROAREA_SHELL:
+		return 0;
+	case MACROAREA_EDITOR:
+		return 1;
+	case MACROAREA_VIEWER:
+		return 2;
+	}
+
+	return -1;
+}
+
 HANDLE OpenFromMacro(const OpenMacroInfo *MInfo)
 {
-	BOOL ShowDialog = TRUE;
+	int nType = GetAreaType();
 
-	int nType, nValue;
-
+	int nValue;
 	if (MInfo->Count == 1) {
-		int nArea = StartupInfo.MacroControl(MCTL_GETAREA, 0, NULL);
+		if (nType < 0) return NO_PANEL_HANDLE;
 
-		switch (nArea) {
-		case MACROAREA_SHELL:
-			nType = 0;
-			break;
-		case MACROAREA_EDITOR:
-			nType = 1;
-			break;
-		case MACROAREA_VIEWER:
-			nType = 2;
-			break;
-		default:
-			return NO_PANEL_HANDLE;
+		if (MInfo->Values[0].Type == FMVT_STRING) {
+			return OpenFromStringMacro(nType, MInfo->Values[0].String);
 		}
 
 		if (!GetIntValue(MInfo->Values[0], nValue)) return NO_PANEL_HANDLE;
@@ -816,7 +863,7 @@ HANDLE OpenFromMacro(const OpenMacroInfo *MInfo)
 
 	switch (nType) {
 	case 0:
-		return OpenPluginFromFileMenu  (nValue, ShowDialog);
+		return OpenPluginFromFileMenu  (nValue);
 	case 1:
 		return OpenPluginFromEditorMenu(nValue);
 	case 2:
@@ -828,14 +875,13 @@ HANDLE OpenFromMacro(const OpenMacroInfo *MInfo)
 
 HANDLE WINAPI OpenW(const struct OpenInfo *Info)
 {
-	BOOL ShowDialog = TRUE;
 	g_bFromCmdLine = false;
 	g_bInterrupted = FALSE;
 	ESearchAgainCalled = FALSE;
 
 	switch (Info->OpenFrom) {
 	case OPEN_PLUGINSMENU:
-		return OpenPluginFromFileMenu(0, ShowDialog);
+		return OpenPluginFromFileMenu(0);
 
 	case OPEN_EDITOR:
 		return OpenPluginFromEditorMenu(0);
@@ -845,6 +891,7 @@ HANDLE WINAPI OpenW(const struct OpenInfo *Info)
 
 	case OPEN_COMMANDLINE:{
 		OpenCommandLineInfo *CmdInfo = (OpenCommandLineInfo *)Info->Data;
+		BOOL ShowDialog = TRUE;
 		INT_PTR Item;
 		if (ProcessCommandLine(CmdInfo->CommandLine, &ShowDialog, &Item)) {
 			g_bFromCmdLine = true;
