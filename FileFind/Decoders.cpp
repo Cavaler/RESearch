@@ -164,10 +164,19 @@ IDecoder *CSingleByteCRLFDecoder::GetEncoder()
 //////////////////////////////////////////////////////////////////////////
 // CUTF8Traverse
 
+template<class Vector> void resize_vector(Vector &vec, size_t nLength)
+{
+	if ((vec.size() < nLength) || (vec.size() > nLength*16))
+		vec.resize(nLength);
+}
+
 void CUTF8Traverse::SetString(const char *szBuffer, INT_PTR nLength)
 {
 	nByte = 0;
 	nChar = 0;
+
+	resize_vector(utf2char, nLength*4+2);
+	resize_vector(char2utf, nLength+2);
 
 	for (; nByte < nLength; ) {
 		utf2char[nByte] = nChar;

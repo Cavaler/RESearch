@@ -59,8 +59,8 @@ public:
 	INT_PTR	CharToByte(INT_PTR nOffset);
 
 protected:
-	std::map<INT_PTR, INT_PTR> utf2char;
-	std::map<INT_PTR, INT_PTR> char2utf;
+	std::vector<INT_PTR> utf2char;
+	std::vector<INT_PTR> char2utf;
 
 	INT_PTR nByte;
 	INT_PTR nChar;
