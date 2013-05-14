@@ -691,7 +691,7 @@ void EctlGetString(EditorGetString *String)
 tstring EctlGetString(int nLine)
 {
 	if (nLine >= 0) {
-		EditorSetPosition Position = {nLine,-1,-1,-1,-1,-1};
+		EditorSetPosition Position = {ITEM_SS(EditorSetPosition) nLine,-1,-1,-1,-1,-1};
 		EctlSetPosition(&Position);
 	}
 	EditorGetString String = {ITEM_SS(EditorGetString) -1};

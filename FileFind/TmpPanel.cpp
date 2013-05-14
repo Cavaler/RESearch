@@ -261,7 +261,7 @@ int CTemporaryPanel::ProcessKey(int Key, unsigned int ControlState) {
 					);
 
 				if (FSEditSrchAfterFile) {
-					EditorSetPosition Position = {0, 0, 0, 0, 0, 0};
+					EditorSetPosition Position = {ITEM_SS(EditorSetPosition) 0, 0, 0, 0, 0, 0};
 					StartupInfo.EditorControl(ECTL_SETPOSITION, &Position);
 					EditorSearchAgain();
 					StartupInfo.EditorControl(ECTL_REDRAW, NULL);

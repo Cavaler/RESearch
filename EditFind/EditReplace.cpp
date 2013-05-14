@@ -352,9 +352,9 @@ BOOL ReplaceInTextByLine(int FirstLine, int StartPos, int LastLine, int EndPos, 
 			if (!EReverse) LastLine += MatchLastLine-FoundLastLine;
 
 			if (ERRemoveEmpty && (Result == RR_OK) && (MatchFirstLine == MatchLastLine)) {
-				EditorSetPosition Position = {MatchFirstLine,-1,-1,-1,-1,-1};
+				EditorSetPosition Position = {ITEM_SS(EditorSetPosition) MatchFirstLine, -1, -1, -1, -1, -1};
 				EctlSetPosition(&Position);
-				EditorGetString String = {-1};
+				EditorGetString String = {ITEM_SS(EditorGetString) -1};
 				EctlGetString(&String);
 				if (String.StringLength == 0) {
 					StartupInfo.EditorControl(ECTL_DELETESTRING, NULL);
@@ -392,7 +392,7 @@ BOOL ReplaceInTextByLine(int FirstLine, int StartPos, int LastLine, int EndPos, 
 		}
 
 		if (ERRemoveNoMatch && !Matched) {
-			EditorSetPosition Position = {Line,-1,-1,-1,-1,-1};
+			EditorSetPosition Position = {ITEM_SS(EditorSetPosition) Line, -1, -1, -1, -1, -1};
 			EctlSetPosition(&Position);
 			StartupInfo.EditorControl(ECTL_DELETESTRING, NULL);
 			if (EReverse) Line--; else LastLine--;
@@ -434,7 +434,7 @@ BOOL EditorReplaceAgain()
 	if (EInSelection) {		// ***************** REPLACE IN SELECTION
 		SaveSelection();
 		ReplaceStartLine = SelStartLine;
-		if ((!ESeveralLine)||ERRemoveEmpty||ERRemoveNoMatch) {
+		if (!ESeveralLine || ERRemoveEmpty || ERRemoveNoMatch) {
 			ReplaceInTextByLine(SelStartLine, SelStartPos, SelEndLine, SelEndPos, SelType == BTYPE_COLUMN);
 		} else {
 			ReplaceInText(SelStartLine, SelStartPos, SelEndLine, SelEndPos);

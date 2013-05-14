@@ -4,11 +4,7 @@
 void EditorSearchOK(int FirstLine,int StartPos,int LastLine,int EndPos) {
 	RefreshEditorInfo();
 
-#ifdef FAR3
-	EditorSelect Select={sizeof(EditorSelect), BTYPE_STREAM,FirstLine,StartPos,EndPos-StartPos,LastLine-FirstLine+1};
-#else
-	EditorSelect Select={BTYPE_STREAM,FirstLine,StartPos,EndPos-StartPos,LastLine-FirstLine+1};
-#endif
+	EditorSelect Select={ITEM_SS(EditorSelect) BTYPE_STREAM,FirstLine,StartPos,EndPos-StartPos,LastLine-FirstLine+1};
 	if ((Select.BlockWidth == 0) && (Select.BlockHeight == 1)) {
 		Select.BlockWidth++;
 		if (Select.BlockStartPos>0) {Select.BlockStartPos--;Select.BlockWidth++;}
