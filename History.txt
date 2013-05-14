@@ -12,7 +12,15 @@ Planned:
 
 Known bugs:
 	- Replace changing part of (real) EOL crashes
+	- Incorrect restoring of vertical selection with tabs
 
+Version 7.67 (14.05.2013)
+	- Fixed slow opening large files for RegExp operations
+	- Fixed removing last command from batch
+	- Fixed seeking to beginning of file when running editor batch
+	- Fixed [X] Remove empty lines in Far3 (and some other StructSize bugs)
+	- Fixed cancelling file replace operation
+	* Plugin.Call updates (thanks to Shmuel)
 
 Version 7.66 (05.03.2013)
 	* All-in-one Far3 script (thanks to Shmuel)
