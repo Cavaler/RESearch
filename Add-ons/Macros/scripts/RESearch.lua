@@ -14,12 +14,14 @@ end
 
 Macro {
   description=""; area="Shell"; key="AltF7"; flags=""; condition=RESearchExists;
-  action=function() CallRS1("Search") end;
+--  action=function() CallRS1("Search") end;
+  action=function() Keys("F11 s s") end;
 }
 
 Macro {
   description=""; area="Shell"; key="ShiftF7"; flags=""; condition=RESearchExists;
-  action=function() CallRS1("Replace") end;
+--  action=function() CallRS1("Replace") end;
+  action=function() Keys("F11 s r") end;
 }
 
 Macro {
