@@ -812,14 +812,25 @@ HANDLE OpenFromStringMacro(int nType, LPCWSTR szParam)
 		for (int nValue = 0; nValue < sizeof(g_szEditorCommands)/sizeof(g_szEditorCommands[0]); nValue++) {
 			if (g_szEditorCommands[nValue] == NULL) continue;
 			if (_wcsicmp(g_szEditorCommands[nValue], szParam) == 0)
-				return OpenPluginFromFileMenu(nValue);
+				return OpenPluginFromEditorMenu(nValue);
 		}
 	} else if (nType == 2) {
 		for (int nValue = 0; nValue < sizeof(g_szViewerCommands)/sizeof(g_szViewerCommands[0]); nValue++) {
 			if (g_szViewerCommands[nValue] == NULL) continue;
 			if (_wcsicmp(g_szViewerCommands[nValue], szParam) == 0)
-				return OpenPluginFromFileMenu(nValue);
+				return OpenPluginFromViewerMenu(nValue);
 		}
+	}
+
+	return NO_PANEL_HANDLE;
+}
+
+HANDLE OpenFromStringMacro(int nType, LPCWSTR szParam1, LPCWSTR szParam2)
+{
+	if (wcsicmp(szParam1, L"Preset") == 0) {
+	}
+
+	if (wcsicmp(szParam1, L"Batch") == 0) {
 	}
 
 	return NO_PANEL_HANDLE;
@@ -843,6 +854,8 @@ int GetAreaType()
 
 HANDLE OpenFromMacro(const OpenMacroInfo *MInfo)
 {
+	g_bFromCmdLine = true;
+
 	int nType = GetAreaType();
 
 	int nValue;
@@ -855,11 +868,15 @@ HANDLE OpenFromMacro(const OpenMacroInfo *MInfo)
 
 		if (!GetIntValue(MInfo->Values[0], nValue)) return NO_PANEL_HANDLE;
 	} else {
+
+		if ((MInfo->Values[0].Type == FMVT_STRING) && (MInfo->Values[1].Type == FMVT_STRING)) {
+			if (nType < 0) return NO_PANEL_HANDLE;
+			return OpenFromStringMacro(nType, MInfo->Values[0].String, MInfo->Values[1].String);
+		}
+
 		if (!GetIntValue(MInfo->Values[0], nType )) return NO_PANEL_HANDLE;
 		if (!GetIntValue(MInfo->Values[1], nValue)) return NO_PANEL_HANDLE;
 	}
-
-	g_bFromCmdLine = true;
 
 	switch (nType) {
 	case 0:

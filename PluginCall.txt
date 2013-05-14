@@ -2,11 +2,15 @@ Plugin exposed API reference
 
 Numeric:
 
-Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", TTT, NNN)
-	TTT is 0 for Panels, 1 for Editor, 2 for Viewer
+Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", [TTT, ]NNN)
+	TTT is 0 for Panels, 1 for Editor, 2 for Viewer, or can be omitted for auto-detect
 	NNN is a menu item number
 
-String (not implemented yet):
+String:
+
+Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", "Search/Replace/Grep/etc")
+
+Not implemented yet:
 
 Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", "Batch <BatchName>")
 Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", "Preset <PresetName>")
