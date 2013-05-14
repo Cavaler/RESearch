@@ -261,7 +261,8 @@ eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &
 	}
 }
 
-BOOL ReplaceInText(int FirstLine, int StartPos, int LastLine, int EndPos) {
+BOOL ReplaceInText(int FirstLine, int StartPos, int LastLine, int EndPos)
+{
 	do {
 		int MatchFirstLine = FirstLine, MatchStartPos = StartPos;
 		int MatchLastLine = LastLine, MatchEndPos = EndPos;
@@ -310,7 +311,8 @@ BOOL ReplaceInText(int FirstLine, int StartPos, int LastLine, int EndPos) {
 	return FALSE;
 }
 
-BOOL ReplaceInTextByLine(int FirstLine, int StartPos, int LastLine, int EndPos, BOOL EachLineLimited) {
+BOOL ReplaceInTextByLine(int FirstLine, int StartPos, int LastLine, int EndPos, BOOL EachLineLimited)
+{
 	int Line = (EReverse)?LastLine:FirstLine;
 
 	do {
@@ -471,7 +473,7 @@ BOOL EditorReplaceAgain()
 
 	tm.Stop();
 
-	if (!bShowNoFound || g_bInterrupted) return TRUE;
+	if (!bShowNoFound || (FindNumber > 0) || g_bInterrupted) return TRUE;
 
 	ShowErrorMsg(GetMsg(MCannotFind), EText.c_str(), _T("ECannotFind"));
 	return FALSE;
