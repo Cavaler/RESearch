@@ -87,12 +87,6 @@ bool ConfirmReplacement(const TCHAR *Found, const TCHAR *Replaced, const TCHAR *
 	Dialog.Add(new CFarButtonItem(0, 7 + nCount, DIF_CENTERGROUP|DIF_NOBRACKETS, FALSE, MCancel));
 	int Result = Dialog.Display(6, -6, -5, -4, -3, -2, -1);
 
-//	const TCHAR *Lines[]={
-//		GetMsg(MREReplace),GetMsg(MAskReplace),Found,GetMsg(MAskWith),Replaced,
-//		GetMsg(MInFile),FileName,GetMsg(MReplace),GetMsg(MAll),GetMsg(MAllFiles),GetMsg(MSkip),GetMsg(MCancel)
-//	};
-//	Result = StartupInfo.Message(0,_T("FRAskReplace"),Lines,12,5)
-
 	switch (Result) {
 	case 2:
 		FRConfirmLineThisRun=false;
