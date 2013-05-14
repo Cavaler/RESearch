@@ -134,7 +134,7 @@ bool CReplacePlainTextFrontend::Process(IBackend *pBackend)
 
 	} while (!Interrupted());
 
-	return ReplaceNumber > 0;
+	return !g_bInterrupted && (ReplaceNumber > 0);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -178,7 +178,7 @@ bool ReplaceRegExpProcess(IBackend *pBackend, ISplitLineProcessor &Proc)
 
 	} while (!Interrupted() && Proc.GetNextLine());
 
-	return ReplaceNumber > 0;
+	return !g_bInterrupted && (ReplaceNumber > 0);
 }
 
 bool CReplaceRegExpFrontend::Process(IBackend *pBackend)
