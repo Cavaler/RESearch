@@ -646,8 +646,8 @@ $ #Replace text in file#
   #All#       Replace all text in this file
   #All Files# Replace all text in this and all following files
   #Skip#      Skip this occurence
-  #Cancel#    Cancel replacing process (remaining portion of current file will be
-left unchanged)
+  #Skip File# Skip this file, reverting it
+  #Cancel#    Cancel replacing process, current file is reverted
 @FRConfirmReplace
 $ #Replace text in readonly file#
     You are asked whether you want to replace text in a specific readonly file.
