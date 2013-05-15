@@ -400,8 +400,10 @@ void SaveSelection()
 
 void RestoreSelection()
 {
-	if (SelType!=BTYPE_NONE) {
-		EditorSelect Select={ITEM_SS(EditorSelect) SelType,SelStartLine,SelStartPos,SelEndPos-SelStartPos,SelEndLine-SelStartLine+1};
+	if (SelType != BTYPE_NONE) {
+		int nStartPos = (SelType == BTYPE_COLUMN) ? RealToTab(SelStartPos) : SelStartPos;
+		int nEndPos   = (SelType == BTYPE_COLUMN) ? RealToTab(SelEndPos)   : SelEndPos;
+		EditorSelect Select={ITEM_SS(EditorSelect) SelType, SelStartLine, nStartPos, nEndPos-nStartPos, SelEndLine-SelStartLine+1};
 		StartupInfo.EditorControl(ECTL_SELECT,&Select);
 		SelType=BTYPE_NONE;
 	}
