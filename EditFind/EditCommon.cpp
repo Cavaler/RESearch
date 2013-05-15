@@ -546,13 +546,13 @@ void ShowCurrentLine(int CurLine,int TotalLines,int TotalColumns)
 #ifdef FAR3
 		FarColor Color;
 		Color.Flags = FCF_4BITMASK;
-		Color.BackgroundColor = 0x03;
-		Color.ForegroundColor = 0x00;
+		Color.BackgroundColor = (BarColor >> 4) & 0x0F;
+		Color.ForegroundColor =  BarColor       & 0x0F;
 		StartupInfo.Text(Position, 0, &Color, strText.c_str());
 		StartupInfo.Text(0, 0, &Color, NULL);
 #else
-		StartupInfo.Text(Position, 0, 0x30, strText.c_str());
-		StartupInfo.Text(0,0,0x30,NULL);
+		StartupInfo.Text(Position, 0, BarColor & 0xFF, strText.c_str());
+		StartupInfo.Text(0, 0, 0, NULL);
 #endif
 		LastLine=CurLine;
 
@@ -754,6 +754,12 @@ bool RefreshEditorInfo()
 		EditorFileName = _T("");
 	}
 #endif
+
+	HANDLE hBuffer = GetStdHandle(STD_OUTPUT_HANDLE);
+	COORD coord = {0, 0};
+	DWORD dwRead;
+	ReadConsoleOutputAttribute(hBuffer, &BarColor, 1, coord, &dwRead);
+
 	return true;
 }
 

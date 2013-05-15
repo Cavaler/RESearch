@@ -73,6 +73,7 @@ void FillLineBuffer(size_t FirstLine, size_t LastLine);
 void ClearLineBuffer();
 
 EXTERN EditorInfo EdInfo;
+EXTERN WORD BarColor;
 #ifdef UNICODE
 EXTERN wstring EditorFileName;
 #endif
