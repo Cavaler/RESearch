@@ -44,7 +44,7 @@ void EWriteRegistry(CFarSettingsKey Key)
 BOOL SearchIn(const TCHAR *Line,int Start,int Length,int *MatchStart,int *MatchLength)
 {
 	REParam.Clear();
-	REParam.AddSource(Line, Length);
+	REParam.AddSource(Line, Start+Length);
 
 	if (ERegExp) {
 		REParam.AddRE(EPattern);
