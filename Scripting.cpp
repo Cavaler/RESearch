@@ -12,8 +12,6 @@ _COM_SMARTPTR_TYPEDEF(IActiveScriptParse, __uuidof(IActiveScriptParse));
 _COM_SMARTPTR_TYPEDEF(ICatInformation, __uuidof(ICatInformation));
 _COM_SMARTPTR_TYPEDEF(IEnumCLSID, __uuidof(IEnumCLSID));
 
-void EnumActiveScripts();
-
 void ReadActiveScripts()
 {
 	CFarSettingsKey hKey = Settings.Open(_T("ScriptEngines"));
@@ -31,19 +29,31 @@ void ReadActiveScripts()
 		m_lstEngines.Append(Script.m_strName.c_str());
 	}
 
+	hKey.Close();
+
 	if (m_arrEngines.size() == 0) {
 		EnumActiveScripts();
-
-		for (size_t nKey = 0; nKey < m_arrEngines.size(); nKey++) {
-			OLECHAR szGuid[42];
-			if (FAILED(StringFromGUID2(m_arrEngines[nKey].m_clsid, szGuid, 42))) continue;
-
-			hKey.SetStringValue((LPCTSTR)_bstr_t(szGuid), m_arrEngines[nKey].m_strName);
-		}
+		SaveActiveScripts();
 	}
 }
 
-void EnumActiveScripts() {
+void SaveActiveScripts()
+{
+	CFarSettingsKey hKey = Settings.Open(_T("ScriptEngines"));
+	hKey.DeleteAllValues();
+
+	for (size_t nKey = 0; nKey < m_arrEngines.size(); nKey++) {
+		OLECHAR szGuid[42];
+		if (FAILED(StringFromGUID2(m_arrEngines[nKey].m_clsid, szGuid, 42))) continue;
+
+		hKey.SetStringValue((LPCTSTR)_bstr_t(szGuid), m_arrEngines[nKey].m_strName);
+	}
+}
+
+void EnumActiveScripts()
+{
+	m_arrEngines.clear();
+
 	ICatInformationPtr spCatInfo;
 	spCatInfo.CreateInstance(CLSID_StdComponentCategoriesMgr);
 

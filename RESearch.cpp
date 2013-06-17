@@ -827,10 +827,10 @@ HANDLE OpenFromStringMacro(int nType, LPCWSTR szParam)
 
 HANDLE OpenFromStringMacro(int nType, LPCWSTR szParam1, LPCWSTR szParam2)
 {
-	if (wcsicmp(szParam1, L"Preset") == 0) {
+	if (_wcsicmp(szParam1, L"Preset") == 0) {
 	}
 
-	if (wcsicmp(szParam1, L"Batch") == 0) {
+	if (_wcsicmp(szParam1, L"Batch") == 0) {
 	}
 
 	return NO_PANEL_HANDLE;
@@ -1077,7 +1077,7 @@ int ConfigureCP()
 
 void ConfigureCommon()
 {
-	CFarDialog Dialog(60,19,_T("CommonConfig"));
+	CFarDialog Dialog(60, 21, _T("CommonConfig"));
 	Dialog.AddFrame(MCommonSettings);
 
 	Dialog.Add(new CFarTextItem(5,3,0,MSeveralLinesIs));
@@ -1099,8 +1099,22 @@ void ConfigureCommon()
 	Dialog.Add(new CFarCheckBoxItem(5,12,0,MUseEscapesInPlainText,&g_bEscapesInPlainText));
 	Dialog.Add(new CFarCheckBoxItem(5,13,0,MIgnoreIdentReplace,&g_bIgnoreIdentReplace));
 
-	Dialog.AddButtons(MOk,MCancel);
-	Dialog.Display(-1);
+	Dialog.Add(new CFarButtonItem(5, 15, DIF_CENTERGROUP, FALSE, MUpdateScriptEngines));
+
+	Dialog.AddButtons(MOk, MCancel);
+
+	do {
+		int nResult = Dialog.Display(2, -2, -3);
+
+		switch (nResult) {
+		case 1:
+			EnumActiveScripts();
+			SaveActiveScripts();
+			break;
+		default:
+			return;
+		}
+	} while (true);
 }
 
 void ConfigureFile()

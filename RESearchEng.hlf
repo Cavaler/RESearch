@@ -221,6 +221,8 @@ $ #Common settings#
   #Ignore identical replaces#         If checked, you won't be prompted to replace
                                     some found text with the very same text again.
 
+  #Update scripting engines#          Re-enumerate existing scripting engines in the system.
+
 @FileConfig
 $ #Panel search settings#
   #Read at once maximum# n #KB#     When replacing multiple files, if file size is less

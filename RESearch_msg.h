@@ -145,6 +145,7 @@ enum eStringTable {
 	MShowUsageWarnings,
 	MUseEscapesInPlainText,
 	MIgnoreIdentReplace,
+	MUpdateScriptEngines,
 
 	MDefaultCP,
 	MDefaultOEM,

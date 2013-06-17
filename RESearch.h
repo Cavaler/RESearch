@@ -52,7 +52,10 @@ BOOL LocalToSystemTime(FILETIME &ft);
 EXTERN CFarSettingsKey Settings;
 void ReadRegistry();
 void WriteRegistry();
+
 void ReadActiveScripts();
+void EnumActiveScripts();
+void SaveActiveScripts();
 
 void ConfigureCommon();
 void ConfigureFile();
