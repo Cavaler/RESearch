@@ -224,10 +224,10 @@ eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &
 		Dialog.AddFrame(MREReplace);
 		Dialog.Add(new CFarTextItem(-1, 2, 0, MAskReplace));
 		for (size_t I = 0; I<arrFound.size();I++)
-			Dialog.Add(new CFarTextItem(-1, 3 + I, 0/*DIF_SETCOLOR|0x30*/, arrFound[I]));
+			Dialog.Add(new CFarTextItem(-1, 3 + I, DIF_SHOWAMPERSAND/*|DIF_SETCOLOR|0x30*/, arrFound[I]));
 		Dialog.Add(new CFarTextItem(-1, 3 + arrFound.size(), 0, MAskWith));
 		for (size_t I = 0; I<arrReplaced.size();I++)
-			Dialog.Add(new CFarTextItem(-1, 4 + arrFound.size() + I, 0/*DIF_SETCOLOR|0xB0*/, arrReplaced[I]));
+			Dialog.Add(new CFarTextItem(-1, 4 + arrFound.size() + I, DIF_SHOWAMPERSAND/*|DIF_SETCOLOR|0xB0*/, arrReplaced[I]));
 		Dialog.Add(new CFarButtonItem(0, 5 + TotalCount, DIF_CENTERGROUP|DIF_NOBRACKETS, TRUE, MReplace));
 		Dialog.Add(new CFarButtonItem(0, 5 + TotalCount, DIF_CENTERGROUP|DIF_NOBRACKETS, FALSE, MAll));
 		Dialog.Add(new CFarButtonItem(0, 5 + TotalCount, DIF_CENTERGROUP|DIF_NOBRACKETS, FALSE, MSkip));

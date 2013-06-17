@@ -74,10 +74,10 @@ bool ConfirmReplacement(const TCHAR *Found, const TCHAR *Replaced, const TCHAR *
 
 	Dialog.Add(new CFarTextItem(-1, 3 + arrFound.size(), 0, MAskWith));
 	for (size_t I = 0; I<arrReplaced.size();I++)
-		Dialog.Add(new CFarTextItem(-1, 4 + arrFound.size() + I, 0/*DIF_SETCOLOR|0xB0*/, arrReplaced[I]));
+		Dialog.Add(new CFarTextItem(-1, 4 + arrFound.size() + I, DIF_SHOWAMPERSAND/*|DIF_SETCOLOR|0xB0*/, arrReplaced[I]));
 
 	Dialog.Add(new CFarTextItem(-1, 4 + nCount, 0, MInFile));
-	Dialog.Add(new CFarTextItem(-1, 5 + nCount,  0/*DIF_SETCOLOR|0x20*/, FileName));
+	Dialog.Add(new CFarTextItem(-1, 5 + nCount,  DIF_SHOWAMPERSAND/*|DIF_SETCOLOR|0x20*/, FileName));
 
 	Dialog.Add(new CFarButtonItem(0, 7 + nCount, DIF_CENTERGROUP|DIF_NOBRACKETS, TRUE,  MReplace));
 	Dialog.Add(new CFarButtonItem(0, 7 + nCount, DIF_CENTERGROUP|DIF_NOBRACKETS, FALSE, MAll));
