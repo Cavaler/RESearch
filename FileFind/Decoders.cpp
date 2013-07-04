@@ -18,7 +18,7 @@ void CDecoder::Clear()
 
 bool CDecoder::AllocBuffer(INT_PTR nSize)
 {
-	if (nSize <= m_nAllocSize) return true;
+	if ((m_szBuffer != NULL) && (nSize <= m_nAllocSize)) return true;
 
 	//	realloc() involves memory copy, we don't need it
 	free(m_szBuffer);
@@ -168,6 +168,11 @@ template<class Vector> void resize_vector(Vector &vec, size_t nLength)
 {
 	if ((vec.size() < nLength) || (vec.size() > nLength*16))
 		vec.resize(nLength);
+}
+
+CUTF8Traverse::CUTF8Traverse()
+{
+	SetString("", 0);
 }
 
 void CUTF8Traverse::SetString(const char *szBuffer, INT_PTR nLength)

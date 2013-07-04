@@ -12,7 +12,10 @@ CSingleByteToUTF8Decoder::CSingleByteToUTF8Decoder(UINT nCP)
 bool CSingleByteToUTF8Decoder::Decode(const char *szBuffer, INT_PTR &nLength)
 {
 	Clear();
-	if (nLength == 0) return true;
+	if (nLength == 0) {
+		AllocBuffer(0);
+		return true;
+	}
 
 	int nSize = MultiByteToWideChar(m_nCP, 0, szBuffer, nLength, NULL, 0);
 	if (nSize == 0) return false;

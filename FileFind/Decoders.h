@@ -53,6 +53,8 @@ protected:
 
 class CUTF8Traverse {
 public:
+	CUTF8Traverse();
+
 	void SetString(const char *szBuffer, INT_PTR nLength);
 
 	INT_PTR	ByteToChar(INT_PTR nOffset);

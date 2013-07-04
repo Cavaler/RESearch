@@ -112,7 +112,7 @@ bool CReplacePlainTextFrontend::Process(IBackend *pBackend)
 
 			REParam.AddSource(szBuffer+nOffset, TextUpcase.size());
 			REParam.AddFNumbers(FileNumber, FindNumber, ReplaceNumber);
-			wstring strReplace = CSO::CreateReplaceString(FRReplace.c_str(), L"\n", -1, REParam);
+			wstring strReplace = CSO::CreateReplaceString(FRReplace.c_str(), L"\n", (FREvaluate ? EREvaluateScript : -1), REParam);
 
 			FindNumber++;
 
@@ -159,7 +159,7 @@ bool ReplaceRegExpProcess(IBackend *pBackend, ISplitLineProcessor &Proc)
 
 			REParamA.AddSource(szBuffer, nOffset+nLength);
 			REParamA.AddFNumbers(FileNumber, FindNumber, ReplaceNumber);
-			string strReplace = CSOA::CreateReplaceString(UTF8FromUnicode(FRReplace).c_str(), "\n", -1, REParamA);
+			string strReplace = CSOA::CreateReplaceString(UTF8FromUnicode(FRReplace).c_str(), "\n", (FREvaluate ? EREvaluateScript : -1), REParamA);
 
 			FindNumber++;
 
@@ -173,7 +173,7 @@ bool ReplaceRegExpProcess(IBackend *pBackend, ISplitLineProcessor &Proc)
 				Proc.SkipTo(nOffset + nLength);
 			}
 
-			nStart    = nOffset + nLength;
+			nStart = nOffset + (nLength ? nLength : 1);
 		}
 
 	} while (!Interrupted() && Proc.GetNextLine());
