@@ -328,10 +328,18 @@ bool CFileBackend::OpenOutput()
 {
 	if (m_hOutFile != INVALID_HANDLE_VALUE) return true;
 
-	if (!ConfirmFile(MREReplace, m_strFileName.c_str())) return false;
+	DWORD dwAttr = GetFileAttributes(m_strFileName.c_str());
+	if (dwAttr & FILE_ATTRIBUTE_READONLY) {
+		if (!ConfirmFileReadonly(m_strFileName.c_str())) return false;
+	} else {
+		if (!ConfirmFile(MREReplace, m_strFileName.c_str())) return false;
+	}
 
 	m_hOutFile = CreateFile(m_strOutFileName.c_str(), GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, NULL, NULL);
-	if (m_hOutFile == INVALID_HANDLE_VALUE) return false;
+	if (m_hOutFile == INVALID_HANDLE_VALUE) {
+		ShowLastError(GetMsg(MFileCreateError), m_strOutFileName.c_str());
+		return false;
+	}
 
 	m_nBackedUp = 0;
 

@@ -4,30 +4,6 @@
 tstring g_strNewFileName;
 tstring g_strBackupFileName;
 
-bool ConfirmFileReadonly(const TCHAR *FileName)
-{
-	if (!FRConfirmReadonlyThisRun) return true;
-	if (FRReplaceReadonly == RR_NEVER) return false;
-
-	const TCHAR *Lines[]={
-		GetMsg(MREReplace),GetMsg(MTheFile),FileName,GetMsg(MModifyReadonlyRequest),
-		GetMsg(MOk),GetMsg(MAll),GetMsg(MSkip),GetMsg(MCancel)
-	};
-	switch (StartupInfo.Message(0,_T("FRConfirmReadonly"),Lines,8,4)) {
-	case 1:
-		FRConfirmReadonlyThisRun = FALSE;
-	case 0:
-		return true;
-	case 2:
-		break;
-	case 3:
-	case -1:
-		g_bInterrupted = true;
-		break;
-	}
-	return false;
-}
-
 LONG_PTR WINAPI ConfirmReplacementDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LONG_PTR lParam2)
 {
 	switch (nMsg) {
@@ -155,12 +131,40 @@ tstring GetUniqueFileName(const TCHAR *szCurrent, const TCHAR *szExt) {
 	} while (true);
 }
 
+class ROBackup
+{
+public:
+	ROBackup(LPCTSTR szFileName)
+	{
+		m_dwAttr = GetFileAttributes(szFileName);
+		if ((m_dwAttr != INVALID_FILE_ATTRIBUTES) && (m_dwAttr & FILE_ATTRIBUTE_READONLY)) {
+			SetFileAttributes(szFileName, m_dwAttr & ~FILE_ATTRIBUTE_READONLY);
+			m_strFileName = szFileName;
+		}
+	}
+	void Done()
+	{
+		if (!m_strFileName.empty()) {
+			SetFileAttributes(m_strFileName.c_str(), m_dwAttr);
+			m_strFileName.clear();
+		}
+	}
+	~ROBackup()
+	{
+		Done();
+	}
+protected:
+	tstring m_strFileName;
+	DWORD m_dwAttr;
+};
+
 bool ReplaceSingleFile_Normal(WIN32_FIND_DATA &FindData)
 {
 	bool bProcess = RunReplace(FindData.cFileName);
 
 	if (bProcess) {
 		if (!FRReplaceToNew) {
+			ROBackup _ro(FindData.cFileName);
 			while (!ReplaceFile(FindData.cFileName, g_strNewFileName.c_str(),
 				(FRSaveOriginal) ? g_strBackupFileName.c_str() : NULL,
 				REPLACEFILE_IGNORE_MERGE_ERRORS, NULL, NULL))
@@ -183,11 +187,15 @@ bool ReplaceSingleFile_CopyFirst(WIN32_FIND_DATA &FindData)
 		return ReplaceSingleFile_Normal(FindData);
 	}
 
+	ROBackup _ro(FindData.cFileName);
 	g_strNewFileName = FindData.cFileName;
 	bool bProcess = RunReplace(g_strBackupFileName.c_str());
 
 	if (bProcess) {
-		if (!FRSaveOriginal) DeleteFile(g_strBackupFileName.c_str());
+		if (!FRSaveOriginal) {
+			ROBackup _ro2(g_strBackupFileName.c_str());
+			DeleteFile(g_strBackupFileName.c_str());
+		}
 	} else {
 		MoveFileEx(g_strBackupFileName.c_str(), FindData.cFileName, MOVEFILE_REPLACE_EXISTING|MOVEFILE_COPY_ALLOWED);
 	}
@@ -208,10 +216,9 @@ void ReplaceSingleFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems)
 	InitFoundPosition();
 
 	if (FindData->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) return;
-	
+
 	if (FindData->dwFileAttributes & FILE_ATTRIBUTE_READONLY) {
-		if (!ConfirmFileReadonly(FindData->cFileName)) return;
-		FileConfirmed = true;
+		if (FRReplaceReadonly == RR_NEVER) return;
 	}
 
 	FileNumber++;
@@ -244,7 +251,6 @@ void ReplaceSingleFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems)
 	} else {
 		const TCHAR *Lines[]={GetMsg(MREReplace),GetMsg(MFileOpenError),FindData->cFileName,GetMsg(MOk)};
 		StartupInfo.Message(FMSG_WARNING,_T("FSOpenError"),Lines,4,1);
-		return;
 	}
 }
 

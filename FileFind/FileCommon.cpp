@@ -570,8 +570,10 @@ OperationResult NoFilesFound() {
 	return OR_OK;
 }
 
-BOOL ConfirmFile(int Title,const TCHAR *FileName) {
+BOOL ConfirmFile(int Title,const TCHAR *FileName)
+{
 	if (FileConfirmed) return TRUE;
+
 	const TCHAR *Lines[]={
 		GetMsg(Title),GetMsg(MConfirmRequest),FileName,GetMsg(MOk),GetMsg(MAll),GetMsg(MSkip),GetMsg(MCancel)
 	};
@@ -581,7 +583,34 @@ BOOL ConfirmFile(int Title,const TCHAR *FileName) {
 	case -1:
 	case 3:g_bInterrupted=TRUE;
 	}
+
 	return FALSE;
+}
+
+
+bool ConfirmFileReadonly(const TCHAR *FileName)
+{
+	if (!FRConfirmReadonlyThisRun) return true;
+	if (FRReplaceReadonly == RR_ALWAYS) return true;
+	if (FRReplaceReadonly == RR_NEVER) return false;
+
+	const TCHAR *Lines[]={
+		GetMsg(MREReplace),GetMsg(MTheFile),FileName,GetMsg(MModifyReadonlyRequest),
+		GetMsg(MOk),GetMsg(MAll),GetMsg(MSkip),GetMsg(MCancel)
+	};
+	switch (StartupInfo.Message(0,_T("FRConfirmReadonly"),Lines,8,4)) {
+	case 1:
+		FRConfirmReadonlyThisRun = FALSE;
+	case 0:
+		return true;
+	case 2:
+		break;
+	case 3:
+	case -1:
+		g_bInterrupted = true;
+		break;
+	}
+	return false;
 }
 
 template<> void SkipNoCRLF<char>(const char *&Buffer,int *Size)
