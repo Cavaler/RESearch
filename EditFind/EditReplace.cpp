@@ -481,8 +481,12 @@ BOOL EditorReplaceAgain()
 
 //////////////////////////////////////////////////////////////////////////
 
-void UpdateERDialog(CFarDialog *pDlg, bool bCheckSel = true) {
+void UpdateERDialog(CFarDialog *pDlg, bool bCheckSel = true)
+{
 	bool bSeveralLines = pDlg->IsDlgItemChecked(MSeveralLine);
+
+	bool bAsScript = pDlg->IsDlgItemChecked(MEvaluateAsScript);
+	pDlg->EnableDlgItem(MEvaluateAsScript, bAsScript, 1);
 
 	if (bSeveralLines) {
 		pDlg->CheckDlgItem(MRemoveEmpty,   false);
@@ -509,6 +513,7 @@ LONG_PTR WINAPI EditorReplaceDialogProc(CFarDialog *pDlg, int nMsg, int nParam1,
 			break;
 		case MInSelection:
 		case MRegExp:
+		case MEvaluateAsScript:
 			UpdateERDialog(pDlg, true);
 			break;
 		}
