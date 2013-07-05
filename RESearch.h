@@ -91,15 +91,16 @@ EXTERN int REErrorOffset VALUE(-1);
 
 bool CheckUsage(const tstring &strText, bool bRegExp, bool bSeveralLine);
 BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const tstring &Text,int CaseSensitive,const unsigned char *pTables=NULL);
-tstring EvaluateReplaceString(TREParameters &Param, const TCHAR *Replace, const TCHAR *EOL, int Engine);
 void HighlightREError(CFarDialog *pDlg);
 
 void FillDefaultNamedParameters(const TCHAR *szFileName);
 void ClearVariables();
 
+template<class CHAR>
+basic_string<CHAR> EvaluateReplaceString(CREParameters<CHAR> &Param, const CHAR *Replace, const CHAR *EOL, int Engine);
+
 #ifdef UNICODE
 BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,int CaseSensitive,const unsigned char *pTables=NULL);
-string EvaluateReplaceString(CREParameters<CHAR> &Param, const CHAR *Replace, const CHAR *EOL, int Engine);
 #endif
 
 BOOL LoadPresets(char *Which,char **StringNames,int StringCount,char **IntNames,int IntCount,void **PresetData,int *PresetCount);

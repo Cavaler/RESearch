@@ -295,12 +295,6 @@ TCHAR ConvertCase(TCHAR C)
 
 #ifdef UNICODE
 
-string EvaluateReplaceString(CREParameters<CHAR> &Param, const CHAR *Replace, const CHAR *EOL, int Engine)
-{
-	wstring strResult = EvaluateReplaceString(TREParameters(), OEMToUnicode(Replace).c_str(), OEMToUnicode(EOL).c_str(), Engine);
-	return OEMFromUnicode(strResult);
-}
-
 void BuildUpCaseTable(UINT nCP, char *pTable)
 {
 	for (unsigned short nChar=0; nChar<256; nChar++) {
