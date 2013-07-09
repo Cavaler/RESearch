@@ -93,6 +93,8 @@ OperationResult EditorFilterExecutor() {
 
 	EText = SearchText;
 
+	if (!EFromCurrentPosition) EditorSeekToBeginEnd();
+
 	BOOL bResult = EditorFilterAgain();
 	StartupInfo.EditorControl(ECTL_REDRAW, NULL);
 	return bResult ? OR_OK : OR_CANCEL;
@@ -111,7 +113,8 @@ BOOL CEFPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.Add(new CFarCheckBoxItem(5,8,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
 	Dialog.Add(new CFarRadioButtonItem(30,7,0,MLeaveMatching,&pPreset->m_mapInts["LeaveFilter"],TRUE));
 	Dialog.Add(new CFarRadioButtonItem(30,8,0,MRemoveMatching,&pPreset->m_mapInts["LeaveFilter"],FALSE));
-	Dialog.Add(new CFarCheckBoxItem(5,11,0,MAddToMenu,&pPreset->m_bAddToMenu));
+	Dialog.Add(new CFarCheckBoxItem(5,10,0,MAddToMenu,&pPreset->m_bAddToMenu));
+	Dialog.Add(new CFarCheckBoxItem(5,11,0,MFromCurrentPosition,&pPreset->m_mapInts["FromCurrent"]));
 	Dialog.AddButtons(MOk,MCancel);
 
 	do {

@@ -259,8 +259,7 @@ OperationResult EditorSearchExecutor() {
 	if (!EPreparePattern(SearchText)) return OR_FAILED;
 	EText = SearchText;
 
-//	Search from current position is more handy
-//	EditorSeekToBeginEnd();
+	if (!EFromCurrentPosition) EditorSeekToBeginEnd();
 
 	return (EListAllFromPreset) ?
 		EditorListAllAgain() ? OR_OK : OR_CANCEL :
@@ -268,7 +267,7 @@ OperationResult EditorSearchExecutor() {
 }
 
 BOOL CESPresetCollection::EditPreset(CPreset *pPreset) {
-	CFarDialog Dialog(76,16,_T("ESPresetDlg"));
+	CFarDialog Dialog(76,18,_T("ESPresetDlg"));
 	Dialog.AddFrame(MESPreset);
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
 	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,_T("RESearch.PresetName"),pPreset->Name()));
@@ -280,7 +279,8 @@ BOOL CESPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.Add(new CFarCheckBoxItem(5,8,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
 	Dialog.Add(new CFarCheckBoxItem(35,7,0,MSeveralLine,&pPreset->m_mapInts["SeveralLine"]));
 	Dialog.Add(new CFarCheckBoxItem(5,10,0,MAddToMenu,&pPreset->m_bAddToMenu));
-	Dialog.Add(new CFarCheckBoxItem(35,10,0,MListAllFromPreset,&pPreset->m_mapInts["ListAll"]));
+	Dialog.Add(new CFarCheckBoxItem(5,11,0,MListAllFromPreset,&pPreset->m_mapInts["ListAll"]));
+	Dialog.Add(new CFarCheckBoxItem(5,12,0,MFromCurrentPosition,&pPreset->m_mapInts["FromCurrent"]));
 	Dialog.AddButtons(MOk,MCancel);
 
 	do {

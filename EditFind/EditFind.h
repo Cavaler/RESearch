@@ -58,6 +58,7 @@ EXTERN bool EREvaluate VALUE(false);
 EXTERN BOOL EReverse VALUE(FALSE);
 EXTERN BOOL ESearchAgainCalled VALUE(FALSE);
 EXTERN BOOL EInSelection;
+EXTERN bool EFromCurrentPosition VALUE(false);
 
 EXTERN tstring ETextUpcase;
 EXTERN pcre *EPattern VALUE(NULL);

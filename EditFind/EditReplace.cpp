@@ -636,7 +636,7 @@ OperationResult EditorReplaceExecutor() {
 	FindNumber = ReplaceNumber = 0;
 	REParam.m_setInitParam.clear();
 
-	EditorSeekToBeginEnd();
+	if (!EFromCurrentPosition) EditorSeekToBeginEnd();
 
 	BOOL bResult = EditorReplaceAgain();
 	StartupInfo.EditorControl(ECTL_REDRAW, NULL);
@@ -644,7 +644,7 @@ OperationResult EditorReplaceExecutor() {
 }
 
 BOOL CERPresetCollection::EditPreset(CPreset *pPreset) {
-	CFarDialog Dialog(76, 20, _T("ERPresetDlg"));
+	CFarDialog Dialog(76, 21, _T("ERPresetDlg"));
 	Dialog.AddFrame(MERPreset);
 	Dialog.Add(new CFarTextItem(5, 2, 0, MPresetName));
 	Dialog.Add(new CFarEditItem(5, 3, 70, DIF_HISTORY,_T("RESearch.PresetName"), pPreset->Name()));
@@ -665,6 +665,7 @@ BOOL CERPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.Add(new CFarButtonItem(60, 12, 0, FALSE, MRunEditor));
 
 	Dialog.Add(new CFarCheckBoxItem(5, 14, 0, MAddToMenu, &pPreset->m_bAddToMenu));
+	Dialog.Add(new CFarCheckBoxItem(5, 15, 0, MFromCurrentPosition, &pPreset->m_mapInts["FromCurrent"]));
 	Dialog.AddButtons(MOk, MCancel);
 
 	do {

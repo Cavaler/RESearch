@@ -226,7 +226,8 @@ MErrorCreatingEngine	"Error creating script engine"		"Ошибка при соз
 MErrorParsingText		"Error parsing script text"			"Ошибка разбора текста скрипта"
 MErrorLoadingTypeLib	"Error loading type library"		"Ошибка при загрузке библиотеки типов"
 MErrorExecutingScript	"Error executing script"			"Ошибка при выполнении скрипта"
-MListAllFromPreset	"Execute as 'Show &all'"				"Выполнить как 'Показать &все'"
+MListAllFromPreset		"Execute as 'Show &all'"			"Выполнить как 'Показать &все'"
+MFromCurrentPosition	"Execute from current position"		"Выполнить с текущей позиции"
 
 MTransliterate		"Transliterate"					"Транслитерация"
 MTransSource		"&Source characters"			"Исходные символы"
