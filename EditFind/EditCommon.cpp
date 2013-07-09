@@ -503,6 +503,7 @@ void SynchronizeWithFile(bool bReplace)
 
 	if (bReplace) {
 		ERReplace = FRReplace;
+		EREvaluate = FREvaluate;
 		LastAction = 1;
 	} else
 		LastAction = 0;
@@ -759,7 +760,7 @@ bool RefreshEditorInfo()
 #endif
 
 	HANDLE hBuffer = GetStdHandle(STD_OUTPUT_HANDLE);
-	COORD coord = {0, 0};
+	COORD coord = {1, 0};
 	DWORD dwRead;
 	ReadConsoleOutputAttribute(hBuffer, &BarColor, 1, coord, &dwRead);
 
