@@ -169,7 +169,8 @@ CPresetCollection::CPresetCollection(CParameterSet &ParamSet, const TCHAR *strKe
 
 void CPresetCollection::Load()
 {
-	CFarSettingsKey hKey = Settings.Open(FormatStr(_T("%sPresets"), Name()).c_str(), false);
+	CFarSettingsKey hRoot = GetSettings();
+	CFarSettingsKey hKey = hRoot.Open(FormatStr(_T("%sPresets"), Name()).c_str(), false);
 	if (!hKey.Valid()) return;
 
 	hKey.StartEnumKeys();
@@ -189,7 +190,8 @@ CPresetCollection::~CPresetCollection()
 
 void CPresetCollection::Save()
 {
-	CFarSettingsKey hKey = Settings.Open(FormatStr(_T("%sPresets"), Name()).c_str());
+	CFarSettingsKey hRoot = GetSettings();
+	CFarSettingsKey hKey = hRoot.Open(FormatStr(_T("%sPresets"), Name()).c_str());
 	if (!hKey.Valid()) return;
 
 	hKey.DeleteAllKeys();

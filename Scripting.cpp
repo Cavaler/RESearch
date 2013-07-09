@@ -14,7 +14,8 @@ _COM_SMARTPTR_TYPEDEF(IEnumCLSID, __uuidof(IEnumCLSID));
 
 void ReadActiveScripts()
 {
-	CFarSettingsKey hKey = Settings.Open(_T("ScriptEngines"));
+	CFarSettingsKey hRoot = GetSettings();
+	CFarSettingsKey hKey = hRoot.Open(_T("ScriptEngines"));
 
 	hKey.StartEnumValues();
 	tstring strName;
@@ -39,7 +40,8 @@ void ReadActiveScripts()
 
 void SaveActiveScripts()
 {
-	CFarSettingsKey hKey = Settings.Open(_T("ScriptEngines"));
+	CFarSettingsKey hRoot = GetSettings();
+	CFarSettingsKey hKey = hRoot.Open(_T("ScriptEngines"));
 	hKey.DeleteAllValues();
 
 	for (size_t nKey = 0; nKey < m_arrEngines.size(); nKey++) {

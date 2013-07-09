@@ -2,19 +2,26 @@
 #define DEFINE_VARS
 #include "RESearch.h"
 
+CFarSettingsKey GetSettings()
+{
+	if (Settings.Valid()) return Settings;
+
+	return CFarSettingsKey(_T("RESearch"));
+}
+
 void ReadRegistry()
 {
-	CFarSettingsKey &hKey = Settings;
+	Settings = GetSettings();
 
-#define DECLARE_PERSIST_LOAD hKey
+#define DECLARE_PERSIST_LOAD Settings
 #include "PersistVars.h"
 
 #ifdef UNICODE
 	vector<BYTE> arrCPs;
 #ifdef FAR3
-	QuerySettingsBinaryValue(hKey, _T("AllCP"), arrCPs);
+	QuerySettingsBinaryValue(Settings, _T("AllCP"), arrCPs);
 #else
-	QueryRegBinaryValue(hKey, _T("AllCP"), arrCPs);
+	QueryRegBinaryValue(Settings, _T("AllCP"), arrCPs);
 #endif
 	if (arrCPs.empty()) {
 		g_setAllCPs.insert(GetOEMCP());
@@ -29,23 +36,25 @@ void ReadRegistry()
 	}
 #endif
 
-	EReadRegistry(hKey);
-	VReadRegistry(hKey);
-	FReadRegistry(hKey);
-	FTReadRegistry(hKey);
+	EReadRegistry(Settings);
+	VReadRegistry(Settings);
+	FReadRegistry(Settings);
+	FTReadRegistry(Settings);
 
 	g_pEditorBatchType = new CBatchType(MEditorBatches, ESPresets, ERPresets, EFPresets, ETPresets, NULL);
-	g_pEditorBatches = new CBatchActionCollection(*g_pEditorBatchType, hKey.Open(_T("EditorBatches")));
+	g_pEditorBatches = new CBatchActionCollection(*g_pEditorBatchType, Settings.Open(_T("EditorBatches")));
 
 	g_pPanelBatchType = new CBatchType(MPanelBatches, FSPresets, FRPresets, RnPresets, QRPresets, FGPresets, NULL);
-	g_pPanelBatches = new CBatchActionCollection(*g_pPanelBatchType, hKey.Open(_T("PanelBatches")));
+	g_pPanelBatches = new CBatchActionCollection(*g_pPanelBatchType, Settings.Open(_T("PanelBatches")));
+
+	Settings.Close();
 }
 
 void WriteRegistry()
 {
-	CFarSettingsKey &hKey = Settings;
+	Settings = GetSettings();
 
-#define DECLARE_PERSIST_SAVE hKey
+#define DECLARE_PERSIST_SAVE Settings
 #include "PersistVars.h"
 
 #ifdef UNICODE
@@ -53,22 +62,21 @@ void WriteRegistry()
 	for (cp_set::iterator it = g_setAllCPs.begin(); it != g_setAllCPs.end(); it++)
 		arrCPs.push_back(*it);
 #ifdef FAR3
-	SetSettingsBinaryValue(hKey, _T("AllCP"), arrCPs.empty() ? NULL : &arrCPs[0], arrCPs.size()*sizeof(DWORD));
+	SetSettingsBinaryValue(Settings, _T("AllCP"), arrCPs.empty() ? NULL : &arrCPs[0], arrCPs.size()*sizeof(DWORD));
 #else
-	SetRegBinaryValue(hKey, _T("AllCP"), arrCPs.empty() ? NULL : &arrCPs[0], arrCPs.size()*sizeof(DWORD));
+	SetRegBinaryValue(Settings, _T("AllCP"), arrCPs.empty() ? NULL : &arrCPs[0], arrCPs.size()*sizeof(DWORD));
 #endif
 #endif
 
-	EWriteRegistry(hKey);
-	VWriteRegistry(hKey);
-	FWriteRegistry(hKey);
-	FTWriteRegistry(hKey);
+	EWriteRegistry(Settings);
+	VWriteRegistry(Settings);
+	FWriteRegistry(Settings);
+	FTWriteRegistry(Settings);
 
-	g_pEditorBatches->Save(hKey.Open(_T("EditorBatches")));
-	g_pPanelBatches->Save (hKey.Open(_T("PanelBatches" )));
+	g_pEditorBatches->Save(Settings.Open(_T("EditorBatches")));
+	g_pPanelBatches->Save (Settings.Open(_T("PanelBatches" )));
 
 	Settings.Close();
-	Settings.OpenRoot(_T("RESearch"));
 }
 
 bool CheckUsage(const tstring &strText, bool bRegExp, bool bSeveralLine)

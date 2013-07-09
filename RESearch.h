@@ -50,6 +50,7 @@ BOOL SystemToLocalTime(FILETIME &ft);
 BOOL LocalToSystemTime(FILETIME &ft);
 
 EXTERN CFarSettingsKey Settings;
+CFarSettingsKey GetSettings();
 void ReadRegistry();
 void WriteRegistry();
 

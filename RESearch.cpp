@@ -68,7 +68,6 @@ void WINAPI FAR_EXPORT(SetStartupInfo)(const PluginStartupInfo *Info)
 #endif
 
 	PrepareLocaleStuff();
-	Settings.OpenRoot(_T("RESearch"));
 	ReadRegistry();
 
 	g_pszOKButton = GetMsg(MOk);
@@ -79,21 +78,6 @@ void WINAPI FAR_EXPORT(SetStartupInfo)(const PluginStartupInfo *Info)
 
 	CoInitialize(NULL);
 	ReadActiveScripts();
-
-/*	BMH Performance check
-	LARGE_INTEGER Freq, Start, End;
-	QueryPerformanceFrequency(&Freq);
-
-	int nSize = 512*1024*1024;
-	char *szBuffer = (char *)malloc(nSize);
-
-	PrepareBMHSearch("ksbnrikavgéãôêåíãøùç", 20, 0);
-	QueryPerformanceCounter(&Start);
-	int nResult = BMHSearch(szBuffer, nSize, "ksbnrikavgéãôêåíãøùç", 20, NULL, 0);
-	QueryPerformanceCounter(&End);
-
-	double mMsec = (End.QuadPart - Start.QuadPart)/(Freq.QuadPart / 1000.0);
-	*/
 }
 
 void BadCmdLine() {
@@ -1283,7 +1267,6 @@ void WINAPI FAR_EXPORT(ExitFAR)() {
 	ECleanup(FALSE);
 	FCleanup(FALSE);
 	FTCleanup(FALSE);
-	Settings.Close();
 	StopREThread();
 	CoUninitialize();
 }
