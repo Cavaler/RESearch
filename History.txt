@@ -8,11 +8,20 @@ Regular Expression Search and Replace
 Planned:
 	- Search in share-opened files
 	? Searching in streams
-	? Preset can start from current position
+	+ Command to "lock" read-only file before replacing
 
 Known bugs:
 	- Replace changing part of (real) EOL crashes
-	- Incorrect restoring of vertical selection with tabs
+
+Version 7.70 (09.07.2013)
+	+ Can perform script evaluation when replacing from panels
+	- Fixed panel replace operations with empty files
+	- Ask for replace in read-only file only when really replacing something
+	- Fixed displaying '&' in replace prompt
+	- Fixed restoring of vertical selection with tabs
+	* "Update script engines" button in Common settings
+	- RESearch doesn't prevent own second copy from reading settings
+	+ Editor search/replace/filter presets can run from start or from current position
 
 Version 7.67 (14.05.2013)
 	- Fixed slow opening large files for RegExp operations
