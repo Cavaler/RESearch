@@ -2005,7 +2005,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Compiling language file $(InputPath)..."
-						CommandLine="$(COMSPEC) /c ..\MakeLng.bat RESearch RESearch_msg.h&#x0D;&#x0A;echo Copying resulting language files...&#x0D;&#x0A;copy *.lng &quot;$(FAR_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;"
+						CommandLine="$(COMSPEC) /c ..\MakeLng.bat RESearch RESearch_msg.h&#x0D;&#x0A;echo Copying resulting language files...&#x0D;&#x0A;copy *.lng &quot;$(FAR_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;copy *.lng &quot;$(FAR2_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;copy *.lng &quot;$(FAR3_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;"
 						Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
 					/>
 				</FileConfiguration>
@@ -2048,7 +2048,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Compiling language file $(InputPath)..."
-						CommandLine="$(COMSPEC) /c ..\MakeLng.bat RESearch RESearch_msg.h&#x0D;&#x0A;echo Copying resulting language files...&#x0D;&#x0A;copy *.lng &quot;$(FAR2_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;"
+						CommandLine="$(COMSPEC) /c ..\MakeLng.bat RESearch RESearch_msg.h&#x0D;&#x0A;echo Copying resulting language files...&#x0D;&#x0A;copy *.lng &quot;$(FAR_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;copy *.lng &quot;$(FAR2_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;copy *.lng &quot;$(FAR3_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;"
 						Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
 					/>
 				</FileConfiguration>
@@ -2091,7 +2091,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Compiling language file $(InputPath)..."
-						CommandLine="$(COMSPEC) /c ..\MakeLng.bat RESearch RESearch_msg.h&#x0D;&#x0A;echo Copying resulting language files...&#x0D;&#x0A;copy *.lng &quot;$(FAR3_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;"
+						CommandLine="$(COMSPEC) /c ..\MakeLng.bat RESearch RESearch_msg.h&#x0D;&#x0A;echo Copying resulting language files...&#x0D;&#x0A;copy *.lng &quot;$(FAR_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;copy *.lng &quot;$(FAR2_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;copy *.lng &quot;$(FAR3_DEBUG_DLLS)\$(ProjectName)\&quot;&#x0D;&#x0A;"
 						Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
 					/>
 				</FileConfiguration>
