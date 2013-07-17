@@ -239,9 +239,15 @@ bool PerformSingleRename(rename_pair &Item)
 
 	if (Error != ERROR_SUCCESS) {
 		const TCHAR *Lines[]={GetMsg(MMenuRename),GetMsg(MRenameError),Item.first.c_str(),
-			GetMsg(MAskTo),Item.second.c_str(),GetMsg(MOk),GetMsg(MCancel)};
-		if (StartupInfo.Message(FMSG_WARNING,_T("FRenameError"),Lines,7,2)==1) g_bInterrupted=TRUE;
-		return false;
+			GetMsg(MAskTo),Item.second.c_str(),GetMsg(MBtnRetry),GetMsg(MSkip),GetMsg(MCancel)};
+		switch (StartupInfo.Message(FMSG_WARNING|FMSG_ERRORTYPE, _T("FRenameError"), Lines, 8, 3)) {
+		case 0:
+			return PerformSingleRename(Item);
+		case 2:
+			g_bInterrupted=TRUE;
+		case 1:
+			return false;
+		}
 	}
 
 	PostPerformRename(Item);
@@ -259,9 +265,11 @@ bool PerformSingleRename(rename_pair &Item, panelitem_vector &PanelItems)
 		return false;
 }
 
-void PerformFinalRename(panelitem_vector &PanelItems) {
+void PerformFinalRename(panelitem_vector &PanelItems)
+{
 	for (size_t nItem = 0; nItem < m_arrPendingRename.size(); nItem++) {
 		PerformSingleRename(m_arrPendingRename[nItem], PanelItems);
+		if (Interrupted()) break;
 	}
 }
 
