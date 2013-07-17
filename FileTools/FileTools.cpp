@@ -924,7 +924,7 @@ OperationResult UndoRenameFiles() {
 
 BOOL CRnPresetCollection::EditPreset(CPreset *pPreset) {
 	CFarDialog Dialog(76,17,_T("RPresetDlg"));
-	Dialog.AddFrame(MFRPreset);
+	Dialog.AddFrame(MRnPreset);
 
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
 	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,_T("RESearch.PresetName"), pPreset->Name()));
