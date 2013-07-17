@@ -186,73 +186,70 @@ void PostPerformRename(rename_pair &Item)
 
 bool PerformSingleRename(rename_pair &Item)
 {
-	if (MoveFile(Item.first.c_str(), Item.second.c_str())) {
-		PostPerformRename(Item);
-		return true;
-	}
-
-	DWORD Error = GetLastError();
-	switch (Error) {
-	case ERROR_ALREADY_EXISTS:
-		if (FTAskOverwrite) {
-			const TCHAR *Lines[]={GetMsg(MMenuRename),GetMsg(MFile),Item.second.c_str(),
-				GetMsg(MAskOverwrite),Item.first.c_str(),GetMsg(MOk),GetMsg(MAll),GetMsg(MSkip),GetMsg(MCancel)};
-			switch (StartupInfo.Message(FMSG_WARNING,_T("FRenameOverwrite"),Lines,9,4)) {
-			case 1:
-				FTAskOverwrite=false;
-			case 0:
-				break;
-			case 3:
-				g_bInterrupted=TRUE;
-			case 2:
-				return false;
-			}
+	bool bOverwrite = !FTAskOverwrite;
+	do {
+		DWORD dwFlags = MOVEFILE_COPY_ALLOWED;
+		if (bOverwrite) dwFlags |= MOVEFILE_REPLACE_EXISTING;
+		
+		if (MoveFileEx(Item.first.c_str(), Item.second.c_str(), dwFlags)) {
+			PostPerformRename(Item);
+			return true;
 		}
 
-		if (MoveFileEx(Item.first.c_str(), Item.second.c_str(), MOVEFILE_REPLACE_EXISTING))
-			Error = ERROR_SUCCESS;
-		else
-			Error = GetLastError();
-		break;
+		DWORD dwError = GetLastError();
 
-	case ERROR_PATH_NOT_FOUND:
-		if (FTAskCreatePath) {
-			const TCHAR *Lines[]={GetMsg(MMenuRename),GetMsg(MFile),Item.second.c_str(),
-				GetMsg(MAskCreatePath),GetMsg(MOk),GetMsg(MAll),GetMsg(MSkip),GetMsg(MCancel)};
-			switch (StartupInfo.Message(FMSG_WARNING,_T("FRenameCreatePath"),Lines,8,4)) {
-			case 1:
-				FTAskCreatePath=false;
-			case 0:
-				break;
-			case 3:
-				g_bInterrupted=TRUE;
-			case 2:
-				return false;
+		switch (dwError) {
+		case ERROR_ALREADY_EXISTS:
+			if (FTAskOverwrite) {
+				const TCHAR *Lines[]={GetMsg(MMenuRename),GetMsg(MFile),Item.second.c_str(),
+					GetMsg(MAskOverwrite),Item.first.c_str(),GetMsg(MOk),GetMsg(MAll),GetMsg(MSkip),GetMsg(MCancel)};
+				switch (StartupInfo.Message(FMSG_WARNING,_T("FRenameOverwrite"),Lines,9,4)) {
+				case 1:
+					FTAskOverwrite = false;
+				case 0:
+					bOverwrite = true;
+					continue;
+				case 3:
+					g_bInterrupted = TRUE;
+				case 2:
+					return false;
+				}
 			}
+			break;
+
+		case ERROR_PATH_NOT_FOUND:
+			if (FTAskCreatePath) {
+				const TCHAR *Lines[]={GetMsg(MMenuRename),GetMsg(MFile),Item.second.c_str(),
+					GetMsg(MAskCreatePath),GetMsg(MOk),GetMsg(MAll),GetMsg(MSkip),GetMsg(MCancel)};
+				switch (StartupInfo.Message(FMSG_WARNING,_T("FRenameCreatePath"),Lines,8,4)) {
+				case 1:
+					FTAskCreatePath=false;
+				case 0:
+					break;
+				case 3:
+					g_bInterrupted=TRUE;
+				case 2:
+					return false;
+				}
+			}
+			CreateDirectoriesForFile(Item.second.c_str());
+			continue;
 		}
 
-		if (CreateDirectoriesForFile(Item.second.c_str()) && MoveFile(Item.first.c_str(), Item.second.c_str()))
-			Error = ERROR_SUCCESS;
-		else
-			Error = GetLastError();
-	}
-
-	if (Error != ERROR_SUCCESS) {
 		const TCHAR *Lines[]={GetMsg(MMenuRename),GetMsg(MRenameError),Item.first.c_str(),
 			GetMsg(MAskTo),Item.second.c_str(),GetMsg(MBtnRetry),GetMsg(MSkip),GetMsg(MCancel)};
 		switch (StartupInfo.Message(FMSG_WARNING|FMSG_ERRORTYPE, _T("FRenameError"), Lines, 8, 3)) {
 		case 0:
-			return PerformSingleRename(Item);
+			continue;
 		case 2:
 			g_bInterrupted=TRUE;
 		case 1:
 			return false;
 		}
-	}
 
-	PostPerformRename(Item);
+	} while (true);
 
-	return true;
+	return false;
 }
 
 bool PerformSingleRename(rename_pair &Item, panelitem_vector &PanelItems)
