@@ -933,7 +933,7 @@ BOOL CRnPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.Add(new CFarTextItem(5,4,0,MMask));
 	Dialog.Add(new CFarEditItem(5,5,70,DIF_HISTORY,_T("Masks"), pPreset->m_mapStrings["Mask"]));
 
-	Dialog.Add(new CFarTextItem(5,6,0,MSearchFor));
+	Dialog.Add(new CFarTextItem(5,6,0,MText));
 	Dialog.Add(new CFarCheckBoxItem(35,6,0,MAsRegExp,&pPreset->m_mapInts["TextAsRegExp"]));
 	Dialog.Add(new CFarEditItem(5,7,70,DIF_HISTORY,_T("SearchText"), pPreset->m_mapStrings["Text"]));
 
@@ -954,7 +954,7 @@ BOOL CQRPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
 	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,_T("RESearch.PresetName"), pPreset->Name()));
 
-	Dialog.Add(new CFarTextItem(5,4,0,MSearchFor));
+	Dialog.Add(new CFarTextItem(5,4,0,MText));
 	Dialog.Add(new CFarCheckBoxItem(35,4,0,MAsRegExp,&pPreset->m_mapInts["TextAsRegExp"]));
 	Dialog.Add(new CFarEditItem(5,5,70,DIF_HISTORY,_T("SearchText"), pPreset->m_mapStrings["Text"]));
 

@@ -669,7 +669,7 @@ BOOL CERPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.AddButtons(MOk, MCancel);
 
 	do {
-		switch (Dialog.Display(2, -2, -4)) {
+		switch (Dialog.Display(2, -2, -5)) {
 		case 0:
 			return TRUE;
 		case 1:
