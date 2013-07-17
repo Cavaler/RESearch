@@ -211,6 +211,7 @@ bool PerformSingleRename(rename_pair &Item)
 					continue;
 				case 3:
 					g_bInterrupted = TRUE;
+				case -1:
 				case 2:
 					return false;
 				}
@@ -228,11 +229,25 @@ bool PerformSingleRename(rename_pair &Item)
 					break;
 				case 3:
 					g_bInterrupted=TRUE;
+				case -1:
 				case 2:
 					return false;
 				}
 			}
-			CreateDirectoriesForFile(Item.second.c_str());
+
+			if (!CreateDirectoriesForFile(Item.second.c_str())) {
+				tstring strPath = GetFullFileName(GetPath(Item.second));
+				const TCHAR *Lines[]={GetMsg(MMenuRename),GetMsg(MPathCreateError),strPath.c_str(),
+					GetMsg(MSkip),GetMsg(MCancel)};
+				switch (StartupInfo.Message(FMSG_WARNING|FMSG_ERRORTYPE,_T("FRenameCreatePathError"),Lines,5,2)) {
+				case 1:
+					g_bInterrupted=TRUE;
+				case -1:
+				case 0:
+					return false;
+				}
+			}
+
 			continue;
 		}
 
@@ -243,6 +258,7 @@ bool PerformSingleRename(rename_pair &Item)
 			continue;
 		case 2:
 			g_bInterrupted=TRUE;
+		case -1:
 		case 1:
 			return false;
 		}
