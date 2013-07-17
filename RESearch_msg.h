@@ -128,6 +128,7 @@ enum eStringTable {
 
 	MFileOpenError,
 	MFileCreateError,
+	MPathCreateError,
 	MFileBackupError,
 	MFileReadError,
 	MFileWriteError,

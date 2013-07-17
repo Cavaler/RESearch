@@ -128,6 +128,7 @@ MRenumber			"Renumber"			"Перенумеровать"
 
 MFileOpenError		"Cannot open file"		"Ошибка открытия файла"
 MFileCreateError	"Cannot create file"	"Ошибка создания файла"
+MPathCreateError	"Cannot create path"	"Ошибка создания пути"
 MFileBackupError	"Cannot backup file"	"Ошибка сохранения копии файла"
 MFileReadError		"Read error in file"	"Ошибка чтения файла"
 MFileWriteError		"Write error in file"	"Ошибка записи в файл"
