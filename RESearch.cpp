@@ -1061,14 +1061,15 @@ int ConfigureCP()
 
 void ConfigureCommon()
 {
-	CFarDialog Dialog(60, 21, _T("CommonConfig"));
+	CFarDialog Dialog(61, 21, _T("CommonConfig"));
+	Dialog.EnableAutoHotkeys(true);
 	Dialog.AddFrame(MCommonSettings);
 
 	Dialog.Add(new CFarTextItem(5,3,0,MSeveralLinesIs));
 	Dialog.Add(new CFarEditItem(32,3,36,0,NULL,(int &)SeveralLines,new CFarIntegerRangeValidator(1, 65535)));
 	Dialog.Add(new CFarTextItem(38,3,0,MLinesOr));
 	Dialog.Add(new CFarEditItem(48,3,52,0,NULL,(int &)SeveralLinesKB,new CFarIntegerRangeValidator(1, 1024)));
-	Dialog.Add(new CFarTextItem(53,3,0,MKB));
+	Dialog.Add(new CFarTextItem(53,3,DIF_NOAUTOHOTKEY,MKB));
 
 	Dialog.Add(new CFarCheckBoxItem(5,5,0,MDotMatchesNewline,&DotMatchesNewline));
 
@@ -1077,7 +1078,7 @@ void ConfigureCommon()
 	Dialog.Add(new CFarEditItem(34,8,40,0,NULL,(int &)g_nMaxInThreadLength,new CFarIntegerRangeValidator(0,0x7FFFFFFF)));
 	Dialog.Add(new CFarTextItem(9,9,0,MThreadStackMB));
 	Dialog.Add(new CFarEditItem(34,9,40,0,NULL,(int &)g_nThreadStackMB,new CFarIntegerRangeValidator(0,1024)));
-	Dialog.Add(new CFarTextItem(43,9,0,MKB));
+	Dialog.Add(new CFarTextItem(44,9,DIF_NOAUTOHOTKEY,MKB));
 
 	Dialog.Add(new CFarCheckBoxItem(5,11,0,MShowUsageWarnings,&g_bShowUsageWarnings));
 	Dialog.Add(new CFarCheckBoxItem(5,12,0,MUseEscapesInPlainText,&g_bEscapesInPlainText));
@@ -1108,6 +1109,7 @@ void ConfigureFile()
 #else
 	CFarDialog Dialog(70, 21, _T("FileConfig"));
 #endif
+	Dialog.EnableAutoHotkeys(true);
 	Dialog.AddFrame(MFileSearchSettings);
 
 	Dialog.Add(new CFarBoxItem(FALSE,5,3,33,7,DIF_LEFTTEXT,MDefaultMaskCase));
@@ -1127,7 +1129,7 @@ void ConfigureFile()
 
 	Dialog.Add(new CFarTextItem(5,15,0,MBufferSize));
 	Dialog.Add(new CFarEditItem(34,15,40,0,NULL,FBufferSize,new CFarIntegerRangeValidator(1,1024)));
-	Dialog.Add(new CFarTextItem(43,15,0,MMB));
+	Dialog.Add(new CFarTextItem(43,15,DIF_NOAUTOHOTKEY,MMB));
 
 #ifdef UNICODE
 	Dialog.Add(new CFarTextItem(5,17,0,MDefaultCP));
@@ -1158,6 +1160,7 @@ void ConfigureFile()
 void ConfigureRenumbering(bool bRuntime)
 {
 	CFarDialog Dialog(70, bRuntime ? 18 : 16, _T("RenumberConfig"));
+	Dialog.EnableAutoHotkeys(true);
 
 	Dialog.AddFrame(MRenumberSettings);
 	Dialog.Add(new CFarCheckBoxItem(5,3,0,MStripFromBeginning, g_bStripRegExp));
@@ -1184,6 +1187,7 @@ void ConfigureRenumbering(bool bRuntime)
 void ConfigureEditor()
 {
 	CFarDialog Dialog(61, 31, _T("EditorConfig"));
+	Dialog.EnableAutoHotkeys(true);
 	Dialog.AddFrame(MEditorSearchSettings);
 
 	Dialog.Add(new CFarTextItem(5,3,0,MShowPositionOffset));
@@ -1197,10 +1201,10 @@ void ConfigureEditor()
 
 	Dialog.Add(new CFarTextItem(5,9,0,MLRSideOffset));
 	Dialog.Add(new CFarEditItem(41,9,45,0,NULL,(int &)ELRSideOffset,new CFarIntegerRangeValidator(0, 1024)));
-	Dialog.Add(new CFarTextItem(47,9,0,MLROffsetChars));
+	Dialog.Add(new CFarTextItem(47,9,DIF_NOAUTOHOTKEY,MLROffsetChars));
 	Dialog.Add(new CFarTextItem(5, 10,0,MTDSideOffset));
 	Dialog.Add(new CFarEditItem(41,10,45,0,NULL,(int &)ETDSideOffset,new CFarIntegerRangeValidator(0, 1024)));
-	Dialog.Add(new CFarTextItem(47,10,0,MTDOffsetLines));
+	Dialog.Add(new CFarTextItem(47,10,DIF_NOAUTOHOTKEY,MTDOffsetLines));
 
 	Dialog.Add(new CFarTextItem(5,12,0,MFindTextAtCursor));
 	Dialog.Add(new CFarRadioButtonItem(7,13,DIF_GROUP,MNone,(int *)&EFindTextAtCursor,FT_NONE));
