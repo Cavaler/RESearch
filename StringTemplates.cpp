@@ -276,7 +276,10 @@ template<class CHAR>
 void CREParameters<CHAR>::AddRE(pcre *re)
 {
 	m_re = re;
-	m_arrMatch.resize((pcre_info(re, NULL, NULL)+1)*3);
+
+	int count;
+	pcre_fullinfo(re, NULL, PCRE_INFO_CAPTURECOUNT, &count);
+	m_arrMatch.resize((count+1)*3);
 
 	vector<cstring> arrNames;
 	pcre_get_stringlist(m_re, arrNames);
