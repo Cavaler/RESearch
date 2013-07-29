@@ -481,6 +481,10 @@ void ECleanup(BOOL PatternOnly)
 	REParam.BackupParam();
 	PCRE_FREE(EPattern);
 	PCRE_FREE(EPatternExtra);
+#ifdef UNICODE
+	PCRE_FREE(EPattern16);
+	PCRE_FREE(EPattern16Extra);
+#endif
 
 	REErrorOffset = -1;
 
