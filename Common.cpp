@@ -161,6 +161,31 @@ BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,
 		return TRUE;
 	}
 }
+
+BOOL PreparePattern(pcre16 **Pattern,pcre16_extra **PatternExtra,const wstring &Text,int CaseSensitive)
+{
+	if (Text.empty()) return FALSE;		// WAS: Not needed if empty NOW: what is search for nothing?
+	const char *ErrPtr;
+	int ErrOffset;
+	int iFlags=PCRE_MULTILINE|PCRE_UCP;
+	if (DotMatchesNewline) iFlags |= PCRE_DOTALL;
+	if (!CaseSensitive) iFlags |= PCRE_CASELESS;
+
+	*Pattern=pcre16_compile((PCRE_SPTR16)Text.c_str(),iFlags,&ErrPtr,&ErrOffset,NULL);
+	if (!(*Pattern)) {
+		tstring ErrPos(Text.length(),' ');
+		tstring strErrPtr = OEMToUnicode(ErrPtr);
+		const TCHAR *Lines[]={GetMsg(MRegExpError),strErrPtr.c_str(),_T("\x01"),Text.c_str(),ErrPos.c_str(),GetMsg(MOk)};
+		ErrPos[ErrOffset]='^';
+		StartupInfo.Message(FMSG_WARNING,_T("RegExpError"),Lines,6,1);
+		return FALSE;
+	} else {
+		if (PatternExtra) {
+			*PatternExtra=pcre16_study(*Pattern,0,&ErrPtr);
+		}
+		return TRUE;
+	}
+}
 #endif
 
 void FillDefaultNamedParameters(const TCHAR *szFileName)

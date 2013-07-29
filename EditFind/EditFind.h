@@ -63,6 +63,8 @@ EXTERN bool EFromCurrentPosition VALUE(false);
 EXTERN tstring ETextUpcase;
 EXTERN pcre *EPattern VALUE(NULL);
 EXTERN pcre_extra *EPatternExtra VALUE(NULL);
+EXTERN pcre16 *EPattern16 VALUE(NULL);
+EXTERN pcre16_extra *EPattern16Extra VALUE(NULL);
 EXTERN const unsigned char *ECharacterTables VALUE(NULL);
 EXTERN int SelStartLine,SelStartPos,SelEndLine,SelEndPos,SelType;
 

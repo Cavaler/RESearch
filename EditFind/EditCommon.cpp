@@ -50,7 +50,11 @@ BOOL SearchIn(const TCHAR *Line,int Start,int Length,int *MatchStart,int *MatchL
 	if (ERegExp) {
 		REParam.AddRE(EPattern);
 
+#ifdef UNICODE
+		if (pcre16_exec(EPattern16,EPattern16Extra,(PCRE_SPTR16)Line,Start+Length,Start,0,REParam.Match(),REParam.Count())>=0) {
+#else
 		if (pcre_exec(EPattern,EPatternExtra,Line,Start+Length,Start,0,REParam.Match(),REParam.Count())>=0) {
+#endif
 			MatchDone();
 			REParam.FillStartLength(MatchStart, MatchLength);
 			return TRUE;
@@ -437,6 +441,9 @@ BOOL EPreparePattern(tstring &SearchText)
 #ifdef UNICODE
 		tstring FillSearchText = REParam.FillNamedReferences(SearchText, true);
 		BOOL Result = PreparePattern(&EPattern,&EPatternExtra,FillSearchText,ECaseSensitive,NULL);
+		if (Result) {
+			PreparePattern(&EPattern16,&EPattern16Extra,FillSearchText,ECaseSensitive);
+		}
 #else
 		if (ECharacterTables && (ECharacterTables != ANSICharTables) && (ECharacterTables != OEMCharTables))
 			pcre_free((void *)ECharacterTables);
