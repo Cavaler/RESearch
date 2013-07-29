@@ -759,12 +759,15 @@ bool RefreshEditorInfo()
 	}
 #endif
 
+	return true;
+}
+
+void RefreshEditorColorInfo()
+{
 	HANDLE hBuffer = GetStdHandle(STD_OUTPUT_HANDLE);
 	COORD coord = {1, 0};
 	DWORD dwRead;
 	ReadConsoleOutputAttribute(hBuffer, &BarColor, 1, coord, &dwRead);
-
-	return true;
 }
 
 void EditorFillNamedParameters()

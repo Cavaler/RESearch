@@ -54,6 +54,7 @@ void PatchEditorInfo(EditorInfo &EdInfo) {
 BOOL EditorSearchAgain()
 {
 	RefreshEditorInfo();
+	RefreshEditorColorInfo();
 	PatchEditorInfo(EdInfo);
 	EctlForceSetPosition(NULL);
 	ClearLineBuffer();

@@ -20,8 +20,10 @@ tstring CanonicalLCName(const TCHAR *szName) {
 	return strResult;
 }
 
-BOOL EditorListAllAgain() {
+BOOL EditorListAllAgain()
+{
 	RefreshEditorInfo();
+	RefreshEditorColorInfo();
 	EctlForceSetPosition(NULL);
 	StartEdInfo = EdInfo;
 

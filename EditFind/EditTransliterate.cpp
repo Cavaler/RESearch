@@ -32,8 +32,10 @@ void EditorTransliterateString(EditorGetString &String, int nStartPos = 0, int n
 	}
 }
 
-BOOL EditorTransliterateAgain() {
+BOOL EditorTransliterateAgain()
+{
 	RefreshEditorInfo();
+	RefreshEditorColorInfo();
 	StartEdInfo = EdInfo;
 
 	CDebugTimer tm(_T("EditTransliterate() took %d ms"));

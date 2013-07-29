@@ -4,6 +4,7 @@
 BOOL EditorFilterAgain()
 {
 	RefreshEditorInfo();
+	RefreshEditorColorInfo();
 	EctlForceSetPosition(NULL);
 
 	EditorSetPosition Position = {ITEM_SS(EditorSetPosition) 0,-1,-1,-1,-1,-1};

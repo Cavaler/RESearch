@@ -80,6 +80,7 @@ EXTERN wstring EditorFileName;
 #endif
 EXTERN EditorInfo StartEdInfo;
 bool RefreshEditorInfo();
+void RefreshEditorColorInfo();
 void EditorFillNamedParameters();
 
 BOOL EditorSearch();

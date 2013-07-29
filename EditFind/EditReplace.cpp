@@ -413,6 +413,7 @@ BOOL _EditorReplaceAgain() {
 BOOL EditorReplaceAgain()
 {
 	RefreshEditorInfo();
+	RefreshEditorColorInfo();
 	PatchEditorInfo(EdInfo);
 	EctlForceSetPosition(NULL);
 	ClearLineBuffer();
