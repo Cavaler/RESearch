@@ -14,6 +14,10 @@ Planned:
 Known bugs:
 	- Replace changing part of (real) EOL crashes
 
+Version 7.75.1 (05.08.2013)
+	- Fixed case-insensitive search in Editor in Unicode (pcre16 weirdness)
+	- Fixed unneeded message after canceling Editor Replace
+
 Version 7.75 (29.07.2013)
 	! Updated to pcre 8.33 - includes pcre16 (UTF-16) and pcre32 (UTF-32) support
 	+ Using pcre16 in Editor, should significantly speed RE search up
