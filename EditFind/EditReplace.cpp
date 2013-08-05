@@ -256,6 +256,7 @@ eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &
 	case 2:
 		return RR_SKIP;
 	default:
+		g_bInterrupted = true;
 		NoAsking = TRUE;
 		return RR_CANCEL;
 	}
