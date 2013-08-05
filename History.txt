@@ -9,9 +9,20 @@ Planned:
 	- Search in share-opened files
 	? Searching in streams
 	+ Command to "lock" read-only file before replacing
+	+ Incremental search
 
 Known bugs:
 	- Replace changing part of (real) EOL crashes
+
+Version 7.75 (29.07.2013)
+	! Updated to pcre 8.33 - includes pcre16 (UTF-16) and pcre32 (UTF-32) support
+	+ Using pcre16 in Editor, should significantly speed RE search up
+	- Fixed bad editor search delay introduced in 7.70 (ReadConsoleOutputAttribute)
+
+Version 7.71 (17.07.2013)
+	- Fixed crash in ANSI version with Russian interface
+	- File rename errors treated better
+	- Various interface fixes
 
 Version 7.70 (09.07.2013)
 	+ Can perform script evaluation when replacing from panels
