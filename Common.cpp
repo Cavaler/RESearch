@@ -167,7 +167,7 @@ BOOL PreparePattern(pcre16 **Pattern,pcre16_extra **PatternExtra,const wstring &
 	if (Text.empty()) return FALSE;		// WAS: Not needed if empty NOW: what is search for nothing?
 	const char *ErrPtr;
 	int ErrOffset;
-	int iFlags=PCRE_MULTILINE|PCRE_UCP;
+	int iFlags=PCRE_MULTILINE|PCRE_UCP|PCRE_UTF8;
 	if (DotMatchesNewline) iFlags |= PCRE_DOTALL;
 	if (!CaseSensitive) iFlags |= PCRE_CASELESS;
 
