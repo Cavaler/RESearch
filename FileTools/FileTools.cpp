@@ -1,10 +1,11 @@
 #include "StdAfx.h"
 #include "..\RESearch.h"
 
-CParameterSet g_RnParamSet(RenameFilesExecutor, 6, 3,
+CParameterSet g_RnParamSet(RenameFilesExecutor, 6, 5,
 	"Mask", &MaskText, "Text", &SearchText, "Replace", &ReplaceText,
 	"@Mask", &FMask, "@Text", &FText, "@Replace", &FRReplace,
-	"MaskAsRegExp", &FMaskAsRegExp, "TextAsRegExp", &FSearchAs, "Repeating", &FRepeating
+	"MaskAsRegExp", &FMaskAsRegExp, "TextAsRegExp", &FSearchAs, "Repeating", &FRepeating,
+	"AsScript", &FREvaluate, "Script", &EREvaluateScript
 	);
 CParameterSet g_QRParamSet(QuickRenameFilesExecutor, 4, 2,
 	"Text", &SearchText, "Replace", &ReplaceText,
@@ -367,7 +368,7 @@ void RenameFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 	while (FindRename(strCurrentName.c_str(), MatchStart, MatchLength)) {
 		REParam.AddFNumbers(FileNumber, FindNumber, ReplaceNumber);
 
-		tstring strNewSubName = CSO::CreateReplaceString(FRReplace.c_str(), _T(""), -1, REParam);
+		tstring strNewSubName = CSO::CreateReplaceString(FRReplace.c_str(), _T(""), (FREvaluate ? EREvaluateScript : -1), REParam);
 
 		tstring strNewName = strCurrentName.substr(0, MatchStart) + strNewSubName + strCurrentName.substr(MatchStart + MatchLength);
 
@@ -403,8 +404,9 @@ void RenameFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 	}
 }
 
-BOOL RenameFilesPrompt() {
-	CFarDialog Dialog(76,20,_T("FileRenameDlg"));
+BOOL RenameFilesPrompt()
+{
+	CFarDialog Dialog(76, 21, _T("FileRenameDlg"));
 	Dialog.SetWindowProc(FileSearchDialogProc, 0);
 
 	Dialog.AddFrame(MRename);
@@ -427,13 +429,17 @@ BOOL RenameFilesPrompt() {
 	Dialog.Add(new CFarTextItem(5,9,0,MSearchIn));
 	Dialog.Add(new CFarComboBoxItem(15,9,55,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearch, false),(int *)&FSearchIn));
 
-	Dialog.Add(new CFarCheckBoxItem(5,11,0,MViewModified,&FROpenModified));
-	Dialog.Add(new CFarCheckBoxItem(5,12,0,MConfirmFile,&FRConfirmFile));
-	Dialog.Add(new CFarCheckBoxItem(5,13,0,MConfirmLine,&FRConfirmLine));
-	Dialog.Add(new CFarCheckBoxItem(5,14,0,MPreviewRename,&FRPreviewRename));
+	Dialog.Add(new CFarCheckBoxItem(5, 10, 0, MEvaluateAsScript, &FREvaluate));
+	Dialog.Add(new CFarComboBoxItem(30, 10, 55, 0, new CFarListData(m_lstEngines, false), EREvaluateScript));
+	Dialog.Add(new CFarButtonItem(60, 10, 0, FALSE, MRunEditor));
+
+	Dialog.Add(new CFarCheckBoxItem(5,12,0,MViewModified, &FROpenModified));
+	Dialog.Add(new CFarCheckBoxItem(5,13,0,MConfirmFile,  &FRConfirmFile));
+	Dialog.Add(new CFarCheckBoxItem(5,14,0,MConfirmLine,  &FRConfirmLine));
+	Dialog.Add(new CFarCheckBoxItem(5,15,0,MPreviewRename,&FRPreviewRename));
 	Dialog.AddButtons(MOk,MCancel);
 	Dialog.Add(new CFarButtonItem(60,9,0,0,MBtnPresets));
-	Dialog.Add(new CFarButtonItem(58,10,0,0,MBtnREBuilder));
+	Dialog.Add(new CFarButtonItem(58,11,0,0,MBtnREBuilder));
 	Dialog.SetFocus(4);
 
 	if (FSearchAs>=SA_SEVERALLINE) FSearchAs=SA_PLAINTEXT;
@@ -445,7 +451,7 @@ BOOL RenameFilesPrompt() {
 	ReplaceText=FRReplace;
 	int ExitCode;
 	do {
-		switch (ExitCode=Dialog.Display(3, -4, -2, -1)) {
+		switch (ExitCode=Dialog.Display(3, -4, -2, -1, -9)) {
 		case 0:
 			FMask=MaskText;
 			FText=SearchText;
@@ -458,6 +464,9 @@ BOOL RenameFilesPrompt() {
 			if (RunREBuilder(SearchText, ReplaceText)) {
 				FSearchAs = SA_REGEXP;
 			}
+			break;
+		case 3:
+			RunExternalEditor(ReplaceText);
 			break;
 		default:
 			return FALSE;
@@ -615,6 +624,7 @@ BOOL RenameSelectedFilesPrompt() {
 	int ExitCode;
 	SearchText=FText;
 	ReplaceText=FRReplace;
+	FREvaluate = false;
 	do {
 		switch (ExitCode=Dialog.Display(3, -4, -2, -1)) {
 		case 0:
@@ -922,8 +932,9 @@ OperationResult UndoRenameFiles() {
 	return OR_CANCEL;
 }
 
-BOOL CRnPresetCollection::EditPreset(CPreset *pPreset) {
-	CFarDialog Dialog(76,17,_T("RPresetDlg"));
+BOOL CRnPresetCollection::EditPreset(CPreset *pPreset)
+{
+	CFarDialog Dialog(76,19,_T("RPresetDlg"));
 	Dialog.AddFrame(MRnPreset);
 
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
@@ -941,10 +952,24 @@ BOOL CRnPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.Add(new CFarCheckBoxItem(35,8,0,MRepeating,&pPreset->m_mapInts["Repeating"]));
 	Dialog.Add(new CFarEditItem(5,9,70,DIF_HISTORY,_T("ReplaceText"), pPreset->m_mapStrings["Replace"]));
 
-	Dialog.Add(new CFarCheckBoxItem(5,11,0,MAddToMenu,&pPreset->m_bAddToMenu));
-	Dialog.AddButtons(MOk,MCancel);
+	Dialog.Add(new CFarCheckBoxItem(5, 11, 0, MEvaluateAsScript, &pPreset->m_mapInts["AsScript"]));
+	Dialog.Add(new CFarComboBoxItem(30, 11, 55, 0, new CFarListData(m_lstEngines, false), &pPreset->m_mapInts["Script"]));
+	Dialog.Add(new CFarButtonItem(60, 11, 0, FALSE, MRunEditor));
 
-	return Dialog.Display(-1)==0;
+	Dialog.Add(new CFarCheckBoxItem(5,13,0,MAddToMenu,&pPreset->m_bAddToMenu));
+	Dialog.AddButtons(MOk, MCancel);
+
+	do {
+		switch (Dialog.Display(3, -2, -3)) {
+		case 0:
+			return TRUE;
+		case 1:
+			RunExternalEditor(pPreset->m_mapStrings["Replace"]);
+			break;
+		default:
+			return FALSE;
+		}
+	} while (true);
 }
 
 BOOL CQRPresetCollection::EditPreset(CPreset *pPreset) {
