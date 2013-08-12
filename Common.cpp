@@ -129,7 +129,7 @@ BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const tstring &Text
 		return FALSE;
 	} else {
 		if (PatternExtra) {
-			*PatternExtra=pcre_study(*Pattern,0,&ErrPtr);
+			*PatternExtra=pcre_study(*Pattern,PCRE_STUDY_JIT_COMPILE,&ErrPtr);
 		}
 		return TRUE;
 	}
@@ -156,7 +156,7 @@ BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,
 		return FALSE;
 	} else {
 		if (PatternExtra) {
-			*PatternExtra=pcre_study(*Pattern,0,&ErrPtr);
+			*PatternExtra=pcre_study(*Pattern,PCRE_STUDY_JIT_COMPILE,&ErrPtr);
 		}
 		return TRUE;
 	}
@@ -181,7 +181,7 @@ BOOL PreparePattern(pcre16 **Pattern,pcre16_extra **PatternExtra,const wstring &
 		return FALSE;
 	} else {
 		if (PatternExtra) {
-			*PatternExtra=pcre16_study(*Pattern,0,&ErrPtr);
+			*PatternExtra=pcre16_study(*Pattern,PCRE_STUDY_JIT_COMPILE,&ErrPtr);
 		}
 		return TRUE;
 	}
