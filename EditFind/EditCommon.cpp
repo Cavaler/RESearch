@@ -146,7 +146,33 @@ void ClearLineBuffer() {
 	g_FirstLine = 0;
 }
 
-void FillLineBuffer(size_t FirstLine, size_t LastLine) {
+void FillSingleLineBuffer(size_t FirstLine)
+{
+	if (g_FirstLine != FirstLine) {
+		EditorGetString String = {ITEM_SS(EditorGetString) -1};
+		EditorSetPosition Position={ITEM_SS(EditorSetPosition) FirstLine,-1,-1,-1,-1,-1};
+
+		EctlSetPosition(&Position);
+		EctlGetString(&String);
+
+		g_LineBuffer.resize(String.StringLength);
+		if (String.StringLength > 0) memmove(&g_LineBuffer[0], String.StringText, String.StringLength*sizeof(TCHAR));
+		g_LineOffsets.resize(1);
+		g_LineOffsets[0] = 0;
+	} else if (g_LineOffsets.size() > 1) {
+		size_t nCut = g_LineOffsets[1];
+		g_LineBuffer.resize(nCut);
+		g_LineOffsets.resize(1);
+	}
+}
+
+void FillLineBuffer(size_t FirstLine, size_t LastLine)
+{
+	if (FirstLine == LastLine) {
+		FillSingleLineBuffer(FirstLine);
+		return;
+	}
+
 	if (g_FirstLine < FirstLine) {
 		if (g_FirstLine+g_LineOffsets.size() > FirstLine) {
 			size_t nCut = g_LineOffsets[FirstLine-g_FirstLine];
@@ -221,16 +247,6 @@ void FillLineBuffer(size_t FirstLine, size_t LastLine) {
 			}
 
 			if (g_LineBuffer.size() >= SeveralLinesKB*1024u) break;
-		}
-	}
-
-	if (FirstLine == LastLine) {
-		while (!g_LineBuffer.empty()) {
-			TCHAR szLast = g_LineBuffer[g_LineBuffer.size()-1];
-			if ((szLast  == '\r') || (szLast  == '\n'))
-				g_LineBuffer.erase(g_LineBuffer.end()-1);
-			else
-				break;
 		}
 	}
 }
