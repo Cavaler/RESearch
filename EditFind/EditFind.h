@@ -56,6 +56,7 @@ EXTERN BOOL ERRemoveEmpty;
 EXTERN BOOL ERRemoveNoMatch;
 EXTERN bool EREvaluate VALUE(false);
 EXTERN BOOL EReverse VALUE(FALSE);
+EXTERN BOOL EIncremental VALUE(FALSE);
 EXTERN BOOL ESearchAgainCalled VALUE(FALSE);
 EXTERN BOOL EInSelection;
 EXTERN bool EFromCurrentPosition VALUE(false);

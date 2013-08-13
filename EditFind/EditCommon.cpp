@@ -148,7 +148,7 @@ void ClearLineBuffer() {
 
 void FillSingleLineBuffer(size_t FirstLine)
 {
-	if (g_FirstLine != FirstLine) {
+	if ((g_FirstLine != FirstLine) || g_LineOffsets.empty()) {
 		EditorGetString String = {ITEM_SS(EditorGetString) -1};
 		EditorSetPosition Position={ITEM_SS(EditorSetPosition) FirstLine,-1,-1,-1,-1,-1};
 
@@ -311,7 +311,12 @@ BOOL SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,bool bS
 	return FALSE;
 }
 
-int TopLine(int NeededLine) {
+int TopLine(int NeededLine)
+{
+	if (EIncremental) {
+		return (NeededLine > 2) ? NeededLine - 2 : 0;
+	}
+
 	if (EKeepLineIfVisible) {
 		//	We're in the visible range right now
 		if ((NeededLine >= StartEdInfo.TopScreenLine) && (NeededLine < StartEdInfo.TopScreenLine+EdInfo.WindowSizeY))
@@ -380,7 +385,7 @@ int LeftColumn(int LeftPosition, int AtPosition, int RightPosition) {
 
 void GetHighlightPosition(EditorSetPosition &Position, int FirstLine,int StartPos,int LastLine,int EndPos)
 {
-	bool bAtStart = (EPositionAt == EP_BEGIN) || ((EPositionAt == EP_DIR) && EReverse);
+	bool bAtStart = (EPositionAt == EP_BEGIN) || ((EPositionAt == EP_DIR) && EReverse) || EIncremental;
 
 	Position.CurLine = (bAtStart) ? FirstLine : LastLine;
 	Position.CurPos = (bAtStart) ? StartPos : EndPos;

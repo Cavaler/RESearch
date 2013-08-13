@@ -20,7 +20,7 @@ void PatchEditorInfo(EditorInfo &EdInfo) {
 	// Skipping over selection - for "Search Again inverse"
 
 	if (ESearchAgainCalled && (EdInfo.BlockType == BTYPE_STREAM)) {
-		EditorGetString String = {EdInfo.BlockStartLine};
+		EditorGetString String = {ITEM_SS(EditorGetString) EdInfo.BlockStartLine};
 		EctlGetString(&String);
 		int BlockStartPos = String.SelStart;
 		while (String.SelEnd == -1) {
@@ -55,7 +55,6 @@ BOOL EditorSearchAgain()
 {
 	RefreshEditorInfo();
 	RefreshEditorColorInfo();
-	PatchEditorInfo(EdInfo);
 	EctlForceSetPosition(NULL);
 	ClearLineBuffer();
 
@@ -63,6 +62,7 @@ BOOL EditorSearchAgain()
 
 	CDebugTimer tm(_T("EditSearch() took %d ms"));
 
+	PatchEditorInfo(EdInfo);
 	StartEdInfo = EdInfo;
 
 	g_bInterrupted = false;
@@ -136,7 +136,7 @@ BOOL EditorSearchAgain()
 
 	tm.Stop();
 
-	if (!g_bInterrupted) {
+	if (!g_bInterrupted && !EIncremental) {
 		const TCHAR *Lines[]={GetMsg(MRESearch),GetMsg(MCannotFind),EText.c_str(),GetMsg(MOk)};
 		StartupInfo.Message(FMSG_WARNING,_T("ECannotFind"),Lines,4,1);
 	}
@@ -147,7 +147,19 @@ BOOL EditorSearchAgain()
 
 //////////////////////////////////////////////////////////////////////////
 
-void UpdateESDialog(CFarDialog *pDlg, bool bCheckSel) {
+void UpdateESDialog(CFarDialog *pDlg, bool bCheckSel)
+{
+	bool bIncremental = pDlg->IsDlgItemChecked(MIncrementalSearch);
+	if (bIncremental) {
+		pDlg->CheckDlgItem (MInSelection,   false);
+		pDlg->EnableDlgItem(MInSelection,   false);
+		pDlg->CheckDlgItem (MReverseSearch, false);
+		pDlg->EnableDlgItem(MReverseSearch, false);
+	} else {
+		pDlg->EnableDlgItem(MInSelection,   true);
+		pDlg->EnableDlgItem(MReverseSearch, true);
+	}
+
 	if (EdInfo.BlockType == BTYPE_COLUMN) {
 		if (bCheckSel) {
 			if (pDlg->IsDlgItemChecked(MInSelection)) {
@@ -174,25 +186,96 @@ void UpdateESDialog(CFarDialog *pDlg, bool bCheckSel) {
 	}
 }
 
-LONG_PTR WINAPI EditorSearchDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LONG_PTR lParam2) {
-	int nCtlID = pDlg->GetID(nParam1);
+bool FetchEditorSearchSettings(CFarDialog *pDlg)
+{
+	EIncremental = pDlg->IsDlgItemChecked(MIncrementalSearch);
+	if (!EIncremental) return false;
+
+	SearchText     = EText = pDlg->GetDlgItemText(pDlg->MakeID(MSearchFor, 1));
+	ERegExp        = pDlg->IsDlgItemChecked(MRegExp);
+	ESeveralLine   = pDlg->IsDlgItemChecked(MSeveralLine);
+	ECaseSensitive = pDlg->IsDlgItemChecked(MCaseSensitive);
+	EInSelection   = FALSE;
+	EReverse       = FALSE;
+
+	return true;
+}
+
+void CheckIncrementalSearch(CFarDialog *pDlg, bool bNext = false, bool bPrev = false)
+{
+	if (!FetchEditorSearchSettings(pDlg)) return;
+	ESearchAgainCalled = bNext;
+	EReverse           = bPrev;
+	EditorSearchAgain();
+	StartupInfo.EditorControl(ECTL_REDRAW, NULL);
+	StartupInfo.SendDlgMessage(pDlg->hDlg(), DM_REDRAW, 0, 0);
+}
+
+LONG_PTR WINAPI EditorSearchDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LONG_PTR lParam2)
+{
+	int nCtlID  = pDlg->GetID(nParam1);
 
 	switch (nMsg) {
 	case DN_INITDIALOG:
 		UpdateESDialog(pDlg);
 		HighlightREError(pDlg);
 		break;
+	case DN_EDITCHANGE:
+		switch (nParam1) {
+		case 2:
+			CheckIncrementalSearch(pDlg);
+			break;
+		}
+		break;
 	case DN_BTNCLICK:
 		switch (nCtlID) {
 		case MSeveralLine:
 			UpdateESDialog(pDlg, false);
+			CheckIncrementalSearch(pDlg);
 			break;
 		case MInSelection:
 		case MRegExp:
 			UpdateESDialog(pDlg, true);
+			CheckIncrementalSearch(pDlg);
+			break;
+		case MCaseSensitive:
+			CheckIncrementalSearch(pDlg);
+			break;
+		case MIncrementalSearch:
+			UpdateESDialog(pDlg, true);
+			pDlg->SetFocus(MSearchFor, 1);
 			break;
 		}
 		break;
+#ifdef FAR3
+	case DN_CONTROLINPUT:
+		if (!pDlg->IsDlgItemChecked(MIncrementalSearch)) break;
+		if (pDlg->GetFocus() != pDlg->MakeID(MSearchFor, 1)) break;
+		INPUT_RECORD *record = (INPUT_RECORD *)lParam2;
+		if ((record->EventType == KEY_EVENT) && (record->Event.KeyEvent.bKeyDown)) {
+			if ((record->Event.KeyEvent.wVirtualKeyCode == VK_RIGHT) &&
+				(record->Event.KeyEvent.dwControlKeyState & (LEFT_ALT_PRESSED|RIGHT_ALT_PRESSED)))
+			{
+				CheckIncrementalSearch(pDlg, true, false);
+				return TRUE;
+			}
+			if ((record->Event.KeyEvent.wVirtualKeyCode == VK_LEFT) &&
+				(record->Event.KeyEvent.dwControlKeyState & (LEFT_ALT_PRESSED|RIGHT_ALT_PRESSED)))
+			{
+				CheckIncrementalSearch(pDlg, false, true);
+				return TRUE;
+			}
+		}
+		break;
+#else
+	case DN_KEY:
+		if (!pDlg->IsDlgItemChecked(MIncrementalSearch)) break;
+		if ((nParam1 == 2) && (lParam2 == KEY_ALTRIGHT)) {
+			CheckIncrementalSearch(pDlg, true);
+			return TRUE;
+		}
+		break;
+#endif
 	}
 
 	return pDlg->DefDlgProc(nMsg, nParam1, lParam2);
@@ -204,7 +287,7 @@ BOOL EditorSearch()
 
 	EInSelection = EAutoFindInSelection && (EdInfo.BlockType != BTYPE_NONE);
 
-	CFarDialog Dialog(76,13,_T("SearchDlg"));
+	CFarDialog Dialog(76, 14, _T("SearchDlg"));
 	Dialog.SetWindowProc(EditorSearchDialogProc, 0);
 	Dialog.SetUseID(true);
 	Dialog.SetCancelID(MCancel);
@@ -222,6 +305,7 @@ BOOL EditorSearch()
 	Dialog.Add(new CFarCheckBoxItem(5,6,0,MCaseSensitive,&ECaseSensitive));
 	Dialog.Add(new CFarCheckBoxItem(5,7,0,MReverseSearch,&EReverse));
 	Dialog.Add(new CFarCheckBoxItem(30,7,(EdInfo.BlockType != BTYPE_NONE) ? 0 : DIF_DISABLE, MInSelection, &EInSelection));
+	Dialog.Add(new CFarCheckBoxItem(5,8,0,MIncrementalSearch,&EIncremental));
 	Dialog.AddButtons(MOk, MShowAll);
 	Dialog.AddButton(MCancel);
 	Dialog.Add(new CFarButtonItem(60,5,0,0,MBtnPresets));

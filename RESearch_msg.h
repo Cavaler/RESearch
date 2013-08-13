@@ -221,6 +221,7 @@ enum eStringTable {
 	MRemoveEmpty,
 	MRemoveNoMatch,
 	MEvaluateAsScript,
+	MIncrementalSearch,
 	MRunEditor,
 	MCannotFind,
 	MErrorCreatingEngine,

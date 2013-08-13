@@ -17,7 +17,7 @@ in file masks, searched text, and using various macros in replacement text.
     Due to this, you can perform complicated searches and context-dependent replacing.
 	Furthermore, it supports ~scripting replacement~@RegularReplaceScripting@.
 
-    This plugin uses ~PCRE 7.4 library~@PCRE@, compiled with ~UTF-8~@UTF8@ support
+    This plugin uses ~PCRE~@PCRE@ regular expression library.
 
    ~Regular Expression Basics~@RegularExpressions@
    ~Replacement Text~@RegularReplace@
@@ -184,20 +184,6 @@ and many others are also available)
     #store(n, v)#   Store value 'v' in named parameter 'n'
     #init(n, v)#    Same as store(), except that it works only once after 'Replace' is invoked.
 
-@UTF8
-$ #UTF-8 support#
-  From version 4.0 RESearch provides a limited support for searching UTF-8 text.
-  The following limitations apply:
-
-    - Enabling UTF-8 has meaning only for regexp-based search, since for plaintext it
-makes no difference what to compare.
-    - #Both# regular expression and searched text are to be UTF8-encoded, there is no way
-to perform a search with UTF-8 pattern on ANSI text or vice versa. For your convenience,
-a small UTF-8 encoder/decoder is present.
-    - Comparison of characters greater than 255 is #always case-sensitive# with UTF-8.
-    - Enabling UTF-8 disables "Use all character tables" (has no meaning).
-
-  For more information on UTF-8 support in regexps, see ~PCRE 4.1 library~@PCRE@ documentation.
 @CommonConfig
 $ #Common settings#
   #'Several' lines means#             When searching using Several Line RegExp,
@@ -306,7 +292,6 @@ there's 4 of them or more.
     #m# - Multi-line regular expression
     #a# - Multiple plain text
     #l# - Multiple regular expressions
-    #u# - Use UTF-8
 
     #0..5# - "Search in" as in dialog
     #d# - View search dialog
@@ -317,7 +302,6 @@ there's 4 of them or more.
     #p# - Plain-text
     #r# - Regular expression
     #s# - Several-line regular expression
-    #u# - Use UTF-8
 
     #v# - View modified files
     #f# - Confirm each file
@@ -377,8 +361,10 @@ regard to symbol case. ANSI and OEM codepages are supported.
 
   #Reverse search#     If checked, text is searched UP from current cursor position.
 
-  #[ UTF-8 ]#          If checked, regular expresiion search will use UTF-8 rules.
-Press the button to bring up ~UTF-8 Converter~@UTF8Converter@
+  #In selection only#  If checked, only selected text is searched.
+
+  #Incremental search# If checked, text matching search parameters is immediately shown.
+Pressing #Alt-Left/Right# selects previous/next instance
 
   #[ Show all ]#       Shows all occurrences of given string in a file.
 @ReplaceDlg
@@ -422,9 +408,6 @@ regard to symbol case. ANSI and OEM codepages are supported.
   #Leave matches lines#  This option makes the command to filter out unmatched lines
   #Remove matches lines# This option makes the command to filter only matching lines.
 
-  #[ UTF-8 ]#            If checked, regular expresiion search will use UTF-8 rules.
-Press the button to bring up ~UTF-8 Converter~@UTF8Converter@
-
 @TransliterateDlg
 $ #Transliterate#
 
@@ -445,8 +428,6 @@ if regular expression search is selected.
 
   #Case sensitive#       If unchecked, text or regular expression is matched without
 regard to symbol case. ANSI and OEM codepages are supported.
-
-  #[ UTF-8 ]#            If checked, regular expresiion search will use UTF-8 rules.
 
 @ListAll
 $ #All occurrences#
@@ -531,16 +512,13 @@ is treated as regular expression.
   #Inverse search#           Only files that do NOT match search criteria will be shown.
 
   #Use all character tables# All character tables installed will be used
-    From version 5.50, this also enables searching in Unicode and UTF8 files. If you plan
+    From version 5.50, this also enables searching in Unicode and UTF-8 files. If you plan
     to use it often, make sure your files have Unicode signature - this speeds up search a lot.
 
   #[ Advanced ]#             Turn on to use ~Advanced File Search options~@AdvancedFileSearchDlg@,
 press button to configure them. Note, that pressing "OK" in the Advanced dialog automatically
 selects the switch here.
  
-  #UTF-8#                    If checked, regular expresiion search will use UTF-8 rules.
-Press the button to bring up ~UTF-8 Converter~@UTF8Converter@
-
   #NOTE:# "\n" in regular expression-based searches matches only newline symbol,
 not carriage-return. To match usual DOS end-of-line, use ".\n", to match both DOS- and
 UNIX-like, use ".?\n".
@@ -819,12 +797,6 @@ $ #Batch menu#
 @DeleteBatch
 $ #Delete batch#
   You are prompted to confirm deleting a batch sequence.
-@UTF8Converter
-$ #UTF-8 converter#
-  Here you can convert some string between plain, UTF-8 and hex representations.
-
-  Pressing #û# near one of the three fields encode value in this field into both
-other fields.
 @REBuilder
 $ #RegExp Builder#
   RegExp Builder allows you to make a regexp by marking up certain parts of a source
