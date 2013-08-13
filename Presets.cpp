@@ -469,7 +469,8 @@ int CountPresets(CBatchActionCollection &Coll, CPreset *pPreset)
 
 bool CBatchAction::EditItems()
 {
-	int piBreakKeys[]={VK_INSERT, (PKF_CONTROL<<16)|VK_UP, (PKF_CONTROL<<16)|VK_DOWN, VK_DELETE, VK_F4, (PKF_CONTROL<<16)|VK_RETURN, 0};
+	int piBreakKeys[] = {VK_INSERT, (PKF_CONTROL<<16)|VK_UP, (PKF_CONTROL<<16)|VK_DOWN, VK_DELETE, VK_F4,
+		(PKF_CONTROL<<16)|VK_RETURN, ((PKF_CONTROL|PKF_ALT)<<16)|VK_RETURN, 0};
 
 	//	Clean-up nonexistent presets
 	for (size_t nPreset = 0; nPreset < size(); nPreset++) {
@@ -480,19 +481,23 @@ bool CBatchAction::EditItems()
 			continue;
 		}
 	}
+	vector<bool> arrExecuted(size());
 
 	do {
-		vector<tstring> arrItems;
+		vector<CFarMenuItemEx> arrItems;
 		arrItems.resize(size()+1);
-		for (size_t nPreset = 0; nPreset < size(); nPreset++) {
-			arrItems[nPreset] = m_Type[at(nPreset)]->Name();
+		for (size_t nPreset = 0; nPreset < size(); nPreset++)
+		{
+			arrItems[nPreset].SetText(m_Type[at(nPreset)]->Name().c_str());
+			if (arrExecuted[nPreset]) arrItems[nPreset].Check(true);
 		}
+		if ((m_nCurrent >= 0) && (m_nCurrent < arrItems.size())) arrItems[m_nCurrent].Select(true);
 
 		int nBreakKey;
 		tstring strTitle = FormatStr(GetMsg(MBatchCommands), RemoveAmpersand(m_strName).c_str());
 
-		int nResult = ChooseMenu(arrItems, strTitle.c_str(), _T("Ins,Ctrl-\x18\x19,Ctrl-Enter,Del"), _T("Batch"), m_nCurrent,
-			FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT, piBreakKeys, &nBreakKey);
+		int nResult = StartupInfo.Menu(-1, -1, 0, FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT|FMENU_USEEXT, strTitle.c_str(), _T("Ins,Ctrl-\x18\x19,Ctrl-Enter,Del"), _T("Batch"),
+			piBreakKeys, &nBreakKey, (const FarMenuItem *)&arrItems[0], arrItems.size());
 		if (nResult >= 0) m_nCurrent = nResult;
 
 		switch (nBreakKey) {
@@ -501,7 +506,8 @@ bool CBatchAction::EditItems()
 		case 0:{		//	VK_INSERT
 			BatchActionIndex NewIndex = m_Type.SelectPreset();
 			if (NewIndex != NO_BATCH_INDEX) {
-				insert(begin()+((m_nCurrent >= 0) ? m_nCurrent : 0), NewIndex);
+				insert(begin() + m_nCurrent, NewIndex);
+				arrExecuted.insert(arrExecuted.begin() + m_nCurrent, false);
 			}
 			break;
 			   }
@@ -524,6 +530,7 @@ bool CBatchAction::EditItems()
 		case 3:			//	VK_DEL
 			if ((m_nCurrent >= 0) && (m_nCurrent < (int)size())) {
 				erase(begin() + m_nCurrent);
+				arrExecuted.erase(arrExecuted.begin() + m_nCurrent);
 			}
 			break;
 		case 4:			//	VK_F4
@@ -550,6 +557,18 @@ bool CBatchAction::EditItems()
 				CPreset *pPreset = (*pColl)(Index.second);
 				if (pPreset == NULL) break;
 
+				arrExecuted[m_nCurrent] = true;
+				pPreset->ExecutePreset();
+			}
+			break;
+		case 6:			//	VK_CTRLALTENTER
+			for (int nPreset = 0; (nPreset <= m_nCurrent) && (nPreset < size()); nPreset++) {
+				BatchActionIndex Index = at(nPreset);
+				CPresetCollection *pColl = m_Type(Index.first);
+				CPreset *pPreset = (*pColl)(Index.second);
+				if (pPreset == NULL) continue;
+
+				arrExecuted[nPreset] = true;
 				pPreset->ExecutePreset();
 			}
 			break;
