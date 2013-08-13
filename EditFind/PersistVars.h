@@ -14,7 +14,7 @@ PERSIST_TYPED_VARIABLE(EPositioning, EPositionAt, EP_DIR, EP_BEGIN, EP_END)
 PERSIST_bool_VARIABLE(EPositionAtSub, true)
 PERSIST_STRING_VARIABLE(EPositionSubName, _T("pos"))
 
-PERSIST_TYPED_VARIABLE(int, EREvaluateScript, 0, 0, 255)
+PERSIST_STRING_VARIABLE(EREvaluateScript, _T(""))
 
 PERSIST_BOOL_VARIABLE(EFLeaveFilter, TRUE)
 

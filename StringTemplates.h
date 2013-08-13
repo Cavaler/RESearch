@@ -16,7 +16,7 @@ public:
 
 	static cstring ExpandParameter(const CHAR *&Replace, CREParameters<CHAR> &Param);
 	static CHAR    ExpandHexDigits(const CHAR *&Replace);
-	static cstring CreateReplaceString(const CHAR *Replace, const CHAR *EOL, int Engine, CREParameters<CHAR> &Param);
+	static cstring CreateReplaceString(const CHAR *Replace, const CHAR *EOL, LPCTSTR szEngine, CREParameters<CHAR> &Param);
 
 	static void QuoteRegExpString (cstring &strText) {
 		QuoteAny(strText, _T2("()[]{}\\^$+*.?|"));

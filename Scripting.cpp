@@ -81,6 +81,61 @@ void EnumActiveScripts()
 	} while (true);
 }
 
+LPCTSTR ScriptEngine(bool bEnabled)
+{
+	return bEnabled ? EREvaluateScript.c_str() : NULL;
+}
+
+int EngineIndex(const tstring &strValue)
+{
+	CLSID clsid;
+	HRESULT hr = CLSIDFromString(_bstr_t(strValue.c_str()), &clsid);
+
+	if (SUCCEEDED(hr)) {
+		for (int nEngine = 0; nEngine < m_arrEngines.size(); nEngine++)
+		{
+			if (memcmp(&m_arrEngines[nEngine].m_clsid, &clsid, sizeof(CLSID)) == 0) return nEngine;
+		}
+		return 0;
+	} else {
+		return _ttoi(strValue.c_str());
+	}
+}
+
+void SetEngineIndex(int nIndex, tstring &strValue)
+{
+	OLECHAR szGuid[64];
+	StringFromGUID2(m_arrEngines[nIndex].m_clsid, szGuid, 64);
+#ifdef UNICODE
+	strValue = szGuid;
+#else
+	strValue = ANSIFromUnicode(szGuid);
+#endif
+}
+
+void SanitateEngine()
+{
+	SetEngineIndex(EngineIndex(EREvaluateScript), EREvaluateScript);
+}
+
+CFarEngineStorage::CFarEngineStorage(tstring &strEngine)
+: CFarIntegerStorage(m_nEngine)
+, m_strEngine(strEngine)
+{
+}
+
+void CFarEngineStorage::Get(TCHAR *pszBuffer, int nSize) const
+{
+	m_nEngine = EngineIndex(m_strEngine);
+	__super::Get(pszBuffer, nSize);
+}
+
+void CFarEngineStorage::Put(int nValue)
+{
+	__super::Put(nValue);
+	SetEngineIndex(m_nEngine, m_strEngine);
+}
+
 // ---------------------------------------------------
 
 template<class CHAR, class CONVERT>
@@ -230,15 +285,18 @@ private:
 };
 
 template<class CONVERT>
-void EvaluateReplaceStringT(IReplaceParameters *pParams, LPCTSTR szReplace, int Engine)
+void EvaluateReplaceStringT(IReplaceParameters *pParams, LPCTSTR szReplace, LPCTSTR szEngine)
 {
 	EXCEPINFO ExcepInfo;
 	HRESULT hResult;
 
 	if (Interrupted()) return;
 
+	CLSID clsid;
+	CLSIDFromString(_bstr_t(szEngine), &clsid);
+
 	IActiveScriptPtr spEngine;
-	hResult = spEngine.CreateInstance(m_arrEngines[Engine].m_clsid);
+	hResult = spEngine.CreateInstance(clsid);
 	if (FAILED(hResult)) {
 		ShowHResultError(MErrorCreatingEngine, hResult);
 		g_bInterrupted = TRUE;
@@ -300,16 +358,16 @@ public:
 #endif
 
 template<>
-basic_string<char> EvaluateReplaceString(CREParameters<char> &Param, const char *Replace, const char *EOL, int Engine)
+basic_string<char> EvaluateReplaceString(CREParameters<char> &Param, const char *Replace, const char *EOL, LPCTSTR szEngine)
 {
 	CReplaceParametersT<char, CConverter> *pParams = new CComObject<CReplaceParametersT<char, CConverter> >();
 	pParams->Init(&Param, EOL);
 	pParams->AddRef();
 
 #ifdef UNICODE
-	EvaluateReplaceStringT<CConverter>(pParams, UTF8ToUnicode(Replace).c_str(), Engine);
+	EvaluateReplaceStringT<CConverter>(pParams, UTF8ToUnicode(Replace).c_str(), szEngine);
 #else
-	EvaluateReplaceStringT<CConverter>(pParams, Replace, Engine);
+	EvaluateReplaceStringT<CConverter>(pParams, Replace, szEngine);
 #endif
 
 	basic_string<char> strResult = pParams->Result();
@@ -322,13 +380,13 @@ basic_string<char> EvaluateReplaceString(CREParameters<char> &Param, const char 
 #ifdef UNICODE
 
 template<>
-basic_string<wchar_t> EvaluateReplaceString(CREParameters<wchar_t> &Param, const wchar_t *Replace, const wchar_t *EOL, int Engine)
+basic_string<wchar_t> EvaluateReplaceString(CREParameters<wchar_t> &Param, const wchar_t *Replace, const wchar_t *EOL, LPCTSTR szEngine)
 {
 	CReplaceParametersT<wchar_t, CConverter> *pParams = new CComObject<CReplaceParametersT<wchar_t, CConverter> >();
 	pParams->Init(&Param, EOL);
 	pParams->AddRef();
 
-	EvaluateReplaceStringT<CConverter>(pParams, Replace, Engine);
+	EvaluateReplaceStringT<CConverter>(pParams, Replace, szEngine);
 
 	basic_string<wchar_t> strResult = pParams->Result();
 

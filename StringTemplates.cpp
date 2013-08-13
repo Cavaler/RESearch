@@ -13,10 +13,10 @@ void CStringOperations<CHAR>::AddString(cstring &String, const CHAR *Add, int Le
 
 template<class CHAR>
 typename CStringOperations<CHAR>::cstring
-CStringOperations<CHAR>::CreateReplaceString(const CHAR *Replace, const CHAR *EOL, int Engine, CREParameters<CHAR> &Param)
+CStringOperations<CHAR>::CreateReplaceString(const CHAR *Replace, const CHAR *EOL, LPCTSTR szEngine, CREParameters<CHAR> &Param)
 {
-	if ((Engine >= 0) && (Engine < (int)m_arrEngines.size()))
-		return EvaluateReplaceString(Param, Replace, EOL, Engine);
+	if (szEngine != NULL)
+		return EvaluateReplaceString(Param, Replace, EOL, szEngine);
 
 	if (!Param.m_re && !g_bEscapesInPlainText)
 		return Replace;

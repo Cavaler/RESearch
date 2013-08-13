@@ -277,9 +277,9 @@ BOOL ReplaceInText(int FirstLine, int StartPos, int LastLine, int EndPos)
 
 		REParam.AddENumbers(MatchFirstLine, MatchFirstLine-ReplaceStartLine, FindNumber, ReplaceNumber);
 #ifdef UNICODE
-		tstring Replace = CSO::CreateReplaceString(ERReplace.c_str(),_T("\n"), (EREvaluate ? EREvaluateScript : -1), REParam);
+		tstring Replace = CSO::CreateReplaceString(ERReplace.c_str(),_T("\n"), ScriptEngine(EREvaluate), REParam);
 #else
-		string Replace_O2E = CSO::CreateReplaceString(ERReplace_O2E.c_str(),"\n", (EREvaluate ? EREvaluateScript : -1), REParam);
+		string Replace_O2E = CSO::CreateReplaceString(ERReplace_O2E.c_str(),"\n", ScriptEngine(EREvaluate), REParam);
 #endif
 		if (g_bInterrupted) return FALSE;	// Script failed
 
@@ -329,9 +329,9 @@ BOOL ReplaceInTextByLine(int FirstLine, int StartPos, int LastLine, int EndPos, 
 
 			REParam.AddENumbers(MatchFirstLine, MatchFirstLine-ReplaceStartLine, FindNumber, ReplaceNumber);
 #ifdef UNICODE
-			tstring Replace = CSO::CreateReplaceString(ERReplace.c_str(),_T("\n"), (EREvaluate ? EREvaluateScript : -1), REParam);
+			tstring Replace = CSO::CreateReplaceString(ERReplace.c_str(),_T("\n"), ScriptEngine(EREvaluate), REParam);
 #else
-			string Replace_O2E = CSO::CreateReplaceString(ERReplace_O2E.c_str(),"\n", (EREvaluate ? EREvaluateScript : -1), REParam);
+			string Replace_O2E = CSO::CreateReplaceString(ERReplace_O2E.c_str(),"\n", ScriptEngine(EREvaluate), REParam);
 #endif
 			if (g_bInterrupted) return FALSE;	// Script failed
 
@@ -561,7 +561,7 @@ BOOL EditorReplace()
 	Dialog.Add(new CFarCheckBoxItem(5, 10, 0, MRemoveEmpty, &ERRemoveEmpty));
 	Dialog.Add(new CFarCheckBoxItem(30, 10, 0, MRemoveNoMatch, &ERRemoveNoMatch));
 	Dialog.Add(new CFarCheckBoxItem(5, 11, 0, MEvaluateAsScript, &EREvaluate));
-	Dialog.Add(new CFarComboBoxItem(30, 11, 55, 0, new CFarListData(m_lstEngines, false), EREvaluateScript));
+	Dialog.Add(new CFarComboBoxItem(30, 11, 55, 0, new CFarListData(m_lstEngines, false), new CFarEngineStorage(EREvaluateScript)));
 	Dialog.Add(new CFarButtonItem(60, 11, 0, FALSE, MRunEditor));
 
 	Dialog.Add(new CFarButtonItem(0, 13, DIF_CENTERGROUP, TRUE, MReplace));
@@ -637,6 +637,7 @@ OperationResult EditorReplaceExecutor() {
 	NoAsking = TRUE;
 	FindNumber = ReplaceNumber = 0;
 	REParam.m_setInitParam.clear();
+	SanitateEngine();
 
 	if (!EFromCurrentPosition) EditorSeekToBeginEnd();
 
@@ -645,7 +646,8 @@ OperationResult EditorReplaceExecutor() {
 	return bResult ? OR_OK : OR_CANCEL;
 }
 
-BOOL CERPresetCollection::EditPreset(CPreset *pPreset) {
+BOOL CERPresetCollection::EditPreset(CPreset *pPreset)
+{
 	CFarDialog Dialog(76, 21, _T("ERPresetDlg"));
 	Dialog.AddFrame(MERPreset);
 	Dialog.Add(new CFarTextItem(5, 2, 0, MPresetName));
@@ -663,7 +665,7 @@ BOOL CERPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.Add(new CFarCheckBoxItem(5, 11, 0, MRemoveEmpty, &pPreset->m_mapInts["RemoveEmpty"]));
 	Dialog.Add(new CFarCheckBoxItem(30, 11, 0, MRemoveNoMatch, &pPreset->m_mapInts["RemoveNoMatch"]));
 	Dialog.Add(new CFarCheckBoxItem(5, 12, 0, MEvaluateAsScript, &pPreset->m_mapInts["AsScript"]));
-	Dialog.Add(new CFarComboBoxItem(30, 12, 55, 0, new CFarListData(m_lstEngines, false), &pPreset->m_mapInts["Script"]));
+	Dialog.Add(new CFarComboBoxItem(30, 12, 55, 0, new CFarListData(m_lstEngines, false), new CFarEngineStorage(pPreset->m_mapStrings["Script"])));
 	Dialog.Add(new CFarButtonItem(60, 12, 0, FALSE, MRunEditor));
 
 	Dialog.Add(new CFarCheckBoxItem(5, 14, 0, MAddToMenu, &pPreset->m_bAddToMenu));

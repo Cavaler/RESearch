@@ -58,6 +58,23 @@ void ReadActiveScripts();
 void EnumActiveScripts();
 void SaveActiveScripts();
 
+LPCTSTR ScriptEngine(bool bEnabled);
+int  EngineIndex(const tstring &strValue);
+void SetEngineIndex(int nIndex, tstring &strValue);
+void SanitateEngine();
+
+class CFarEngineStorage : public CFarIntegerStorage
+{
+public:
+	CFarEngineStorage(tstring &strValue);
+
+	virtual void Get(TCHAR *pszBuffer, int nSize) const;
+	virtual void Put(int nValue);
+protected:
+	mutable int	m_nEngine;
+	tstring &m_strEngine;
+};
+
 void ConfigureCommon();
 void ConfigureFile();
 void ConfigureRenumbering(bool bRuntime);
@@ -98,7 +115,7 @@ void FillDefaultNamedParameters(const TCHAR *szFileName);
 void ClearVariables();
 
 template<class CHAR>
-basic_string<CHAR> EvaluateReplaceString(CREParameters<CHAR> &Param, const CHAR *Replace, const CHAR *EOL, int Engine);
+basic_string<CHAR> EvaluateReplaceString(CREParameters<CHAR> &Param, const CHAR *Replace, const CHAR *EOL, LPCTSTR szEngine);
 
 #ifdef UNICODE
 BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,int CaseSensitive,const unsigned char *pTables=NULL);

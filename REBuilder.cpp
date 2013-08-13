@@ -58,7 +58,7 @@ void UpdateStrings(CFarDialog *pDlg, sREData *pData)
 	if (pcre_exec(re, NULL, strSource.c_str(), strSource.length(), 0, 0, ThisREParam.Match(), ThisREParam.Count()) < 0) return;
 
 	tstring strReplace = pDlg->GetDlgItemText(6);
-	tstring strResult = CSO::CreateReplaceString(strReplace.c_str(), _T("\n"), -1, ThisREParam);
+	tstring strResult = CSO::CreateReplaceString(strReplace.c_str(), _T("\n"), NULL, ThisREParam);
 	pDlg->SendDlgMessage(DM_SETTEXTPTR, 8, (LONG_PTR)strResult.data());
 }
 

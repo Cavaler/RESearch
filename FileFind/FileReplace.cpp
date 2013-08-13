@@ -324,7 +324,7 @@ int ReplacePrompt(BOOL Plugin)
 	Dialog.Add(new CFarCheckBoxItem(5,13,0,MAllCharTables,&FAllCharTables));
 
 	Dialog.Add(new CFarCheckBoxItem(5, 14, 0, MEvaluateAsScript, &FREvaluate));
-	Dialog.Add(new CFarComboBoxItem(30, 14, 55, 0, new CFarListData(m_lstEngines, false), EREvaluateScript));
+	Dialog.Add(new CFarComboBoxItem(30, 14, 55, 0, new CFarListData(m_lstEngines, false), new CFarEngineStorage(EREvaluateScript)));
 	Dialog.Add(new CFarButtonItem(60, 14, 0, FALSE, MRunEditor));
 
 	Dialog.Add(new CFarTextItem(5,16,0,MSearchIn));
@@ -424,6 +424,7 @@ OperationResult FileReplaceExecutor() {
 	FText = SearchText;
 	FRReplace = ReplaceText;
 	FROpenModified = FALSE;
+	SanitateEngine();
 
 	return FileReplace(g_PanelItems, FALSE, TRUE);
 }
@@ -458,7 +459,7 @@ BOOL CFRPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.Add(new CFarCheckBoxItem(5,15,0,MAllCharTables,&pPreset->m_mapInts["AllCharTables"]));
 
 	Dialog.Add(new CFarCheckBoxItem(5, 16, 0, MEvaluateAsScript, &pPreset->m_mapInts["AsScript"]));
-	Dialog.Add(new CFarComboBoxItem(30, 16, 55, 0, new CFarListData(m_lstEngines, false), &pPreset->m_mapInts["Script"]));
+	Dialog.Add(new CFarComboBoxItem(30, 16, 55, 0, new CFarListData(m_lstEngines, false), new CFarEngineStorage(pPreset->m_mapStrings["Script"])));
 	Dialog.Add(new CFarButtonItem(60, 16, 0, FALSE, MRunEditor));
 
 	Dialog.Add(new CFarCheckBoxItem(56,11,0,_T(""),&bFAdvanced));
