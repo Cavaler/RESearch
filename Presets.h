@@ -78,7 +78,7 @@ protected:
 	int  FindUnusedID();
 	void ValidateIDs();
 
-	int  m_nCurrent;
+	size_t m_nCurrent;
 };
 
 template<class _Preset>
@@ -130,7 +130,7 @@ protected:
 
 	class CBatchActionCollection *Collection();
 
-	int  m_nCurrent;
+	size_t m_nCurrent;
 };
 
 class CBatchActionCollection : public vector<CBatchAction *> {
@@ -147,7 +147,7 @@ public:
 	CBatchType &m_Type;
 
 protected:
-	int  m_nCurrent;
+	size_t m_nCurrent;
 };
 
 #endif
