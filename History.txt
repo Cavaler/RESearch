@@ -9,10 +9,17 @@ Planned:
 	- Search in share-opened files
 	? Searching in streams
 	+ Command to "lock" read-only file before replacing
-	+ Incremental search
 
 Known bugs:
 	- Replace changing part of (real) EOL crashes
+
+Version 7.80 (13.08.2013)
+	! Enabled JIT for faster regexp matches
+	! Incremental search in Editor
+	+ Added "Evaluate as script" to "Rename files". "Rename selected" stays as simple as possible.
+	* Ctrl-Alt-Enter in Batch executes all presets up to selected
+	* Presets run manually in Batch are checked
+	- Scripting engine CLSID stored in presets instead of index
 
 Version 7.75.1 (05.08.2013)
 	- Fixed case-insensitive search in Editor in Unicode (pcre16 weirdness)
