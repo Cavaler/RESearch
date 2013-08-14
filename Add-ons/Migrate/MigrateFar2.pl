@@ -1,31 +1,19 @@
-#~/bin/perl -w
+#!/bin/perl -w
 use Win32::Registry;
 
 print "DELETE FROM `table_keys` WHERE `id`>1;\n";
-print "DELETE FROM `table_values` WHERE `key_id`>1;\n";
+print "DELETE FROM `table_values` WHERE `key_id`>=1;\n";
 
-my $key = 2;
-
-MigratePresets('EditFilterPresets');
-MigratePresets('EditFindPresets');
-MigratePresets('EditReplacePresets');
-MigratePresets('EditTransliteratePresets');
-MigratePresets('FileAdvancedPresets');
-MigratePresets('FileFindPresets');
-MigratePresets('FileGrepPresets');
-MigratePresets('FileQuickRenamePresets');
-MigratePresets('FileRenamePresets');
-MigratePresets('FileReplacePresets');
-MigratePresets('ViewFindPresets');
-
-MigrateBatches('EditorBatches');
-MigrateBatches('PanelBatches');
+my $key = 1;
+RecursiveCopy(0, '', '');
 
 sub CreateKey
 {
 	my ($root, $name) = @_;
 
-	print "INSERT INTO `table_keys` (`id`, `parent_id`, `name`) VALUES ($key, $root, '$name');\n";
+	if ($root > 0) {
+		print "INSERT INTO `table_keys` (`id`, `parent_id`, `name`) VALUES ($key, $root, '$name');\n";
+	}
 	return $key++;
 }
 
@@ -60,18 +48,4 @@ sub RecursiveCopy
 	foreach $rkey (@rkeys) {
 		RecursiveCopy($tkey, $rkey, $sub.$name."\\");
 	}
-}
-
-sub MigratePresets
-{
-	my ($name) = @_;
-
-	RecursiveCopy(1, $name);
-}
-
-sub MigrateBatches
-{
-	my ($name) = @_;
-
-	RecursiveCopy(1, $name);
 }
