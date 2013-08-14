@@ -799,6 +799,39 @@ void RunExternalEditor(tstring &strText)
 	}
 }
 
+
+void RunExternalViewer(tstring &strText)
+{
+	if ((strText.length() > 3) && (strText[1] == ':') && (strText[2] == '\\')) {
+#ifdef UNICODE
+		StartupInfo.Viewer(strText.c_str(), NULL, 0, 0, -1, -1, 0, CP_AUTODETECT);
+#else
+		StartupInfo.Viewer(strText.c_str(), NULL, 0, 0, -1, -1, 0);
+#endif
+	} else {
+		TCHAR szBuffer[MAX_PATH], szName[MAX_PATH];
+		GetTempPath(MAX_PATH, szBuffer);
+		GetTempFileName(szBuffer, _T("re"), 0, szName);
+
+		CFileMapping mapFile;
+#ifdef UNICODE
+		mapFile.Open(szName, true, strText.length()*2+2);
+		memmove((BYTE *)mapFile,   "\xFF\xFE", 2);
+		memmove(((BYTE *)mapFile)+2, strText.data(), strText.length()*2);
+#else
+		mapFile.Open(szName, true, strText.length());
+		memmove((BYTE *)mapFile, strText.data(), strText.length());
+#endif
+		mapFile.Close();
+
+#ifdef UNICODE
+		StartupInfo.Viewer(szName, NULL, 0, 0, -1, -1, VF_DELETEONCLOSE, CP_AUTODETECT);
+#else
+		StartupInfo.Viewer(szName, NULL, 0, 0, -1, -1, VF_DELETEONCLOSE);
+#endif
+	}
+}
+
 void RefreshConsoleInfo()
 {
 	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &ConInfo);
@@ -809,7 +842,7 @@ void QuoteString(const TCHAR *Source, int Length, vector<tstring> &arrQuoted, in
 	tstring str;
 
 	if (Length>MaxWidth) {
-		size_t nLeft = (MaxWidth-5)/2;
+		size_t nLeft = (MaxWidth-3)/2;
 		str = tstring(Source, nLeft) + _T("...") + tstring(Source + Length-nLeft, nLeft);
 	} else {
 		str = tstring(Source, Length);

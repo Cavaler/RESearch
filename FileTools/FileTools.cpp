@@ -287,35 +287,44 @@ void PerformFinalRename(panelitem_vector &PanelItems)
 	}
 }
 
+void GenerateRenameStrings(vector<tstring> &arrFrom, vector<tstring> &arrTo, int nMaxX)
+{
+	arrFrom.clear();
+	arrTo.clear();
+
+	for each (const rename_pair &Item in m_arrPendingRename) {
+		QuoteString(Item.first. c_str(), Item.first. size(), arrFrom, nMaxX);
+		QuoteString(Item.second.c_str(), Item.second.size(), arrTo,   nMaxX);
+	}
+
+	MakeSameWidth(arrFrom);
+	MakeSameWidth(arrTo  );
+}
+
 void RenamePreview(panelitem_vector &PanelItems)
 {
 	vector<tstring> arrItems;
 	int nBreakKey, nResult = 0;
-	int BreakKeys[] = {VK_INSERT, VK_DELETE, 0};
+	int BreakKeys[] = {VK_INSERT, VK_DELETE, VK_F2, VK_F3, 0};
 
 	if (m_arrPendingRename.empty()) return;
 
+	bool bWrap = true;
 	RefreshConsoleInfo();
-	int nMaxX = ConInfo.dwSize.X/2 - 8;
 
 	do {
 		vector<tstring> arrFrom;
 		vector<tstring> arrTo;
 
-		for each (const rename_pair &Item in m_arrPendingRename) {
-			QuoteString(Item.first. data(), Item.first. size(), arrFrom, nMaxX);
-			QuoteString(Item.second.data(), Item.second.size(), arrTo,   nMaxX);
-		}
-
-		MakeSameWidth(arrFrom);
-		MakeSameWidth(arrTo  );
+		size_t nMaxX = bWrap ? ConInfo.dwSize.X/2-6 : 65535;
+		GenerateRenameStrings(arrFrom, arrTo, nMaxX);
 
 		arrItems.clear();
 		for (size_t nItem = 0; nItem < arrFrom.size(); nItem++) {
 			arrItems.push_back(arrFrom[nItem] + _T(" => ") + arrTo[nItem]);
 		}
 
-		nResult = ChooseMenu(arrItems, GetMsg(MRenamePreview), _T("Ins, Del, Enter, Esc"), _T("RenamePreview"), nResult, FMENU_WRAPMODE,
+		nResult = ChooseMenu(arrItems, GetMsg(MRenamePreview), _T("Ins, Del, F2, F3, Enter, Esc"), _T("RenamePreview"), nResult, FMENU_WRAPMODE,
 			BreakKeys, &nBreakKey);
 
 		switch (nBreakKey) {
@@ -334,6 +343,18 @@ void RenamePreview(panelitem_vector &PanelItems)
 		case 1:
 			m_arrPendingRename.erase(m_arrPendingRename.begin() + nResult);
 			break;
+		case 2:
+			bWrap = !bWrap;
+			break;
+		case 3:{
+			tstring strContent;
+			GenerateRenameStrings(arrFrom, arrTo, 65535);
+			for (size_t nItem = 0; nItem < arrFrom.size(); nItem++) {
+				strContent += arrFrom[nItem] + _T(" => ") + arrTo[nItem] + _T("\n");
+			}
+			RunExternalViewer(strContent);
+			break;
+			   }
 		}
 
 		if (m_arrPendingRename.empty()) {

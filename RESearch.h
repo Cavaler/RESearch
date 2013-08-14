@@ -189,6 +189,7 @@ int do_pcre_execA(const pcre *external_re, const pcre_extra *extra_data,
 
 bool RunREBuilder(tstring &strSearch, tstring &strReplace);
 void RunExternalEditor(tstring &strText);
+void RunExternalViewer(tstring &strText);
 
 #include "Presets.h"
 #include "ViewFind\ViewFind.h"
