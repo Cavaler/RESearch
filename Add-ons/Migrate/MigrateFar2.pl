@@ -21,6 +21,8 @@ sub CreateValue
 {
 	my ($root, $name, $value) = @_;
 
+	return if $name eq 'AllCP';
+
 	$value =~ s/'/''/g;
 
 	print "INSERT INTO `table_values` (`key_id`, `name`, `value`) VALUES ($root, '$name', '$value');\n";
