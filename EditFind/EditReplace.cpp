@@ -406,7 +406,8 @@ BOOL ReplaceInTextByLine(int FirstLine, int StartPos, int LastLine, int EndPos, 
 	return FALSE;
 }
 
-BOOL _EditorReplaceAgain() {
+BOOL _EditorReplaceAgain()
+{
 	NoAsking = FALSE;
 	return EditorReplaceAgain();
 }
@@ -425,6 +426,7 @@ BOOL EditorReplaceAgain()
 
 	StartEdInfo = EdInfo;
 	bShowNoFound = !NoAsking;
+	FindNumber = ReplaceNumber = 0;
 
 #ifndef UNICODE
 	m_pReplaceTable = (EdInfo.AnsiMode) ? &XLatTables[XLatTables.size()-1] :
@@ -615,7 +617,6 @@ BOOL EditorReplace()
 
 	NoAsking = (ExitCode == MAll);
 	ReplaceStartLine = -1;
-	FindNumber = ReplaceNumber = 0;
 	g_bInterrupted = FALSE;
 	REParam.m_setInitParam.clear();
 
