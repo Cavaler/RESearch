@@ -560,8 +560,7 @@ wstring HexToUni(tstring strHex)
 void EditorStartUndo()
 {
 #ifdef UNICODE
-	EditorUndoRedo UR;
-	UR.Command = EUR_BEGIN;
+	EditorUndoRedo UR = { ITEM_SS(EditorUndoRedo) EUR_BEGIN };
 
 	StartupInfo.EditorControl(ECTL_UNDOREDO, &UR);
 #endif
@@ -570,8 +569,7 @@ void EditorStartUndo()
 void EditorEndUndo()
 {
 #ifdef UNICODE
-	EditorUndoRedo UR;
-	UR.Command = EUR_END;
+	EditorUndoRedo UR = { ITEM_SS(EditorUndoRedo) EUR_END };
 
 	StartupInfo.EditorControl(ECTL_UNDOREDO, &UR);
 #endif

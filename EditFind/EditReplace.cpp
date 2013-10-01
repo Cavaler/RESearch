@@ -107,7 +107,7 @@ void DoEditReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, cons
 		if (SetString.StringLength > 0)
 			memmove(&g_LineBuffer[0], SetString.StringText, SetString.StringLength*sizeof(TCHAR));
 
-		/*if (!NoAsking) */EctlSetString(&SetString);
+		if (!NoAsking) EctlSetString(&SetString);
 	} else {
 		EctlSetString(&SetString);
 	}
@@ -379,7 +379,7 @@ BOOL ReplaceInTextByLine(int FirstLine, int StartPos, int LastLine, int EndPos, 
 			FindNumber++;
 		}
 
-		/*if (bCachedReplace && Matched && NoAsking) {
+		if (bCachedReplace && Matched && NoAsking) {
 			CEditorSetString SetString(-1);
 
 			if (g_LineBuffer.empty()) {
@@ -392,7 +392,7 @@ BOOL ReplaceInTextByLine(int FirstLine, int StartPos, int LastLine, int EndPos, 
 			SetString.StringEOL = g_DefEOL.c_str();
 
 			EctlSetString(&SetString);
-		}*/
+		}
 
 		if (ERRemoveNoMatch && !Matched) {
 			EditorSetPosition Position = {ITEM_SS(EditorSetPosition) Line, -1, -1, -1, -1, -1};
