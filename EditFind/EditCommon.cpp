@@ -159,6 +159,8 @@ void FillSingleLineBuffer(size_t FirstLine)
 		if (String.StringLength > 0) memmove(&g_LineBuffer[0], String.StringText, String.StringLength*sizeof(TCHAR));
 		g_LineOffsets.resize(1);
 		g_LineOffsets[0] = 0;
+
+		g_DefEOL = String.StringEOL ? String.StringEOL : _T("");
 	} else if (g_LineOffsets.size() > 1) {
 		size_t nCut = g_LineOffsets[1];
 		g_LineBuffer.resize(nCut);
