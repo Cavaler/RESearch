@@ -13,6 +13,11 @@ Planned:
 Known bugs:
 	- Replace changing part of (real) EOL crashes
 
+Version 7.82 (01.10.2013)
+	- Fixed Undo after replace in Far3
+	- Fixed losing end of lines in Far3 after Replace All
+	* Brought back replace confirmation dialog colorization
+
 Version 7.81 (14.08.2013)
 	- Fixed broken reading of presets with scripts in Far1/2.
 	* Updated Rename Preview interface
