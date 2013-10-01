@@ -8,6 +8,9 @@ enum eReplaceResult {RR_OK, RR_SKIP, RR_CANCEL};
 int LastReplaceLine, LastReplacePos;
 
 bool bShowNoFound;
+
+//	Optimized case of single-line replace
+//	Modifying g_LineBuffer directly to avoid multiple Get/SetString in case of multiple replaces in single line
 bool bCachedReplace;
 
 void DoEditReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, const tstring &Replace)
@@ -107,6 +110,7 @@ void DoEditReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, cons
 		if (SetString.StringLength > 0)
 			memmove(&g_LineBuffer[0], SetString.StringText, SetString.StringLength*sizeof(TCHAR));
 
+		//	Doing SetString() here to update view
 		if (!NoAsking) EctlSetString(&SetString);
 	} else {
 		EctlSetString(&SetString);
@@ -137,8 +141,8 @@ LONG_PTR WINAPI ReplaceOKDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LON
 {
 	switch (nMsg) {
 	case DN_CTLCOLORDLGITEM:
-		//		switch (nParam1) {
-		//		}
+//		switch (nParam1) {
+//		}
 		break;
 	}
 
