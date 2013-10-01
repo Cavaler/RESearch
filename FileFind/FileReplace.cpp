@@ -7,10 +7,36 @@ tstring g_strBackupFileName;
 LONG_PTR WINAPI ConfirmReplacementDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LONG_PTR lParam2)
 {
 	switch (nMsg) {
-	case DN_CTLCOLORDLGITEM:
-//		switch (nParam1) {
-//		}
+	case DN_INITDIALOG:
+		pDlg->SendDlgMessage(DM_SETDLGDATA, 0, lParam2);
 		break;
+#ifdef FAR3
+	case DN_CTLCOLORDLGITEM:{
+		int nCounts = pDlg->SendDlgMessage(DM_GETDLGDATA, 0, 0);
+		int nFoundCount = nCounts >> 16;
+		int nReplacedCount = nCounts & 0xFFFF;
+		FarDialogItemColors *pColors = (FarDialogItemColors *)lParam2;
+		if ((nParam1 >= 2) && (nParam1 < 2+nFoundCount)) {
+			pColors->Colors[0].Flags = FCF_4BITMASK;
+			pColors->Colors[0].BackgroundColor = 0x0A;
+			pColors->Colors[0].ForegroundColor = 0x00;
+			return TRUE;
+		}
+		if ((nParam1 >= 3+nFoundCount) && (nParam1 < 3+nFoundCount+nReplacedCount)) {
+			pColors->Colors[0].Flags = FCF_4BITMASK;
+			pColors->Colors[0].BackgroundColor = 0x0B;
+			pColors->Colors[0].ForegroundColor = 0x00;
+			return TRUE;
+		}
+		if (nParam1 == 4+nFoundCount+nReplacedCount) {
+			pColors->Colors[0].Flags = FCF_4BITMASK;
+			pColors->Colors[0].BackgroundColor = 0x02;
+			pColors->Colors[0].ForegroundColor = 0x00;
+			return TRUE;
+		}
+		break;
+							}
+#endif
 	}
 
 	return pDlg->DefDlgProc(nMsg, nParam1, lParam2);
@@ -41,19 +67,19 @@ bool ConfirmReplacement(const TCHAR *Found, const TCHAR *Replaced, const TCHAR *
 	size_t nCount = arrFound.size()+arrReplaced.size();
 
 	CFarDialog Dialog(nWidth+12, nCount+10, _T("FRAskReplace"));
-	Dialog.SetWindowProc(ConfirmReplacementDialogProc, NULL);
+	Dialog.SetWindowProc(ConfirmReplacementDialogProc, (arrFound.size() << 16) + arrReplaced.size());
 	Dialog.AddFrame(MREReplace);
 
 	Dialog.Add(new CFarTextItem(-1, 2, 0, MAskReplace));
 	for (size_t I = 0; I<arrFound.size(); I++)
-		Dialog.Add(new CFarTextItem(-1, 3 + I, 0/*DIF_SETCOLOR|0x30*/, arrFound[I]));
+		Dialog.Add(new CFarTextItem(-1, 3 + I, DIF_SHOWAMPERSAND|DLG_SETCOLOR(0xA0), arrFound[I]));
 
 	Dialog.Add(new CFarTextItem(-1, 3 + arrFound.size(), 0, MAskWith));
 	for (size_t I = 0; I<arrReplaced.size();I++)
-		Dialog.Add(new CFarTextItem(-1, 4 + arrFound.size() + I, DIF_SHOWAMPERSAND/*|DIF_SETCOLOR|0xB0*/, arrReplaced[I]));
+		Dialog.Add(new CFarTextItem(-1, 4 + arrFound.size() + I, DIF_SHOWAMPERSAND|DLG_SETCOLOR(0xB0), arrReplaced[I]));
 
 	Dialog.Add(new CFarTextItem(-1, 4 + nCount, 0, MInFile));
-	Dialog.Add(new CFarTextItem(-1, 5 + nCount,  DIF_SHOWAMPERSAND/*|DIF_SETCOLOR|0x20*/, FileName));
+	Dialog.Add(new CFarTextItem(-1, 5 + nCount,  DIF_SHOWAMPERSAND|DLG_SETCOLOR(0x20), FileName));
 
 	Dialog.Add(new CFarButtonItem(0, 7 + nCount, DIF_CENTERGROUP|DIF_NOBRACKETS, TRUE,  MReplace));
 	Dialog.Add(new CFarButtonItem(0, 7 + nCount, DIF_CENTERGROUP|DIF_NOBRACKETS, FALSE, MAll));
