@@ -151,20 +151,24 @@ bool CGrepFrontend::Process(IBackend *pBackend)
 	return nFoundCount > 0;
 }
 
-void GrepFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
+void GrepFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems)
+{
 	if (FText.empty()) {
 		AddFile(FindData, PanelItems);
 		AddGrepLine(FindData->cFileName);
 		return;
 	}
 
+	bool bAnyFound;
 	if (FSearchAs == SA_REGEXP) {
 		CGrepFrontend Frontend(true);
-		RunSearch(FindData->cFileName, &Frontend, true);
+		bAnyFound = RunSearch(FindData->cFileName, &Frontend, true);
 	} else {
 		CGrepFrontend Frontend(false);
-		RunSearch(FindData->cFileName, &Frontend, false);
+		bAnyFound = RunSearch(FindData->cFileName, &Frontend, false);
 	}
+
+	if (bAnyFound) AddFile(FindData, PanelItems, true);
 }
 
 bool PrepareFileGrepPattern() {
@@ -278,7 +282,8 @@ bool GrepPrompt(BOOL bPlugin) {
 	return true;
 }
 
-OperationResult FileGrep(BOOL ShowDialog) {
+OperationResult FileGrep(BOOL ShowDialog)
+{
 	CPanelInfo PInfo;
 	PInfo.GetInfo(false);
 	if (PInfo.PanelType!=PTYPE_FILEPANEL) return OR_FAILED;
