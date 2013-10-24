@@ -4,19 +4,29 @@
 ::CHandle g_hOutput;
 int     g_nLines;
 
-void AddGrepLine(const TCHAR *szLine, bool bEOL = true) {
+void AddGrepLine(const TCHAR *szLine, bool bEOL = true)
+{
 	DWORD dwWritten;
 	WriteFile(g_hOutput, szLine, _tcslen(szLine)*sizeof(TCHAR), &dwWritten, NULL);
-	if (bEOL) WriteFile(g_hOutput, _T("\r\n"), 2, &dwWritten, NULL);
+	if (bEOL) WriteFile(g_hOutput, _T("\r\n"), 2*sizeof(TCHAR), &dwWritten, NULL);
 }
 
-void AddGrepLine(const tstring &strLine, bool bEOL = true) {
+void AddGrepLine(const tstring &strLine, bool bEOL = true)
+{
 	DWORD dwWritten;
 	WriteFile(g_hOutput, strLine.data(), strLine.size()*sizeof(TCHAR), &dwWritten, NULL);
-	if (bEOL) WriteFile(g_hOutput, _T("\r\n"), 2, &dwWritten, NULL);
+	if (bEOL) WriteFile(g_hOutput, _T("\r\n"), 2*sizeof(TCHAR), &dwWritten, NULL);
 }
 
-void AddGrepResultLine(const string &strLine, int nLineNumber) {
+void AddGrepFileName(const tstring &strFileName)
+{
+	AddGrepLine(FGFileNamePrepend, false);
+	AddGrepLine(strFileName, FGFileNameAppend.empty());
+	AddGrepLine(FGFileNameAppend, false);
+}
+
+void AddGrepResultLine(const string &strLine, int nLineNumber)
+{
 	if (FGAddLineNumbers) {
 		AddGrepLine(FormatStr(_T("%d:"), nLineNumber), false);
 	}
@@ -33,19 +43,28 @@ void AddGrepResultLine(const string &strLine, int nLineNumber) {
 #endif
 }
 
-bool GrepLineFound(const string &strBuf) {
+bool GrepLineFound(const string &strBuf, string &strMatch)
+{
 	BOOL bResult;
 
 #ifdef UNICODE
 	if (FSearchAs == SA_REGEXP) {
-		bResult = do_pcre_execA(FPattern, FPatternExtra, strBuf.data(), strBuf.length(), 0, 0, NULL, 0) >= 0;
+		bResult = do_pcre_execA(FPattern, FPatternExtra, strBuf.data(), strBuf.length(), 0, 0, REParamA.Match(), REParamA.Count()) >= 0;
+		if (bResult) {
+			REParamA.AddSource(strBuf.data(), strBuf.length());
+			strMatch = REParamA.GetParam(0);
+		}
 	} else {
 		TCHAR *szTable = (FCaseSensitive) ? NULL : UpCaseTable;
 		bResult = BMHSearch((WCHAR *)strBuf.data(), strBuf.length()/2, FTextUpcase.data(), FTextUpcase.size(), szTable) >= 0;
 	}
 #else
 	if (FSearchAs == SA_REGEXP) {
-		bResult = do_pcre_exec(FPattern, FPatternExtra, strBuf.data(), strBuf.length(), 0, 0, NULL, 0) >= 0;
+		bResult = do_pcre_exec(FPattern, FPatternExtra, strBuf.data(), strBuf.length(), 0, 0, REParamA.Match(), REParamA.Count()) >= 0;
+		if (bResult) {
+			REParamA.AddSource(strBuf.data(), strBuf.length());
+			strMatch = REParamA.GetParam(0);
+		}
 	} else {
 		TCHAR *szTable = (FCaseSensitive) ? NULL : UpCaseTable;
 		bResult = BMHSearch(strBuf.data(), strBuf.length(), FTextUpcase.data(), FTextUpcase.size(), szTable) >= 0;
@@ -84,50 +103,63 @@ bool CGrepFrontend::Process(IBackend *pBackend)
 	int nFirstBufferLine = 0;
 	int nLastMatched = -1;
 
-	int nContextLines = FGAddContext ? FGContextLines : 0;
+	REParamA.Clear();
+	REParamA.AddRE(FPattern);
+
 	do {
 		const char *szBuffer = m_pProc->Buffer();
 		INT_PTR nSize  = m_pProc->Size();
 
 		arrStringBuffer.push_back(string(szBuffer, szBuffer+nSize));
 
-		if (GrepLineFound(arrStringBuffer.back())) {
+		string strMatch;
+		if (GrepLineFound(arrStringBuffer.back(), strMatch)) {
 			nFoundCount++;
-			nLastMatched = arrStringBuffer.size()-1;
 
 			switch (FGrepWhat) {
 			case GREP_NAMES:
-				AddGrepLine(pBackend->FileName());
+				AddGrepFileName(pBackend->FileName());
 				return true;
 			case GREP_NAMES_LINES:
-				if (nFoundCount == 1) AddGrepLine(pBackend->FileName());
+				if (nFoundCount == 1) AddGrepFileName(pBackend->FileName());
 				break;
+			}
+
+			if (FGAddContext) {
+				nLastMatched = arrStringBuffer.size()-1;
+			} else {
+				AddGrepResultLine(FGMatchingLinePart ? strMatch : arrStringBuffer.back(), nFirstBufferLine + 1);
 			}
 		} else {
 			if (nLastMatched >= 0) {
-				if (nLastMatched < (int)arrStringBuffer.size()-nContextLines*2-1) {
+				if (nLastMatched < (int)(arrStringBuffer.size()-FGContextLines*2-1)) {
 					switch (FGrepWhat) {
 					case GREP_NAMES_LINES:
 					case GREP_LINES:
-						if (nContextLines > 0) AddGrepLine(_T(">>>"));
-						for (int nLine = 0; nLine <= nLastMatched+nContextLines; nLine++) {
+						AddGrepLine(_T(">>>"));
+						for (size_t nLine = 0; nLine <= nLastMatched+FGContextLines; nLine++) {
 							AddGrepResultLine(arrStringBuffer[nLine], nLine + nFirstBufferLine + 1);
 						}
-						if (nContextLines > 0) AddGrepLine(_T("<<<"));
+						AddGrepLine(_T("<<<"));
 						break;
 					}
-					while ((int)arrStringBuffer.size() > nContextLines) {
+					while ((int)arrStringBuffer.size() > FGContextLines) {
 						arrStringBuffer.pop_front();
 						nFirstBufferLine++;
 					}
 					nLastMatched = -1;
 				} // else not yet time for output
-			} else {
-				while ((int)arrStringBuffer.size() > nContextLines) {
+			} else if (FGAddContext) {
+				while ((int)arrStringBuffer.size() > FGContextLines) {
 					arrStringBuffer.pop_front();
 					nFirstBufferLine++;
 				}
 			}
+		}
+
+		if (!FGAddContext) {
+			arrStringBuffer.clear();
+			nFirstBufferLine++;
 		}
 
 	} while (m_pProc->GetNextLine());
@@ -138,12 +170,12 @@ bool CGrepFrontend::Process(IBackend *pBackend)
 		break;
 	case GREP_NAMES_LINES:
 	case GREP_LINES:
-		if (nLastMatched >= 0) {
-			if (nContextLines > 0) AddGrepLine(_T(">>>"));
-			for (int nLine = 0; (nLine < (int)arrStringBuffer.size()) && (nLine <= nLastMatched+nContextLines); nLine++) {
+		if (FGAddContext && (nLastMatched >= 0)) {
+			AddGrepLine(_T(">>>"));
+			for (size_t nLine = 0; (nLine < arrStringBuffer.size()) && (nLine <= nLastMatched+FGContextLines); nLine++) {
 				AddGrepResultLine(arrStringBuffer[nLine], nLine + nFirstBufferLine + 1);
 			}
-			if (nContextLines > 0) AddGrepLine(_T("<<<"));
+			AddGrepLine(_T("<<<"));
 		}
 		break;
 	}
@@ -179,13 +211,15 @@ bool PrepareFileGrepPattern() {
 	return true;
 }
 
-void UpdateFGDialog(CFarDialog *pDlg, bool bCheckSel = true) {
+void UpdateFGDialog(CFarDialog *pDlg, bool bCheckSel = true)
+{
 	bool bRegExp = pDlg->IsDlgItemChecked(MRegExp);
 
 	pDlg->EnableDlgItem(MQuoteSearch, bRegExp);
 }
 
-LONG_PTR WINAPI FileGrepDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LONG_PTR lParam2) {
+LONG_PTR WINAPI FileGrepDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LONG_PTR lParam2)
+{
 	int nCtlID = pDlg->GetID(nParam1);
 
 	switch (nMsg) {
@@ -208,7 +242,7 @@ LONG_PTR WINAPI FileGrepDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LONG
 bool GrepPrompt(BOOL bPlugin) {
 	BOOL AsRegExp = (FSearchAs == SA_REGEXP) || (FSearchAs == SA_SEVERALLINE) || (FSearchAs == SA_MULTILINE) || (FSearchAs == SA_MULTIREGEXP);
 
-	CFarDialog Dialog(76,25,_T("FileGrepDlg"));
+	CFarDialog Dialog(76,28,_T("FileGrepDlg"));
 	Dialog.SetWindowProc(FileGrepDialogProc, 0);
 	Dialog.SetUseID(true);
 	Dialog.SetCancelID(MCancel);
@@ -238,14 +272,20 @@ bool GrepPrompt(BOOL bPlugin) {
 	Dialog.Add(new CFarCheckBoxItem(5,14,0,MGrepAdd,&FGAddContext));
 	Dialog.Add(new CFarEditItem(15,14,20,0,NULL,(int &)FGContextLines,new CFarIntegerRangeValidator(0,1024)));
 	Dialog.Add(new CFarTextItem(22,14,0,MGrepContext));
-	Dialog.Add(new CFarCheckBoxItem(5,15,0,MGrepAddLineNumbers,&FGAddLineNumbers));
+	Dialog.Add(new CFarCheckBoxItem(5,15,0,MGrepAddLineNumbers, &FGAddLineNumbers));
+	Dialog.Add(new CFarCheckBoxItem(5,16,0,MGrepMatchedLinePart, &FGMatchingLinePart));
 
-	Dialog.Add(new CFarCheckBoxItem(5,16,0,MGrepOutput,&FGOutputToFile));
-	Dialog.Add(new CFarEditItem(20,16,45,DIF_HISTORY,_T("RESearch.GrepOutput"), FGOutputFile));
-	Dialog.Add(new CFarCheckBoxItem(5,17,0,MGrepEditor,&FGOpenInEditor));
+	Dialog.Add(new CFarTextItem(5,17,0,MGrepFileNamePrepend));
+	Dialog.Add(new CFarEditItem(35,17,55,DIF_HISTORY,_T("FGPrepend"), FGFileNamePrepend));
+	Dialog.Add(new CFarTextItem(5,18,0,MGrepFileNameAppend));
+	Dialog.Add(new CFarEditItem(35,18,55,DIF_HISTORY,_T("FGAppend"), FGFileNameAppend));
 
-	Dialog.Add(new CFarTextItem(5,19,0,MSearchIn));
-	Dialog.Add(new CFarComboBoxItem(15,19,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearch, false),(int *)&FSearchIn));
+	Dialog.Add(new CFarCheckBoxItem(5,19,0,MGrepOutput,&FGOutputToFile));
+	Dialog.Add(new CFarEditItem(20,19,45,DIF_HISTORY,_T("RESearch.GrepOutput"), FGOutputFile));
+	Dialog.Add(new CFarCheckBoxItem(5,20,0,MGrepEditor,&FGOpenInEditor));
+
+	Dialog.Add(new CFarTextItem(5,22,0,MSearchIn));
+	Dialog.Add(new CFarComboBoxItem(15,22,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearch, false),(int *)&FSearchIn));
 
 	Dialog.AddButtons(MOk,MCancel);
 	Dialog.Add(new CFarButtonItem(60,10,0,0,MBtnPresets));

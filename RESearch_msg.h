@@ -81,6 +81,9 @@ enum eStringTable {
 	MGrepAddLineNumbers,
 	MGrepAdd,
 	MGrepContext,
+	MGrepMatchedLinePart,
+	MGrepFileNamePrepend,
+	MGrepFileNameAppend,
 	MGrepOutput,
 	MGrepEditor,
 

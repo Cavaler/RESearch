@@ -81,6 +81,9 @@ MGrepNamesLines		"Output file names and matched &lines"	"Выводить име
 MGrepAddLineNumbers	"Add line n&umbers"						"Добавить &номера строк"
 MGrepAdd			"&Add"									"&Показ"
 MGrepContext		"context lines around matches"			"окружающих строк"
+MGrepMatchedLinePart	"Output only matched line fragment"	"Выводить только совпавший фрагмент строки"
+MGrepFileNamePrepend	"Prepend to file name:				"Добавлять к началу имени файла:"
+MGrepFileNameAppend		"Append to file name:"				"Добавлять к концу имени файла:"
 MGrepOutput			"&Output to:"							"В&ыводить в:"
 MGrepEditor			"O&pen output in editor"				"Открыть вывод в р&едакторе"
 

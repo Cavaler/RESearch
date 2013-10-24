@@ -92,7 +92,7 @@ int EngineIndex(const tstring &strValue)
 	HRESULT hr = CLSIDFromString(_bstr_t(strValue.c_str()), &clsid);
 
 	if (SUCCEEDED(hr)) {
-		for (int nEngine = 0; nEngine < m_arrEngines.size(); nEngine++)
+		for (size_t nEngine = 0; nEngine < m_arrEngines.size(); nEngine++)
 		{
 			if (memcmp(&m_arrEngines[nEngine].m_clsid, &clsid, sizeof(CLSID)) == 0) return nEngine;
 		}
