@@ -235,6 +235,13 @@ but only to beginning, e.g. "ab*cd" will match "ab123cd456"
     #Always#                        Replace without additional questions
 
   #Skip preconfigured system folders# Folders matching given masks will be always skipped
+@GrepConfig
+$ #Grep settings#
+
+  #Prepend to file name:#         Text to add immediately before file name in output
+  #Append to file name:#          Text to add immediately after file name in output.
+Note that when it is non-empty, newline isn't added automatically.
+
 @RenumberConfig
 $ #Renumbering settings#
 
@@ -457,17 +464,24 @@ $ #Cannot find text#
     No more occurences of given text are found.
 @FileMenu
 $ #RESearch menu in panels#
-  ~#Search#~@FileSearchDlg@                - Search for text or regexp in files
-  ~#Replace#~@FileReplaceDlg@               - Replace text or regexp in files
+  ~#Search#~@FileSearchDlg@                 - Search for text or regexp in files
+  ~#Replace#~@FileReplaceDlg@                - Replace text or regexp in files
+  ~#Grep#~@FileGrepDlg@                   - Grep for text or regexp in files
 
-  ~#Select files#~@FileSelectDlg@          - Select files using mask or regexp
-  #Unselect files#        - Unselect files using mask or regexp
-  #Flip selection#        - Flip selection of files using mask or regexp
+  ~#Select files#~@FileSelectDlg@           - Select files using mask or regexp
+  #Unselect files#         - Unselect files using mask or regexp
+  #Flip selection#         - Flip selection of files using mask or regexp
 
-  ~#Rename files#~@FileRenameDlg@          - find and rename files
-  ~#Rename selected files#~@SelectedFileRenameDlg@ - rename selected files
+  ~#Rename files#~@FileRenameDlg@           - Find and rename files
+  ~#Rename selected files#~@SelectedFileRenameDlg@  - Rename selected files
+  ~#Renumber files#~@Renumber@         - Renumber selected files
+  #Undo last rename files# - Undo last rename/renumber
 
-  #Show last results#     - Show results of last search/replace/etc
+  #Show last results#      - Show results of last search/replace/etc
+  #Clean up named variables#
+
+  #Batches#
+
 @FileSearchDlg
 $ #Regular Expression File Search#
     Using this command, you can search for files containing given text or regular expression.
@@ -587,6 +601,41 @@ Date should be in #dd.mm.yyyy hh:mm:ss.ms# format; time can be partially or full
     #System#                #[?]# Atrribute is not important
     #Compressed#
     #Encrypted#
+@FileGrepDlg
+$ #File Grep#
+ This command mostly imitates behavior of unix grep(2) command.
+
+  #File mask(s)#             Specifies what files are to be searched. File mask delimiter
+can be set in ~configuration dialog~@RECfg@.
+  #As regular expression# If this option is set, mask will be treated as regular expression,
+not as usual DOS mask.
+
+  #Containing text#          This text is searched for.
+  #[ \ ]#                    This button will quote all special symbols in search string,
+if regular expression search is selected.
+
+  #Regular expression#       Each single line of the input file is matched with given
+~regular expression~@RegularExpressions@.
+
+  #Case sensitive#           If unchecked, text or regular expression is matched without regard
+to symbol case. ANSI and OEM codepages are supported.
+
+  #Inverse search#           Only non-matching lines are written.
+
+  #Use all character tables#
+
+  #Output file names only#
+  #Output file names and match count#
+  #Output matched lines only#
+  #Output file names and matched lines#
+
+  #Add NNN context lines around matches#
+  #Add line numbers#
+  #Output only matched line fragment#	When using regilar expressions, only matched part of line is written.
+
+  #Output to:#                          Output to specified file. If unchecked, temporary file is created.
+  #Open output in editor#
+
 @SearchResults
 $ #Search Results panel#
     This panel is much the same as standard temporary panel, except for that
