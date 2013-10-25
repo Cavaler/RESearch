@@ -82,8 +82,6 @@ enum eStringTable {
 	MGrepAdd,
 	MGrepContext,
 	MGrepMatchedLinePart,
-	MGrepFileNamePrepend,
-	MGrepFileNameAppend,
 	MGrepOutput,
 	MGrepEditor,
 
@@ -171,6 +169,10 @@ enum eStringTable {
 	MSkipSystemFolders,
 	MUseSingleCR,
 	MEditSrchAfterFile,
+
+	MGrepSettings,
+	MGrepFileNamePrepend,
+	MGrepFileNameAppend,
 
 	MRenumberSettings,
 	MStripFromBeginning,

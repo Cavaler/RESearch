@@ -1157,6 +1157,23 @@ void ConfigureFile()
 #endif
 }
 
+void ConfigureGrep()
+{
+	CFarDialog Dialog(70, 10, _T("GrepConfig"));
+	Dialog.EnableAutoHotkeys(true);
+
+	Dialog.AddFrame(MGrepSettings);
+
+	Dialog.Add(new CFarTextItem(5,3,0,MGrepFileNamePrepend));
+	Dialog.Add(new CFarEditItem(35,3,55,DIF_HISTORY,_T("FGPrepend"), FGFileNamePrepend));
+	Dialog.Add(new CFarTextItem(5,4,0,MGrepFileNameAppend));
+	Dialog.Add(new CFarEditItem(35,4,55,DIF_HISTORY,_T("FGAppend"), FGFileNameAppend));
+
+	Dialog.AddButtons(MOk,MCancel);
+
+	Dialog.Display(-1);
+}
+
 void ConfigureRenumbering(bool bRuntime)
 {
 	CFarDialog Dialog(70, bRuntime ? 18 : 16, _T("RenumberConfig"));
@@ -1236,16 +1253,18 @@ int WINAPI FAR_EXPORT(Configure)(int ItemNumber)
 	const TCHAR *ppszItems[]={
 		GetMsg(MCommonSettings),
 		GetMsg(MFileSearchSettings),
+		GetMsg(MGrepSettings),
 		GetMsg(MRenumberSettings),
 		GetMsg(MEditorSearchSettings)
 	};
 	int iResult = 0;
 	do {
-		switch (iResult = ChooseMenu(4,ppszItems,GetMsg(MRESearch),NULL,_T("Config"),iResult)) {
+		switch (iResult = ChooseMenu(5,ppszItems,GetMsg(MRESearch),NULL,_T("Config"),iResult)) {
 		case 0:ConfigureCommon();break;
 		case 1:ConfigureFile();break;
-		case 2:ConfigureRenumbering(false);break;
-		case 3:ConfigureEditor();break;
+		case 2:ConfigureGrep();break;
+		case 3:ConfigureRenumbering(false);break;
+		case 4:ConfigureEditor();break;
 		default:WriteRegistry();return TRUE;
 		}
 	} while (TRUE);

@@ -252,7 +252,7 @@ LONG_PTR WINAPI FileGrepDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LONG
 bool GrepPrompt(BOOL bPlugin) {
 	BOOL AsRegExp = (FSearchAs == SA_REGEXP) || (FSearchAs == SA_SEVERALLINE) || (FSearchAs == SA_MULTILINE) || (FSearchAs == SA_MULTIREGEXP);
 
-	CFarDialog Dialog(76, 28, _T("FileGrepDlg"));
+	CFarDialog Dialog(76, 26, _T("FileGrepDlg"));
 	Dialog.SetWindowProc(FileGrepDialogProc, 0);
 	Dialog.SetUseID(true);
 	Dialog.SetCancelID(MCancel);
@@ -285,17 +285,12 @@ bool GrepPrompt(BOOL bPlugin) {
 	Dialog.Add(new CFarCheckBoxItem(5,15,0,MGrepAddLineNumbers, &FGAddLineNumbers));
 	Dialog.Add(new CFarCheckBoxItem(5,16,0,MGrepMatchedLinePart, &FGMatchingLinePart));
 
-	Dialog.Add(new CFarTextItem(5,17,0,MGrepFileNamePrepend));
-	Dialog.Add(new CFarEditItem(35,17,55,DIF_HISTORY,_T("FGPrepend"), FGFileNamePrepend));
-	Dialog.Add(new CFarTextItem(5,18,0,MGrepFileNameAppend));
-	Dialog.Add(new CFarEditItem(35,18,55,DIF_HISTORY,_T("FGAppend"), FGFileNameAppend));
+	Dialog.Add(new CFarCheckBoxItem(5,17,0,MGrepOutput,&FGOutputToFile));
+	Dialog.Add(new CFarEditItem(20,17,45,DIF_HISTORY,_T("RESearch.GrepOutput"), FGOutputFile));
+	Dialog.Add(new CFarCheckBoxItem(5,18,0,MGrepEditor,&FGOpenInEditor));
 
-	Dialog.Add(new CFarCheckBoxItem(5,19,0,MGrepOutput,&FGOutputToFile));
-	Dialog.Add(new CFarEditItem(20,19,45,DIF_HISTORY,_T("RESearch.GrepOutput"), FGOutputFile));
-	Dialog.Add(new CFarCheckBoxItem(5,20,0,MGrepEditor,&FGOpenInEditor));
-
-	Dialog.Add(new CFarTextItem(5,22,0,MSearchIn));
-	Dialog.Add(new CFarComboBoxItem(15,22,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearch, false),(int *)&FSearchIn));
+	Dialog.Add(new CFarTextItem(5,20,0,MSearchIn));
+	Dialog.Add(new CFarComboBoxItem(15,20,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearch, false),(int *)&FSearchIn));
 
 	Dialog.AddButtons(MOk,MCancel);
 	Dialog.Add(new CFarButtonItem(60,10,0,0,MBtnPresets));
@@ -395,11 +390,7 @@ BOOL CFGPresetCollection::EditPreset(CPreset *pPreset) {
 	SearchAs FSA = (SearchAs)pPreset->m_mapInts["SearchAs"];
 	BOOL AsRegExp = (FSA == SA_REGEXP) || (FSA == SA_SEVERALLINE) || (FSA == SA_MULTILINE) || (FSA == SA_MULTIREGEXP);
 
-	CFarDialog Dialog(76,28,_T("FGPresetDlg"));
-	Dialog.SetWindowProc(FileGrepDialogProc, 0);
-	Dialog.SetUseID(true);
-	Dialog.SetCancelID(MCancel);
-
+	CFarDialog Dialog(76,25,_T("FGPresetDlg"));
 	Dialog.AddFrame(MREGrep);
 
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
@@ -427,20 +418,14 @@ BOOL CFGPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.Add(new CFarEditItem(15,16,20,0,NULL,&pPreset->m_mapInts["ContextLines"],new CFarIntegerRangeValidator(0,1024)));
 	Dialog.Add(new CFarTextItem(22,16,0,MGrepContext));
 	Dialog.Add(new CFarCheckBoxItem(5,17,0,MGrepAddLineNumbers, &pPreset->m_mapInts["AddLineNumbers"]));
-
 	Dialog.Add(new CFarCheckBoxItem(5,18,0,MGrepMatchedLinePart, &pPreset->m_mapInts["MatchingLinePart"]));
-
-	Dialog.Add(new CFarTextItem(5,19,0,MGrepFileNamePrepend));
-	Dialog.Add(new CFarEditItem(35,19,55,DIF_HISTORY,_T("FGPrepend"), pPreset->m_mapStrings["FileNamePrepend"]));
-	Dialog.Add(new CFarTextItem(5,20,0,MGrepFileNameAppend));
-	Dialog.Add(new CFarEditItem(35,20,55,DIF_HISTORY,_T("FGAppend"), pPreset->m_mapStrings["FileNameAppend"]));
 
 	int  nAdvancedID = pPreset->m_mapInts["AdvancedID"];
 	bool bFAdvanced = nAdvancedID > 0;
 
 	Dialog.Add(new CFarCheckBoxItem(56,12,0,_T(""),&bFAdvanced));
 	Dialog.Add(new CFarButtonItem(60,12,0,0,MBtnAdvanced));
-	Dialog.Add(new CFarCheckBoxItem(5,22,0,MAddToMenu,&pPreset->m_bAddToMenu));
+	Dialog.Add(new CFarCheckBoxItem(5,19,0,MAddToMenu,&pPreset->m_bAddToMenu));
 	Dialog.AddButtons(MOk,MCancel);
 
 	do {

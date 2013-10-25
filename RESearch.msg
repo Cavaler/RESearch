@@ -82,8 +82,6 @@ MGrepAddLineNumbers	"Add line n&umbers"						"Добавить &номера с�
 MGrepAdd			"&Add"									"&Показ"
 MGrepContext		"context lines around matches"			"окружающих строк"
 MGrepMatchedLinePart	"Output only matched line fragment"	"Выводить только совпавший фрагмент строки"
-MGrepFileNamePrepend	"Prepend to file name:				"Добавлять к началу имени файла:"
-MGrepFileNameAppend		"Append to file name:"				"Добавлять к концу имени файла:"
 MGrepOutput			"&Output to:"							"В&ыводить в:"
 MGrepEditor			"O&pen output in editor"				"Открыть вывод в р&едакторе"
 
@@ -171,6 +169,10 @@ MAlways				"&Always"										"&Всегда"
 MSkipSystemFolders	"Skip preconfig&ured system folders:"	"Пропускать заданные системные каталоги:"
 MUseSingleCR		"Search for CR-onl&y EOL"				"Искать переводы строк из одного CR"
 MEditSrchAfterFile	"Au&tomatic search in editor"			"Автомати&ческий поиск в редакторе"
+
+MGrepSettings		"Grep settings"						"Нaстройки Grep"
+MGrepFileNamePrepend	"Prepend to file name:"				"Добавлять к началу имени файла:"
+MGrepFileNameAppend		"Append to file name:"				"Добавлять к концу имени файла:"
 
 MRenumberSettings	"Renumbering settings"				"Перенумерование"
 MStripFromBeginning	"RegExp to &strip from beginning:"	"RegExp, &убираемый с начала:"
