@@ -105,7 +105,8 @@ bool CGrepFrontend::Process(IBackend *pBackend)
 #endif
 
 	deque<string> arrStringBuffer;
-	int nFoundCount = 0;
+	int nFoundLineCount = 0;
+	int nFoundMatchCount = 0;
 	int nFirstBufferLine = 0;
 	int nLastMatched = -1;
 
@@ -121,45 +122,42 @@ bool CGrepFrontend::Process(IBackend *pBackend)
 		vector<string> arrMatch;
 		string strMatch;
 
-		bool bFound = (
-			((FGrepWhat == GREP_LINES) || (FGrepWhat == GREP_NAMES_LINES)) &&
-			(FGMatchingLinePart)
-			) ? GrepMatchesFound(arrStringBuffer.back(), arrMatch) : GrepLineFound(arrStringBuffer.back(), strMatch);
+		bool bFound = (FGOutputLines && FGMatchingLinePart) || (FGOutputNames && FGAddMatchCount)
+			? GrepMatchesFound(arrStringBuffer.back(), arrMatch)
+			: GrepLineFound(arrStringBuffer.back(), strMatch);
 
 		if (bFound) {
-			nFoundCount++;
+			nFoundLineCount++;
+			nFoundMatchCount += arrMatch.size();
 
-			switch (FGrepWhat) {
-			case GREP_NAMES:
-				AddGrepFileName(pBackend->FileName());
-				return true;
-			case GREP_NAMES_LINES:
-				if (nFoundCount == 1) AddGrepFileName(pBackend->FileName());
-				break;
+			if (FGOutputNames) {
+				if (FGOutputLines) {
+					if (nFoundLineCount == 1) AddGrepFileName(pBackend->FileName());
+				} else if (!FGAddLineCount && !FGAddMatchCount) {
+					AddGrepFileName(pBackend->FileName());
+					return true;
+				}
 			}
 
 			if (FGAddContext) {
 				nLastMatched = arrStringBuffer.size()-1;
-			} else if ((FGrepWhat == GREP_LINES) || (FGrepWhat == GREP_NAMES_LINES)) {
+			} else if (FGOutputLines) {
 				if (FGMatchingLinePart) {
 					for each (const string &strFound in arrMatch)
 						AddGrepResultLine(strFound, nFirstBufferLine + 1);
 				} else {
-					AddGrepResultLine(FGMatchingLinePart ? strMatch : arrStringBuffer.back(), nFirstBufferLine + 1);
+					AddGrepResultLine(/*FGMatchingLinePart ? strMatch : */arrStringBuffer.back(), nFirstBufferLine + 1);
 				}
 			}
 		} else {
 			if (nLastMatched >= 0) {
 				if (nLastMatched < (int)(arrStringBuffer.size()-FGContextLines*2-1)) {
-					switch (FGrepWhat) {
-					case GREP_NAMES_LINES:
-					case GREP_LINES:
+					if (FGOutputLines) {
 						AddGrepLine(_T(">>>"));
 						for (size_t nLine = 0; nLine <= nLastMatched+FGContextLines; nLine++) {
 							AddGrepResultLine(arrStringBuffer[nLine], nLine + nFirstBufferLine + 1);
 						}
 						AddGrepLine(_T("<<<"));
-						break;
 					}
 					while ((int)arrStringBuffer.size() > FGContextLines) {
 						arrStringBuffer.pop_front();
@@ -182,23 +180,22 @@ bool CGrepFrontend::Process(IBackend *pBackend)
 
 	} while (m_pProc->GetNextLine());
 
-	switch (FGrepWhat) {
-	case GREP_NAMES_COUNT:
-		if (nFoundCount > 0) AddGrepFileName(FormatStr(_T("%s:%d"), pBackend->FileName(), nFoundCount).c_str());
-		break;
-	case GREP_NAMES_LINES:
-	case GREP_LINES:
-		if (FGAddContext && (nLastMatched >= 0)) {
-			AddGrepLine(_T(">>>"));
-			for (size_t nLine = 0; (nLine < arrStringBuffer.size()) && (nLine <= nLastMatched+FGContextLines); nLine++) {
-				AddGrepResultLine(arrStringBuffer[nLine], nLine + nFirstBufferLine + 1);
-			}
-			AddGrepLine(_T("<<<"));
-		}
-		break;
+	if (FGOutputNames && (nFoundLineCount > 0)) {
+		tstring strFileName = pBackend->FileName();
+		if (FGAddLineCount ) strFileName += FormatStr(_T(":%d"), nFoundLineCount );
+		if (FGAddMatchCount) strFileName += FormatStr(_T(":%d"), nFoundMatchCount);
+		AddGrepFileName(strFileName);
 	}
 
-	return nFoundCount > 0;
+	if (FGOutputLines && (FGAddContext && (nLastMatched >= 0))) {
+		AddGrepLine(_T(">>>"));
+		for (size_t nLine = 0; (nLine < arrStringBuffer.size()) && (nLine <= nLastMatched+FGContextLines); nLine++) {
+			AddGrepResultLine(arrStringBuffer[nLine], nLine + nFirstBufferLine + 1);
+		}
+		AddGrepLine(_T("<<<"));
+	}
+
+	return nFoundLineCount > 0;
 }
 
 void GrepFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems)
@@ -233,20 +230,25 @@ bool PrepareFileGrepPattern()
 void UpdateFGDialog(CFarDialog *pDlg)
 {
 	bool bRegExp  = pDlg->IsDlgItemChecked(MRegExp);
-	bool bContext = pDlg->IsDlgItemChecked(MGrepAdd);
-	bool bLines   = pDlg->IsDlgItemChecked(MGrepLines) || pDlg->IsDlgItemChecked(MGrepNamesLines);
 	bool bInverse = pDlg->IsDlgItemChecked(MInverseSearch);
-
-	pDlg->EnableDlgItem(MGrepAdd, bLines);
-	pDlg->EnableDlgItem(MGrepAddLineNumbers, bLines);
 	pDlg->EnableDlgItem(MQuoteSearch, bRegExp);
-	pDlg->EnableDlgItem(MGrepMatchedLinePart, bLines && bRegExp && !bContext && !bInverse);
-	if (!bRegExp || bContext || bInverse) pDlg->CheckDlgItem(MGrepMatchedLinePart, false);
+
+	bool bNames   = pDlg->IsDlgItemChecked(MGrepOutputNames);
+	pDlg->EnableCheckDlgItem(MGrepOutputLCount, bNames);
+	pDlg->EnableCheckDlgItem(MGrepOutputMCount, bNames && bRegExp && !bInverse);
+
+	bool bNamesCount = pDlg->IsDlgItemChecked(MGrepOutputLCount) || pDlg->IsDlgItemChecked(MGrepOutputMCount);
+	pDlg->EnableCheckDlgItem(MGrepOutputLines, !bNamesCount);
+
+	bool bLines   = pDlg->IsDlgItemChecked(MGrepOutputLines);
+	bool bContext = pDlg->IsDlgItemChecked(MGrepAndContext);
+	pDlg->EnableCheckDlgItem(MGrepOutputLNumbers, bLines);
+	pDlg->EnableCheckDlgItem(MGrepMatchedLinePart, bLines && bRegExp && !bContext && !bInverse);
 
 	bool bMatchedPart = pDlg->IsDlgItemChecked(MGrepMatchedLinePart);
-	pDlg->EnableDlgItem(MGrepAdd, !bMatchedPart);
-	pDlg->EnableDlgItem(MGrepAdd, !bMatchedPart, 1);
-	if (bMatchedPart) pDlg->CheckDlgItem(MGrepAdd, false);
+	pDlg->EnableCheckDlgItem(MGrepAndContext, bLines && !bMatchedPart);
+	pDlg->EnableDlgItem(MGrepAndContext, bLines && !bMatchedPart, 1);
+	pDlg->EnableDlgItem(MGrepAndContext, bLines && !bMatchedPart, 2);
 }
 
 LONG_PTR WINAPI FileGrepDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LONG_PTR lParam2)
@@ -269,7 +271,7 @@ LONG_PTR WINAPI FileGrepDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LONG
 bool GrepPrompt(BOOL bPlugin) {
 	BOOL AsRegExp = (FSearchAs == SA_REGEXP) || (FSearchAs == SA_SEVERALLINE) || (FSearchAs == SA_MULTILINE) || (FSearchAs == SA_MULTIREGEXP);
 
-	CFarDialog Dialog(77, 26, _T("FileGrepDlg"));
+	CFarDialog Dialog(77, 27, _T("FileGrepDlg"));
 	Dialog.SetWindowProc(FileGrepDialogProc, 0);
 	Dialog.SetUseID(true);
 	Dialog.SetCancelID(MCancel);
@@ -291,23 +293,22 @@ bool GrepPrompt(BOOL bPlugin) {
 	Dialog.Add(new CFarCheckBoxItem(35,8,0,MAllCharTables,&FAllCharTables));
 	Dialog.Add(new CFarTextItem(5,9,DIF_BOXCOLOR|DIF_SEPARATOR,_T("")));
 
-	Dialog.Add(new CFarRadioButtonItem(5,10,DIF_GROUP,MGrepNames,		(int *)&FGrepWhat,GREP_NAMES));
-	Dialog.Add(new CFarRadioButtonItem(5,11,0,MGrepNamesCount,	(int *)&FGrepWhat,GREP_NAMES_COUNT));
-	Dialog.Add(new CFarRadioButtonItem(5,12,0,MGrepLines,		(int *)&FGrepWhat,GREP_LINES));
-	Dialog.Add(new CFarRadioButtonItem(5,13,0,MGrepNamesLines,	(int *)&FGrepWhat,GREP_NAMES_LINES));
+	Dialog.Add(new CFarCheckBoxItem(5,10,0,MGrepOutputNames,&FGOutputNames));
+		Dialog.Add(new CFarCheckBoxItem(7,11,0,MGrepOutputLCount,&FGAddLineCount));
+		Dialog.Add(new CFarCheckBoxItem(7,12,0,MGrepOutputMCount,&FGAddMatchCount));
+	Dialog.Add(new CFarCheckBoxItem(5,13,0,MGrepOutputLines,&FGOutputLines));
+		Dialog.Add(new CFarCheckBoxItem(7,14,0,MGrepOutputLNumbers,&FGAddLineNumbers));
+		Dialog.Add(new CFarCheckBoxItem(7,15,0,MGrepAndContext,&FGAddContext));
+		Dialog.Add(new CFarEditItem(15,15,19,0,NULL,(int &)FGContextLines,new CFarIntegerRangeValidator(0,1024)));
+		Dialog.Add(new CFarTextItem(21,15,0,MGrepContextLines));
+		Dialog.Add(new CFarCheckBoxItem(7,16,0,MGrepMatchedLinePart, &FGMatchingLinePart));
 
-	Dialog.Add(new CFarCheckBoxItem(5,14,0,MGrepAdd,&FGAddContext));
-	Dialog.Add(new CFarEditItem(15,14,20,0,NULL,(int &)FGContextLines,new CFarIntegerRangeValidator(0,1024)));
-	Dialog.Add(new CFarTextItem(22,14,0,MGrepContext));
-	Dialog.Add(new CFarCheckBoxItem(5,15,0,MGrepAddLineNumbers, &FGAddLineNumbers));
-	Dialog.Add(new CFarCheckBoxItem(5,16,0,MGrepMatchedLinePart, &FGMatchingLinePart));
+	Dialog.Add(new CFarCheckBoxItem(5,18,0,MGrepOutputTo,&FGOutputToFile));
+	Dialog.Add(new CFarEditItem(20,18,45,DIF_HISTORY,_T("RESearch.GrepOutput"), FGOutputFile));
+	Dialog.Add(new CFarCheckBoxItem(5,19,0,MGrepEditor,&FGOpenInEditor));
 
-	Dialog.Add(new CFarCheckBoxItem(5,17,0,MGrepOutput,&FGOutputToFile));
-	Dialog.Add(new CFarEditItem(20,17,45,DIF_HISTORY,_T("RESearch.GrepOutput"), FGOutputFile));
-	Dialog.Add(new CFarCheckBoxItem(5,18,0,MGrepEditor,&FGOpenInEditor));
-
-	Dialog.Add(new CFarTextItem(5,20,0,MSearchIn));
-	Dialog.Add(new CFarComboBoxItem(15,20,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearch, false),(int *)&FSearchIn));
+	Dialog.Add(new CFarTextItem(5,21,0,MSearchIn));
+	Dialog.Add(new CFarComboBoxItem(15,21,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearch, false),(int *)&FSearchIn));
 
 	Dialog.AddButtons(MOk,MCancel);
 	Dialog.Add(new CFarButtonItem(60,10,0,0,MBtnPresets));
@@ -407,8 +408,9 @@ OperationResult FileGrepExecutor() {
 	return FileGrep(FALSE);
 }
 
-BOOL CFGPresetCollection::EditPreset(CPreset *pPreset) {
-	SearchAs FSA = (SearchAs)pPreset->m_mapInts["SearchAs"];
+BOOL CFGPresetCollection::EditPreset(CPreset *pPreset)
+{
+/*	SearchAs FSA = (SearchAs)pPreset->m_mapInts["SearchAs"];
 	BOOL AsRegExp = (FSA == SA_REGEXP) || (FSA == SA_SEVERALLINE) || (FSA == SA_MULTILINE) || (FSA == SA_MULTIREGEXP);
 
 	CFarDialog Dialog(76,25,_T("FGPresetDlg"));
@@ -461,5 +463,6 @@ BOOL CFGPresetCollection::EditPreset(CPreset *pPreset) {
 		default:
 			return FALSE;
 		}
-	} while (true);
+	} while (true);*/
+	return FALSE;
 }
