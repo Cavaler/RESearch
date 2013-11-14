@@ -45,9 +45,8 @@ void AddGrepResultLine(const string &strLine, int nLineNumber)
 
 bool GrepLineFound(const string &strBuf, string &strMatch)
 {
-	BOOL bResult;
+	bool bResult;
 
-#ifdef UNICODE
 	if (FSearchAs == SA_REGEXP) {
 		bResult = do_pcre_execA(FPattern, FPatternExtra, strBuf.data(), strBuf.length(), 0, 0, REParamA.Match(), REParamA.Count()) >= 0;
 		if (bResult) {
@@ -55,23 +54,30 @@ bool GrepLineFound(const string &strBuf, string &strMatch)
 			strMatch = REParamA.GetParam(0);
 		}
 	} else {
+#ifdef UNICODE
 		TCHAR *szTable = (FCaseSensitive) ? NULL : UpCaseTable;
 		bResult = BMHSearch((WCHAR *)strBuf.data(), strBuf.length()/2, FTextUpcase.data(), FTextUpcase.size(), szTable) >= 0;
-	}
 #else
-	if (FSearchAs == SA_REGEXP) {
-		bResult = do_pcre_exec(FPattern, FPatternExtra, strBuf.data(), strBuf.length(), 0, 0, REParamA.Match(), REParamA.Count()) >= 0;
-		if (bResult) {
-			REParamA.AddSource(strBuf.data(), strBuf.length());
-			strMatch = REParamA.GetParam(0);
-		}
-	} else {
 		TCHAR *szTable = (FCaseSensitive) ? NULL : UpCaseTable;
 		bResult = BMHSearch(strBuf.data(), strBuf.length(), FTextUpcase.data(), FTextUpcase.size(), szTable) >= 0;
-	}
 #endif
+	}
 
-	return (bResult != 0) != (FSInverse != 0);
+	return bResult != (FSInverse != 0);
+}
+
+bool GrepMatchesFound(const string &strBuf, vector<string> &arrMatch)
+{
+	REParamA.AddSource(strBuf.data(), strBuf.length());
+
+	size_t nStart = 0;
+	while (nStart < strBuf.size())  {
+		if (do_pcre_execA(FPattern, FPatternExtra, strBuf.data(), strBuf.length(), nStart, 0, REParamA.Match(), REParamA.Count()) < 0) break;
+		arrMatch.push_back(REParamA.GetParam(0));
+		nStart = REParamA.m_arrMatch[1];
+	}
+
+	return !arrMatch.empty();
 }
 
 class CGrepFrontend : public IFrontend
@@ -112,8 +118,15 @@ bool CGrepFrontend::Process(IBackend *pBackend)
 
 		arrStringBuffer.push_back(string(szBuffer, szBuffer+nSize));
 
+		vector<string> arrMatch;
 		string strMatch;
-		if (GrepLineFound(arrStringBuffer.back(), strMatch)) {
+
+		bool bFound = (
+			((FGrepWhat == GREP_LINES) || (FGrepWhat == GREP_NAMES_LINES)) &&
+			(FGMatchingLinePart)
+			) ? GrepMatchesFound(arrStringBuffer.back(), arrMatch) : GrepLineFound(arrStringBuffer.back(), strMatch);
+
+		if (bFound) {
 			nFoundCount++;
 
 			switch (FGrepWhat) {
@@ -127,8 +140,13 @@ bool CGrepFrontend::Process(IBackend *pBackend)
 
 			if (FGAddContext) {
 				nLastMatched = arrStringBuffer.size()-1;
-			} else if ((FGrepWhat == GREP_LINES) ||(FGrepWhat == GREP_NAMES_LINES) ) {
-				AddGrepResultLine(FGMatchingLinePart ? strMatch : arrStringBuffer.back(), nFirstBufferLine + 1);
+			} else if ((FGrepWhat == GREP_LINES) || (FGrepWhat == GREP_NAMES_LINES)) {
+				if (FGMatchingLinePart) {
+					for each (const string &strFound in arrMatch)
+						AddGrepResultLine(strFound, nFirstBufferLine + 1);
+				} else {
+					AddGrepResultLine(FGMatchingLinePart ? strMatch : arrStringBuffer.back(), nFirstBufferLine + 1);
+				}
 			}
 		} else {
 			if (nLastMatched >= 0) {
