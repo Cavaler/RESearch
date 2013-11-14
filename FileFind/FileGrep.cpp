@@ -217,12 +217,13 @@ void UpdateFGDialog(CFarDialog *pDlg)
 	bool bRegExp  = pDlg->IsDlgItemChecked(MRegExp);
 	bool bContext = pDlg->IsDlgItemChecked(MGrepAdd);
 	bool bLines   = pDlg->IsDlgItemChecked(MGrepLines) || pDlg->IsDlgItemChecked(MGrepNamesLines);
+	bool bInverse = pDlg->IsDlgItemChecked(MInverseSearch);
 
 	pDlg->EnableDlgItem(MGrepAdd, bLines);
 	pDlg->EnableDlgItem(MGrepAddLineNumbers, bLines);
 	pDlg->EnableDlgItem(MQuoteSearch, bRegExp);
-	pDlg->EnableDlgItem(MGrepMatchedLinePart, bLines && bRegExp && !bContext);
-	if (!bRegExp || bContext) pDlg->CheckDlgItem(MGrepMatchedLinePart, false);
+	pDlg->EnableDlgItem(MGrepMatchedLinePart, bLines && bRegExp && !bContext && !bInverse);
+	if (!bRegExp || bContext || bInverse) pDlg->CheckDlgItem(MGrepMatchedLinePart, false);
 
 	bool bMatchedPart = pDlg->IsDlgItemChecked(MGrepMatchedLinePart);
 	pDlg->EnableDlgItem(MGrepAdd, !bMatchedPart);
