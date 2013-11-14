@@ -134,6 +134,9 @@ void DoEditReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, cons
 		EditorSelect Select = {ITEM_SS(EditorSelect) BTYPE_NONE};
 		StartupInfo.EditorControl(ECTL_REDRAW, NULL);
 		StartupInfo.EditorControl(ECTL_SELECT, &Select);
+
+		EditorEndUndo();
+		EditorStartUndo();
 	}
 }
 
