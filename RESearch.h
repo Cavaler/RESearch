@@ -77,6 +77,7 @@ protected:
 
 void ConfigureCommon();
 void ConfigureFile();
+void ConfigureGrep();
 void ConfigureRenumbering(bool bRuntime);
 void ConfigureEditor();
 int  ConfigureSeveralLines();

@@ -127,7 +127,7 @@ bool CGrepFrontend::Process(IBackend *pBackend)
 
 			if (FGAddContext) {
 				nLastMatched = arrStringBuffer.size()-1;
-			} else {
+			} else if ((FGrepWhat == GREP_LINES) ||(FGrepWhat == GREP_NAMES_LINES) ) {
 				AddGrepResultLine(FGMatchingLinePart ? strMatch : arrStringBuffer.back(), nFirstBufferLine + 1);
 			}
 		} else {
@@ -166,7 +166,7 @@ bool CGrepFrontend::Process(IBackend *pBackend)
 
 	switch (FGrepWhat) {
 	case GREP_NAMES_COUNT:
-		if (nFoundCount > 0) AddGrepLine(FormatStr(_T("%s:%d"), pBackend->FileName(), nFoundCount).c_str());
+		if (nFoundCount > 0) AddGrepFileName(FormatStr(_T("%s:%d"), pBackend->FileName(), nFoundCount).c_str());
 		break;
 	case GREP_NAMES_LINES:
 	case GREP_LINES:
@@ -203,7 +203,8 @@ void GrepFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems)
 	if (bAnyFound) AddFile(FindData, PanelItems, true);
 }
 
-bool PrepareFileGrepPattern() {
+bool PrepareFileGrepPattern()
+{
 	if (!FPreparePattern(true)) return false;
 	if (FAdvanced) {
 		if (!CompileAdvancedSettings()) return false;
@@ -213,11 +214,14 @@ bool PrepareFileGrepPattern() {
 
 void UpdateFGDialog(CFarDialog *pDlg)
 {
-	bool bRegExp = pDlg->IsDlgItemChecked(MRegExp);
+	bool bRegExp  = pDlg->IsDlgItemChecked(MRegExp);
 	bool bContext = pDlg->IsDlgItemChecked(MGrepAdd);
+	bool bLines   = pDlg->IsDlgItemChecked(MGrepLines) || pDlg->IsDlgItemChecked(MGrepNamesLines);
 
+	pDlg->EnableDlgItem(MGrepAdd, bLines);
+	pDlg->EnableDlgItem(MGrepAddLineNumbers, bLines);
 	pDlg->EnableDlgItem(MQuoteSearch, bRegExp);
-	pDlg->EnableDlgItem(MGrepMatchedLinePart, bRegExp && !bContext);
+	pDlg->EnableDlgItem(MGrepMatchedLinePart, bLines && bRegExp && !bContext);
 	if (!bRegExp || bContext) pDlg->CheckDlgItem(MGrepMatchedLinePart, false);
 
 	bool bMatchedPart = pDlg->IsDlgItemChecked(MGrepMatchedLinePart);
@@ -236,13 +240,7 @@ LONG_PTR WINAPI FileGrepDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LONG
 		HighlightREError(pDlg);
 		break;
 	case DN_BTNCLICK:
-		switch (nCtlID) {
-		case MRegExp:
-		case MGrepAdd:
-		case MGrepMatchedLinePart:
-			UpdateFGDialog(pDlg);
-			break;
-		}
+		UpdateFGDialog(pDlg);
 		break;
 	}
 
@@ -252,7 +250,7 @@ LONG_PTR WINAPI FileGrepDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LONG
 bool GrepPrompt(BOOL bPlugin) {
 	BOOL AsRegExp = (FSearchAs == SA_REGEXP) || (FSearchAs == SA_SEVERALLINE) || (FSearchAs == SA_MULTILINE) || (FSearchAs == SA_MULTIREGEXP);
 
-	CFarDialog Dialog(76, 26, _T("FileGrepDlg"));
+	CFarDialog Dialog(77, 26, _T("FileGrepDlg"));
 	Dialog.SetWindowProc(FileGrepDialogProc, 0);
 	Dialog.SetUseID(true);
 	Dialog.SetCancelID(MCancel);
@@ -296,6 +294,7 @@ bool GrepPrompt(BOOL bPlugin) {
 	Dialog.Add(new CFarButtonItem(60,10,0,0,MBtnPresets));
 	Dialog.Add(new CFarCheckBoxItem(56,11,0,_T(""),&FAdvanced));
 	Dialog.Add(new CFarButtonItem(60,11,0,0,MBtnAdvanced));
+	Dialog.Add(new CFarButtonItem(60,14,0,0,MBtnSettings));
 	Dialog.SetFocus(MMask, 1);
 	FACaseSensitive = FADirectoryCaseSensitive = MaskCaseHere();
 
@@ -318,6 +317,9 @@ bool GrepPrompt(BOOL bPlugin) {
 			break;
 		case MBtnAdvanced:
 			if (AdvancedSettings()) FAdvanced=TRUE;
+			break;
+		case MBtnSettings:
+			ConfigureGrep();
 			break;
 		default:
 			return false;

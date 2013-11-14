@@ -1159,15 +1159,15 @@ void ConfigureFile()
 
 void ConfigureGrep()
 {
-	CFarDialog Dialog(70, 10, _T("GrepConfig"));
+	CFarDialog Dialog(62, 10, _T("GrepConfig"));
 	Dialog.EnableAutoHotkeys(true);
 
 	Dialog.AddFrame(MGrepSettings);
 
 	Dialog.Add(new CFarTextItem(5,3,0,MGrepFileNamePrepend));
-	Dialog.Add(new CFarEditItem(35,3,55,DIF_HISTORY,_T("FGPrepend"), FGFileNamePrepend));
+	Dialog.Add(new CFarEditItem(30,3,55,DIF_HISTORY,_T("FGPrepend"), FGFileNamePrepend));
 	Dialog.Add(new CFarTextItem(5,4,0,MGrepFileNameAppend));
-	Dialog.Add(new CFarEditItem(35,4,55,DIF_HISTORY,_T("FGAppend"), FGFileNameAppend));
+	Dialog.Add(new CFarEditItem(30,4,55,DIF_HISTORY,_T("FGAppend"), FGFileNameAppend));
 
 	Dialog.AddButtons(MOk,MCancel);
 
