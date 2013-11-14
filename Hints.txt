@@ -11,22 +11,24 @@ Some non-obvious aspects of RESearch usage are explained here.
   the word 'end' at the end of string, use regexp 'end$', not 'end\n'!
 
 - Several-line search in editor is done by internally concatenating lines with a single '\n',
-  so it is to be used instead of '\r\n' always, UNLESS you turn on "[X] Use real EOLs in editor".
+  so it is to be used instead of '\r\n' always, UNLESS you turn on "[X] Use real end-of-line sequences".
 
-- In Several/Multi-Line RegExp search from panels actual newline symbols are to be used,
-  so '\r?\n' is good for most cases.
+- Several-line search from panels is done in the same way - use a single '\n'.
+
+- Multi-line search from panels feeds the whole file to RegExp engine, therefore
+  actual newline symbols are to be used. '\r?\n' is good for most cases.
 
 - If '[ ] Dot matches newline also' is not set, you can use '\C' as 'Absolutely any symbol,
   including newline'
 
 - If zero-width string is found, characters surrounding it are highlighted.
 
-- If UTF-16LE/BE or UTF-8 byte-order mark (BOM) is found in Search/Grep,
+- If UTF-16LE/BE or UTF-8 byte-order mark (BOM) is found while working from Panels,
   no other encodings are tried!
 
-- Without [ ] Use all character tables, search/grep from panel is performed:
-  1. if BOM is found, that encoding is used
-  2. In ANSI version, OEM codepage is used
-  3. In Unicode version, codepage selected as default is used (OEM or ANSI)
+- Without '[ ] Use all character tables', panel operations use the following:
+  1. If BOM is found, that encoding is used
+  2. In Far 1.x (ANSI) version, OEM codepage is used
+  3. In Far 2/3 (Unicode) version, codepage selected as default is used (OEM or ANSI)
 
 - In Replace from panels, only default codepage is used.
