@@ -747,10 +747,6 @@ void EctlSetString(EditorSetString *String)
 #ifdef FAR3
 	String->StructSize = sizeof(EditorSetString);
 #endif
-
-	if ((String->StringEOL != NULL) && (String->StringEOL[0] == 0))
-		String->StringEOL = NULL;
-
 	StartupInfo.EditorControl(ECTL_SETSTRING, String);
 }
 
