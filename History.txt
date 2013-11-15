@@ -13,6 +13,11 @@ Planned:
 Known bugs:
 	- Replace changing part of (real) EOL crashes
 
+Version 7.84 (15.11.2013)
+	+ Redesigned Grep interface
+	- Fixed problems with "match count" in Grep
+	- Fixed extra newline at end of file after Replace
+
 Version 7.83 (12.11.2013)
 	- Show found file count and names in Grep
 	* Can output only matching line part in Grep (only RegExp and no context lines)
