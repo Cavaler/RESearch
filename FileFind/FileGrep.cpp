@@ -1,21 +1,40 @@
 #include "StdAfx.h"
 #include "..\RESearch.h"
 
-::CHandle g_hOutput;
-int     g_nLines;
+::CHandle		g_hOutput;
+
+bool			g_bCacheOutput;
+vector<BYTE>	g_arrOutput;
+
+void WriteGrepOutput(LPCVOID lpBuffer, DWORD dwSize)
+{
+	if (g_bCacheOutput) {
+		g_arrOutput.insert(g_arrOutput.end(), (BYTE *)lpBuffer, (BYTE *)lpBuffer + dwSize);
+	} else {
+		DWORD dwWritten;
+		WriteFile(g_hOutput, lpBuffer, dwSize, &dwWritten, NULL);
+	}
+}
+
+void FlushGrepOutput()
+{
+	if (g_arrOutput.empty()) return;
+
+	DWORD dwWritten;
+	WriteFile(g_hOutput, &g_arrOutput[0], g_arrOutput.size(), &dwWritten, NULL);
+	g_arrOutput.clear();
+}
 
 void AddGrepLine(const TCHAR *szLine, bool bEOL = true)
 {
-	DWORD dwWritten;
-	WriteFile(g_hOutput, szLine, _tcslen(szLine)*sizeof(TCHAR), &dwWritten, NULL);
-	if (bEOL) WriteFile(g_hOutput, _T("\r\n"), 2*sizeof(TCHAR), &dwWritten, NULL);
+	WriteGrepOutput(szLine, _tcslen(szLine)*sizeof(TCHAR));
+	if (bEOL) WriteGrepOutput(_T("\r\n"), 2*sizeof(TCHAR));
 }
 
 void AddGrepLine(const tstring &strLine, bool bEOL = true)
 {
-	DWORD dwWritten;
-	WriteFile(g_hOutput, strLine.data(), strLine.size()*sizeof(TCHAR), &dwWritten, NULL);
-	if (bEOL) WriteFile(g_hOutput, _T("\r\n"), 2*sizeof(TCHAR), &dwWritten, NULL);
+	WriteGrepOutput(strLine.data(), strLine.size()*sizeof(TCHAR));
+	if (bEOL) WriteGrepOutput(_T("\r\n"), 2*sizeof(TCHAR));
 }
 
 void AddGrepFileName(const tstring &strFileName)
@@ -34,8 +53,7 @@ void AddGrepResultLine(const string &strLine, int nLineNumber)
 	if (FSearchAs == SA_REGEXP) {
 		AddGrepLine(UTF8ToUnicode(strLine));
 	} else {
-		DWORD dwWritten;
-		WriteFile(g_hOutput, strLine.data(), strLine.size(), &dwWritten, NULL);
+		WriteGrepOutput(strLine.data(), strLine.size());
 		AddGrepLine(L"");
 	}
 #else
@@ -113,6 +131,9 @@ bool CGrepFrontend::Process(IBackend *pBackend)
 	REParamA.Clear();
 	REParamA.AddRE(FPattern);
 
+	g_bCacheOutput = true;
+	g_arrOutput.clear();
+
 	do {
 		const char *szBuffer = m_pProc->Buffer();
 		INT_PTR nSize  = m_pProc->Size();
@@ -130,11 +151,11 @@ bool CGrepFrontend::Process(IBackend *pBackend)
 			nFoundLineCount++;
 			nFoundMatchCount += arrMatch.size();
 
-			if (FGOutputNames) {
+			if (FGOutputNames && !FGAddLineCount && !FGAddMatchCount) {
 				if (FGOutputLines) {
 					if (nFoundLineCount == 1) AddGrepFileName(pBackend->FileName());
-				} else if (!FGAddLineCount && !FGAddMatchCount) {
-					AddGrepFileName(pBackend->FileName());
+				} else {
+					FlushGrepOutput();
 					return true;
 				}
 			}
@@ -180,12 +201,16 @@ bool CGrepFrontend::Process(IBackend *pBackend)
 
 	} while (m_pProc->GetNextLine());
 
-	if (FGOutputNames && (nFoundLineCount > 0)) {
+	g_bCacheOutput = false;
+
+	if (FGOutputNames && (FGAddLineCount || FGAddMatchCount) && (nFoundLineCount > 0)) {
 		tstring strFileName = pBackend->FileName();
 		if (FGAddLineCount ) strFileName += FormatStr(_T(":%d"), nFoundLineCount );
-		if (FGAddMatchCount) strFileName += FormatStr(_T(":%d"), nFoundMatchCount);
+		if (FGAddMatchCount) strFileName += FormatStr(_T(";%d"), nFoundMatchCount);
 		AddGrepFileName(strFileName);
 	}
+
+	FlushGrepOutput();
 
 	if (FGOutputLines && (FGAddContext && (nLastMatched >= 0))) {
 		AddGrepLine(_T(">>>"));
@@ -236,9 +261,6 @@ void UpdateFGDialog(CFarDialog *pDlg)
 	bool bNames   = pDlg->IsDlgItemChecked(MGrepOutputNames);
 	pDlg->EnableCheckDlgItem(MGrepOutputLCount, bNames);
 	pDlg->EnableCheckDlgItem(MGrepOutputMCount, bNames && bRegExp && !bInverse);
-
-	bool bNamesCount = pDlg->IsDlgItemChecked(MGrepOutputLCount) || pDlg->IsDlgItemChecked(MGrepOutputMCount);
-	pDlg->EnableCheckDlgItem(MGrepOutputLines, !bNamesCount);
 
 	bool bLines   = pDlg->IsDlgItemChecked(MGrepOutputLines);
 	bool bContext = pDlg->IsDlgItemChecked(MGrepAndContext);
@@ -370,7 +392,7 @@ OperationResult FileGrep(BOOL ShowDialog)
 	} else {
 		TCHAR szBuffer[MAX_PATH], szName[MAX_PATH];
 		GetTempPath(MAX_PATH, szBuffer);
-		GetTempFileName(szBuffer, _T("re"), 0, szName);
+		GetTempFileName(szBuffer, _T("grep"), 0, szName);
 		strFileName = szName;
 	}
 
