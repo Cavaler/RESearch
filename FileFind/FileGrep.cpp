@@ -247,8 +247,10 @@ void UpdateFGDialog(CFarDialog *pDlg)
 
 	bool bMatchedPart = pDlg->IsDlgItemChecked(MGrepMatchedLinePart);
 	pDlg->EnableCheckDlgItem(MGrepAndContext, bLines && !bMatchedPart);
-	pDlg->EnableDlgItem(MGrepAndContext, bLines && !bMatchedPart, 1);
-	pDlg->EnableDlgItem(MGrepAndContext, bLines && !bMatchedPart, 2);
+
+	bContext = pDlg->IsDlgItemChecked(MGrepAndContext);
+	pDlg->EnableDlgItem(MGrepAndContext, bContext, 1);
+	pDlg->EnableDlgItem(MGrepAndContext, bContext, 2);
 }
 
 LONG_PTR WINAPI FileGrepDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LONG_PTR lParam2)
@@ -410,10 +412,14 @@ OperationResult FileGrepExecutor() {
 
 BOOL CFGPresetCollection::EditPreset(CPreset *pPreset)
 {
-/*	SearchAs FSA = (SearchAs)pPreset->m_mapInts["SearchAs"];
+	SearchAs FSA = (SearchAs)pPreset->m_mapInts["SearchAs"];
 	BOOL AsRegExp = (FSA == SA_REGEXP) || (FSA == SA_SEVERALLINE) || (FSA == SA_MULTILINE) || (FSA == SA_MULTIREGEXP);
 
-	CFarDialog Dialog(76,25,_T("FGPresetDlg"));
+	CFarDialog Dialog(76,26,_T("FGPresetDlg"));
+	Dialog.SetWindowProc(FileGrepDialogProc, 0);
+	Dialog.SetUseID(true);
+	Dialog.SetCancelID(MCancel);
+
 	Dialog.AddFrame(MREGrep);
 
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
@@ -432,27 +438,26 @@ BOOL CFGPresetCollection::EditPreset(CPreset *pPreset)
 
 	Dialog.Add(new CFarTextItem(5,11,DIF_BOXCOLOR|DIF_SEPARATOR,_T("")));
 
-	Dialog.Add(new CFarRadioButtonItem(5,12,DIF_GROUP,MGrepNames,	&pPreset->m_mapInts["GrepWhat"],GREP_NAMES));
-	Dialog.Add(new CFarRadioButtonItem(5,13,0,MGrepNamesCount,		&pPreset->m_mapInts["GrepWhat"],GREP_NAMES_COUNT));
-	Dialog.Add(new CFarRadioButtonItem(5,14,0,MGrepLines,			&pPreset->m_mapInts["GrepWhat"],GREP_LINES));
-	Dialog.Add(new CFarRadioButtonItem(5,15,0,MGrepNamesLines,		&pPreset->m_mapInts["GrepWhat"],GREP_NAMES_LINES));
-
-	Dialog.Add(new CFarCheckBoxItem(5,16,0,MGrepAdd,&pPreset->m_mapInts["AddContext"]));
-	Dialog.Add(new CFarEditItem(15,16,20,0,NULL,&pPreset->m_mapInts["ContextLines"],new CFarIntegerRangeValidator(0,1024)));
-	Dialog.Add(new CFarTextItem(22,16,0,MGrepContext));
-	Dialog.Add(new CFarCheckBoxItem(5,17,0,MGrepAddLineNumbers, &pPreset->m_mapInts["AddLineNumbers"]));
-	Dialog.Add(new CFarCheckBoxItem(5,18,0,MGrepMatchedLinePart, &pPreset->m_mapInts["MatchingLinePart"]));
+	Dialog.Add(new CFarCheckBoxItem(5,12,0,MGrepOutputNames,&pPreset->m_mapInts["OutputNames"]));
+		Dialog.Add(new CFarCheckBoxItem(7,13,0,MGrepOutputLCount,&pPreset->m_mapInts["AddLineCount"]));
+		Dialog.Add(new CFarCheckBoxItem(7,14,0,MGrepOutputMCount,&pPreset->m_mapInts["AddMatchCount"]));
+	Dialog.Add(new CFarCheckBoxItem(5,15,0,MGrepOutputLines,&pPreset->m_mapInts["OutputLines"]));
+		Dialog.Add(new CFarCheckBoxItem(7,16,0,MGrepOutputLNumbers,&pPreset->m_mapInts["AddLineNumbers"]));
+		Dialog.Add(new CFarCheckBoxItem(7,17,0,MGrepAndContext,&pPreset->m_mapInts["AddContext"]));
+		Dialog.Add(new CFarEditItem(15,17,19,0,NULL,&pPreset->m_mapInts["ContextLines"],new CFarIntegerRangeValidator(0,1024)));
+		Dialog.Add(new CFarTextItem(21,17,0,MGrepContextLines));
+		Dialog.Add(new CFarCheckBoxItem(7,18,0,MGrepMatchedLinePart, &pPreset->m_mapInts["MatchingLinePart"]));
 
 	int  nAdvancedID = pPreset->m_mapInts["AdvancedID"];
 	bool bFAdvanced = nAdvancedID > 0;
 
 	Dialog.Add(new CFarCheckBoxItem(56,12,0,_T(""),&bFAdvanced));
 	Dialog.Add(new CFarButtonItem(60,12,0,0,MBtnAdvanced));
-	Dialog.Add(new CFarCheckBoxItem(5,19,0,MAddToMenu,&pPreset->m_bAddToMenu));
+	Dialog.Add(new CFarCheckBoxItem(5,20,0,MAddToMenu,&pPreset->m_bAddToMenu));
 	Dialog.AddButtons(MOk,MCancel);
 
 	do {
-		switch (Dialog.Display(2, MOk, MBtnAdvanced)) {
+		switch (Dialog.Display(-1)) {
 		case MOk:
 			pPreset->m_mapInts["SearchAs"] = AsRegExp ? SA_REGEXP : SA_PLAINTEXT;
 			pPreset->m_mapInts["AdvancedID"] = bFAdvanced ? nAdvancedID : 0;
@@ -463,6 +468,6 @@ BOOL CFGPresetCollection::EditPreset(CPreset *pPreset)
 		default:
 			return FALSE;
 		}
-	} while (true);*/
+	} while (true);
 	return FALSE;
 }
