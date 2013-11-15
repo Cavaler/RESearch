@@ -2,7 +2,7 @@
 .PluginContents=Regular Expression Search
 
 @Contents
-$ #Regular Expression Search and Replace, version 7.40#
+$ #Regular Expression Search and Replace, version 7.84#
     This plugin allows you to:
 
     - Perform text search and replace in editor
@@ -22,11 +22,15 @@ in file masks, searched text, and using various macros in replacement text.
    ~Regular Expression Basics~@RegularExpressions@
    ~Replacement Text~@RegularReplace@
 
+   Most often-used editor commands:
    ~Regular Expression Search~@SearchDlg@
    ~Regular Expression Replace~@ReplaceDlg@
+   ~Regular Expression Filter~@FilterDlg@
 
+   Most often-used panels commands:
    ~Regular Expression File Search~@FileSearchDlg@
    ~Regular Expression File Replace~@FileReplaceDlg@
+   ~Regular Expression Grep~@FileGrepDlg@
    ~Regular Expression File Rename~@FileRenameDlg@
 
    ~Advanced File Search options~@AdvancedFileSearchDlg@
@@ -58,8 +62,8 @@ string, but a set of them. For full information, see included pcrepattern.html f
     Most commonly used patterns are:
 
     #.# (dot) matches any single character, possibly #except# newline (can be ~configured~@CommonConfig@)
-    #^#       matches beginning of line
-    #$#       matches end of line
+    #^#       matches zero characters at the beginning of line
+    #$#       matches zero characters at the end of line
     #[abi-l]# matches either 'a' or 'b' or any letter from 'i' to 'l'
     #one|another# matches either 'one' or 'another'
 
@@ -385,8 +389,7 @@ if regular expression search is selected.
   #Replace with#       Specifies ~text to replace found with~@RegularReplace@.
   #[ / ]#              This button will quote special symbols '\' and '$' in replace string.
 
-  #Remove empty lines#  If, after replacing, line becomes empty, delete it.
-
+  #Remove emptied lines#     If, after replacing, line becomes empty, delete it.
   #Remove not matched lines# If there were no matches within line, delete it.
 
   #Evaluate as script# Forces evaluating of a replace string as script in a specified language.
@@ -624,14 +627,13 @@ to symbol case. ANSI and OEM codepages are supported.
 
   #Use all character tables#
 
-  #Output file names only#
-  #Output file names and match count#
-  #Output matched lines only#
-  #Output file names and matched lines#
-
-  #Add NNN context lines around matches#
-  #Add line numbers#
-  #Output only matched line fragment#	When using regilar expressions, only matched part of line is written.
+  #Output file names#
+    #and line count#                    Appended to file anme in form of ":1"
+    #and match count#                   Appended to file anme in form of ";1"
+  #Output matched lines#
+    #and line numbers#                  Prepended in form of "1:"
+    #and NNNNN context lines around matches#
+    #only matched line fragments#       When using regular expressions, each matching part of line is written.
 
   #Output to:#                          Output to specified file. If unchecked, temporary file is created.
   #Open output in editor#
