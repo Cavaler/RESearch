@@ -14,13 +14,35 @@ CParameterSet::CParameterSet(PresetExecutor Executor, int nStringCount, int nInt
 {
 	va_list List;
 	va_start(List, nIntCount);
-	while (nStringCount--) {
-		const char *szName = va_arg(List, const char *);
-		m_mapStrings[szName] = va_arg(List, tstring *);
+	
+	if (nStringCount >= 0) {
+		while (nStringCount--) {
+			const char *szName = va_arg(List, const char *);
+			m_mapStrings[szName] = va_arg(List, tstring *);
+		}
+	} else {
+		while (true) {
+			const char *szName = va_arg(List, const char *);
+			if (szName != NULL)
+				m_mapStrings[szName] = va_arg(List, tstring *);
+			else
+				break;
+		} 
 	}
-	while (nIntCount--) {
-		const char *szName = va_arg(List, const char *);
-		m_mapInts[szName] = va_arg(List, int *);
+
+	if (nIntCount >= 0) {
+		while (nIntCount--) {
+			const char *szName = va_arg(List, const char *);
+			m_mapInts[szName] = va_arg(List, int *);
+		}
+	} else {
+		while (true) {
+			const char *szName = va_arg(List, const char *);
+			if (szName != NULL)
+				m_mapInts[szName] = va_arg(List, int *);
+			else
+				break;
+		} 
 	}
 	va_end(List);
 }

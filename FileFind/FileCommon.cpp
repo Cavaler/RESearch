@@ -13,14 +13,14 @@ CParameterSet g_FRParamSet(FileReplaceExecutor, 6, 7,
 	"MaskAsRegExp", &FMaskAsRegExp, "CaseSensitive", &FCaseSensitive, "AllCharTables", &FAllCharTables,
 	"SearchAs", &FSearchAs, "AdvancedID", &FAdvancedID, "AsScript", &FREvaluate
 	);
-CParameterSet g_FGParamSet(FileGrepExecutor, 4, 13,
-	"Mask", &MaskText, "Text", &SearchText, "@Mask", &FMask, "@Text", &FText,
+CParameterSet g_FGParamSet(FileGrepExecutor, -1, -1,
+	"Mask", &MaskText, "Text", &SearchText, "@Mask", &FMask, "@Text", &FText, NULL,
 	"MaskAsRegExp", &FMaskAsRegExp, "CaseSensitive", &FCaseSensitive,
 	"SearchAs", &FSearchAs, "IsInverse", &FSInverse,
 	"OutputNames", &FGOutputNames, "AddLineCount", &FGAddLineCount, "AddMatchCount", &FGAddMatchCount,
 	"OutputLines", &FGOutputLines, "AddLineNumbers", &FGAddLineNumbers,
 	"AddContext", &FGAddContext, "ContextLines", &FGContextLines,
-	"MatchingLinePart", &FGMatchingLinePart, "AdvancedID", &FAdvancedID
+	"MatchingLinePart", &FGMatchingLinePart, "AdvancedID", &FAdvancedID, NULL
 	);
 
 DWORD g_dwDateAfterThis, g_dwDateBeforeThis;
