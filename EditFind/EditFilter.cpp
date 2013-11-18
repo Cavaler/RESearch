@@ -47,7 +47,7 @@ BOOL EditorFilter()
 {
 	EditorFillNamedParameters();
 
-	CFarDialog Dialog(76,13,_T("FilterDlg"));
+	CFarDialog Dialog(78, 13, _T("FilterDlg"));
 	Dialog.SetWindowProc(EditorSearchDialogProc, 0);
 	Dialog.SetUseID(true);
 	Dialog.SetCancelID(MCancel);
@@ -64,7 +64,7 @@ BOOL EditorFilter()
 	Dialog.Add(new CFarRadioButtonItem(30,5,0,MLeaveMatching,&EFLeaveFilter,TRUE));
 	Dialog.Add(new CFarRadioButtonItem(30,6,0,MRemoveMatching,&EFLeaveFilter,FALSE));
 	Dialog.AddButtons(MOk,MCancel);
-	Dialog.Add(new CFarButtonItem(60,5,0,0,MBtnPresets));
+	Dialog.Add(new CFarButtonItem(62,5,0,0,MBtnPresets));
 
 	SearchText=PickupText();
 	if (SearchText.empty()) SearchText=EText;
