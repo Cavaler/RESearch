@@ -147,7 +147,7 @@ INT_PTR	CSingleByteCRLFDecoder::OriginalOffset(INT_PTR nOffset)
 	INT_PTR nNewOffset = nOffset;
 
 	for each (const skip_map::value_type &Skip in m_mapSkipped) {
-		if (Skip.first <= nOffset)
+		if (Skip.first < nOffset)
 			nNewOffset += Skip.second;
 		else
 			break;
