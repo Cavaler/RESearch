@@ -312,10 +312,8 @@ void ShowProgress(const TCHAR *Directory, panelitem_vector &PanelItems)
 	if (GetTickCount() < LastTickCount+250) return;
 	LastTickCount = GetTickCount();
 
-	TCHAR Scanned[80], Found[80];
-
-	_stprintf_s(Scanned, 80, GetMsg(MFilesScanned), FilesScanned);
-	_stprintf_s(Found, 80, GetMsg(MFilesFound), PanelItems.size());
+	tstring strScanned = FormatStr(GetMsg(MFilesScanned), FilesScanned);
+	tstring strFound   = FormatStr(GetMsg(MFilesFound), PanelItems.size());
 
 	TCHAR szFileName[15][75];
 
@@ -331,7 +329,7 @@ void ShowProgress(const TCHAR *Directory, panelitem_vector &PanelItems)
 
 	tstring strFiller(ScanProgressX, ' ');
 
-	const TCHAR *Lines[20]={GetMsg(MRESearch), Directory, Scanned, Found, strFiller.c_str(),
+	const TCHAR *Lines[20]={GetMsg(MRESearch), Directory, strScanned.c_str(), strFound.c_str(), strFiller.c_str(),
 		szFileName[ 0], szFileName[ 1], szFileName[ 2], szFileName[ 3], szFileName[ 4], 
 		szFileName[ 5], szFileName[ 6], szFileName[ 7], szFileName[ 8], szFileName[ 9],
 		szFileName[10], szFileName[11], szFileName[12], szFileName[13], szFileName[14]};
@@ -562,11 +560,14 @@ int ScanDirectories(panelitem_vector &PanelItems,ProcessFileProc ProcessFile) {
 	return TRUE;
 }
 
-OperationResult NoFilesFound() {
+OperationResult NoFilesFound()
+{
 	if (g_bInterrupted) return OR_OK;
 
-	const TCHAR *Lines[]={GetMsg(MRESearch),GetMsg(MNoFilesFound),GetMsg(MOk)};
-	StartupInfo.Message(0, _T("NoFilesFound"), Lines, 3, 1);
+	tstring strScanned = FormatStr(GetMsg(MFilesScanned), FilesScanned);
+	const TCHAR *Lines[] = {GetMsg(MRESearch), strScanned.c_str(), GetMsg(MNoFilesFound), GetMsg(MOk)};
+	StartupInfo.Message(0, _T("NoFilesFound"), Lines, 4, 1);
+
 	return OR_OK;
 }
 
