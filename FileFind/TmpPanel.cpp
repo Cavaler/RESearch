@@ -188,12 +188,12 @@ int CTemporaryPanel::PutFiles(PluginPanelItem *AddItems,int AddNumber,int Move,i
 }
 
 #ifdef FAR3
-int CTemporaryPanel::ProcessPanelInput(const INPUT_RECORD *pInput)
+int CTemporaryPanel::ProcessPanelInput(const struct ProcessPanelInputInfo *Info)
 {
-	if (pInput->EventType != KEY_EVENT)
+	if (Info->Rec.EventType != KEY_EVENT)
 		return FALSE;
 
-	return ProcessKey(pInput->Event.KeyEvent.wVirtualKeyCode, pInput->Event.KeyEvent.dwControlKeyState);
+	return ProcessKey(Info->Rec.Event.KeyEvent.wVirtualKeyCode, Info->Rec.Event.KeyEvent.dwControlKeyState);
 }
 #endif
 
