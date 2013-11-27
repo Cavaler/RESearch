@@ -193,7 +193,7 @@ int CTemporaryPanel::ProcessPanelInput(const INPUT_RECORD *pInput)
 	if (pInput->EventType != KEY_EVENT)
 		return FALSE;
 
-	return ProcessKey(pInput->Event.KeyEvent.wVirtualKeyCode, pInput->Event.KeyEvent.dwControlKeyState);
+	return ProcessKey(pInput->Event.KeyEvent.wVirtualKeyCode, FarKeyState(pInput->Event.KeyEvent.dwControlKeyState));
 }
 #endif
 
