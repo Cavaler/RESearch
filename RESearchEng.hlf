@@ -2,7 +2,7 @@
 .PluginContents=Regular Expression Search
 
 @Contents
-$ #Regular Expression Search and Replace, version 7.84#
+$ #Regular Expression Search and Replace, version 7.85#
     This plugin allows you to:
 
     - Perform text search and replace in editor
@@ -215,19 +215,6 @@ $ #Common settings#
 
 @FileConfig
 $ #Panel search settings#
-  #Read at once maximum# n #KB#     When replacing multiple files, if file size is less
-than this given, it will be read into memory all at once, otherwise backup copy will be
-created and read sequentally.
-
-  #Mask delimiter#                This character will be used to delimit files masks.
-
-  #Mask negation#                 Masks preceded with this character will mean: 'Do NOT
-search file with this mask'.
-
-  #Filemask should match only file name start#
-                                If checked, mask can apply not to full file name,
-but only to beginning, e.g. "ab*cd" will match "ab123cd456"
-
   #Mask matching by default#      Specifies how file mask matching will be done by default
     #Case-sensitive#
     #Case-insensitive#
@@ -239,6 +226,11 @@ but only to beginning, e.g. "ab*cd" will match "ab123cd456"
     #Always#                        Replace without additional questions
 
   #Skip preconfigured system folders# Folders matching given masks will be always skipped
+  #Search for CR-only EOL#            Should search from panels recognize single \r as end-of-line sequence
+  #Read buffer size#
+  #Default codepage#                  Codepage assumed when working with files without BOM
+  #'All codepages' include#           Which codepages to use when '[X] Use all codepages' is selected
+
 @GrepConfig
 $ #Grep settings#
 
@@ -264,9 +256,13 @@ $ #Editor settings#
   #Found text horizontal offset:# Where does line with text found in editor appears.
 Specifies offset from given position (for Top and Center - down, for Bottom - up).
 Can be both positive and negative.
+  #Keep current line if possible#
 
   #Right side offset:#            How much space is left between right end of text found
 and right side of the screen
+
+  #Margins: horizontal#
+           #vertical#
 
   #Pick up text at cursor#        Specifies whether text under cursor should appear
 as default "search for" text
@@ -274,6 +270,15 @@ as default "search for" text
     #Words only#                  Pick up words (alphanumeric characters)
     #Any text#                    Pick up any text
   #Pick up selection#             Whether to pick up selection text
+  #Turn 'In selection' on automatically#
+
+  #Use real end-of-line sequences#
+
+  #Position cursor at#
+    #Beginning of found fragment#
+    #Depends on direction#
+    #End of found fragment#
+    #At named subpattern#         Override cursor by inserting a named supbattern
 @Config
 $ #RESearch configuration#
   ~Common settings~@CommonConfig@          General options

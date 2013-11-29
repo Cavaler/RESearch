@@ -13,10 +13,17 @@ Planned:
 Known bugs:
 	- Replace changing part of (real) EOL crashes
 
+Version 7.85 (29.11.2013)
+	* Hotkey fixes
+	- Fixed leaving \r when replacing "\n" with "" from Panels
+	* Show number of scanned files in "No files found" message
+	- "Search only in first..." worked even with disabled Advanced search
+	- Fixed Grep with "Output file names only"
+
 Version 7.84 (15.11.2013)
 	+ Redesigned Grep interface
 	- Fixed problems with "match count" in Grep
-	- Fixed extra newline at end of file after Replace
+	- Fixed extra newline at end of file after Editor Replace
 
 Version 7.83 (12.11.2013)
 	- Show found file count and names in Grep
