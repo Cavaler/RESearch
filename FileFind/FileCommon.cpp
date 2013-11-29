@@ -220,13 +220,7 @@ void InitFoundPosition() {
 void AddFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems, bool bSearch) {
 	CPluginPanelItem Item;
 
-#ifdef UNICODE
 	Item.SetFindData(*FindData);
-#else
-	Item.FindData = *FindData;
-	Item.PackSizeHigh = 0;
-	Item.PackSize = 0;
-#endif
 	Item.Flags = 0;
 	Item.NumberOfLinks = 0;
 	Item.Description = NULL;
