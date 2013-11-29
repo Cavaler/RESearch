@@ -155,6 +155,7 @@ bool CGrepFrontend::Process(IBackend *pBackend)
 				if (FGOutputLines) {
 					if (nFoundLineCount == 1) AddGrepFileName(pBackend->FileName());
 				} else {
+					AddGrepFileName(pBackend->FileName());
 					FlushGrepOutput();
 					return true;
 				}
