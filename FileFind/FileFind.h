@@ -209,8 +209,6 @@ private:
 	KeyBarLabel KeyBarLabels[1];
 #endif
 
-	CFarPanelMode m_Mode;
-
 	void UpdateList();
 };
 EXTERN CTemporaryPanel *LastTempPanel VALUE(NULL);

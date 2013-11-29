@@ -41,32 +41,38 @@ void WINAPI ClosePanelW(const struct ClosePanelInfo *Info)
 
 #else
 
-void WINAPI FAR_EXPORT(GetOpenPluginInfo)(HANDLE hPlugin,OpenPluginInfo *Info) {
+void WINAPI FAR_EXPORT(GetOpenPluginInfo)(HANDLE hPlugin,OpenPluginInfo *Info)
+{
 	CTemporaryPanel *Panel=(CTemporaryPanel *)hPlugin;
 	if (Panel) Panel->GetOpenPluginInfo(Info);
 }
 
-int WINAPI FAR_EXPORT(GetFindData)(HANDLE hPlugin,PluginPanelItem **PanelItem,int *ItemsNumber,int OpMode) {
+int WINAPI FAR_EXPORT(GetFindData)(HANDLE hPlugin,PluginPanelItem **PanelItem,int *ItemsNumber,int OpMode)
+{
 	CTemporaryPanel *Panel=(CTemporaryPanel *)hPlugin;
 	return (Panel)?Panel->GetFindData(PanelItem,ItemsNumber,OpMode):0;
 }
 
-int WINAPI FAR_EXPORT(SetDirectory)(HANDLE hPlugin,TCHAR *Name,int OpMode) {
+int WINAPI FAR_EXPORT(SetDirectory)(HANDLE hPlugin,TCHAR *Name,int OpMode)
+{
 	CTemporaryPanel *Panel=(CTemporaryPanel *)hPlugin;
 	return (Panel)?Panel->_SetDirectory(Name,OpMode):0;
 }
 
-int WINAPI FAR_EXPORT(PutFiles)(HANDLE hPlugin,PluginPanelItem *AddItems,int AddNumber,int Move,int OpMode) {
+int WINAPI FAR_EXPORT(PutFiles)(HANDLE hPlugin,PluginPanelItem *AddItems,int AddNumber,int Move,int OpMode)
+{
 	CTemporaryPanel *Panel=(CTemporaryPanel *)hPlugin;
 	return (Panel)?Panel->PutFiles(AddItems,AddNumber,Move,OpMode):0;
 }
 
-int WINAPI FAR_EXPORT(ProcessKey)(HANDLE hPlugin,int Key,unsigned int ControlState) {
+int WINAPI FAR_EXPORT(ProcessKey)(HANDLE hPlugin,int Key,unsigned int ControlState)
+{
 	CTemporaryPanel *Panel=(CTemporaryPanel *)hPlugin;
 	return (Panel)?Panel->ProcessKey(Key,ControlState):0;
 }
 
-void WINAPI FAR_EXPORT(ClosePlugin)(HANDLE hPlugin) {
+void WINAPI FAR_EXPORT(ClosePlugin)(HANDLE hPlugin)
+{
 	CTemporaryPanel *Panel=(CTemporaryPanel *)hPlugin;
 	if (Panel) Panel->ClosePlugin();
 }
@@ -85,11 +91,10 @@ CTemporaryPanel::CTemporaryPanel(panelitem_vector &PanelItems,TCHAR *CalledFolde
 
 	if (LastTempPanel && !LastTempPanel->m_bActive) delete LastTempPanel;
 	LastTempPanel = this;
-
-	m_Mode.Assign(INVALID_HANDLE_VALUE);
 }
 
-CTemporaryPanel::~CTemporaryPanel() {
+CTemporaryPanel::~CTemporaryPanel()
+{
 	for (size_t I=0; I<m_arrItems.size(); I++) {
 		if (m_arrItems[I].UData()) delete (TempUserData *)m_arrItems[I].UData();
 	}
@@ -169,7 +174,8 @@ int CTemporaryPanel::GetFindData(PluginPanelItem **PanelItem,int *ItemsNumber,in
 	return TRUE;
 }
 
-int CTemporaryPanel::_SetDirectory(const TCHAR *Name,int OpMode) {
+int CTemporaryPanel::_SetDirectory(const TCHAR *Name,int OpMode)
+{
 //	We don't get here upon '..', Ctrl-PgUp or Ctrl-\
 
 	if (OpMode&OPM_FIND) return FALSE;
@@ -183,7 +189,8 @@ int CTemporaryPanel::_SetDirectory(const TCHAR *Name,int OpMode) {
 	return TRUE;
 }
 
-int CTemporaryPanel::PutFiles(PluginPanelItem *AddItems,int AddNumber,int Move,int OpMode) {
+int CTemporaryPanel::PutFiles(PluginPanelItem *AddItems,int AddNumber,int Move,int OpMode)
+{
 	return TRUE;
 }
 
@@ -197,7 +204,8 @@ int CTemporaryPanel::ProcessPanelInput(const INPUT_RECORD *pInput)
 }
 #endif
 
-int CTemporaryPanel::ProcessKey(int Key, unsigned int ControlState) {
+int CTemporaryPanel::ProcessKey(int Key, unsigned int ControlState)
+{
 	if ((ControlState==0) && (Key==VK_F3)) {
 		CPanelInfo PInfo;
 		PInfo.GetInfo((HANDLE)this);
@@ -309,7 +317,8 @@ int CTemporaryPanel::ProcessKey(int Key, unsigned int ControlState) {
 	return FALSE;
 }
 
-void CTemporaryPanel::ClosePlugin() {
+void CTemporaryPanel::ClosePlugin()
+{
 	CPanelInfo PInfo;
 	if (PInfo.GetInfo(false)) {
 		TPPanelMode = PInfo.ViewMode;
@@ -319,6 +328,4 @@ void CTemporaryPanel::ClosePlugin() {
 	}
 
 	if (LastTempPanel == this) m_bActive = false; else delete this;
-
-	m_Mode.Apply(INVALID_HANDLE_VALUE);
 }
