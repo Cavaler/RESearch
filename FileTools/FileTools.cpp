@@ -1,11 +1,11 @@
 #include "StdAfx.h"
 #include "..\RESearch.h"
 
-CParameterSet g_RnParamSet(RenameFilesExecutor, 6, 5,
+CParameterSet g_RnParamSet(RenameFilesExecutor, 6, 6,
 	"Mask", &MaskText, "Text", &SearchText, "Replace", &ReplaceText, "Script", &EREvaluateScript,
 	"@Mask", &FMask, "@Text", &FText, "@Replace", &FRReplace,
 	"MaskAsRegExp", &FMaskAsRegExp, "TextAsRegExp", &FSearchAs, "Repeating", &FRepeating,
-	"AsScript", &FREvaluate
+	"AsScript", &FREvaluate, "AdvancedID", &FAdvancedID
 	);
 CParameterSet g_QRParamSet(QuickRenameFilesExecutor, 4, 2,
 	"Text", &SearchText, "Replace", &ReplaceText,
@@ -364,7 +364,8 @@ void RenamePreview(panelitem_vector &PanelItems)
 	} while (true);
 }
 
-void RenameFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
+void RenameFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems)
+{
 	int MatchStart = 0, MatchLength;
 	int FindNumber = 0, ReplaceNumber = 0;
 
@@ -429,6 +430,7 @@ BOOL RenameFilesPrompt()
 {
 	CFarDialog Dialog(76, 21, _T("FileRenameDlg"));
 	Dialog.SetWindowProc(FileSearchDialogProc, 0);
+	Dialog.SetUseID(true);
 
 	Dialog.AddFrame(MRename);
 
@@ -460,8 +462,10 @@ BOOL RenameFilesPrompt()
 	Dialog.Add(new CFarCheckBoxItem(5,15,0,MPreviewRename,&FRPreviewRename));
 	Dialog.AddButtons(MOk,MCancel);
 	Dialog.Add(new CFarButtonItem(60,9,0,0,MBtnPresets));
-	Dialog.Add(new CFarButtonItem(58,11,0,0,MBtnREBuilder));
-	Dialog.SetFocus(4);
+	Dialog.Add(new CFarCheckBoxItem(56,11,0,_T(""),&FAdvanced));
+	Dialog.Add(new CFarButtonItem(60,11,0,0,MBtnAdvanced));
+	Dialog.Add(new CFarButtonItem(58,12,0,0,MBtnREBuilder));
+	Dialog.SetFocus(MMask, 1);
 
 	if (FSearchAs>=SA_SEVERALLINE) FSearchAs=SA_PLAINTEXT;
 	if (!g_bFromCmdLine) FCaseSensitive=MaskCaseHere();
@@ -472,27 +476,30 @@ BOOL RenameFilesPrompt()
 	ReplaceText=FRReplace;
 	int ExitCode;
 	do {
-		switch (ExitCode=Dialog.Display(3, -4, -2, -1, -9)) {
-		case 0:
+		switch (ExitCode=Dialog.Display()) {
+		case MOk:
 			FMask=MaskText;
 			FText=SearchText;
 			FRReplace=ReplaceText;
 			break;
-		case 1:
+		case MBtnPresets:
 			RnPresets->ShowMenu(true);
 			break;
-		case 2:
+		case MBtnREBuilder:
 			if (RunREBuilder(SearchText, ReplaceText)) {
 				FSearchAs = SA_REGEXP;
 			}
 			break;
-		case 3:
+		case MRunEditor:
 			RunExternalEditor(ReplaceText);
+			break;
+		case MBtnAdvanced:
+			if (AdvancedSettings()) FAdvanced=TRUE;
 			break;
 		default:
 			return FALSE;
 		}
-	} while ((ExitCode>=1)||!FPreparePattern(false));
+	} while ((ExitCode != MOk) || !FPreparePattern(false));
 	return TRUE;
 }
 
@@ -958,6 +965,7 @@ BOOL CRnPresetCollection::EditPreset(CPreset *pPreset)
 {
 	CFarDialog Dialog(76,19,_T("RPresetDlg"));
 	Dialog.AddFrame(MRnPreset);
+	Dialog.SetUseID(true);
 
 	Dialog.Add(new CFarCheckBoxItem(35,4,0,MAsRegExp,&pPreset->m_mapInts["MaskAsRegExp"]));
 
@@ -979,16 +987,26 @@ BOOL CRnPresetCollection::EditPreset(CPreset *pPreset)
 	Dialog.Add(new CFarComboBoxItem(30, 11, 55, 0, new CFarListData(m_lstEngines, false), new CFarEngineStorage(pPreset->m_mapStrings["Script"])));
 	Dialog.Add(new CFarButtonItem(60, 11, 0, FALSE, MRunEditor));
 
+	int  nAdvancedID = pPreset->m_mapInts["AdvancedID"];
+	bool bFAdvanced = nAdvancedID > 0;
+
+	Dialog.Add(new CFarCheckBoxItem(56,12,0,_T(""),&bFAdvanced));
+	Dialog.Add(new CFarButtonItem(60,12,0,0,MBtnAdvanced));
+
 	Dialog.Add(new CFarCheckBoxItem(5,13,0,MAddToMenu,&pPreset->m_bAddToMenu));
 	Dialog.AddButtons(MOk, MCancel);
-	Dialog.SetFocus(3);
+	Dialog.SetFocus(MPresetName, 1);
 
 	do {
-		switch (Dialog.Display(3, -2, -3)) {
-		case 0:
+		switch (Dialog.Display()) {
+		case MOk:
+			pPreset->m_mapInts["AdvancedID"] = bFAdvanced ? nAdvancedID : 0;
 			return TRUE;
-		case 1:
+		case MRunEditor:
 			RunExternalEditor(pPreset->m_mapStrings["Replace"]);
+			break;
+		case MBtnAdvanced:
+			SelectAdvancedPreset(nAdvancedID, bFAdvanced);
 			break;
 		default:
 			return FALSE;

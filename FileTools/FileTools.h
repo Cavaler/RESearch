@@ -5,9 +5,9 @@
 #include "..\Presets.h"
 #include "..\FileFind\FileFind.h"
 
-class CRnPresetCollection:public CStdPresetCollection {
+class CRnPresetCollection:public CFPresetCollection {
 public:
-	CRnPresetCollection(CParameterSet &ParamSet) : CStdPresetCollection(ParamSet, _T("FileRename"), MRnPreset) {}
+	CRnPresetCollection(CParameterSet &ParamSet) : CFPresetCollection(ParamSet, _T("FileRename"), MRnPreset) {}
 	virtual BOOL EditPreset(CPreset *pPreset);
 	virtual int  ID() { return 1; }
 };
