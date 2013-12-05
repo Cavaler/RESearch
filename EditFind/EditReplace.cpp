@@ -179,12 +179,10 @@ eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &
 #endif
 	RefreshEditorInfo();
 
-	LastReplaceLine = LastLine;LastReplacePos = EndPos;
-
 	EditorSetPosition Position INIT_SS(EditorSetPosition);
 	GetHighlightPosition(Position, FirstLine, StartPos, LastLine, EndPos);
 	LastReplaceLine = Position.CurLine;
-	LastReplacePos = Position.CurPos;
+	LastReplacePos  = Position.CurPos;
 
 	EditorSelect Select = {ITEM_SS(EditorSelect) BTYPE_STREAM, FirstLine, StartPos, EndPos-StartPos, LastLine-FirstLine + 1};
 
@@ -227,13 +225,44 @@ eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &
 		if (nLen < 40) nLen = 40;
 		if ((int)nLen > EdInfo.WindowSizeX-2) nLen = EdInfo.WindowSizeX-2;
 
-		int H, TotalCount = arrFound.size() + arrReplaced.size();
+		// Calculate dialog position
+		int nTotalCount = arrFound.size() + arrReplaced.size();
+		int nVSize    = LastLine - FirstLine + ((EndPos > 0) ? 1 : 0);
+		int nVDlgSize = nTotalCount + 9;
 
-		int L = Position.CurLine-Position.TopScreenLine;		// Calculate dialog position
-		if (L<1 + EdInfo.WindowSizeY/2) {
-			H = (EdInfo.WindowSizeY + L-9)/2;
-		} else {
-			H = (L-9)/2;
+		int nSpaceAbove = FirstLine - Position.TopScreenLine;
+		int nSpaceBelow = EdInfo.WindowSizeY - (LastLine - Position.TopScreenLine);
+		int nCanScrollBelow = EdInfo.TotalLines - Position.TopScreenLine - EdInfo.WindowSizeY;
+
+		int nDlgY;
+		if (nSpaceAbove >= nVDlgSize)			//	Can we fit above pre-calculated position?
+		{
+			nDlgY = (nSpaceAbove - nVDlgSize)/2;
+		}
+		else if (nSpaceBelow >= nVDlgSize)		//	Can we fit below pre-calculated position?
+		{
+			nDlgY = (LastLine - Position.TopScreenLine) + (nSpaceBelow - nVDlgSize)/2;
+		}
+		else if ((nSpaceAbove > nSpaceBelow) && (Position.TopScreenLine >= (nVDlgSize-nSpaceAbove)))	//	Can we scroll up?
+		{
+			if (nSpaceBelow >= (nVDlgSize-nSpaceAbove)) {
+				Position.TopScreenLine -= (nVDlgSize-nSpaceAbove);
+				nDlgY = 0;
+			} else {
+				Position.TopScreenLine -= nSpaceBelow;
+				nDlgY = 0;
+			}
+		}
+		else
+		{
+			if ((nVDlgSize-nSpaceBelow) > nCanScrollBelow) {
+				Position.TopScreenLine += nCanScrollBelow;
+			} else if (nSpaceAbove >= (nVDlgSize-nSpaceBelow)) {
+				Position.TopScreenLine += (nVDlgSize-nSpaceBelow);
+			} else {
+				Position.TopScreenLine += nSpaceAbove;
+			}
+			nDlgY = EdInfo.WindowSizeY - nVDlgSize;
 		}
 
 		EctlForceSetPosition(&Position);
@@ -246,7 +275,7 @@ eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &
 		StartupInfo.EditorControl(ECTL_SELECT, &Select);
 		StartupInfo.EditorControl(ECTL_REDRAW, NULL);
 
-		CFarDialog Dialog(-1, H + 1, nLen + 8, H + 8+TotalCount, _T("ERAskReplace"));
+		CFarDialog Dialog(-1, nDlgY + 1, nLen + 8, nDlgY + 8 + nTotalCount, _T("ERAskReplace"));
 		Dialog.SetWindowProc(ReplaceOKDialogProc, (arrFound.size() << 16) + arrReplaced.size());
 		Dialog.AddFrame(MREReplace);
 		Dialog.Add(new CFarTextItem(-1, 2, 0, MAskReplace));
@@ -255,10 +284,10 @@ eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &
 		Dialog.Add(new CFarTextItem(-1, 3 + arrFound.size(), 0, MAskWith));
 		for (size_t I = 0; I<arrReplaced.size();I++)
 			Dialog.Add(new CFarTextItem(-1, 4 + arrFound.size() + I, DIF_SHOWAMPERSAND|DLG_SETCOLOR(0xB0), arrReplaced[I]));
-		Dialog.Add(new CFarButtonItem(0, 5 + TotalCount, DIF_CENTERGROUP|DIF_NOBRACKETS, TRUE, MReplace));
-		Dialog.Add(new CFarButtonItem(0, 5 + TotalCount, DIF_CENTERGROUP|DIF_NOBRACKETS, FALSE, MAll));
-		Dialog.Add(new CFarButtonItem(0, 5 + TotalCount, DIF_CENTERGROUP|DIF_NOBRACKETS, FALSE, MSkip));
-		Dialog.Add(new CFarButtonItem(0, 5 + TotalCount, DIF_CENTERGROUP|DIF_NOBRACKETS, FALSE, MCancel));
+		Dialog.Add(new CFarButtonItem(0, 5 + nTotalCount, DIF_CENTERGROUP|DIF_NOBRACKETS, TRUE, MReplace));
+		Dialog.Add(new CFarButtonItem(0, 5 + nTotalCount, DIF_CENTERGROUP|DIF_NOBRACKETS, FALSE, MAll));
+		Dialog.Add(new CFarButtonItem(0, 5 + nTotalCount, DIF_CENTERGROUP|DIF_NOBRACKETS, FALSE, MSkip));
+		Dialog.Add(new CFarButtonItem(0, 5 + nTotalCount, DIF_CENTERGROUP|DIF_NOBRACKETS, FALSE, MCancel));
 		Result = Dialog.Display(4,-4,-3,-2,-1);
 
 	} else {	//	!NoAsking
@@ -652,7 +681,8 @@ BOOL EditorReplace()
 	return TRUE;
 }
 
-OperationResult EditorReplaceExecutor() {
+OperationResult EditorReplaceExecutor()
+{
 	if (!EPreparePattern(SearchText)) return OR_FAILED;
 
 	EText = SearchText;
