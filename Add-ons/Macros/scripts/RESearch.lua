@@ -72,6 +72,11 @@ Macro {
   action=function() CallRS1("SRAgain") end;
 }
 
+Macro {
+  description=""; area="Editor"; key="AltF7"; flags=""; condition=RESearchExists;
+  action=function() CallRS1("Filter") end;
+}
+
 
 
 Macro {
