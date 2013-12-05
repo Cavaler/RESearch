@@ -166,6 +166,7 @@ void FillSingleLineBuffer(size_t FirstLine)
 		g_LineBuffer.resize(nCut);
 		g_LineOffsets.resize(1);
 	}
+	g_FirstLine = FirstLine;
 }
 
 void FillLineBuffer(size_t FirstLine, size_t LastLine)
