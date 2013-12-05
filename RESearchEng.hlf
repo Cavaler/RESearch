@@ -717,7 +717,7 @@ not as usual DOS mask.
   #Regular expression#       If this option is set, above text will be treated as regular expression.
   #Replace with#             Specifies text to replace one matched with above option.
   #Repeating replace#        If this option is set, rename will not stop after first file rename
-attempt, but try to apply pattern to new name again.
+attempt, but try to apply pattern to rest of the name again.
   #List modified files#      A temporary panel with all renamed files will be shown.
   #Confirm each file#        Plugin will confirm each file to be renamed.
   #Confirm each replacement# Plugin will confirm each pattern match for each file.
