@@ -959,20 +959,21 @@ BOOL CRnPresetCollection::EditPreset(CPreset *pPreset)
 	CFarDialog Dialog(76,19,_T("RPresetDlg"));
 	Dialog.AddFrame(MRnPreset);
 
+	Dialog.Add(new CFarCheckBoxItem(35,4,0,MAsRegExp,&pPreset->m_mapInts["MaskAsRegExp"]));
+
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
 	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,_T("RESearch.PresetName"), pPreset->Name()));
 
-	Dialog.Add(new CFarCheckBoxItem(35,4,0,MAsRegExp,&pPreset->m_mapInts["MaskAsRegExp"]));
 	Dialog.Add(new CFarTextItem(5,4,0,MMask));
 	Dialog.Add(new CFarEditItem(5,5,70,DIF_HISTORY,_T("Masks"), pPreset->m_mapStrings["Mask"]));
 
 	Dialog.Add(new CFarTextItem(5,6,0,MText));
-	Dialog.Add(new CFarCheckBoxItem(35,6,0,MAsRegExp,&pPreset->m_mapInts["TextAsRegExp"]));
 	Dialog.Add(new CFarEditItem(5,7,70,DIF_HISTORY,_T("SearchText"), pPreset->m_mapStrings["Text"]));
-
 	Dialog.Add(new CFarTextItem(5,8,0,MReplaceWith));
-	Dialog.Add(new CFarCheckBoxItem(35,8,0,MRepeating,&pPreset->m_mapInts["Repeating"]));
 	Dialog.Add(new CFarEditItem(5,9,70,DIF_HISTORY,_T("ReplaceText"), pPreset->m_mapStrings["Replace"]));
+
+	Dialog.Add(new CFarCheckBoxItem(35,6,0,MRegExp,&pPreset->m_mapInts["TextAsRegExp"]));
+	Dialog.Add(new CFarCheckBoxItem(35,8,0,MRepeating,&pPreset->m_mapInts["Repeating"]));
 
 	Dialog.Add(new CFarCheckBoxItem(5, 11, 0, MEvaluateAsScript, &pPreset->m_mapInts["AsScript"]));
 	Dialog.Add(new CFarComboBoxItem(30, 11, 55, 0, new CFarListData(m_lstEngines, false), new CFarEngineStorage(pPreset->m_mapStrings["Script"])));
@@ -980,6 +981,7 @@ BOOL CRnPresetCollection::EditPreset(CPreset *pPreset)
 
 	Dialog.Add(new CFarCheckBoxItem(5,13,0,MAddToMenu,&pPreset->m_bAddToMenu));
 	Dialog.AddButtons(MOk, MCancel);
+	Dialog.SetFocus(3);
 
 	do {
 		switch (Dialog.Display(3, -2, -3)) {
@@ -994,23 +996,26 @@ BOOL CRnPresetCollection::EditPreset(CPreset *pPreset)
 	} while (true);
 }
 
-BOOL CQRPresetCollection::EditPreset(CPreset *pPreset) {
+BOOL CQRPresetCollection::EditPreset(CPreset *pPreset)
+{
 	CFarDialog Dialog(76,15,_T("QRPresetDlg"));
 	Dialog.AddFrame(MQRPreset);
+
+	Dialog.Add(new CFarCheckBoxItem(35,4,0,MRegExp,&pPreset->m_mapInts["TextAsRegExp"]));
 
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
 	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,_T("RESearch.PresetName"), pPreset->Name()));
 
 	Dialog.Add(new CFarTextItem(5,4,0,MText));
-	Dialog.Add(new CFarCheckBoxItem(35,4,0,MAsRegExp,&pPreset->m_mapInts["TextAsRegExp"]));
 	Dialog.Add(new CFarEditItem(5,5,70,DIF_HISTORY,_T("SearchText"), pPreset->m_mapStrings["Text"]));
 
 	Dialog.Add(new CFarTextItem(5,6,0,MReplaceWith));
-	Dialog.Add(new CFarCheckBoxItem(35,6,0,MRepeating,&pPreset->m_mapInts["Repeating"]));
 	Dialog.Add(new CFarEditItem(5,7,70,DIF_HISTORY,_T("ReplaceText"), pPreset->m_mapStrings["Replace"]));
+	Dialog.Add(new CFarCheckBoxItem(35,6,0,MRepeating,&pPreset->m_mapInts["Repeating"]));
 
 	Dialog.Add(new CFarCheckBoxItem(5,9,0,MAddToMenu,&pPreset->m_bAddToMenu));
 	Dialog.AddButtons(MOk,MCancel);
+	Dialog.SetFocus(3);
 
 	return Dialog.Display(-1)==0;
 }
