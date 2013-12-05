@@ -75,6 +75,7 @@ void WINAPI FAR_EXPORT(SetStartupInfo)(const PluginStartupInfo *Info)
 	CFarIntegerRangeValidator::s_szErrorMsg = GetMsg(MInvalidNumber);
 	CFarIntegerRangeValidator::s_szHelpTopic = _T("REInvalidNumber");
 	CFarDialog::AutoHotkeys = true;
+	CFarDialog::SetDefaultCancelID(MCancel);
 
 	CoInitialize(NULL);
 	ReadActiveScripts();
