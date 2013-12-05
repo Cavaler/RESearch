@@ -45,7 +45,7 @@ void SearchFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 					  }
 	case SA_MULTITEXT:{
 		CSearchMultiTextFrontend Frontend;
-		IsFound = RunSearch(FindData->cFileName, &Frontend, true);
+		IsFound = RunSearch(FindData->cFileName, &Frontend, false);
 		break;
 					  }
 	default:IsFound=FALSE;
@@ -102,8 +102,9 @@ LONG_PTR WINAPI FileSearchDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LO
 	return pDlg->DefDlgProc(nMsg, nParam1, lParam2);
 }
 
-int SearchPrompt(BOOL Plugin) {
-	CFarDialog Dialog(76,24,_T("FileSearchDlg"));
+int SearchPrompt(BOOL Plugin)
+{
+	CFarDialog Dialog(76,23,_T("FileSearchDlg"));
 	Dialog.SetWindowProc(FileSearchDialogProc, 0);
 	Dialog.SetUseID(true);
 	Dialog.SetCancelID(MCancel);
@@ -124,18 +125,17 @@ int SearchPrompt(BOOL Plugin) {
 	Dialog.Add(new CFarRadioButtonItem(5,9,0,MSeveralLineRegExp,(int *)&FSearchAs,SA_SEVERALLINE));
 	Dialog.Add(new CFarRadioButtonItem(5,10,0,MMultiLineRegExp,	(int *)&FSearchAs,SA_MULTILINE));
 	Dialog.Add(new CFarRadioButtonItem(5,11,0,MMultiPlainText,	(int *)&FSearchAs,SA_MULTITEXT));
-	Dialog.Add(new CFarRadioButtonItem(5,12,DIF_DISABLE,MMultiRegExp,		(int *)&FSearchAs,SA_MULTIREGEXP));
 
-	Dialog.Add(new CFarCheckBoxItem(5,14,0,MCaseSensitive,&FCaseSensitive));
-	Dialog.Add(new CFarCheckBoxItem(5,15,0,MInverseSearch,&FSInverse));
-	Dialog.Add(new CFarCheckBoxItem(5,16,0,MAllCharTables,&FAllCharTables));
+	Dialog.Add(new CFarCheckBoxItem(5,13,0,MCaseSensitive,&FCaseSensitive));
+	Dialog.Add(new CFarCheckBoxItem(5,14,0,MInverseSearch,&FSInverse));
+	Dialog.Add(new CFarCheckBoxItem(5,15,0,MAllCharTables,&FAllCharTables));
 
-	Dialog.Add(new CFarTextItem(5,18,0,MSearchIn));
+	Dialog.Add(new CFarTextItem(5,17,0,MSearchIn));
 	if (Plugin) {
 		if (FSearchIn<SI_FROMCURRENT) FSearchIn=SI_FROMCURRENT;
-		Dialog.Add(new CFarComboBoxItem(15,18,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearchPlugin, false),(int *)&FSearchIn,NULL,3));
+		Dialog.Add(new CFarComboBoxItem(15,17,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearchPlugin, false),(int *)&FSearchIn,NULL,3));
 	} else {
-		Dialog.Add(new CFarComboBoxItem(15,18,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearch, false),(int *)&FSearchIn));
+		Dialog.Add(new CFarComboBoxItem(15,17,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearch, false),(int *)&FSearchIn));
 	}
 
 	Dialog.AddButtons(MOk,MCancel);
@@ -199,8 +199,9 @@ OperationResult FileSearchExecutor() {
 	return FileFind(g_PanelItems, FALSE, TRUE);
 }
 
-BOOL CFSPresetCollection::EditPreset(CPreset *pPreset) {
-	CFarDialog Dialog(76,25,_T("FSPresetDlg"));
+BOOL CFSPresetCollection::EditPreset(CPreset *pPreset)
+{
+	CFarDialog Dialog(76,24,_T("FSPresetDlg"));
 	Dialog.AddFrame(MFSPreset);
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
 	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,_T("RESearch.PresetName"), pPreset->Name()));
@@ -223,14 +224,13 @@ BOOL CFSPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.Add(new CFarRadioButtonItem(5,11,0,		MSeveralLineRegExp,	pSearchAs,SA_SEVERALLINE));
 	Dialog.Add(new CFarRadioButtonItem(5,12,0,		MMultiLineRegExp,	pSearchAs,SA_MULTILINE));
 	Dialog.Add(new CFarRadioButtonItem(5,13,0,		MMultiPlainText,	pSearchAs,SA_MULTITEXT));
-	Dialog.Add(new CFarRadioButtonItem(5,14,DIF_DISABLE,MMultiRegExp,	pSearchAs,SA_MULTIREGEXP));
 
-	Dialog.Add(new CFarCheckBoxItem(5,16,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
-	Dialog.Add(new CFarCheckBoxItem(5,17,0,MInverseSearch,&pPreset->m_mapInts["Inverse"]));
+	Dialog.Add(new CFarCheckBoxItem(5,15,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
+	Dialog.Add(new CFarCheckBoxItem(5,16,0,MInverseSearch,&pPreset->m_mapInts["Inverse"]));
 	Dialog.Add(new CFarCheckBoxItem(56,9,0,_T(""),&bFAdvanced));
 	Dialog.Add(new CFarButtonItem(60,9,0,0,MBtnAdvanced));
 
-	Dialog.Add(new CFarCheckBoxItem(5,19,0,MAddToMenu,&pPreset->m_bAddToMenu));
+	Dialog.Add(new CFarCheckBoxItem(5,18,0,MAddToMenu,&pPreset->m_bAddToMenu));
 	Dialog.AddButtons(MOk,MCancel);
 
 	do {
