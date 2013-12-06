@@ -9,7 +9,10 @@ CSingleBytePassThroughProcessor::CSingleBytePassThroughProcessor(IBackend *pBack
 
 bool CSingleBytePassThroughProcessor::GetNextLine()
 {
-	return false;
+	if (m_pBackend->Last()) return false;
+	if (!m_pBackend->Move(m_pBackend->Size())) return false;
+
+	return true;
 }
 
 const char *CSingleBytePassThroughProcessor::Buffer()
