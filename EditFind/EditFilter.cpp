@@ -89,12 +89,14 @@ BOOL EditorFilter()
 	return TRUE;
 }
 
-OperationResult EditorFilterExecutor() {
+OperationResult EditorFilterExecutor()
+{
 	if (!EPreparePattern(SearchText)) return OR_FAILED;
 
 	EText = SearchText;
 
 	if (!EFromCurrentPosition) EditorSeekToBeginEnd();
+	EFromCurrentPosition = false;
 
 	BOOL bResult = EditorFilterAgain();
 	StartupInfo.EditorControl(ECTL_REDRAW, NULL);

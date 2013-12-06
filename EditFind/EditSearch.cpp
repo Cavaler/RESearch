@@ -340,11 +340,13 @@ BOOL EditorSearch()
 	return TRUE;
 }
 
-OperationResult EditorSearchExecutor() {
+OperationResult EditorSearchExecutor()
+{
 	if (!EPreparePattern(SearchText)) return OR_FAILED;
 	EText = SearchText;
 
 	if (!EFromCurrentPosition) EditorSeekToBeginEnd();
+	EFromCurrentPosition = false;
 
 	return (EListAllFromPreset) ?
 		EditorListAllAgain() ? OR_OK : OR_CANCEL :

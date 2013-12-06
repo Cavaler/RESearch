@@ -699,6 +699,7 @@ OperationResult EditorReplaceExecutor()
 	SanitateEngine();
 
 	if (!EFromCurrentPosition) EditorSeekToBeginEnd();
+	EFromCurrentPosition = false;
 
 	BOOL bResult = EditorReplaceAgain();
 	StartupInfo.EditorControl(ECTL_REDRAW, NULL);
