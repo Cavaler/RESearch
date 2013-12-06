@@ -42,6 +42,11 @@ LONG_PTR WINAPI ConfirmReplacementDialogProc(CFarDialog *pDlg, int nMsg, int nPa
 	return pDlg->DefDlgProc(nMsg, nParam1, lParam2);
 }
 
+bool ConfirmReplacement()
+{
+	return !FRConfirmLineThisFile;
+}
+
 bool ConfirmReplacement(const TCHAR *Found, const TCHAR *Replaced, const TCHAR *FileName)
 {
 	if (!FRConfirmLineThisFile) return true;

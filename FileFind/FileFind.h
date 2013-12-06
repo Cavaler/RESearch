@@ -143,6 +143,7 @@ int  FPreparePattern(bool bAcceptEmpty);
 
 BOOL ConfirmFile(int Title,const TCHAR *FileName);
 bool ConfirmFileReadonly(const TCHAR *FileName);
+bool ConfirmReplacement();
 bool ConfirmReplacement(const TCHAR *Found, const TCHAR *Replaced, const TCHAR *FileName);
 
 void FReadRegistry (CFarSettingsKey Key);

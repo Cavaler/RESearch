@@ -116,7 +116,7 @@ bool CReplacePlainTextFrontend::Process(IBackend *pBackend)
 
 			FindNumber++;
 
-			if (ConfirmReplacement(REParam.Original().c_str(), strReplace.c_str(), pBackend->FileName())) {
+			if (ConfirmReplacement() || ConfirmReplacement(REParam.Original().c_str(), strReplace.c_str(), pBackend->FileName())) {
 				if (!pBackend->WriteBack(szBuffer - pBackend->Buffer() + nOffset)) break;
 				if (!pBackend->WriteThru(strReplace.data(), strReplace.size(), TextUpcase.size())) break;
 
@@ -163,7 +163,7 @@ bool ReplaceRegExpProcess(IBackend *pBackend, ISplitLineProcessor &Proc)
 
 			FindNumber++;
 
-			if (ConfirmReplacement(REParam.GetParam(0).c_str(), strReplace.c_str(), pBackend->FileName())) {
+			if (ConfirmReplacement() || ConfirmReplacement(REParam.GetParam(0).c_str(), strReplace.c_str(), pBackend->FileName())) {
 				if (!Proc.WriteBack(nOffset)) break;
 				if (!Proc.WriteThru(strReplace.data(), strReplace.size(), nLength)) break;
 
