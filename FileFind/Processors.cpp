@@ -2,6 +2,47 @@
 #include "..\RESearch.h"
 #include "Processors.h"
 
+CSingleBytePassThroughProcessor::CSingleBytePassThroughProcessor(IBackend *pBackend)
+: m_pBackend(pBackend)
+{
+}
+
+bool CSingleBytePassThroughProcessor::GetNextLine()
+{
+	return false;
+}
+
+const char *CSingleBytePassThroughProcessor::Buffer()
+{
+	return m_pBackend->Buffer();
+}
+
+INT_PTR CSingleBytePassThroughProcessor::Size()
+{
+	return m_pBackend->Size();
+}
+
+INT_PTR CSingleBytePassThroughProcessor::Start()
+{
+	return 0;
+}
+
+bool CSingleBytePassThroughProcessor::WriteBack(INT_PTR nOffset)
+{
+	return m_pBackend->WriteBack(nOffset);
+}
+
+bool CSingleBytePassThroughProcessor::WriteThru(const char *szBuffer, INT_PTR nLength, INT_PTR nSkipLength)
+{
+	return m_pBackend->WriteThru(szBuffer, nLength, nSkipLength);
+}
+
+void CSingleBytePassThroughProcessor::SkipTo(INT_PTR nOffset)
+{
+}
+
+//////////////////////////////////////////////////////////////////////////
+
 CSingleByteSplitLineProcessor::CSingleByteSplitLineProcessor(IBackend *pBackend)
 : m_pBackend(pBackend)
 {

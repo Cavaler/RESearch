@@ -49,3 +49,9 @@ class CReplaceSeveralLineRegExpFrontend : public IFrontend
 public:
 	virtual bool	Process(IBackend *pBackend);
 };
+
+class CReplaceMultiLineRegExpFrontend : public IFrontend
+{
+public:
+	virtual bool	Process(IBackend *pBackend);
+};

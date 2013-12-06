@@ -33,7 +33,7 @@ bool CSearchRegExpFrontend::Process(IBackend *pBackend)
 	CSingleByteSplitLineProcessor Proc(pBackend);
 
 	do {
-		int nResult = do_pcre_execA(FPattern, FPatternExtra, Proc.Buffer(), Proc.Size(), 0, 0, REParamA.Match(), REParamA.Count());
+		int nResult = do_pcre_execA(FPattern, FPatternExtra, Proc.Buffer(), Proc.Size(), 0, PCRE_NO_UTF8_CHECK, REParamA.Match(), REParamA.Count());
 		if (nResult >= 0) return true;
 		g_nFoundLine++;
 	} while (!Interrupted() && Proc.GetNextLine());
@@ -48,7 +48,7 @@ bool CSearchSeveralLineRegExpFrontend::Process(IBackend *pBackend)
 	CSingleByteSeveralLineProcessor Proc(pBackend, SeveralLines, SeveralLinesKB);
 
 	do {
-		int nResult = do_pcre_execA(FPattern, FPatternExtra, Proc.Buffer(), Proc.Size(), 0, 0, REParamA.Match(), REParamA.Count());
+		int nResult = do_pcre_execA(FPattern, FPatternExtra, Proc.Buffer(), Proc.Size(), 0, PCRE_NO_UTF8_CHECK, REParamA.Match(), REParamA.Count());
 		if (nResult >= 0) return true;
 		g_nFoundLine++;
 	} while (!Interrupted() && Proc.GetNextLine());
@@ -64,7 +64,7 @@ bool CSearchMultiLineRegExpFrontend::Process(IBackend *pBackend)
 		const char *szBuffer = pBackend->Buffer();
 		INT_PTR nSize  = pBackend->Size();
 
-		int nResult = do_pcre_execA(FPattern, FPatternExtra, szBuffer, nSize, 0, 0, REParamA.Match(), REParamA.Count());
+		int nResult = do_pcre_execA(FPattern, FPatternExtra, szBuffer, nSize, 0, PCRE_NO_UTF8_CHECK, REParamA.Match(), REParamA.Count());
 		if (nResult >= 0) return true;
 
 		if (pBackend->Last()) break;
@@ -150,7 +150,7 @@ bool ReplaceRegExpProcess(IBackend *pBackend, ISplitLineProcessor &Proc)
 		INT_PTR nStart = Proc.Start();
 
 		int nResult;
-		while ((nResult = do_pcre_execA(FPattern, FPatternExtra, szBuffer, nSize, nStart, 0, REParamA.Match(), REParamA.Count())) >= 0)
+		while ((nResult = do_pcre_execA(FPattern, FPatternExtra, szBuffer, nSize, nStart, PCRE_NO_UTF8_CHECK, REParamA.Match(), REParamA.Count())) >= 0)
 		{
 			if (!pBackend->CheckWriteReady()) return false;
 
@@ -193,6 +193,13 @@ bool CReplaceRegExpFrontend::Process(IBackend *pBackend)
 bool CReplaceSeveralLineRegExpFrontend::Process(IBackend *pBackend)
 {
 	CSingleByteSeveralLineProcessor Proc(pBackend, SeveralLines, SeveralLinesKB);
+
+	return ReplaceRegExpProcess(pBackend, Proc);
+}
+
+bool CReplaceMultiLineRegExpFrontend::Process(IBackend *pBackend)
+{
+	CSingleBytePassThroughProcessor Proc(pBackend);
 
 	return ReplaceRegExpProcess(pBackend, Proc);
 }

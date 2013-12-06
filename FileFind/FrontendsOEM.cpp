@@ -197,4 +197,11 @@ bool CReplaceSeveralLineRegExpFrontend::Process(IBackend *pBackend)
 	return ReplaceRegExpProcess(pBackend, Proc);
 }
 
+bool CReplaceMultiLineRegExpFrontend::Process(IBackend *pBackend)
+{
+	CSingleBytePassThroughProcessor Proc(pBackend);
+
+	return ReplaceRegExpProcess(pBackend, Proc);
+}
+
 #endif

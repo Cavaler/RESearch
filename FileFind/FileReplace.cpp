@@ -123,7 +123,7 @@ BOOL WriteBuffer(HANDLE hFile,const void *Buffer,DWORD BufLen,const TCHAR *FileN
 	} else return TRUE;
 }
 
-bool RunReplace(LPCTSTR szFileName)
+bool RunReplace(LPCTSTR szFileName, __int64 dwFileSize)
 {
 	switch (FSearchAs) {
 	case SA_PLAINTEXT:{
@@ -138,6 +138,21 @@ bool RunReplace(LPCTSTR szFileName)
 		CReplaceSeveralLineRegExpFrontend Frontend;
 		return RunReplace(szFileName, g_strNewFileName.c_str(), &Frontend, true);
 						}
+	case SA_MULTILINE:
+#ifdef _WIN64
+		if (dwFileSize < 2*1024*1024*1024)
+#else
+		if (dwFileSize < 256*1024*1024)
+#endif
+		{
+			CReplaceMultiLineRegExpFrontend Frontend;
+			return RunReplace(szFileName, g_strNewFileName.c_str(), &Frontend, true);
+		}
+		else
+		{
+			CReplaceSeveralLineRegExpFrontend Frontend;
+			return RunReplace(szFileName, g_strNewFileName.c_str(), &Frontend, true);
+		}
 	}
 
 	return false;
@@ -191,7 +206,7 @@ protected:
 
 bool ReplaceSingleFile_Normal(WIN32_FIND_DATA &FindData)
 {
-	bool bProcess = RunReplace(FindData.cFileName);
+	bool bProcess = RunReplace(FindData.cFileName, ((__int64)FindData.nFileSizeHigh << 32) + FindData.nFileSizeLow);
 
 	if (bProcess) {
 		if (!FRReplaceToNew) {
@@ -220,7 +235,7 @@ bool ReplaceSingleFile_CopyFirst(WIN32_FIND_DATA &FindData)
 
 	ROBackup _ro(FindData.cFileName);
 	g_strNewFileName = FindData.cFileName;
-	bool bProcess = RunReplace(g_strBackupFileName.c_str());
+	bool bProcess = RunReplace(g_strBackupFileName.c_str(), ((__int64)FindData.nFileSizeHigh << 32) + FindData.nFileSizeLow);
 
 	if (bProcess) {
 		if (!FRSaveOriginal) {
@@ -327,7 +342,7 @@ LONG_PTR WINAPI FileReplaceDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, L
 
 int ReplacePrompt(BOOL Plugin)
 {
-	CFarDialog Dialog(76, 26, _T("FileReplaceDlg"));
+	CFarDialog Dialog(76, 27, _T("FileReplaceDlg"));
 	Dialog.SetWindowProc(FileReplaceDialogProc, 0);
 	Dialog.SetUseID(true);
 	Dialog.SetCancelID(MCancel);
@@ -348,30 +363,31 @@ int ReplacePrompt(BOOL Plugin)
 	Dialog.Add(new CFarButtonItem(67,7,0,0,MQuoteReplace));
 
 	Dialog.Add(new CFarTextItem(5,8,DIF_BOXCOLOR|DIF_SEPARATOR, _T("")));
-	Dialog.Add(new CFarRadioButtonItem(5,9,DIF_GROUP,MPlainText,(int *)&FSearchAs,SA_PLAINTEXT));
+	Dialog.Add(new CFarRadioButtonItem(5,9,DIF_GROUP,MPlainText, (int *)&FSearchAs,SA_PLAINTEXT));
 	Dialog.Add(new CFarRadioButtonItem(5,10,0,MRegExp,			 (int *)&FSearchAs,SA_REGEXP));
 	Dialog.Add(new CFarRadioButtonItem(5,11,0,MSeveralLineRegExp,(int *)&FSearchAs,SA_SEVERALLINE));
-	Dialog.Add(new CFarCheckBoxItem(5,12,0,MCaseSensitive,&FCaseSensitive));
-	Dialog.Add(new CFarCheckBoxItem(5,13,0,MAllCharTables,&FAllCharTables));
+	Dialog.Add(new CFarRadioButtonItem(5,12,0,MMultiLineRegExp,	 (int *)&FSearchAs,SA_MULTILINE));
+	Dialog.Add(new CFarCheckBoxItem(5,13,0,MCaseSensitive,&FCaseSensitive));
+	Dialog.Add(new CFarCheckBoxItem(5,14,0,MAllCharTables,&FAllCharTables));
 
-	Dialog.Add(new CFarCheckBoxItem(5, 14, 0, MEvaluateAsScript, &FREvaluate));
-	Dialog.Add(new CFarComboBoxItem(30, 14, 55, 0, new CFarListData(m_lstEngines, false), new CFarEngineStorage(EREvaluateScript)));
-	Dialog.Add(new CFarButtonItem(60, 14, 0, FALSE, MRunEditor));
+	Dialog.Add(new CFarCheckBoxItem( 5, 15, 0, MEvaluateAsScript, &FREvaluate));
+	Dialog.Add(new CFarComboBoxItem(30, 15, 55, 0, new CFarListData(m_lstEngines, false), new CFarEngineStorage(EREvaluateScript)));
+	Dialog.Add(new CFarButtonItem  (60, 15, 0, FALSE, MRunEditor));
 
-	Dialog.Add(new CFarTextItem(5,16,0,MSearchIn));
+	Dialog.Add(new CFarTextItem(5,17,0,MSearchIn));
 	if (Plugin) {
 		if (FSearchIn<SI_FROMCURRENT) FSearchIn=SI_FROMCURRENT;
-		Dialog.Add(new CFarComboBoxItem(15,16,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearchPlugin, false),(int *)&FSearchIn,NULL,3));
+		Dialog.Add(new CFarComboBoxItem(15,17,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearchPlugin, false),(int *)&FSearchIn,NULL,3));
 	} else {
-		Dialog.Add(new CFarComboBoxItem(15,16,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearch, false),(int *)&FSearchIn));
+		Dialog.Add(new CFarComboBoxItem(15,17,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearch, false),(int *)&FSearchIn));
 	}
 
-	Dialog.Add(new CFarCheckBoxItem(5,18,0,MViewModified,&FROpenModified));
-	Dialog.Add(new CFarCheckBoxItem(5,19,0,MConfirmFile,&FRConfirmFile));
-	Dialog.Add(new CFarCheckBoxItem(5,20,0,MConfirmLine,&FRConfirmLine));
-	Dialog.Add(new CFarCheckBoxItem(40,18,0,MSaveOriginal,&FRSaveOriginal));
-	Dialog.Add(new CFarCheckBoxItem(40,19,0,MOverwriteBackup,&FROverwriteBackup));
-	Dialog.Add(new CFarCheckBoxItem(40,20,0,MReplaceToNew,&FRReplaceToNew));
+	Dialog.Add(new CFarCheckBoxItem(5,19,0,MViewModified,&FROpenModified));
+	Dialog.Add(new CFarCheckBoxItem(5,20,0,MConfirmFile,&FRConfirmFile));
+	Dialog.Add(new CFarCheckBoxItem(5,21,0,MConfirmLine,&FRConfirmLine));
+	Dialog.Add(new CFarCheckBoxItem(40,19,0,MSaveOriginal,&FRSaveOriginal));
+	Dialog.Add(new CFarCheckBoxItem(40,20,0,MOverwriteBackup,&FROverwriteBackup));
+	Dialog.Add(new CFarCheckBoxItem(40,21,0,MReplaceToNew,&FRReplaceToNew));
 
 	Dialog.AddButtons(MOk,MCancel);
 	Dialog.Add(new CFarButtonItem(60,9,0,0,MBtnPresets));
@@ -380,7 +396,7 @@ int ReplacePrompt(BOOL Plugin)
 	Dialog.Add(new CFarButtonItem(58, 11, 0, FALSE, MBtnREBuilder));
 
 	Dialog.SetFocus(MMask, 1);
-	if (FSearchAs>=SA_MULTILINE) FSearchAs=SA_PLAINTEXT;
+	if (FSearchAs>=SA_MULTITEXT) FSearchAs=SA_PLAINTEXT;
 	FACaseSensitive=FADirectoryCaseSensitive=MaskCaseHere();
 
 	MaskText=FMask;
@@ -461,7 +477,7 @@ OperationResult FileReplaceExecutor() {
 }
 
 BOOL CFRPresetCollection::EditPreset(CPreset *pPreset) {
-	CFarDialog Dialog(76, 24, _T("FRPresetDlg"));
+	CFarDialog Dialog(76, 25, _T("FRPresetDlg"));
 	Dialog.AddFrame(MFRPreset);
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
 	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,_T("RESearch.PresetName"), pPreset->Name()));
@@ -483,19 +499,20 @@ BOOL CFRPresetCollection::EditPreset(CPreset *pPreset) {
 	bool bFAdvanced = nAdvancedID > 0;
 
 	Dialog.Add(new CFarRadioButtonItem(5,11,DIF_GROUP,MPlainText,pSearchAs,SA_PLAINTEXT));
-	Dialog.Add(new CFarRadioButtonItem(5,12,0,MRegExp,		pSearchAs,SA_REGEXP));
+	Dialog.Add(new CFarRadioButtonItem(5,12,0,MRegExp,           pSearchAs,SA_REGEXP));
 	Dialog.Add(new CFarRadioButtonItem(5,13,0,MSeveralLineRegExp,pSearchAs,SA_SEVERALLINE));
+	Dialog.Add(new CFarRadioButtonItem(5,14,0,MMultiLineRegExp,	 pSearchAs,SA_MULTILINE));
 
-	Dialog.Add(new CFarCheckBoxItem(5,14,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
-	Dialog.Add(new CFarCheckBoxItem(5,15,0,MAllCharTables,&pPreset->m_mapInts["AllCharTables"]));
+	Dialog.Add(new CFarCheckBoxItem(5,15,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
+	Dialog.Add(new CFarCheckBoxItem(5,16,0,MAllCharTables,&pPreset->m_mapInts["AllCharTables"]));
 
-	Dialog.Add(new CFarCheckBoxItem(5, 16, 0, MEvaluateAsScript, &pPreset->m_mapInts["AsScript"]));
-	Dialog.Add(new CFarComboBoxItem(30, 16, 55, 0, new CFarListData(m_lstEngines, false), new CFarEngineStorage(pPreset->m_mapStrings["Script"])));
-	Dialog.Add(new CFarButtonItem(60, 16, 0, FALSE, MRunEditor));
+	Dialog.Add(new CFarCheckBoxItem(5, 17, 0, MEvaluateAsScript, &pPreset->m_mapInts["AsScript"]));
+	Dialog.Add(new CFarComboBoxItem(30, 17, 55, 0, new CFarListData(m_lstEngines, false), new CFarEngineStorage(pPreset->m_mapStrings["Script"])));
+	Dialog.Add(new CFarButtonItem(60, 17, 0, FALSE, MRunEditor));
 
 	Dialog.Add(new CFarCheckBoxItem(56,11,0,_T(""),&bFAdvanced));
 	Dialog.Add(new CFarButtonItem(60,11,0,0,MBtnAdvanced));
-	Dialog.Add(new CFarCheckBoxItem(5,18,0,MAddToMenu,&pPreset->m_bAddToMenu));
+	Dialog.Add(new CFarCheckBoxItem(5,19,0,MAddToMenu,&pPreset->m_bAddToMenu));
 	Dialog.AddButtons(MOk,MCancel);
 
 	do {
