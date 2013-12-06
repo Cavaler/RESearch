@@ -43,6 +43,8 @@ protected:
 	HANDLE		m_hFile;
 	__int64		m_nSizeLimit;
 	bool		m_bEOF;
+	bool		OpenInputFile(LPCTSTR szFileName);
+	void 		CloseInputFile();
 	bool		ReadUp(INT_PTR nRest);
 
 	bool		OpenOutput();

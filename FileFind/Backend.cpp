@@ -64,7 +64,7 @@ void CFileBackend::Free()
 	m_nBlockSize = 0;
 }
 
-bool CFileBackend::Open(LPCTSTR szFileName, INT_PTR nMaxSize)
+bool CFileBackend::OpenInputFile(LPCTSTR szFileName)
 {
 	m_hFile = CreateFile(szFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, NULL, NULL);
 	if (m_hFile == INVALID_HANDLE_VALUE) return false;
@@ -72,11 +72,18 @@ bool CFileBackend::Open(LPCTSTR szFileName, INT_PTR nMaxSize)
 	DWORD dwSizeHigh;
 	DWORD dwSizeLow = GetFileSize(m_hFile, &dwSizeHigh);
 	m_nSizeLimit = dwSizeLow + (((__int64)dwSizeHigh)<<32);
+
+	m_strFileName = szFileName;
+
+	return true;
+}
+
+bool CFileBackend::Open(LPCTSTR szFileName, INT_PTR nMaxSize)
+{
+	if (!OpenInputFile(szFileName)) return false;
 	if ((nMaxSize > 0) && (nMaxSize < m_nSizeLimit)) m_nSizeLimit = nMaxSize;
 
 	m_nOriginalSizeLimit = m_nSizeLimit;
-
-	m_strFileName = szFileName;
 
 	ReadUp(0);
 
@@ -85,16 +92,10 @@ bool CFileBackend::Open(LPCTSTR szFileName, INT_PTR nMaxSize)
 
 bool CFileBackend::Open(LPCTSTR szInFileName, LPCTSTR szOutFileName)
 {
-	m_hFile = CreateFile(szInFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, NULL, NULL);
-	if (m_hFile == INVALID_HANDLE_VALUE) return false;
-
-	DWORD dwSizeHigh;
-	DWORD dwSizeLow = GetFileSize(m_hFile, &dwSizeHigh);
-	m_nSizeLimit = dwSizeLow + (((__int64)dwSizeHigh)<<32);
+	if (!OpenInputFile(szInFileName)) return false;
 
 	m_nOriginalSizeLimit = m_nSizeLimit;
 
-	m_strFileName = szInFileName;
 	m_strOutFileName = szOutFileName;
 
 	ReadUp(0);
@@ -153,6 +154,14 @@ bool CFileBackend::ReadUp(INT_PTR nRest)
 	return true;
 }
 
+void CFileBackend::CloseInputFile()
+{
+	if (m_hFile != INVALID_HANDLE_VALUE) {
+		CloseHandle(m_hFile);
+		m_hFile = INVALID_HANDLE_VALUE;
+	}
+}
+
 void CFileBackend::Close()
 {
 	if (m_hOutFile != INVALID_HANDLE_VALUE) {
@@ -169,10 +178,7 @@ void CFileBackend::Close()
 		m_hOutFile = INVALID_HANDLE_VALUE;
 	}
 
-	if (m_hFile != INVALID_HANDLE_VALUE) {
-		CloseHandle(m_hFile);
-		m_hFile = INVALID_HANDLE_VALUE;
-	}
+	CloseInputFile();
 
 	m_pDecoder = NULL;
 }
@@ -186,10 +192,7 @@ void CFileBackend::Abort()
 		DeleteFile(m_strOutFileName.c_str());
 	}
 
-	if (m_hFile != INVALID_HANDLE_VALUE) {
-		CloseHandle(m_hFile);
-		m_hFile = INVALID_HANDLE_VALUE;
-	}
+	CloseInputFile();
 
 	m_pDecoder = NULL;
 }
