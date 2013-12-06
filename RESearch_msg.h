@@ -281,6 +281,7 @@ enum eStringTable {
 	MPresetName,
 	MAddToMenu,
 	MDeletePresetQuery,
+	MCopyOf,
 
 	MPanelBatches,
 	MEditorBatches,

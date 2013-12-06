@@ -101,6 +101,13 @@ void CPreset::FillDefaults()
 	}
 }
 
+void CPreset::CopyFrom(const CPreset &Preset)
+{
+	m_mapStrings = Preset.m_mapStrings;
+	m_mapInts    = Preset.m_mapInts;
+	m_bAddToMenu = Preset.m_bAddToMenu;
+}
+
 CPreset::CPreset(CParameterSet &ParamSet, const tstring &strName, CFarSettingsKey &hKey)
 : m_ParamSet(ParamSet)
 , m_nID(0)
@@ -224,7 +231,7 @@ void CPresetCollection::Save()
 
 int CPresetCollection::ShowMenu(bool bExecute, int nDefaultID)
 {
-	int piBreakKeys[]={VK_INSERT, VK_DELETE, VK_F4, (PKF_CONTROL<<16)|VK_UP, (PKF_CONTROL<<16)|VK_DOWN, (PKF_CONTROL<<16)|VK_RETURN, 0};
+	int piBreakKeys[]={VK_INSERT, VK_DELETE, VK_F4, VK_F5, (PKF_CONTROL<<16)|VK_UP, (PKF_CONTROL<<16)|VK_DOWN, (PKF_CONTROL<<16)|VK_RETURN, 0};
 	vector<tstring> arrItems;
 
 	do {
@@ -238,7 +245,7 @@ int CPresetCollection::ShowMenu(bool bExecute, int nDefaultID)
 
 		int nBreakKey;
 		tstring strTitle = FormatStr(_T("%s presets"), Name());
-		int nResult = ChooseMenu(arrItems, strTitle.c_str(), _T("Ins,Del,F4,Ctrl-\x18\x19,Ctrl-Enter"), _T("Presets"), m_nCurrent,
+		int nResult = ChooseMenu(arrItems, strTitle.c_str(), _T("Ins,Del,F4,F5,Ctrl-\x18\x19,Ctrl-Enter"), _T("Presets"), m_nCurrent,
 			FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT, piBreakKeys, &nBreakKey);
 		if (nResult >= 0) m_nCurrent = nResult;
 
@@ -274,7 +281,19 @@ int CPresetCollection::ShowMenu(bool bExecute, int nDefaultID)
 				if (EditPreset(at(m_nCurrent))) Save();
 			}
 			break;
-		case 3:			//	VK_CTRL_UP
+		case 3:			//	VK_F5
+			if (m_nCurrent < size()) {
+				CPreset *pPreset = NewPreset();
+				pPreset->CopyFrom(*at(m_nCurrent));
+				pPreset->Name() = GetMsg(MCopyOf) + pPreset->Name();
+				if (EditPreset(pPreset)) {
+					pPreset->m_nID = FindUnusedID();
+					insert(begin() + m_nCurrent + 1, pPreset);
+					Save();
+				}
+			}
+			break;
+		case 4:			//	VK_CTRL_UP
 			if (m_nCurrent > 0) {
 				CPreset *pPreset = at(m_nCurrent-1);
 				at(m_nCurrent-1) = at(m_nCurrent);
@@ -283,7 +302,7 @@ int CPresetCollection::ShowMenu(bool bExecute, int nDefaultID)
 				m_nCurrent--;
 			}
 			break;
-		case 4:			//	VK_CTRL_DOWN
+		case 5:			//	VK_CTRL_DOWN
 			if (m_nCurrent < size()-1) {
 				CPreset *pPreset = at(m_nCurrent+1);
 				at(m_nCurrent+1) = at(m_nCurrent);
@@ -292,7 +311,7 @@ int CPresetCollection::ShowMenu(bool bExecute, int nDefaultID)
 				m_nCurrent++;
 			}
 			break;
-		case 5:			//	VK_CTRLENTER
+		case 6:			//	VK_CTRLENTER
 			if (m_nCurrent < size()) {
 				at(m_nCurrent)->ExecutePreset();
 			}

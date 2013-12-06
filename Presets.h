@@ -33,6 +33,7 @@ public:
 	CPreset(CParameterSet &ParamSet);
 	CPreset(CParameterSet &ParamSet, const tstring &strName, CFarSettingsKey &hKey);	// hKey is root key
 	void FillDefaults();
+	void CopyFrom(const CPreset &Preset);
 
 	OperationResult ExecutePreset();
 	virtual void Apply();
