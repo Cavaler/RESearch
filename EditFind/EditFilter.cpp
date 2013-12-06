@@ -15,7 +15,9 @@ BOOL EditorFilterAgain()
 	EditorStartUndo();
 
 	if (EReverse) {
-		for (Position.CurLine=EdInfo.CurLine; Position.CurLine>=0; Position.CurLine--) {
+		for (Position.CurLine=EdInfo.CurLine; Position.CurLine>=0; Position.CurLine--)
+		{
+			ShowCurrentLine(Position.CurLine,EdInfo.TotalLines,EdInfo.WindowSizeX);
 			EctlSetPosition(&Position);
 			EctlGetString(&String);
 
@@ -24,9 +26,13 @@ BOOL EditorFilterAgain()
 				Position.CurLine--;
 				EdInfo.TotalLines--;
 			}
+
+			if (Interrupted()) break;
 		}
 	} else {
-		for (Position.CurLine=EdInfo.CurLine; Position.CurLine<EdInfo.TotalLines; Position.CurLine++) {
+		for (Position.CurLine=EdInfo.CurLine; Position.CurLine<EdInfo.TotalLines; Position.CurLine++)
+		{
+			ShowCurrentLine(Position.CurLine,EdInfo.TotalLines,EdInfo.WindowSizeX);
 			EctlSetPosition(&Position);
 			EctlGetString(&String);
 
@@ -35,6 +41,8 @@ BOOL EditorFilterAgain()
 				Position.CurLine--;
 				EdInfo.TotalLines--;
 			}
+
+			if (Interrupted()) break;
 		}
 	}
 
@@ -85,7 +93,10 @@ BOOL EditorFilter()
 	} while ((ExitCode != MOk) || !EPreparePattern(SearchText));
 
 	EText=SearchText;
+	g_bInterrupted = FALSE;
+
 	if (!EText.empty()) EditorFilterAgain();
+
 	return TRUE;
 }
 

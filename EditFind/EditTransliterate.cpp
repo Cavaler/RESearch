@@ -48,20 +48,26 @@ BOOL EditorTransliterateAgain()
 	if (EInSelection) {
 		for (int nLine = EdInfo.BlockStartLine; nLine < EdInfo.TotalLines; nLine++) {
 			Position.CurLine = nLine;
+			ShowCurrentLine(Position.CurLine,EdInfo.TotalLines,EdInfo.WindowSizeX);
 			EctlSetPosition(&Position);
 			EctlGetString(&String);
 
 			if (String.SelStart==-1) break;
 
 			EditorTransliterateString(String, String.SelStart, String.SelEnd);
+
+			if (Interrupted()) break;
 		}
 	} else {
 		for (int nLine = 0; nLine < EdInfo.TotalLines; nLine++) {
 			Position.CurLine = nLine;
+			ShowCurrentLine(Position.CurLine,EdInfo.TotalLines,EdInfo.WindowSizeX);
 			EctlSetPosition(&Position);
 			EctlGetString(&String);
 
 			EditorTransliterateString(String);
+
+			if (Interrupted()) break;
 		}
 	}
 
