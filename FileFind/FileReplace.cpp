@@ -140,7 +140,7 @@ bool RunReplace(LPCTSTR szFileName, __int64 dwFileSize)
 						}
 	case SA_MULTILINE:
 #ifdef _WIN64
-		if (dwFileSize < 2*1024*1024*1024)
+		if (dwFileSize < 1i64*1024*1024*1024*1024)
 #else
 		if (dwFileSize < 256*1024*1024)
 #endif
