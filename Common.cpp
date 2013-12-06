@@ -678,7 +678,7 @@ int do_pcre_exec(const pcre *external_re, const pcre_extra *extra_data,
 	const TCHAR *subject, int length, int start_offset, int options, int *offsets,
 	int offsetcount)
 {
-	if (g_bUseSeparateThread && (length > g_nMaxInThreadLength)) {
+	if (g_bUseSeparateThread && (length-start_offset > g_nMaxInThreadLength)) {
 		if (!g_hREThread)
 			StartREThread();
 		if (g_hREThread) {
@@ -703,7 +703,7 @@ int do_pcre_execA(const pcre *external_re, const pcre_extra *extra_data,
 	const char *subject, int length, int start_offset, int options, int *offsets,
 	int offsetcount)
 {
-	if (g_bUseSeparateThread && (length > g_nMaxInThreadLength)) {
+	if (g_bUseSeparateThread && (length-start_offset > g_nMaxInThreadLength)) {
 		if (!g_hREThread)
 			StartREThread();
 		if (g_hREThread) {
