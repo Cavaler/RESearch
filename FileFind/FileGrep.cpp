@@ -293,7 +293,8 @@ LONG_PTR WINAPI FileGrepDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LONG
 	return pDlg->DefDlgProc(nMsg, nParam1, lParam2);
 }
 
-bool GrepPrompt(BOOL bPlugin) {
+bool GrepPrompt(BOOL bPlugin)
+{
 	BOOL AsRegExp = (FSearchAs == SA_REGEXP) || (FSearchAs == SA_SEVERALLINE) || (FSearchAs == SA_MULTILINE) || (FSearchAs == SA_MULTIREGEXP);
 
 	CFarDialog Dialog(77, 27, _T("FileGrepDlg"));
@@ -332,14 +333,15 @@ bool GrepPrompt(BOOL bPlugin) {
 	Dialog.Add(new CFarEditItem(20,18,45,DIF_HISTORY,_T("RESearch.GrepOutput"), FGOutputFile));
 	Dialog.Add(new CFarCheckBoxItem(5,19,0,MGrepEditor,&FGOpenInEditor));
 
+	Dialog.Add(new CFarButtonItem(60,11,0,0,MBtnAdvanced));
+	Dialog.Add(new CFarButtonItem(60,14,0,0,MBtnSettings));
+
 	Dialog.Add(new CFarTextItem(5,21,0,MSearchIn));
 	Dialog.Add(new CFarComboBoxItem(15,21,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearch, false),(int *)&FSearchIn));
 
-	Dialog.AddButtons(MOk,MCancel);
-	Dialog.Add(new CFarButtonItem(60,10,0,0,MBtnPresets));
+	Dialog.AddButtons(MOk,MCancel,MBtnApply);
+	Dialog.Add(new CFarButtonItem(60,24,0,0,MBtnPresets));
 	Dialog.Add(new CFarCheckBoxItem(56,11,0,_T(""),&FAdvanced));
-	Dialog.Add(new CFarButtonItem(60,11,0,0,MBtnAdvanced));
-	Dialog.Add(new CFarButtonItem(60,14,0,0,MBtnSettings));
 	Dialog.SetFocus(MMask, 1);
 	FACaseSensitive = FADirectoryCaseSensitive = MaskCaseHere();
 
@@ -348,8 +350,9 @@ bool GrepPrompt(BOOL bPlugin) {
 
 	int ExitCode;
 	do {
-		switch (ExitCode=Dialog.Display(-1)) {
+		switch (ExitCode=Dialog.Display()) {
 		case MOk:
+		case MBtnApply:
 			FSearchAs = AsRegExp ? SA_REGEXP : SA_PLAINTEXT;
 			FMask=MaskText;
 			FText=SearchText;
@@ -369,9 +372,9 @@ bool GrepPrompt(BOOL bPlugin) {
 		default:
 			return false;
 		}
-	} while ((ExitCode != MOk) || !PrepareFileGrepPattern() || (!FGOutputToFile && !FGOpenInEditor));
+	} while (!IsOKApply(ExitCode) || !PrepareFileGrepPattern() || (!FGOutputToFile && !FGOpenInEditor));
 
-	return true;
+	return (ExitCode == MOk);
 }
 
 OperationResult FileGrep(BOOL ShowDialog)

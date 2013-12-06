@@ -456,15 +456,16 @@ BOOL RenameFilesPrompt()
 	Dialog.Add(new CFarComboBoxItem(30, 10, 55, 0, new CFarListData(m_lstEngines, false), new CFarEngineStorage(EREvaluateScript)));
 	Dialog.Add(new CFarButtonItem(60, 10, 0, FALSE, MRunEditor));
 
+	Dialog.Add(new CFarCheckBoxItem(56,11,0,_T(""),&FAdvanced));
+	Dialog.Add(new CFarButtonItem(60,11,0,0,MBtnAdvanced));
+	Dialog.Add(new CFarButtonItem(58,12,0,0,MBtnREBuilder));
+
 	Dialog.Add(new CFarCheckBoxItem(5,12,0,MViewModified, &FROpenModified));
 	Dialog.Add(new CFarCheckBoxItem(5,13,0,MConfirmFile,  &FRConfirmFile));
 	Dialog.Add(new CFarCheckBoxItem(5,14,0,MConfirmLine,  &FRConfirmLine));
 	Dialog.Add(new CFarCheckBoxItem(5,15,0,MPreviewRename,&FRPreviewRename));
-	Dialog.AddButtons(MOk,MCancel);
-	Dialog.Add(new CFarButtonItem(60,9,0,0,MBtnPresets));
-	Dialog.Add(new CFarCheckBoxItem(56,11,0,_T(""),&FAdvanced));
-	Dialog.Add(new CFarButtonItem(60,11,0,0,MBtnAdvanced));
-	Dialog.Add(new CFarButtonItem(58,12,0,0,MBtnREBuilder));
+	Dialog.AddButtons(MOk,MCancel,MBtnApply);
+	Dialog.Add(new CFarButtonItem(60,17,0,0,MBtnPresets));
 	Dialog.SetFocus(MMask, 1);
 
 	if (FSearchAs>=SA_SEVERALLINE) FSearchAs=SA_PLAINTEXT;
@@ -478,6 +479,7 @@ BOOL RenameFilesPrompt()
 	do {
 		switch (ExitCode=Dialog.Display()) {
 		case MOk:
+		case MBtnApply:
 			FMask=MaskText;
 			FText=SearchText;
 			FRReplace=ReplaceText;
@@ -499,8 +501,9 @@ BOOL RenameFilesPrompt()
 		default:
 			return FALSE;
 		}
-	} while ((ExitCode != MOk) || !FPreparePattern(false));
-	return TRUE;
+	} while (!IsOKApply(ExitCode) || !FPreparePattern(false));
+
+	return (ExitCode == MOk);
 }
 
 OperationResult RenameFiles(panelitem_vector &PanelItems, BOOL ShowDialog) {
@@ -629,6 +632,7 @@ BOOL RenameSelectedFilesPrompt() {
 	Dialog.SetWindowProc(FileSearchDialogProc, 0);
 
 	Dialog.AddFrame(MRenameSelected);
+	Dialog.SetUseID(true);
 
 	Dialog.Add(new CFarCheckBoxItem(25,2,0,MRegExp,(BOOL *)&FSearchAs));
 	Dialog.Add(new CFarCheckBoxItem(50,2,0,MCaseSensitive,&FCaseSensitive));
@@ -639,13 +643,14 @@ BOOL RenameSelectedFilesPrompt() {
 	Dialog.Add(new CFarEditItem(5,5,70,DIF_HISTORY,_T("ReplaceText"), ReplaceText));
 	Dialog.Add(new CFarCheckBoxItem(25,4,0,MRepeating,&FRepeating));
 
+	Dialog.Add(new CFarButtonItem(58,7,0,0,MBtnREBuilder));
+
 	Dialog.Add(new CFarCheckBoxItem(5,7,0,MConfirmLine,&FRConfirmLine));
 	Dialog.Add(new CFarCheckBoxItem(5,8,0,MLeaveSelection,&FRLeaveSelection));
 	Dialog.Add(new CFarCheckBoxItem(5,9,0,MPreviewRename,&FRPreviewRename));
-	Dialog.AddButtons(MOk,MCancel);
-	Dialog.Add(new CFarButtonItem(60,6,0,0,MBtnPresets));
-	Dialog.Add(new CFarButtonItem(58,7,0,0,MBtnREBuilder));
-	Dialog.SetFocus(4);
+	Dialog.AddButtons(MOk,MCancel,MBtnApply);
+	Dialog.Add(new CFarButtonItem(60,11,0,0,MBtnPresets));
+	Dialog.SetFocus(MText, 1);
 
 	if (FSearchAs>=SA_SEVERALLINE) FSearchAs=SA_PLAINTEXT;
 	if (!g_bFromCmdLine) FCaseSensitive=MaskCaseHere();
@@ -655,15 +660,16 @@ BOOL RenameSelectedFilesPrompt() {
 	ReplaceText=FRReplace;
 	FREvaluate = false;
 	do {
-		switch (ExitCode=Dialog.Display(3, -4, -2, -1)) {
-		case 0:
+		switch (ExitCode=Dialog.Display()) {
+		case MOk:
+		case MBtnApply:
 			FText=SearchText;
 			FRReplace=ReplaceText;
 			break;
-		case 1:
+		case MBtnPresets:
 			QRPresets->ShowMenu(true);
 			break;
-		case 2:
+		case MREBuilder:
 			if (RunREBuilder(SearchText, ReplaceText)) {
 				FSearchAs = SA_REGEXP;
 			}
@@ -671,8 +677,9 @@ BOOL RenameSelectedFilesPrompt() {
 		default:
 			return FALSE;
 		}
-	} while ((ExitCode>=1)||!FPreparePattern(false));
-	return TRUE;
+	} while (!IsOKApply(ExitCode) || !FPreparePattern(false));
+
+	return (ExitCode == MOk);
 }
 
 OperationResult RenameSelectedFiles(panelitem_vector &PanelItems, BOOL ShowDialog) {

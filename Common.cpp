@@ -886,6 +886,11 @@ size_t MakeSameWidth(vector<tstring> &arrQuoted)
 	return nMaxLength;
 }
 
+bool IsOKApply(int ExitCode)
+{
+	return (ExitCode == MOk) || (ExitCode == MBtnApply);
+}
+
 hack_string::hack_string(const char *szData, size_t nSize) {
 	_Bx._Ptr = (char *)szData;
 	_Myres = string::_BUF_SIZE*2;

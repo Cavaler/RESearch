@@ -71,15 +71,16 @@ BOOL EditorFilter()
 	Dialog.Add(new CFarCheckBoxItem(5,7,0,MReverseSearch,&EReverse));
 	Dialog.Add(new CFarRadioButtonItem(30,5,0,MLeaveMatching,&EFLeaveFilter,TRUE));
 	Dialog.Add(new CFarRadioButtonItem(30,6,0,MRemoveMatching,&EFLeaveFilter,FALSE));
-	Dialog.AddButtons(MOk,MCancel);
-	Dialog.Add(new CFarButtonItem(62,5,0,0,MBtnPresets));
+	Dialog.AddButtons(MOk,MCancel,MBtnApply);
+	Dialog.Add(new CFarButtonItem(62,9,0,0,MBtnPresets));
 
 	SearchText=PickupText();
 	if (SearchText.empty()) SearchText=EText;
 	int ExitCode;
 	do {
-		switch (ExitCode=Dialog.Display(-1)) {
+		switch (ExitCode=Dialog.Display()) {
 		case MOk:
+		case MBtnApply:
 			break;
 		case MQuoteSearch:
 			if (ERegExp) CSO::QuoteRegExpString(SearchText);
@@ -90,12 +91,12 @@ BOOL EditorFilter()
 		default:
 			return FALSE;
 		}
-	} while ((ExitCode != MOk) || !EPreparePattern(SearchText));
+	} while (!IsOKApply(ExitCode) || !EPreparePattern(SearchText));
 
 	EText=SearchText;
 	g_bInterrupted = FALSE;
 
-	if (!EText.empty()) EditorFilterAgain();
+	if ((ExitCode == MOk) && !EText.empty()) EditorFilterAgain();
 
 	return TRUE;
 }

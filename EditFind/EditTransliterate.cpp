@@ -82,7 +82,9 @@ BOOL EditorTransliterate()
 {
 	EInSelection = EAutoFindInSelection && (EdInfo.BlockType != BTYPE_NONE);
 
-	CFarDialog Dialog(76,13,_T("TransliterateDlg"));
+	CFarDialog Dialog(76, 13, _T("TransliterateDlg"));
+	Dialog.SetUseID(true);
+
 	Dialog.AddFrame(MTransliterate);
 	Dialog.Add(new CFarTextItem(5,2,0,MTransSource));
 	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,_T("SourceChars"),SearchText));
@@ -91,30 +93,31 @@ BOOL EditorTransliterate()
 
 	Dialog.Add(new CFarCheckBoxItem(5, 7, (EdInfo.BlockType != BTYPE_NONE) ? 0 : DIF_DISABLE, MInSelection, &EInSelection));
 
-	Dialog.AddButtons(MOk,MCancel);
-	Dialog.Add(new CFarButtonItem(60,7,0,0,MBtnPresets));
+	Dialog.AddButtons(MOk, MCancel, MBtnApply);
+	Dialog.Add(new CFarButtonItem(60,9,0,0,MBtnPresets));
 
 	SearchText = ETSource;
 	ReplaceText = ETTarget;
 
 	int ExitCode;
 	do {
-		switch (ExitCode=Dialog.Display(2, -3, -1)) {
-		case 0:
+		switch (ExitCode=Dialog.Display()) {
+		case MOk:
 			break;
-		case 1:
+		case MBtnPresets:
 			ETPresets->ShowMenu(true);
 			break;
-		case -1:
+		default:
 			return FALSE;
 		}
-	} while (ExitCode >= 1);
+	} while (!IsOKApply(ExitCode));
 
 	ETSource = SearchText;
 	ETTarget = ReplaceText;
+	g_bInterrupted = FALSE;
 
-	g_bInterrupted=FALSE;
-	if (!ETSource.empty()) EditorTransliterateAgain();
+	if ((ExitCode == MOk) && !ETSource.empty()) EditorTransliterateAgain();
+
 	return TRUE;
 }
 

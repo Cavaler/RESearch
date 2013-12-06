@@ -287,38 +287,36 @@ BOOL EditorSearch()
 
 	EInSelection = EAutoFindInSelection && (EdInfo.BlockType != BTYPE_NONE);
 
-	CFarDialog Dialog(76, 14, _T("SearchDlg"));
+	CFarDialog Dialog(80, 14, _T("SearchDlg"));
 	Dialog.SetWindowProc(EditorSearchDialogProc, 0);
 	Dialog.SetUseID(true);
 	Dialog.SetCancelID(MCancel);
 
 	Dialog.AddFrame(MRESearch);
 	Dialog.Add(new CFarTextItem(5,2,0,MSearchFor));
-	Dialog.Add(new CFarEditItem(5,3,65,DIF_HISTORY|DIF_VAREDIT,_T("SearchText"),SearchText));
-	Dialog.Add(new CFarButtonItem(67,3,0,0,MQuoteSearch));
+	Dialog.Add(new CFarEditItem(5,3,69,DIF_HISTORY|DIF_VAREDIT,_T("SearchText"),SearchText));
+	Dialog.Add(new CFarButtonItem(71,3,0,0,MQuoteSearch));
 
 	Dialog.Add(new CFarTextItem(5,4,DIF_BOXCOLOR|DIF_SEPARATOR,_T("")));
 	Dialog.Add(new CFarCheckBoxItem(5,5,0,MRegExp,&ERegExp));
-	Dialog.Add(new CFarCheckBoxItem(30,5,0,MSeveralLine,&ESeveralLine));
-	Dialog.Add(new CFarButtonItem(48,5,0,0,MEllipsis));
+	Dialog.Add(new CFarCheckBoxItem(35,5,0,MSeveralLine,&ESeveralLine));
+	Dialog.Add(new CFarButtonItem(53,5,0,0,MEllipsis));
 
 	Dialog.Add(new CFarCheckBoxItem(5,6,0,MCaseSensitive,&ECaseSensitive));
 	Dialog.Add(new CFarCheckBoxItem(5,7,0,MReverseSearch,&EReverse));
-	Dialog.Add(new CFarCheckBoxItem(30,7,(EdInfo.BlockType != BTYPE_NONE) ? 0 : DIF_DISABLE, MInSelection, &EInSelection));
+	Dialog.Add(new CFarCheckBoxItem(35,7,(EdInfo.BlockType != BTYPE_NONE) ? 0 : DIF_DISABLE, MInSelection, &EInSelection));
 	Dialog.Add(new CFarCheckBoxItem(5,8,0,MIncrementalSearch,&EIncremental));
-	Dialog.AddButtons(MOk, MShowAll);
-	Dialog.AddButton(MCancel);
-	Dialog.Add(new CFarButtonItem(60,5,0,0,MBtnPresets));
+	Dialog.AddButtons(MOk, MShowAll, MCancel, MBtnApply);
+	Dialog.Add(new CFarButtonItem(64,10,0,0,MBtnPresets));
 
 	SearchText=PickupText();
 	if (SearchText.empty()) SearchText=EText;
 	int ExitCode;
 	do {
-		switch (ExitCode=Dialog.Display(-1)) {
+		switch (ExitCode=Dialog.Display()) {
 		case MOk:
-			break;
 		case MShowAll:
-			// Show All
+		case MBtnApply:
 			break;
 		case MQuoteSearch:
 			if (ERegExp) CSO::QuoteRegExpString(SearchText);
@@ -332,11 +330,14 @@ BOOL EditorSearch()
 		default:
 			return FALSE;
 		}
-	} while (((ExitCode != MOk) && (ExitCode != MShowAll)) || !EPreparePattern(SearchText));
+	} while (((ExitCode != MOk) && (ExitCode != MShowAll) && (ExitCode != MBtnApply)) || !EPreparePattern(SearchText));
 
 	EText=SearchText;
 	g_bInterrupted=FALSE;
-	if (!EText.empty()) (ExitCode == MOk) ? EditorSearchAgain() : EditorListAllAgain();
+
+	if ((ExitCode != MBtnApply) && !EText.empty())
+		(ExitCode == MOk) ? EditorSearchAgain() : EditorListAllAgain();
+
 	return TRUE;
 }
 
@@ -353,18 +354,19 @@ OperationResult EditorSearchExecutor()
 		EditorSearchAgain() ? OR_OK : OR_CANCEL;
 }
 
-BOOL CESPresetCollection::EditPreset(CPreset *pPreset) {
-	CFarDialog Dialog(76,18,_T("ESPresetDlg"));
+BOOL CESPresetCollection::EditPreset(CPreset *pPreset)
+{
+	CFarDialog Dialog(80,18,_T("ESPresetDlg"));
 	Dialog.AddFrame(MESPreset);
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
-	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,_T("RESearch.PresetName"),pPreset->Name()));
+	Dialog.Add(new CFarEditItem(5,3,74,DIF_HISTORY,_T("RESearch.PresetName"),pPreset->Name()));
 
 	Dialog.Add(new CFarTextItem(5,4,0,MSearchFor));
-	Dialog.Add(new CFarEditItem(5,5,70,DIF_HISTORY|DIF_VAREDIT,_T("SearchText"), pPreset->m_mapStrings["Text"]));
+	Dialog.Add(new CFarEditItem(5,5,74,DIF_HISTORY|DIF_VAREDIT,_T("SearchText"), pPreset->m_mapStrings["Text"]));
 
 	Dialog.Add(new CFarCheckBoxItem(5,7,0,MRegExp,&pPreset->m_mapInts["IsRegExp"]));
-	Dialog.Add(new CFarCheckBoxItem(5,8,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
 	Dialog.Add(new CFarCheckBoxItem(35,7,0,MSeveralLine,&pPreset->m_mapInts["SeveralLine"]));
+	Dialog.Add(new CFarCheckBoxItem(5,8,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
 	Dialog.Add(new CFarCheckBoxItem(5,10,0,MAddToMenu,&pPreset->m_bAddToMenu));
 	Dialog.Add(new CFarCheckBoxItem(5,11,0,MListAllFromPreset,&pPreset->m_mapInts["ListAll"]));
 	Dialog.Add(new CFarCheckBoxItem(5,12,0,MFromCurrentPosition,&pPreset->m_mapInts["FromCurrent"]));

@@ -593,41 +593,39 @@ BOOL EditorReplace()
 
 	EInSelection = EAutoFindInSelection && (EdInfo.BlockType != BTYPE_NONE);
 
-	CFarDialog Dialog(76, 18, _T("ReplaceDlg"));
+	CFarDialog Dialog(80, 18, _T("ReplaceDlg"));
 	Dialog.SetWindowProc(EditorReplaceDialogProc, 0);
 	Dialog.SetUseID(true);
 	Dialog.SetCancelID(MCancel);
 
 	Dialog.AddFrame(MREReplace);
 	Dialog.Add(new CFarTextItem(5, 2, 0, MSearchFor));
-	Dialog.Add(new CFarEditItem(5, 3, 65, DIF_HISTORY|DIF_VAREDIT,_T("SearchText"), SearchText));
+	Dialog.Add(new CFarEditItem(5, 3, 69, DIF_HISTORY|DIF_VAREDIT,_T("SearchText"), SearchText));
 
 	Dialog.Add(new CFarTextItem(5, 4, 0, MReplaceWith));
-	Dialog.Add(new CFarEditItem(5, 5, 65, DIF_HISTORY|DIF_VAREDIT,_T("ReplaceText"), ReplaceText));
+	Dialog.Add(new CFarEditItem(5, 5, 69, DIF_HISTORY|DIF_VAREDIT,_T("ReplaceText"), ReplaceText));
 
-	Dialog.Add(new CFarButtonItem(67, 3, 0, 0, MQuoteSearch));
-	Dialog.Add(new CFarButtonItem(67, 5, 0, 0, MQuoteReplace));
+	Dialog.Add(new CFarButtonItem(71, 3, 0, 0, MQuoteSearch));
+	Dialog.Add(new CFarButtonItem(71, 5, 0, 0, MQuoteReplace));
+	Dialog.Add(new CFarButtonItem(62, 9, 0, FALSE, MBtnREBuilder));
 
 	Dialog.Add(new CFarTextItem(5, 6, DIF_BOXCOLOR|DIF_SEPARATOR, _T("")));
 
 	Dialog.Add(new CFarCheckBoxItem(5, 7, 0, MRegExp, &ERegExp));
-	Dialog.Add(new CFarCheckBoxItem(32, 7, 0, MSeveralLine, &ESeveralLine));
-	Dialog.Add(new CFarButtonItem(51, 7, 0, 0, MEllipsis));
+	Dialog.Add(new CFarCheckBoxItem(35, 7, 0, MSeveralLine, &ESeveralLine));
+	Dialog.Add(new CFarButtonItem(55, 7, 0, 0, MEllipsis));
 
 	Dialog.Add(new CFarCheckBoxItem(5, 8, 0, MCaseSensitive, &ECaseSensitive));
 	Dialog.Add(new CFarCheckBoxItem(5, 9, 0, MReverseSearch, &EReverse));
-	Dialog.Add(new CFarCheckBoxItem(32, 9, (EdInfo.BlockType != BTYPE_NONE) ? 0 : DIF_DISABLE, MInSelection, &EInSelection));
+	Dialog.Add(new CFarCheckBoxItem(35, 9, (EdInfo.BlockType != BTYPE_NONE) ? 0 : DIF_DISABLE, MInSelection, &EInSelection));
 	Dialog.Add(new CFarCheckBoxItem(5, 10, 0, MRemoveEmpty, &ERRemoveEmpty));
 	Dialog.Add(new CFarCheckBoxItem(5, 11, 0, MRemoveNoMatch, &ERRemoveNoMatch));
 	Dialog.Add(new CFarCheckBoxItem(5, 12, 0, MEvaluateAsScript, &EREvaluate));
-	Dialog.Add(new CFarComboBoxItem(32, 12, 55, 0, new CFarListData(m_lstEngines, false), new CFarEngineStorage(EREvaluateScript)));
-	Dialog.Add(new CFarButtonItem(60, 12, 0, FALSE, MRunEditor));
+	Dialog.Add(new CFarComboBoxItem(35, 12, 60, 0, new CFarListData(m_lstEngines, false), new CFarEngineStorage(EREvaluateScript)));
+	Dialog.Add(new CFarButtonItem(64, 12, 0, FALSE, MRunEditor));
 
-	Dialog.Add(new CFarButtonItem(0, 14, DIF_CENTERGROUP, TRUE, MReplace));
-	Dialog.Add(new CFarButtonItem(0, 14, DIF_CENTERGROUP, FALSE, MAll));
-	Dialog.Add(new CFarButtonItem(0, 14, DIF_CENTERGROUP, FALSE, MCancel));
-	Dialog.Add(new CFarButtonItem(60, 7, 0, FALSE, MBtnPresets));
-	Dialog.Add(new CFarButtonItem(58, 8, 0, FALSE, MBtnREBuilder));
+	Dialog.AddButtons(MReplace,MAll,MCancel,MBtnApply);
+	Dialog.Add(new CFarButtonItem(64, 14, 0, FALSE, MBtnPresets));
 
 	SearchText = PickupText();
 	if (SearchText.empty()) SearchText = EText;
@@ -635,9 +633,10 @@ BOOL EditorReplace()
 
 	int ExitCode;
 	do {
-		switch (ExitCode = Dialog.Display(-1)) {
+		switch (ExitCode = Dialog.Display()) {
 		case MReplace:
 		case MAll:
+		case MBtnApply:
 			break;
 		case MQuoteSearch:
 			if (ERegExp) CSO::QuoteRegExpString(SearchText);
@@ -662,7 +661,7 @@ BOOL EditorReplace()
 		case -1:
 			return FALSE;
 		}
-	} while (((ExitCode != MReplace) && (ExitCode != MAll)) || !EPreparePattern(SearchText));
+	} while (((ExitCode != MReplace) && (ExitCode != MAll)&& (ExitCode != MBtnApply)) || !EPreparePattern(SearchText));
 
 	EText = SearchText;
 #ifdef UNICODE
@@ -677,7 +676,7 @@ BOOL EditorReplace()
 	g_bInterrupted = FALSE;
 	REParam.m_setInitParam.clear();
 
-	if (!EText.empty()) EditorReplaceAgain();
+	if ((ExitCode != MBtnApply) && !EText.empty()) EditorReplaceAgain();
 	return TRUE;
 }
 
@@ -708,25 +707,25 @@ OperationResult EditorReplaceExecutor()
 
 BOOL CERPresetCollection::EditPreset(CPreset *pPreset)
 {
-	CFarDialog Dialog(76, 22, _T("ERPresetDlg"));
+	CFarDialog Dialog(80, 22, _T("ERPresetDlg"));
 	Dialog.AddFrame(MERPreset);
 	Dialog.Add(new CFarTextItem(5, 2, 0, MPresetName));
-	Dialog.Add(new CFarEditItem(5, 3, 70, DIF_HISTORY,_T("RESearch.PresetName"), pPreset->Name()));
+	Dialog.Add(new CFarEditItem(5, 3, 74, DIF_HISTORY,_T("RESearch.PresetName"), pPreset->Name()));
 
 	Dialog.Add(new CFarTextItem(5, 4, 0, MSearchFor));
-	Dialog.Add(new CFarEditItem(5, 5, 70, DIF_HISTORY|DIF_VAREDIT,_T("SearchText"), pPreset->m_mapStrings["Text"]));
+	Dialog.Add(new CFarEditItem(5, 5, 74, DIF_HISTORY|DIF_VAREDIT,_T("SearchText"), pPreset->m_mapStrings["Text"]));
 
 	Dialog.Add(new CFarTextItem(5, 6, 0, MReplaceWith));
-	Dialog.Add(new CFarEditItem(5, 7, 70, DIF_HISTORY|DIF_VAREDIT,_T("ReplaceText"), pPreset->m_mapStrings["Replace"]));
+	Dialog.Add(new CFarEditItem(5, 7, 74, DIF_HISTORY|DIF_VAREDIT,_T("ReplaceText"), pPreset->m_mapStrings["Replace"]));
 
 	Dialog.Add(new CFarCheckBoxItem(5, 9, 0, MRegExp, &pPreset->m_mapInts["IsRegExp"]));
+	Dialog.Add(new CFarCheckBoxItem(35, 9, 0, MSeveralLine, &pPreset->m_mapInts["SeveralLine"]));
 	Dialog.Add(new CFarCheckBoxItem(5, 10, 0, MCaseSensitive, &pPreset->m_mapInts["CaseSensitive"]));
-	Dialog.Add(new CFarCheckBoxItem(32, 9, 0, MSeveralLine, &pPreset->m_mapInts["SeveralLine"]));
 	Dialog.Add(new CFarCheckBoxItem(5, 11, 0, MRemoveEmpty, &pPreset->m_mapInts["RemoveEmpty"]));
 	Dialog.Add(new CFarCheckBoxItem(5, 12, 0, MRemoveNoMatch, &pPreset->m_mapInts["RemoveNoMatch"]));
 	Dialog.Add(new CFarCheckBoxItem(5, 13, 0, MEvaluateAsScript, &pPreset->m_mapInts["AsScript"]));
-	Dialog.Add(new CFarComboBoxItem(32, 13, 55, 0, new CFarListData(m_lstEngines, false), new CFarEngineStorage(pPreset->m_mapStrings["Script"])));
-	Dialog.Add(new CFarButtonItem(60, 13, 0, FALSE, MRunEditor));
+	Dialog.Add(new CFarComboBoxItem(35, 13, 55, 0, new CFarListData(m_lstEngines, false), new CFarEngineStorage(pPreset->m_mapStrings["Script"])));
+	Dialog.Add(new CFarButtonItem(64, 13, 0, FALSE, MRunEditor));
 
 	Dialog.Add(new CFarCheckBoxItem(5, 15, 0, MAddToMenu, &pPreset->m_bAddToMenu));
 	Dialog.Add(new CFarCheckBoxItem(5, 16, 0, MFromCurrentPosition, &pPreset->m_mapInts["FromCurrent"]));

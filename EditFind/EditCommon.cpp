@@ -72,7 +72,8 @@ BOOL SearchIn(const TCHAR *Line,int Start,int Length,int *MatchStart,int *MatchL
 	return FALSE;
 }
 
-BOOL SearchInLine(const TCHAR *Line,int Length,int Start,int End,int *MatchStart,int *MatchLength) {
+BOOL SearchInLine(const TCHAR *Line,int Length,int Start,int End,int *MatchStart,int *MatchLength)
+{
 	int Len;
 
 	if (Start>Length) return FALSE;

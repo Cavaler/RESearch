@@ -8,6 +8,7 @@ enum eStringTable {
 	MBtnBatch,
 	MBtnRetry,
 	MBtnSettings,
+	MBtnApply,
 	MError,
 	MWarning,
 	MQuoteSearch,

@@ -374,6 +374,10 @@ int ReplacePrompt(BOOL Plugin)
 	Dialog.Add(new CFarComboBoxItem(30, 15, 55, 0, new CFarListData(m_lstEngines, false), new CFarEngineStorage(EREvaluateScript)));
 	Dialog.Add(new CFarButtonItem  (60, 15, 0, FALSE, MRunEditor));
 
+	Dialog.Add(new CFarCheckBoxItem(55, 10,0,_T(""),&FAdvanced));
+	Dialog.Add(new CFarButtonItem(59, 10,0,0,MBtnAdvanced));
+	Dialog.Add(new CFarButtonItem(57, 11, 0, FALSE, MBtnREBuilder));
+
 	Dialog.Add(new CFarTextItem(5,17,0,MSearchIn));
 	if (Plugin) {
 		if (FSearchIn<SI_FROMCURRENT) FSearchIn=SI_FROMCURRENT;
@@ -390,10 +394,7 @@ int ReplacePrompt(BOOL Plugin)
 	Dialog.Add(new CFarCheckBoxItem(40,21,0,MReplaceToNew,&FRReplaceToNew));
 
 	Dialog.AddButtons(MOk,MCancel);
-	Dialog.Add(new CFarButtonItem(60,9,0,0,MBtnPresets));
-	Dialog.Add(new CFarCheckBoxItem(56,10,0,_T(""),&FAdvanced));
-	Dialog.Add(new CFarButtonItem(60,10,0,0,MBtnAdvanced));
-	Dialog.Add(new CFarButtonItem(58, 11, 0, FALSE, MBtnREBuilder));
+	Dialog.Add(new CFarButtonItem(60,23,0,0,MBtnPresets));
 
 	Dialog.SetFocus(MMask, 1);
 	if (FSearchAs>=SA_MULTITEXT) FSearchAs=SA_PLAINTEXT;
@@ -404,8 +405,9 @@ int ReplacePrompt(BOOL Plugin)
 	ReplaceText=FRReplace;
 	int ExitCode;
 	do {
-		switch (ExitCode=Dialog.Display(-1)) {
+		switch (ExitCode=Dialog.Display()) {
 		case MOk:
+		case MBtnApply:
 			FMask=MaskText;
 			FText=SearchText;
 			FRReplace=ReplaceText;
@@ -434,9 +436,9 @@ int ReplacePrompt(BOOL Plugin)
 		default:
 			return FALSE;
 		}
-	} while ((ExitCode != MOk) || !PrepareFileReplacePattern());
+	} while (!IsOKApply(ExitCode) || !PrepareFileReplacePattern());
 
-	return TRUE;
+	return (ExitCode == MOk);
 }
 
 OperationResult FileReplace(panelitem_vector &PanelItems, BOOL ShowDialog, BOOL bSilent) {
@@ -476,7 +478,8 @@ OperationResult FileReplaceExecutor() {
 	return FileReplace(g_PanelItems, FALSE, TRUE);
 }
 
-BOOL CFRPresetCollection::EditPreset(CPreset *pPreset) {
+BOOL CFRPresetCollection::EditPreset(CPreset *pPreset)
+{
 	CFarDialog Dialog(76, 25, _T("FRPresetDlg"));
 	Dialog.AddFrame(MFRPreset);
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
@@ -510,8 +513,8 @@ BOOL CFRPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.Add(new CFarComboBoxItem(30, 17, 55, 0, new CFarListData(m_lstEngines, false), new CFarEngineStorage(pPreset->m_mapStrings["Script"])));
 	Dialog.Add(new CFarButtonItem(60, 17, 0, FALSE, MRunEditor));
 
-	Dialog.Add(new CFarCheckBoxItem(56,11,0,_T(""),&bFAdvanced));
-	Dialog.Add(new CFarButtonItem(60,11,0,0,MBtnAdvanced));
+	Dialog.Add(new CFarCheckBoxItem(56,12,0,_T(""),&bFAdvanced));
+	Dialog.Add(new CFarButtonItem(60,12,0,0,MBtnAdvanced));
 	Dialog.Add(new CFarCheckBoxItem(5,19,0,MAddToMenu,&pPreset->m_bAddToMenu));
 	Dialog.AddButtons(MOk,MCancel);
 

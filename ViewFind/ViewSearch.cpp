@@ -210,8 +210,8 @@ BOOL ViewerSearch()
 	Dialog.Add(new CFarCheckBoxItem(30,5,DIF_DISABLE,MSeveralLine,&ESeveralLine));
 	Dialog.Add(new CFarCheckBoxItem(5,6,0,MCaseSensitive,&ECaseSensitive));
 	Dialog.Add(new CFarCheckBoxItem(5,7,DIF_DISABLE,MReverseSearch,&EReverse));
-	Dialog.AddButtons(MOk,MCancel);
-	Dialog.Add(new CFarButtonItem(60,5,0,0,MBtnPresets));
+	Dialog.AddButtons(MOk,MCancel,MBtnApply);
+	Dialog.Add(new CFarButtonItem(60,9,0,0,MBtnPresets));
 
 	SearchText = EText;
 	ESeveralLine = FALSE;
@@ -219,8 +219,9 @@ BOOL ViewerSearch()
 
 	int ExitCode;
 	do {
-		switch (ExitCode=Dialog.Display(-1)) {
+		switch (ExitCode=Dialog.Display()) {
 		case MOk:
+		case MBtnApply:
 			break;
 		case MQuoteSearch:
 			if (ERegExp) CSO::QuoteRegExpString(SearchText);
@@ -231,10 +232,11 @@ BOOL ViewerSearch()
 		default:
 			return FALSE;
 		}
-	} while ((ExitCode != MOk) || !EPreparePattern(SearchText));
+	} while (!IsOKApply(ExitCode) || !EPreparePattern(SearchText));
 
 	EText=SearchText;
-	if (!EText.empty()) ViewerSearchAgain();
+	if ((ExitCode == MOk) && !EText.empty()) ViewerSearchAgain();
+
 	return TRUE;
 }
 

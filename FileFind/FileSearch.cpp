@@ -130,6 +130,9 @@ int SearchPrompt(BOOL Plugin)
 	Dialog.Add(new CFarCheckBoxItem(5,14,0,MInverseSearch,&FSInverse));
 	Dialog.Add(new CFarCheckBoxItem(5,15,0,MAllCharTables,&FAllCharTables));
 
+	Dialog.Add(new CFarCheckBoxItem(56,8,0,_T(""),&FAdvanced));
+	Dialog.Add(new CFarButtonItem  (60,8,0,0,MBtnAdvanced));
+
 	Dialog.Add(new CFarTextItem(5,17,0,MSearchIn));
 	if (Plugin) {
 		if (FSearchIn<SI_FROMCURRENT) FSearchIn=SI_FROMCURRENT;
@@ -138,10 +141,9 @@ int SearchPrompt(BOOL Plugin)
 		Dialog.Add(new CFarComboBoxItem(15,17,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearch, false),(int *)&FSearchIn));
 	}
 
-	Dialog.AddButtons(MOk,MCancel);
-	Dialog.Add(new CFarButtonItem(60,7,0,0,MBtnPresets));
-	Dialog.Add(new CFarCheckBoxItem(56,9,0,_T(""),&FAdvanced));
-	Dialog.Add(new CFarButtonItem(60,9,0,0,MBtnAdvanced));
+	Dialog.AddButtons(MOk,MCancel,MBtnApply);
+	Dialog.Add(new CFarButtonItem(60,19,0,0,MBtnPresets));
+
 	Dialog.SetFocus(MMask, 1);
 	FACaseSensitive=FADirectoryCaseSensitive=MaskCaseHere();
 
@@ -151,6 +153,7 @@ int SearchPrompt(BOOL Plugin)
 	do {
 		switch (ExitCode=Dialog.Display(-1)) {
 		case MOk:
+		case MBtnApply:
 			FMask=MaskText;
 			FText=SearchText;
 			break;
@@ -167,9 +170,9 @@ int SearchPrompt(BOOL Plugin)
 		default:
 			return FALSE;
 		}
-	} while ((ExitCode != MOk) || !PrepareFileSearchPattern());
+	} while (!IsOKApply(ExitCode) || !PrepareFileSearchPattern());
 
-	return TRUE;
+	return (ExitCode == MOk);
 }
 
 OperationResult FileFind(panelitem_vector &PanelItems, BOOL ShowDialog, BOOL bSilent) {
