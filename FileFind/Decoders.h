@@ -47,8 +47,17 @@ public:
 protected:
 	IDecoder *m_pBackDecoder;
 
-	typedef map<INT_PTR, int> skip_map;
+	typedef pair<INT_PTR, int> skip_element;
+	typedef vector<skip_element> skip_map;
 	skip_map m_mapSkipped;
+
+	INT_PTR		m_nDOIn;
+	size_t		m_nDOSkip;
+	INT_PTR		m_nDOOut;
+
+	INT_PTR		m_nOOIn;
+	size_t		m_nOOSkip;
+	INT_PTR		m_nOOOut;
 };
 
 class CUTF8Traverse {

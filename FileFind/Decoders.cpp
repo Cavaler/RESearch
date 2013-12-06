@@ -97,6 +97,7 @@ bool CSingleByteCRLFDecoder::Decode(const char *szBuffer, INT_PTR &nLength)
 	if (!AllocBuffer(m_pBackDecoder->Size())) return false;
 
 	m_mapSkipped.clear();
+	m_mapSkipped.reserve(m_pBackDecoder->Size() / 32);
 	m_nSize = 0;
 
 	const char *szDecBuffer = m_pBackDecoder->Buffer();
@@ -111,7 +112,10 @@ bool CSingleByteCRLFDecoder::Decode(const char *szBuffer, INT_PTR &nLength)
 		szOurBuffer += nSkip;
 		m_nSize     += nSkip;
 
-		m_mapSkipped[szOurBuffer-m_szBuffer]++;
+		if (m_mapSkipped.empty() || (m_mapSkipped.back().first != szOurBuffer-m_szBuffer))
+			m_mapSkipped.push_back(skip_element(szOurBuffer-m_szBuffer, 1));
+		else
+			m_mapSkipped.back().second++;
 
 		szDecBuffer += nSkip+1;
 		nDecSize    -= nSkip+1;
@@ -119,6 +123,8 @@ bool CSingleByteCRLFDecoder::Decode(const char *szBuffer, INT_PTR &nLength)
 
 	memmove(szOurBuffer, szDecBuffer, nDecSize);
 	m_nSize += nDecSize;
+	m_nDOIn = -1;
+	m_nOOIn = -1;
 
 	return true;
 }
@@ -128,30 +134,55 @@ INT_PTR	CSingleByteCRLFDecoder::DecodedOffset(INT_PTR nOffset)
 	nOffset = m_pBackDecoder->DecodedOffset(nOffset);
 	if (nOffset < 0) return nOffset;
 
-	for each (const skip_map::value_type &Skip in m_mapSkipped) {
-		if (nOffset <= Skip.first)
+	INT_PTR nNewOffset = nOffset;
+	size_t nSkipped = 0;
+	if ((m_nDOIn >= 0) && (nOffset >= m_nDOIn)) {
+		nSkipped    = m_nDOSkip;
+		nNewOffset -= m_nDOOut;
+	}
+
+	for (; nSkipped < m_mapSkipped.size(); nSkipped++)
+	{
+		const skip_element &Skip = m_mapSkipped[nSkipped];
+		if (nNewOffset <= Skip.first)
 			break;
-		else if (nOffset >= Skip.first+Skip.second)
-			nOffset -= Skip.second;
+		else if (nNewOffset >= Skip.first+Skip.second)
+			nNewOffset -= Skip.second;
 		else {	// Weird case of \r\r\n
-			nOffset = Skip.first;
+			nNewOffset = Skip.first;
 			break;
 		}
 	}
 
-	return nOffset;
+	m_nDOIn   = nOffset;
+	m_nDOSkip = nSkipped;
+	m_nDOOut  = nOffset - nNewOffset;
+
+	return nNewOffset;
 }
 
 INT_PTR	CSingleByteCRLFDecoder::OriginalOffset(INT_PTR nOffset)
 {
 	INT_PTR nNewOffset = nOffset;
+	size_t nSkipped = 0;
 
-	for each (const skip_map::value_type &Skip in m_mapSkipped) {
+	if ((m_nOOIn >= 0) && (nOffset >= m_nOOIn)) {
+		nSkipped    = m_nOOSkip;
+		nNewOffset += m_nOOOut;
+	}
+
+	for (; nSkipped < m_mapSkipped.size(); nSkipped++)
+	{
+		const skip_element &Skip = m_mapSkipped[nSkipped];
 		if (Skip.first < nOffset)
 			nNewOffset += Skip.second;
 		else
 			break;
 	}
+
+	m_nOOIn   = nOffset;
+	m_nOOSkip = nSkipped;
+	m_nOOOut  = nNewOffset - nOffset;
 
 	return m_pBackDecoder->OriginalOffset(nNewOffset);
 }
