@@ -8,7 +8,7 @@ public:
 	~CFileBackend();
 
 	//	Methods ordered by life cycle
-	bool Init(INT_PTR nBlockSize);
+	bool SetBlockSize(INT_PTR nBlockSize);
 
 	bool Open(LPCTSTR szFileName, INT_PTR nMaxSize = -1);
 	bool Open(LPCTSTR szInFileName, LPCTSTR szOutFileName);
@@ -46,6 +46,9 @@ protected:
 	bool		OpenInputFile(LPCTSTR szFileName);
 	void 		CloseInputFile();
 	bool		ReadUp(INT_PTR nRest);
+
+	bool		m_bSlurpMode;
+	void		InitSlurpMode();
 
 	bool		OpenOutput();
 	bool		CatchUpOutput();

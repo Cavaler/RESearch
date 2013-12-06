@@ -59,7 +59,7 @@ bool RunSearchANSI(CFileBackend *pBackend, IFrontend *pFrontend)
 bool RunSearch(LPCTSTR szFileName, IFrontend *pFrontend, bool /*bUTF8*/)
 {
 	shared_ptr<CFileBackend> pBackend = new CFileBackend();
-	if (!pBackend->Init(FBufferSize*1024*1024)) return false;
+	if (!pBackend->SetBlockSize(FBufferSize*1024*1024)) return false;
 	if (!pBackend->Open(szFileName, FAdvanced && FASearchHead ? FASearchHeadLimit : -1)) return false;
 
 	return RunSearchANSI(pBackend, pFrontend);
@@ -68,7 +68,7 @@ bool RunSearch(LPCTSTR szFileName, IFrontend *pFrontend, bool /*bUTF8*/)
 bool RunReplace(LPCTSTR szInFileName, LPCTSTR szOutFileName, IFrontend *pFrontend, bool /*bUTF8*/)
 {
 	shared_ptr<CFileBackend> pBackend = new CFileBackend();
-	if (!pBackend->Init(FBufferSize*1024*1024)) return false;
+	if (!pBackend->SetBlockSize(0)) return false;
 	if (!pBackend->Open(szInFileName, szOutFileName)) return false;
 
 	return RunSearchANSI(pBackend, pFrontend);
@@ -197,17 +197,16 @@ bool RunSearchUnicode(CFileBackend *pBackend, IFrontend *pFrontend)
 bool RunSearch(LPCTSTR szFileName, IFrontend *pFrontend, bool bUTF8)
 {
 	shared_ptr<CFileBackend> pBackend = new CFileBackend();
-	if (!pBackend->Init(FBufferSize*1024*1024)) return false;
+	if (!pBackend->SetBlockSize(FBufferSize*1024*1024)) return false;
 	if (!pBackend->Open(szFileName, FAdvanced && FASearchHead ? FASearchHeadLimit : -1)) return false;
 
 	return (bUTF8) ? RunSearchUTF8(pBackend, pFrontend) : RunSearchUnicode(pBackend, pFrontend);
 }
 
-
 bool RunReplace(LPCTSTR szInFileName, LPCTSTR szOutFileName, IFrontend *pFrontend, bool bUTF8)
 {
 	shared_ptr<CFileBackend> pBackend = new CFileBackend();
-	if (!pBackend->Init(FBufferSize*1024*1024)) return false;
+	if (!pBackend->SetBlockSize(0)) return false;
 	if (!pBackend->Open(szInFileName, szOutFileName)) return false;
 
 	return (bUTF8) ? RunSearchUTF8(pBackend, pFrontend) : RunSearchUnicode(pBackend, pFrontend);

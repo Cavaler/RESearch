@@ -23,24 +23,33 @@ CFileBackend::CFileBackend()
 , m_nSize		(0)
 , m_hOutFile	(INVALID_HANDLE_VALUE)
 , m_nBuffered   (0)
+, m_bSlurpMode  (false)
 , m_pEncoder	(NULL)
 {
 }
 
 CFileBackend::~CFileBackend()
 {
-	if (g_bInterrupted) Abort(); else Close();
 	Done();
 }
 
-bool CFileBackend::Init(INT_PTR nBlockSize)
+bool CFileBackend::SetBlockSize(INT_PTR nBlockSize)
 {
-	if (m_nBlockSize != nBlockSize) {
-		m_nBlockSize = nBlockSize;
-		m_szBuffer   = (char *)realloc(m_szBuffer, nBlockSize);
+	if (nBlockSize == 0) {
+		m_bSlurpMode = true;
+		return true;
 	}
 
-	m_nSize      = 0;
+	nBlockSize = (nBlockSize + 1023) & ~0x03FF;
+
+	if (m_nBlockSize != nBlockSize) {
+		m_nBlockSize = nBlockSize;
+		while ((m_szBuffer = (char *)realloc(m_szBuffer, m_nBlockSize*4)) == NULL)
+			m_nBlockSize /= 2;
+		m_szBuffer = (char *)realloc(m_szBuffer, m_nBlockSize);
+	}
+
+	m_nSize = 0;
 
 	return m_szBuffer != NULL;
 }
@@ -78,14 +87,21 @@ bool CFileBackend::OpenInputFile(LPCTSTR szFileName)
 	return true;
 }
 
+void CFileBackend::InitSlurpMode()
+{
+	if (!m_bSlurpMode) return;
+
+	if (m_nSizeLimit > m_nBlockSize)
+		SetBlockSize((INT_PTR)m_nSizeLimit);
+}
+
 bool CFileBackend::Open(LPCTSTR szFileName, INT_PTR nMaxSize)
 {
 	if (!OpenInputFile(szFileName)) return false;
 	if ((nMaxSize > 0) && (nMaxSize < m_nSizeLimit)) m_nSizeLimit = nMaxSize;
 
+	InitSlurpMode();
 	m_nOriginalSizeLimit = m_nSizeLimit;
-
-	ReadUp(0);
 
 	return true;
 }
@@ -94,11 +110,10 @@ bool CFileBackend::Open(LPCTSTR szInFileName, LPCTSTR szOutFileName)
 {
 	if (!OpenInputFile(szInFileName)) return false;
 
+	InitSlurpMode();
 	m_nOriginalSizeLimit = m_nSizeLimit;
 
 	m_strOutFileName = szOutFileName;
-
-	ReadUp(0);
 
 	return true;
 }
