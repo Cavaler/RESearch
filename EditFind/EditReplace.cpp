@@ -25,6 +25,12 @@ void DoEditReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, cons
 		return;
 	}
 
+	int nSelEndOffsX, nSelEndOffsY;
+	if (EInSelection && (SelType != BTYPE_NONE)) {
+		nSelEndOffsX = SelEndPos - EndPos;
+		nSelEndOffsY = SelEndLine - LastLine;
+	}
+
 	if (FirstLine < LastLine) {
 		// Delete lines to be fully replaced
 		Position.CurLine = FirstLine + 1;
@@ -124,6 +130,14 @@ void DoEditReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, cons
 	}
 	LastReplaceLine = LastLine = Position.CurLine;
 	LastReplacePos = EndPos = NewString.length()-OriginalEndLength;
+
+	if (EInSelection && (SelType != BTYPE_NONE)) {
+		if (nSelEndOffsY == 0) {
+			nSelEndOffsX = EndPos + SelEndPos;
+		} else {
+			SelEndLine = LastLine + nSelEndOffsY;
+		}
+	}
 
 	Position.CurPos = (EReverse)?StartPos:EndPos;
 	Position.LeftPos = (EReverse)?-1:LeftColumn(Position.CurPos);
