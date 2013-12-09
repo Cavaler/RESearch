@@ -112,6 +112,7 @@ OperationResult EditorReplaceExecutor();
 OperationResult EditorFilterExecutor();
 OperationResult EditorTransliterateExecutor();
 void EditorSeekToBeginEnd();
+void EditorUpdatePresetPosition();
 
 void PatchEditorInfo(EditorInfo &EdInfo);
 

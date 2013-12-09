@@ -1,26 +1,28 @@
 #include "StdAfx.h"
 #include "..\RESearch.h"
 
-CParameterSet g_ESParamSet(EditorSearchExecutor, 2, 5,
-	"Text", &SearchText, "@Text", &EText,
+CParameterSet g_ESParamSet(EditorSearchExecutor, -1, -1,
+	"Text", &SearchText, "@Text", &EText, NULL,
 	"IsRegExp", &ERegExp, "CaseSensitive", &ECaseSensitive, "SeveralLine", &ESeveralLine,
-	"ListAll", &EListAllFromPreset, "FromCurrent", &EFromCurrentPosition
+	"Reverse", &EReverse, "InSelection", &EInSelection,
+	"ListAll", &EListAllFromPreset, "FromCurrent", &EFromCurrentPosition, NULL
 					 );
-CParameterSet g_ERParamSet(EditorReplaceExecutor, 5, 7,
+CParameterSet g_ERParamSet(EditorReplaceExecutor, -1, -1,
 	"Text", &SearchText, "Replace", &ReplaceText, "Script", &EREvaluateScript, 
-	 "@Text", &EText,  "@Replace", &ERReplace,
+	 "@Text", &EText,  "@Replace", &ERReplace, NULL,
 	"IsRegExp", &ERegExp, "CaseSensitive", &ECaseSensitive, "SeveralLine", &ESeveralLine,
+	"Reverse", &EReverse, "InSelection", &EInSelection,
 	"RemoveEmpty", &ERRemoveEmpty, "RemoveNoMatch", &ERRemoveNoMatch,
-	"AsScript", &EREvaluate, "FromCurrent", &EFromCurrentPosition
+	"AsScript", &EREvaluate, "FromCurrent", &EFromCurrentPosition, NULL
 					 );
-CParameterSet g_EFParamSet(EditorFilterExecutor, 2, 4,
-	"Text", &SearchText, "@Text", &EText,
+CParameterSet g_EFParamSet(EditorFilterExecutor, -1, -1,
+	"Text", &SearchText, "@Text", &EText, NULL,
 	"LeaveFilter", &EFLeaveFilter, "IsRegExp", &ERegExp, "CaseSensitive", &ECaseSensitive,
-	"FromCurrent", &EFromCurrentPosition
+	"Reverse", &EReverse, "FromCurrent", &EFromCurrentPosition, NULL
 					 );
-CParameterSet g_ETParamSet(EditorTransliterateExecutor, 2, 0,
+CParameterSet g_ETParamSet(EditorTransliterateExecutor, -1, -1,
 	"Text", &SearchText, "Replace", &ReplaceText,
-	 "@Text", &EText,  "@Replace", &ERReplace
+	"@Text", &EText,  "@Replace", &ERReplace, NULL, NULL
 					 );
 
 void EReadRegistry(CFarSettingsKey Key)
@@ -861,5 +863,18 @@ void EditorSeekToBeginEnd()
 	} else {
 		EditorSetPosition Position = {ITEM_SS(EditorSetPosition) 0, 0, 0, -1, -1, -1};
 		EctlForceSetPosition(&Position);
+	}
+}
+
+void EditorUpdatePresetPosition()
+{
+	if (EFromCurrentPosition) {
+		EFromCurrentPosition = false;
+		RefreshEditorInfo();
+		if (EdInfo.BlockType == BTYPE_NONE)
+			EInSelection = FALSE;
+	} else {
+		EditorSeekToBeginEnd();
+		EInSelection = FALSE;
 	}
 }

@@ -711,8 +711,7 @@ OperationResult EditorReplaceExecutor()
 	REParam.m_setInitParam.clear();
 	SanitateEngine();
 
-	if (!EFromCurrentPosition) EditorSeekToBeginEnd();
-	EFromCurrentPosition = false;
+	EditorUpdatePresetPosition();
 
 	BOOL bResult = EditorReplaceAgain();
 	StartupInfo.EditorControl(ECTL_REDRAW, NULL);
@@ -721,7 +720,7 @@ OperationResult EditorReplaceExecutor()
 
 BOOL CERPresetCollection::EditPreset(CPreset *pPreset)
 {
-	CFarDialog Dialog(80, 22, _T("ERPresetDlg"));
+	CFarDialog Dialog(80, 23, _T("ERPresetDlg"));
 	Dialog.AddFrame(MERPreset);
 	Dialog.Add(new CFarTextItem(5, 2, 0, MPresetName));
 	Dialog.Add(new CFarEditItem(5, 3, 74, DIF_HISTORY,_T("RESearch.PresetName"), pPreset->Name()));
@@ -732,17 +731,20 @@ BOOL CERPresetCollection::EditPreset(CPreset *pPreset)
 	Dialog.Add(new CFarTextItem(5, 6, 0, MReplaceWith));
 	Dialog.Add(new CFarEditItem(5, 7, 74, DIF_HISTORY|DIF_VAREDIT,_T("ReplaceText"), pPreset->m_mapStrings["Replace"]));
 
-	Dialog.Add(new CFarCheckBoxItem(5, 9, 0, MRegExp, &pPreset->m_mapInts["IsRegExp"]));
+	Dialog.Add(new CFarCheckBoxItem(5,  9, 0, MRegExp, &pPreset->m_mapInts["IsRegExp"]));
 	Dialog.Add(new CFarCheckBoxItem(35, 9, 0, MSeveralLine, &pPreset->m_mapInts["SeveralLine"]));
 	Dialog.Add(new CFarCheckBoxItem(5, 10, 0, MCaseSensitive, &pPreset->m_mapInts["CaseSensitive"]));
-	Dialog.Add(new CFarCheckBoxItem(5, 11, 0, MRemoveEmpty, &pPreset->m_mapInts["RemoveEmpty"]));
-	Dialog.Add(new CFarCheckBoxItem(5, 12, 0, MRemoveNoMatch, &pPreset->m_mapInts["RemoveNoMatch"]));
-	Dialog.Add(new CFarCheckBoxItem(5, 13, 0, MEvaluateAsScript, &pPreset->m_mapInts["AsScript"]));
-	Dialog.Add(new CFarComboBoxItem(35, 13, 55, 0, new CFarListData(m_lstEngines, false), new CFarEngineStorage(pPreset->m_mapStrings["Script"])));
-	Dialog.Add(new CFarButtonItem(64, 13, 0, FALSE, MRunEditor));
+	Dialog.Add(new CFarCheckBoxItem(5, 11, 0, MReverseSearch,&pPreset->m_mapInts["Reverse"]));
+	Dialog.Add(new CFarCheckBoxItem(35,11, 0, MInSelection, &pPreset->m_mapInts["InSelection"]));
 
-	Dialog.Add(new CFarCheckBoxItem(5, 15, 0, MAddToMenu, &pPreset->m_bAddToMenu));
-	Dialog.Add(new CFarCheckBoxItem(5, 16, 0, MFromCurrentPosition, &pPreset->m_mapInts["FromCurrent"]));
+	Dialog.Add(new CFarCheckBoxItem(5, 12, 0, MRemoveEmpty, &pPreset->m_mapInts["RemoveEmpty"]));
+	Dialog.Add(new CFarCheckBoxItem(5, 13, 0, MRemoveNoMatch, &pPreset->m_mapInts["RemoveNoMatch"]));
+	Dialog.Add(new CFarCheckBoxItem(5, 14, 0, MEvaluateAsScript, &pPreset->m_mapInts["AsScript"]));
+	Dialog.Add(new CFarComboBoxItem(35,14, 60, 0, new CFarListData(m_lstEngines, false), new CFarEngineStorage(pPreset->m_mapStrings["Script"])));
+	Dialog.Add(new CFarButtonItem(64, 14, 0, FALSE, MRunEditor));
+
+	Dialog.Add(new CFarCheckBoxItem(5, 16, 0, MAddToMenu, &pPreset->m_bAddToMenu));
+	Dialog.Add(new CFarCheckBoxItem(5, 17, 0, MFromCurrentPosition, &pPreset->m_mapInts["FromCurrent"]));
 	Dialog.AddButtons(MOk, MCancel);
 
 	do {

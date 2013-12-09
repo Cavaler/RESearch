@@ -107,8 +107,7 @@ OperationResult EditorFilterExecutor()
 
 	EText = SearchText;
 
-	if (!EFromCurrentPosition) EditorSeekToBeginEnd();
-	EFromCurrentPosition = false;
+	EditorUpdatePresetPosition();
 
 	BOOL bResult = EditorFilterAgain();
 	StartupInfo.EditorControl(ECTL_REDRAW, NULL);
