@@ -47,7 +47,7 @@ BOOL SearchIn(const TCHAR *Line,int Start,int Length,int *MatchStart,int *MatchL
 	REParam.Clear();
 	REParam.AddSource(Line, Start+Length);
 
-	if (ERegExp) {
+	if (ERegExp && !EReverse) {
 		REParam.AddRE(EPattern);
 
 #ifdef UNICODE
@@ -59,7 +59,35 @@ BOOL SearchIn(const TCHAR *Line,int Start,int Length,int *MatchStart,int *MatchL
 			REParam.FillStartLength(MatchStart, MatchLength);
 			return TRUE;
 		}
-	} else {
+	}
+	else if (ERegExp && EReverse)
+	{
+		REParam.AddRE(EPattern);
+
+		//	Optimize for the case of no match at all
+#ifdef UNICODE
+		bool bFound = pcre16_exec(EPattern16,EPattern16Extra,(PCRE_SPTR16)Line,Start+Length,Start,0,REParam.Match(),REParam.Count()) >= 0;
+#else
+		bool bFound = pcre_exec(EPattern,EPatternExtra,Line,Start+Length,Start,0,REParam.Match(),REParam.Count()) >= 0;
+#endif
+		if (!bFound) return FALSE;
+
+		//	Look for last match
+		for (int Offset = Length-1; Offset >=0; Offset--) {
+#ifdef UNICODE
+			bFound = pcre16_exec(EPattern16,EPattern16Extra,(PCRE_SPTR16)Line,Start+Length,Start+Offset,0,REParam.Match(),REParam.Count()) >= 0;
+#else
+			bFound = pcre_exec(EPattern,EPatternExtra,Line,Start+Length,Start+Offset,0,REParam.Match(),REParam.Count()) >= 0;
+#endif
+			if (bFound && ((Offset == 0) || (REParam.Match()[0] > Offset))) {
+				MatchDone();
+				REParam.FillStartLength(MatchStart, MatchLength);
+				return TRUE;
+			}
+		}
+	}
+	else
+	{
 		TCHAR *Table = ECaseSensitive ? NULL : UpCaseTable;
 		int Position=(EReverse)?ReverseBMHSearch(Line+Start,Length,ETextUpcase.data(),ETextUpcase.length(),Table)
 									  :BMHSearch(Line+Start,Length,ETextUpcase.data(),ETextUpcase.length(),Table);
@@ -566,7 +594,7 @@ void FindIfClockPresent()
 
 void ShowCurrentLine(int CurLine,int TotalLines,int TotalColumns)
 {
-	if ((CurLine<LastLine) || (CurLine>=LastLine+1000) || (GetTickCount() > LastTickCount+250)) {
+	if ((CurLine < LastLine-1000) || (CurLine>=LastLine+1000) || (GetTickCount() > LastTickCount+250)) {
 		int Position = (ClockPresent) ? 19 : 25;
 		if (TotalColumns > 80) Position += (TotalColumns-81);
 #ifdef UNICODE
