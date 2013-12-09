@@ -818,7 +818,8 @@ void PerformRenumber(vector<tstring> &arrFileNames, vector<tstring> &arrProcesse
 	}
 }
 
-OperationResult RenumberFiles() {
+OperationResult RenumberFiles()
+{
 	CPanelInfo PInfo;
 	PInfo.GetInfo(false);
 	if (PInfo.PanelType != PTYPE_FILEPANEL) return OR_FAILED;
@@ -830,10 +831,10 @@ OperationResult RenumberFiles() {
 		arrFileNames.push_back(FarPanelFileName(PInfo.SelectedItems[nItem]));
 
 	int BreakKeys[] = {
-		VK_F2, VK_F7, (PKF_CONTROL<<16)|VK_UP, (PKF_CONTROL<<16)|VK_DOWN,
-		VK_ADD, (PKF_CONTROL<<16)|VK_ADD, (PKF_SHIFT<<16)|VK_ADD, (PKF_ALT<<16)|VK_ADD,
-		VK_SUBTRACT, (PKF_CONTROL<<16)|VK_SUBTRACT, (PKF_SHIFT<<16)|VK_SUBTRACT, (PKF_ALT<<16)|VK_SUBTRACT,
-		VK_F10, VK_INSERT, VK_DELETE, VK_F8, VK_F4, 0
+		VK_F2, VK_F4, VK_F7, VK_F8, VK_F10, VK_CTRL_UP, VK_CTRL_DOWN,
+		VK_ADD, VK_CTRL_ADD, VK_SHIFT_ADD, VK_ALT_ADD,
+		VK_SUBTRACT, VK_CTRL_SUBTRACT, VK_SHIFT_SUBTRACT, VK_ALT_SUBTRACT,
+		VK_INSERT, VK_DELETE, 0
 	};
 
 	bool bOriginal = false;
@@ -850,8 +851,8 @@ OperationResult RenumberFiles() {
 		if (nPosition >= nOK) nPosition++;
 
 		int nBreakKey = 0;
-		nPosition = ChooseMenu(arrNames, GetMsg(MRenumber), _T("F2, F4, F7, Ctrl-\x18\x19, F10=Go"), _T("Renumber"),
-			nPosition, FMENU_WRAPMODE, BreakKeys, &nBreakKey);
+		nPosition = ChooseMenu(arrNames, GetMsg(MRenumber), _T("F2, F4, F7, F8, Ctrl-\x18\x19, F10=Go"), _T("Renumber"),
+			nPosition, FMENU_WRAPMODE|FMENU_RETURNCODE, BreakKeys, &nBreakKey);
 		if (nPosition >= nOK) nPosition--; else
 			if (nPosition < 0) nPosition = -2;		// -1 is not Esc
 
@@ -869,17 +870,27 @@ OperationResult RenumberFiles() {
 				nPosition = ++nOK;
 			}
 			break;
-		case 0:
+		case VK_F2:
 			bOriginal = !bOriginal;
 			break;
-		case 1:{
+		case VK_F4:
+			ConfigureRenumbering(true);
+			WriteRegistry();
+			break;
+		case VK_F7:{
 			nOK = 0;
 			for (size_t nItem = 0; nItem < arrFileNames.size(); ) {
 				if (arrFileNames[nItem].empty()) arrFileNames.erase(arrFileNames.begin()+nItem); else nItem++;
 			}
 			break;
 			  }
-		case 2:
+		case VK_F8:
+			g_bStripCommon = !g_bStripCommon;
+			break;
+		case VK_F10:
+			PerformRenumber(arrFileNames, arrProcessedNames, AddSlash(tstring(PInfo.CurDir)).c_str());
+			return OR_OK;
+		case VK_CTRL_UP:
 			if (nPosition > nOK) {
 				tstring strPrev = arrFileNames[nPosition-1];
 				arrFileNames[nPosition-1] = arrFileNames[nPosition];
@@ -887,7 +898,7 @@ OperationResult RenumberFiles() {
 				nPosition--;
 			}
 			break;
-		case 3:
+		case VK_CTRL_DOWN:
 			if ((nPosition >= nOK) && (nPosition < (int)arrFileNames.size()-1)) {
 				tstring strNext = arrFileNames[nPosition+1];
 				arrFileNames[nPosition+1] = arrFileNames[nPosition];
@@ -895,50 +906,40 @@ OperationResult RenumberFiles() {
 				nPosition++;
 			}
 			break;
-		case 4:
+		case VK_ADD:
 			g_nStartWithNow++;
 			break;
-		case 5:
+		case VK_CTRL_ADD:
 			g_nStartWithNow+=10;
 			break;
-		case 6:
+		case VK_SHIFT_ADD:
 			g_nStartWithNow+=100;
 			break;
-		case 7:
+		case VK_ALT_ADD:
 			g_nStartWithNow+=1000;
 			break;
-		case 8:
+		case VK_SUBTRACT:
 			if (g_nStartWithNow > 0) g_nStartWithNow--;
 			break;
-		case 9:
+		case VK_CTRL_SUBTRACT:
 			if (g_nStartWithNow > 10) g_nStartWithNow -= 10; else g_nStartWithNow = 0;
 			break;
-		case 10:
+		case VK_SHIFT_SUBTRACT:
 			if (g_nStartWithNow > 100) g_nStartWithNow -= 100; else g_nStartWithNow = 0;
 			break;
-		case 11:
+		case VK_ALT_SUBTRACT:
 			if (g_nStartWithNow > 1000) g_nStartWithNow -= 1000; else g_nStartWithNow = 0;
 			break;
-		case 12:
-			PerformRenumber(arrFileNames, arrProcessedNames, AddSlash(tstring(PInfo.CurDir)).c_str());
-			return OR_OK;
-		case 13:
+		case VK_INSERT:
 			arrFileNames.insert(arrFileNames.begin()+nOK, _T(""));
 			nPosition = ++nOK;
 			break;
-		case 14:
+		case VK_DELETE:
 			if (nOK > 0) {
 				if (arrFileNames[nOK-1].empty()) arrFileNames.erase(arrFileNames.begin()+nOK-1);
 				nOK--;
 			}
 			nPosition = nOK;
-			break;
-		case 15:
-			g_bStripCommon = !g_bStripCommon;
-			break;
-		case 16:
-			ConfigureRenumbering(true);
-			WriteRegistry();
 			break;
 		}
 	} while (true);

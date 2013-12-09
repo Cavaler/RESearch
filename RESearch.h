@@ -4,6 +4,7 @@
 #undef _FAR_NO_NAMELESS_UNIONS
 #include <FAR.h>
 #include <FarDlg.h>
+#include <FarCombinedKeys.h>
 
 #include "RESearch_msg.h"
 
