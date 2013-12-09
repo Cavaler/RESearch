@@ -758,7 +758,9 @@ should be (previously selected files will be moved to a separate area)
   #F8#            Turn on/off stripping common part at the beginning of filenames
   #Ctrl-Up/Down#  Move file up/down
   #Gray +/-#      Change initial number up/down by 1
-  #Ctrl- Gray+/-# Change initial number up/down by 10
+  #Ctrl- Gray+/-#  Change initial number up/down by 10
+  #Shift- Gray+/-# Change initial number up/down by 100
+  #Alt- Gray+/-#   Change initial number up/down by 1000
   #F4#            Call options dialog
   #F10#           Perform rename
   #Esc#           Cancel
