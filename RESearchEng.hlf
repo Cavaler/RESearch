@@ -75,6 +75,7 @@ string, but a set of them. For full information, see included pcrepattern.html f
     #\b#      matches word boundary
     #\B#      matches not word boundary
     #\C#      matches any single character, #including# newline
+	#\R#      matches any newline sequence - \r, \n, or \r\n
     Also standard C metacharacters work (with '\n' matching only newline character).
 
     #?#     after a pattern matches it zero or one time
@@ -777,6 +778,7 @@ $ #Presets menu#
   #Enter#      to use highlighted preset
   #Ins#        to add a new preset (based on what was in the dialog you called menu from)
   #F4#         to edit highlighted preset
+  #F5#         to copy highlighted preset
   #Ctrl-Enter# to run highlighted preset
   #Del#        to delete highlighted preset
 @ESPresetDlg
