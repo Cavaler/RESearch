@@ -114,8 +114,9 @@ OperationResult EditorFilterExecutor()
 	return bResult ? OR_OK : OR_CANCEL;
 }
 
-BOOL CEFPresetCollection::EditPreset(CPreset *pPreset) {
-	CFarDialog Dialog(76,17,_T("EFPresetDlg"));
+BOOL CEFPresetCollection::EditPreset(CPreset *pPreset)
+{
+	CFarDialog Dialog(76,18,_T("EFPresetDlg"));
 	Dialog.AddFrame(MEFPreset);
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
 	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,_T("RESearch.PresetName"),pPreset->Name()));
@@ -127,8 +128,9 @@ BOOL CEFPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.Add(new CFarCheckBoxItem(5,8,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
 	Dialog.Add(new CFarRadioButtonItem(30,7,0,MLeaveMatching,&pPreset->m_mapInts["LeaveFilter"],TRUE));
 	Dialog.Add(new CFarRadioButtonItem(30,8,0,MRemoveMatching,&pPreset->m_mapInts["LeaveFilter"],FALSE));
-	Dialog.Add(new CFarCheckBoxItem(5,10,0,MAddToMenu,&pPreset->m_bAddToMenu));
-	Dialog.Add(new CFarCheckBoxItem(5,11,0,MFromCurrentPosition,&pPreset->m_mapInts["FromCurrent"]));
+	Dialog.Add(new CFarCheckBoxItem(5, 9, 0, MReverseSearch,&pPreset->m_mapInts["Reverse"]));
+	Dialog.Add(new CFarCheckBoxItem(5,11,0,MAddToMenu,&pPreset->m_bAddToMenu));
+	Dialog.Add(new CFarCheckBoxItem(5,12,0,MFromCurrentPosition,&pPreset->m_mapInts["FromCurrent"]));
 	Dialog.AddButtons(MOk,MCancel);
 
 	do {
