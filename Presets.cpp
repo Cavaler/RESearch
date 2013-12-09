@@ -231,7 +231,7 @@ void CPresetCollection::Save()
 
 int CPresetCollection::ShowMenu(bool bExecute, int nDefaultID)
 {
-	int piBreakKeys[]={VK_INSERT, VK_DELETE, VK_F4, VK_F5, (PKF_CONTROL<<16)|VK_UP, (PKF_CONTROL<<16)|VK_DOWN, (PKF_CONTROL<<16)|VK_RETURN, 0};
+	int piBreakKeys[]={VK_INSERT, VK_ADD, VK_DELETE, VK_F4, VK_F5, (PKF_CONTROL<<16)|VK_UP, (PKF_CONTROL<<16)|VK_DOWN, (PKF_CONTROL<<16)|VK_RETURN, 0};
 	vector<tstring> arrItems;
 
 	do {
@@ -254,9 +254,11 @@ int CPresetCollection::ShowMenu(bool bExecute, int nDefaultID)
 			if (nResult >= (int)size()) break;	//	Enter in empty menu or last item
 			if (bExecute && (nResult >= 0)) at(nResult)->Apply();
 			return nResult;
-		case 0:{		//	VK_INSERT
+		case 0:
+		case 1:{		//	VK_INSERT
 			CPreset *pPreset = NewPreset();
 			if (EditPreset(pPreset)) {
+				if (nBreakKey == 1) m_nCurrent = size();
 				pPreset->m_nID = FindUnusedID();
 				insert(begin() + m_nCurrent, pPreset);
 				Save();
@@ -265,7 +267,7 @@ int CPresetCollection::ShowMenu(bool bExecute, int nDefaultID)
 			}
 			break;
 			  }
-		case 1:			//	VK_DELETE
+		case 2:			//	VK_DELETE
 			if (m_nCurrent < size()) {
 				const TCHAR *Lines[]={_T("Delete"), GetMsg(MDeletePresetQuery),
 					at(m_nCurrent)->Name().c_str(), GetMsg(MOk), GetMsg(MCancel)};
@@ -276,12 +278,12 @@ int CPresetCollection::ShowMenu(bool bExecute, int nDefaultID)
 				}
 			}
 			break;
-		case 2:			//	VK_F4
+		case 3:			//	VK_F4
 			if (m_nCurrent < size()) {
 				if (EditPreset(at(m_nCurrent))) Save();
 			}
 			break;
-		case 3:			//	VK_F5
+		case 4:			//	VK_F5
 			if (m_nCurrent < size()) {
 				CPreset *pPreset = NewPreset();
 				pPreset->CopyFrom(*at(m_nCurrent));
@@ -293,7 +295,7 @@ int CPresetCollection::ShowMenu(bool bExecute, int nDefaultID)
 				}
 			}
 			break;
-		case 4:			//	VK_CTRL_UP
+		case 5:			//	VK_CTRL_UP
 			if (m_nCurrent > 0) {
 				CPreset *pPreset = at(m_nCurrent-1);
 				at(m_nCurrent-1) = at(m_nCurrent);
@@ -302,7 +304,7 @@ int CPresetCollection::ShowMenu(bool bExecute, int nDefaultID)
 				m_nCurrent--;
 			}
 			break;
-		case 5:			//	VK_CTRL_DOWN
+		case 6:			//	VK_CTRL_DOWN
 			if (m_nCurrent < size()-1) {
 				CPreset *pPreset = at(m_nCurrent+1);
 				at(m_nCurrent+1) = at(m_nCurrent);
@@ -311,7 +313,7 @@ int CPresetCollection::ShowMenu(bool bExecute, int nDefaultID)
 				m_nCurrent++;
 			}
 			break;
-		case 6:			//	VK_CTRLENTER
+		case 7:			//	VK_CTRLENTER
 			if (m_nCurrent < size()) {
 				at(m_nCurrent)->ExecutePreset();
 			}
@@ -510,7 +512,7 @@ int CountPresets(CBatchActionCollection &Coll, CPreset *pPreset)
 
 bool CBatchAction::EditItems()
 {
-	int piBreakKeys[] = {VK_INSERT, (PKF_CONTROL<<16)|VK_UP, (PKF_CONTROL<<16)|VK_DOWN, VK_DELETE, VK_F4,
+	int piBreakKeys[] = {VK_INSERT, VK_ADD, (PKF_CONTROL<<16)|VK_UP, (PKF_CONTROL<<16)|VK_DOWN, VK_DELETE, VK_F4,
 		(PKF_CONTROL<<16)|VK_RETURN, ((PKF_CONTROL|PKF_ALT)<<16)|VK_RETURN, 0};
 
 	//	Clean-up nonexistent presets
@@ -544,15 +546,17 @@ bool CBatchAction::EditItems()
 		switch (nBreakKey) {
 		case -1:
 			return size() > 0;
-		case 0:{		//	VK_INSERT
+		case 0:
+		case 1:{		//	VK_INSERT
 			BatchActionIndex NewIndex = m_Type.SelectPreset();
 			if (NewIndex != NO_BATCH_INDEX) {
+				if (nBreakKey == 1) m_nCurrent = size();
 				insert(begin() + m_nCurrent, NewIndex);
 				arrExecuted.insert(arrExecuted.begin() + m_nCurrent, false);
 			}
 			break;
 			   }
-		case 1:			//	VK_CTRL_UP
+		case 2:			//	VK_CTRL_UP
 			if (m_nCurrent > 0) {
 				value_type nSave = at(m_nCurrent-1);
 				at(m_nCurrent-1) = at(m_nCurrent);
@@ -560,7 +564,7 @@ bool CBatchAction::EditItems()
 				m_nCurrent--;
 			}
 			break;
-		case 2:			//	VK_CTRL_DOWN
+		case 3:			//	VK_CTRL_DOWN
 			if (m_nCurrent < size()-1) {
 				value_type nSave = at(m_nCurrent+1);
 				at(m_nCurrent+1) = at(m_nCurrent);
@@ -568,13 +572,13 @@ bool CBatchAction::EditItems()
 				m_nCurrent++;
 			}
 			break;
-		case 3:			//	VK_DEL
+		case 4:			//	VK_DEL
 			if (m_nCurrent < size()) {
 				erase(begin() + m_nCurrent);
 				arrExecuted.erase(arrExecuted.begin() + m_nCurrent);
 			}
 			break;
-		case 4:			//	VK_F4
+		case 5:			//	VK_F4
 			if (m_nCurrent < size()) {
 
 				BatchActionIndex Index = at(m_nCurrent);
@@ -591,7 +595,7 @@ bool CBatchAction::EditItems()
 					pColl->Save();
 			}
 			break;
-		case 5:			//	VK_CTRLENTER
+		case 6:			//	VK_CTRLENTER
 			if (m_nCurrent < size()) {
 				BatchActionIndex Index = at(m_nCurrent);
 				CPresetCollection *pColl = m_Type(Index.first);
@@ -602,7 +606,7 @@ bool CBatchAction::EditItems()
 				pPreset->ExecutePreset();
 			}
 			break;
-		case 6:			//	VK_CTRLALTENTER
+		case 7:			//	VK_CTRLALTENTER
 			for (size_t nPreset = 0; (nPreset <= m_nCurrent) && (nPreset < size()); nPreset++) {
 				BatchActionIndex Index = at(nPreset);
 				CPresetCollection *pColl = m_Type(Index.first);
@@ -653,8 +657,9 @@ void CBatchActionCollection::Save(CFarSettingsKey &hKey)
 	}
 }
 
-void CBatchActionCollection::ShowMenu() {
-	int piBreakKeys[]={VK_INSERT, VK_DELETE, VK_F4, VK_F6, (PKF_CONTROL<<16)|VK_UP, (PKF_CONTROL<<16)|VK_DOWN, 0};
+void CBatchActionCollection::ShowMenu()
+{
+	int piBreakKeys[]={VK_INSERT, VK_ADD, VK_DELETE, VK_F4, VK_F6, (PKF_CONTROL<<16)|VK_UP, (PKF_CONTROL<<16)|VK_DOWN, 0};
 	vector<tstring> arrItems;
 
 	do {
@@ -682,18 +687,20 @@ void CBatchActionCollection::ShowMenu() {
 			}
 
 			return;
-		case 0:{		//	VK_INSERT
+		case 0:
+		case 1:{		//	VK_INSERT
 			CBatchAction *pBatch = new CBatchAction(m_Type);
 			pBatch->m_strName = _T("New Batch");
 			if (pBatch->EditProperties()) {
-				insert(begin()+((m_nCurrent >= 0) ? m_nCurrent : 0), pBatch);
+				if (nBreakKey == 1) m_nCurrent = size();
+				insert(begin()+m_nCurrent, pBatch);
 				WriteRegistry();
 			} else {
 				delete pBatch;
 			}
 			break;
 			   }
-		case 1:			//	VK_DELETE
+		case 2:			//	VK_DELETE
 			if (m_nCurrent < size()) {
 				const TCHAR *Lines[]={_T("Delete"), GetMsg(MDeleteBatchQuery),
 					at(m_nCurrent)->m_strName.c_str(), GetMsg(MOk), GetMsg(MCancel)};
@@ -704,19 +711,19 @@ void CBatchActionCollection::ShowMenu() {
 				}
 			}
 			break;
-		case 2:			//	VK_F4
+		case 3:			//	VK_F4
 			if (m_nCurrent < size()) {
 				at(m_nCurrent)->EditItems();
 				WriteRegistry();
 			}
 			break;
-		case 3:			//	VK_F6
+		case 4:			//	VK_F6
 			if (m_nCurrent < size()) {
 				at(m_nCurrent)->EditProperties();
 				WriteRegistry();
 			}
 			break;
-		case 4:			//	VK_CTRL_UP
+		case 5:			//	VK_CTRL_UP
 			if (m_nCurrent > 0) {
 				CBatchAction *pBatch = at(m_nCurrent-1);
 				at(m_nCurrent-1) = at(m_nCurrent);
@@ -725,7 +732,7 @@ void CBatchActionCollection::ShowMenu() {
 				m_nCurrent--;
 			}
 			break;
-		case 5:			//	VK_CTRL_DOWN
+		case 6:			//	VK_CTRL_DOWN
 			if (m_nCurrent < size()-1) {
 				CBatchAction *pBatch = at(m_nCurrent+1);
 				at(m_nCurrent+1) = at(m_nCurrent);
