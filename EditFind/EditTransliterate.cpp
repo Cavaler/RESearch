@@ -110,7 +110,7 @@ BOOL EditorTransliterate()
 		default:
 			return FALSE;
 		}
-	} while (!IsOKApply(ExitCode));
+	} while (!IsOKClose(ExitCode));
 
 	ETSource = SearchText;
 	ETTarget = ReplaceText;

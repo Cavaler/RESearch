@@ -232,7 +232,7 @@ BOOL ViewerSearch()
 		default:
 			return FALSE;
 		}
-	} while (!IsOKApply(ExitCode) || !EPreparePattern(SearchText));
+	} while (!IsOKClose(ExitCode) || !EPreparePattern(SearchText));
 
 	EText=SearchText;
 	if ((ExitCode == MOk) && !EText.empty()) ViewerSearchAgain();

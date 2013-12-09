@@ -170,7 +170,7 @@ int SearchPrompt(BOOL Plugin)
 		default:
 			return FALSE;
 		}
-	} while (!IsOKApply(ExitCode) || !PrepareFileSearchPattern());
+	} while (!IsOKClose(ExitCode) || !PrepareFileSearchPattern());
 
 	return (ExitCode == MOk);
 }

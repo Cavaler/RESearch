@@ -886,7 +886,7 @@ size_t MakeSameWidth(vector<tstring> &arrQuoted)
 	return nMaxLength;
 }
 
-bool IsOKApply(int ExitCode)
+bool IsOKClose(int ExitCode)
 {
 	return (ExitCode == MOk) || (ExitCode == MBtnClose);
 }

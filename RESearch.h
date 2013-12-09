@@ -137,7 +137,7 @@ size_t QuoteStrings(const TCHAR *Source, vector<tstring> &arrQuoted, int MaxWidt
 
 size_t MakeSameWidth(vector<tstring> &arrQuoted);
 
-bool IsOKApply(int ExitCode);
+bool IsOKClose(int ExitCode);
 
 #ifdef UNICODE
 EXTERN TCHAR UpCaseTable[65537];

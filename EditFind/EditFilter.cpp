@@ -91,7 +91,7 @@ BOOL EditorFilter()
 		default:
 			return FALSE;
 		}
-	} while (!IsOKApply(ExitCode) || !EPreparePattern(SearchText));
+	} while (!IsOKClose(ExitCode) || !EPreparePattern(SearchText));
 
 	EText=SearchText;
 	g_bInterrupted = FALSE;

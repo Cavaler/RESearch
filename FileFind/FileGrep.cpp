@@ -372,7 +372,7 @@ bool GrepPrompt(BOOL bPlugin)
 		default:
 			return false;
 		}
-	} while (!IsOKApply(ExitCode) || !PrepareFileGrepPattern() || (!FGOutputToFile && !FGOpenInEditor));
+	} while (!IsOKClose(ExitCode) || !PrepareFileGrepPattern() || (!FGOutputToFile && !FGOpenInEditor));
 
 	return (ExitCode == MOk);
 }

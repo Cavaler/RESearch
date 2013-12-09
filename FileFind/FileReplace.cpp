@@ -436,7 +436,7 @@ int ReplacePrompt(BOOL Plugin)
 		default:
 			return FALSE;
 		}
-	} while (!IsOKApply(ExitCode) || !PrepareFileReplacePattern());
+	} while (!IsOKClose(ExitCode) || !PrepareFileReplacePattern());
 
 	return (ExitCode == MOk);
 }

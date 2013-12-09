@@ -501,7 +501,7 @@ BOOL RenameFilesPrompt()
 		default:
 			return FALSE;
 		}
-	} while (!IsOKApply(ExitCode) || !FPreparePattern(false));
+	} while (!IsOKClose(ExitCode) || !FPreparePattern(false));
 
 	return (ExitCode == MOk);
 }
@@ -677,7 +677,7 @@ BOOL RenameSelectedFilesPrompt() {
 		default:
 			return FALSE;
 		}
-	} while (!IsOKApply(ExitCode) || !FPreparePattern(false));
+	} while (!IsOKClose(ExitCode) || !FPreparePattern(false));
 
 	return (ExitCode == MOk);
 }
