@@ -776,7 +776,8 @@ $ #Presets menu#
  In this menu you can see current presets for the given search/replace/rename operation. Press:
 
   #Enter#      to use highlighted preset
-  #Ins#        to add a new preset (based on what was in the dialog you called menu from)
+  #Ins#        to insert a new preset (based on what was in the dialog you called menu from)
+  #NumPlus#    to add a new preset at the end
   #F4#         to edit highlighted preset
   #F5#         to copy highlighted preset
   #Ctrl-Enter# to run highlighted preset
@@ -839,7 +840,8 @@ $ #Batches menu#
 
  Commands:
   #Enter#      Run highlighted batch
-  #Ins#        Add a new batch
+  #Ins#        Insert a new batch
+  #NumPlus#    Add a new batch
   #F4#         Edit highlighted batch
   #F6#         Rename current batch, or change other options
   #Del#        Delete highlighted batch
@@ -848,7 +850,8 @@ $ #Batch menu#
  Here you can see a sequence of presets to be run when the batch is selected.
 
  Commands:
-  #Ins#            Add a new preset to a batch
+  #Ins#            Insert a new preset to a batch
+  #NumPlus#        Add a new preset to a batch
   #Del#            Remove preset from a batch
   #Ctrl-#        Move preset up/down in a batch
   #F4#             Edit selected preset
