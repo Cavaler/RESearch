@@ -18,6 +18,8 @@ Some non-obvious aspects of RESearch usage are explained here.
 - Multi-line search/replace from panels feeds the whole file to RegExp engine, therefore
   actual newline symbols are to be used. '\r?\n' is good for most cases.
 
+- Or, you can use '\R' and don't bother about newline sequences at all.
+
 - Multi-line replace from panels has some file size limits: 256Mb for x86 and 1Tb for x64
   If file exceeds it, several-line replace is used. Also, if file is below the limit but buffer
   for the original and decoded file cannot be allocated, file is processed in chunks without
