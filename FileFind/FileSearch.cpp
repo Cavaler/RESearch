@@ -141,7 +141,7 @@ int SearchPrompt(BOOL Plugin)
 		Dialog.Add(new CFarComboBoxItem(15,17,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearch, false),(int *)&FSearchIn));
 	}
 
-	Dialog.AddButtons(MOk,MCancel,MBtnApply);
+	Dialog.AddButtons(MOk,MCancel,MBtnClose);
 	Dialog.Add(new CFarButtonItem(60,19,0,0,MBtnPresets));
 
 	Dialog.SetFocus(MMask, 1);
@@ -153,7 +153,7 @@ int SearchPrompt(BOOL Plugin)
 	do {
 		switch (ExitCode=Dialog.Display(-1)) {
 		case MOk:
-		case MBtnApply:
+		case MBtnClose:
 			FMask=MaskText;
 			FText=SearchText;
 			break;

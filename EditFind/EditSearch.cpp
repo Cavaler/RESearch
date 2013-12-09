@@ -306,7 +306,7 @@ BOOL EditorSearch()
 	Dialog.Add(new CFarCheckBoxItem(5,7,0,MReverseSearch,&EReverse));
 	Dialog.Add(new CFarCheckBoxItem(35,7,(EdInfo.BlockType != BTYPE_NONE) ? 0 : DIF_DISABLE, MInSelection, &EInSelection));
 	Dialog.Add(new CFarCheckBoxItem(5,8,0,MIncrementalSearch,&EIncremental));
-	Dialog.AddButtons(MOk, MShowAll, MCancel, MBtnApply);
+	Dialog.AddButtons(MOk, MShowAll, MCancel, MBtnClose);
 	Dialog.Add(new CFarButtonItem(64,10,0,0,MBtnPresets));
 
 	SearchText=PickupText();
@@ -316,7 +316,7 @@ BOOL EditorSearch()
 		switch (ExitCode=Dialog.Display()) {
 		case MOk:
 		case MShowAll:
-		case MBtnApply:
+		case MBtnClose:
 			break;
 		case MQuoteSearch:
 			if (ERegExp) CSO::QuoteRegExpString(SearchText);
@@ -330,12 +330,12 @@ BOOL EditorSearch()
 		default:
 			return FALSE;
 		}
-	} while (((ExitCode != MOk) && (ExitCode != MShowAll) && (ExitCode != MBtnApply)) || !EPreparePattern(SearchText));
+	} while (((ExitCode != MOk) && (ExitCode != MShowAll) && (ExitCode != MBtnClose)) || !EPreparePattern(SearchText));
 
 	EText=SearchText;
 	g_bInterrupted=FALSE;
 
-	if ((ExitCode != MBtnApply) && !EText.empty())
+	if ((ExitCode != MBtnClose) && !EText.empty())
 		(ExitCode == MOk) ? EditorSearchAgain() : EditorListAllAgain();
 
 	return TRUE;

@@ -638,7 +638,7 @@ BOOL EditorReplace()
 	Dialog.Add(new CFarComboBoxItem(35, 12, 60, 0, new CFarListData(m_lstEngines, false), new CFarEngineStorage(EREvaluateScript)));
 	Dialog.Add(new CFarButtonItem(64, 12, 0, FALSE, MRunEditor));
 
-	Dialog.AddButtons(MReplace,MAll,MCancel,MBtnApply);
+	Dialog.AddButtons(MReplace,MAll,MCancel,MBtnClose);
 	Dialog.Add(new CFarButtonItem(64, 14, 0, FALSE, MBtnPresets));
 
 	SearchText = PickupText();
@@ -650,7 +650,7 @@ BOOL EditorReplace()
 		switch (ExitCode = Dialog.Display()) {
 		case MReplace:
 		case MAll:
-		case MBtnApply:
+		case MBtnClose:
 			break;
 		case MQuoteSearch:
 			if (ERegExp) CSO::QuoteRegExpString(SearchText);
@@ -675,7 +675,7 @@ BOOL EditorReplace()
 		case -1:
 			return FALSE;
 		}
-	} while (((ExitCode != MReplace) && (ExitCode != MAll)&& (ExitCode != MBtnApply)) || !EPreparePattern(SearchText));
+	} while (((ExitCode != MReplace) && (ExitCode != MAll)&& (ExitCode != MBtnClose)) || !EPreparePattern(SearchText));
 
 	EText = SearchText;
 #ifdef UNICODE
@@ -690,7 +690,7 @@ BOOL EditorReplace()
 	g_bInterrupted = FALSE;
 	REParam.m_setInitParam.clear();
 
-	if ((ExitCode != MBtnApply) && !EText.empty()) EditorReplaceAgain();
+	if ((ExitCode != MBtnClose) && !EText.empty()) EditorReplaceAgain();
 	return TRUE;
 }
 

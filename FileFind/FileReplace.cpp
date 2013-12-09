@@ -407,7 +407,7 @@ int ReplacePrompt(BOOL Plugin)
 	do {
 		switch (ExitCode=Dialog.Display()) {
 		case MOk:
-		case MBtnApply:
+		case MBtnClose:
 			FMask=MaskText;
 			FText=SearchText;
 			FRReplace=ReplaceText;

@@ -210,7 +210,7 @@ BOOL ViewerSearch()
 	Dialog.Add(new CFarCheckBoxItem(30,5,DIF_DISABLE,MSeveralLine,&ESeveralLine));
 	Dialog.Add(new CFarCheckBoxItem(5,6,0,MCaseSensitive,&ECaseSensitive));
 	Dialog.Add(new CFarCheckBoxItem(5,7,DIF_DISABLE,MReverseSearch,&EReverse));
-	Dialog.AddButtons(MOk,MCancel,MBtnApply);
+	Dialog.AddButtons(MOk,MCancel,MBtnClose);
 	Dialog.Add(new CFarButtonItem(60,9,0,0,MBtnPresets));
 
 	SearchText = EText;
@@ -221,7 +221,7 @@ BOOL ViewerSearch()
 	do {
 		switch (ExitCode=Dialog.Display()) {
 		case MOk:
-		case MBtnApply:
+		case MBtnClose:
 			break;
 		case MQuoteSearch:
 			if (ERegExp) CSO::QuoteRegExpString(SearchText);

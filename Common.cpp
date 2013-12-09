@@ -888,7 +888,7 @@ size_t MakeSameWidth(vector<tstring> &arrQuoted)
 
 bool IsOKApply(int ExitCode)
 {
-	return (ExitCode == MOk) || (ExitCode == MBtnApply);
+	return (ExitCode == MOk) || (ExitCode == MBtnClose);
 }
 
 hack_string::hack_string(const char *szData, size_t nSize) {

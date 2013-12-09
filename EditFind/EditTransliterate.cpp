@@ -93,7 +93,7 @@ BOOL EditorTransliterate()
 
 	Dialog.Add(new CFarCheckBoxItem(5, 7, (EdInfo.BlockType != BTYPE_NONE) ? 0 : DIF_DISABLE, MInSelection, &EInSelection));
 
-	Dialog.AddButtons(MOk, MCancel, MBtnApply);
+	Dialog.AddButtons(MOk, MCancel, MBtnClose);
 	Dialog.Add(new CFarButtonItem(60,9,0,0,MBtnPresets));
 
 	SearchText = ETSource;

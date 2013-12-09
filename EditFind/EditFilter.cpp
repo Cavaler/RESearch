@@ -71,7 +71,7 @@ BOOL EditorFilter()
 	Dialog.Add(new CFarCheckBoxItem(5,7,0,MReverseSearch,&EReverse));
 	Dialog.Add(new CFarRadioButtonItem(30,5,0,MLeaveMatching,&EFLeaveFilter,TRUE));
 	Dialog.Add(new CFarRadioButtonItem(30,6,0,MRemoveMatching,&EFLeaveFilter,FALSE));
-	Dialog.AddButtons(MOk,MCancel,MBtnApply);
+	Dialog.AddButtons(MOk,MCancel,MBtnClose);
 	Dialog.Add(new CFarButtonItem(62,9,0,0,MBtnPresets));
 
 	SearchText=PickupText();
@@ -80,7 +80,7 @@ BOOL EditorFilter()
 	do {
 		switch (ExitCode=Dialog.Display()) {
 		case MOk:
-		case MBtnApply:
+		case MBtnClose:
 			break;
 		case MQuoteSearch:
 			if (ERegExp) CSO::QuoteRegExpString(SearchText);

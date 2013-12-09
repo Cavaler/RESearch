@@ -464,7 +464,7 @@ BOOL RenameFilesPrompt()
 	Dialog.Add(new CFarCheckBoxItem(5,13,0,MConfirmFile,  &FRConfirmFile));
 	Dialog.Add(new CFarCheckBoxItem(5,14,0,MConfirmLine,  &FRConfirmLine));
 	Dialog.Add(new CFarCheckBoxItem(5,15,0,MPreviewRename,&FRPreviewRename));
-	Dialog.AddButtons(MOk,MCancel,MBtnApply);
+	Dialog.AddButtons(MOk,MCancel,MBtnClose);
 	Dialog.Add(new CFarButtonItem(60,17,0,0,MBtnPresets));
 	Dialog.SetFocus(MMask, 1);
 
@@ -479,7 +479,7 @@ BOOL RenameFilesPrompt()
 	do {
 		switch (ExitCode=Dialog.Display()) {
 		case MOk:
-		case MBtnApply:
+		case MBtnClose:
 			FMask=MaskText;
 			FText=SearchText;
 			FRReplace=ReplaceText;
@@ -648,7 +648,7 @@ BOOL RenameSelectedFilesPrompt() {
 	Dialog.Add(new CFarCheckBoxItem(5,7,0,MConfirmLine,&FRConfirmLine));
 	Dialog.Add(new CFarCheckBoxItem(5,8,0,MLeaveSelection,&FRLeaveSelection));
 	Dialog.Add(new CFarCheckBoxItem(5,9,0,MPreviewRename,&FRPreviewRename));
-	Dialog.AddButtons(MOk,MCancel,MBtnApply);
+	Dialog.AddButtons(MOk,MCancel,MBtnClose);
 	Dialog.Add(new CFarButtonItem(60,11,0,0,MBtnPresets));
 	Dialog.SetFocus(MText, 1);
 
@@ -662,7 +662,7 @@ BOOL RenameSelectedFilesPrompt() {
 	do {
 		switch (ExitCode=Dialog.Display()) {
 		case MOk:
-		case MBtnApply:
+		case MBtnClose:
 			FText=SearchText;
 			FRReplace=ReplaceText;
 			break;

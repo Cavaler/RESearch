@@ -339,7 +339,7 @@ bool GrepPrompt(BOOL bPlugin)
 	Dialog.Add(new CFarTextItem(5,21,0,MSearchIn));
 	Dialog.Add(new CFarComboBoxItem(15,21,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearch, false),(int *)&FSearchIn));
 
-	Dialog.AddButtons(MOk,MCancel,MBtnApply);
+	Dialog.AddButtons(MOk,MCancel,MBtnClose);
 	Dialog.Add(new CFarButtonItem(60,24,0,0,MBtnPresets));
 	Dialog.Add(new CFarCheckBoxItem(56,11,0,_T(""),&FAdvanced));
 	Dialog.SetFocus(MMask, 1);
@@ -352,7 +352,7 @@ bool GrepPrompt(BOOL bPlugin)
 	do {
 		switch (ExitCode=Dialog.Display()) {
 		case MOk:
-		case MBtnApply:
+		case MBtnClose:
 			FSearchAs = AsRegExp ? SA_REGEXP : SA_PLAINTEXT;
 			FMask=MaskText;
 			FText=SearchText;
