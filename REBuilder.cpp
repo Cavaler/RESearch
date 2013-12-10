@@ -108,13 +108,13 @@ LONG_PTR WINAPI REBuilderDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LON
 			if (record->Event.KeyEvent.wVirtualKeyCode == VK_RETURN) {
 				pData->nCurrentPart = -1;
 				UpdateStrings(pDlg, pData);
-				return TRUE;
+				return true;
 			}
 			if (record->Event.KeyEvent.wVirtualKeyCode == VK_ESCAPE) {
 				pData->nCurrentPart = -1;
 				pData->mapParts.clear();
 				UpdateStrings(pDlg, pData);
-				return TRUE;
+				return true;
 			}
 		}
 		break;
@@ -123,13 +123,13 @@ LONG_PTR WINAPI REBuilderDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LON
 		if ((nParam1 == 2) && (lParam2 == KEY_ENTER)) {
 			pData->nCurrentPart = -1;
 			UpdateStrings(pDlg, pData);
-			return TRUE;
+			return true;
 		}
 		if ((nParam1 == 2) && (lParam2 == KEY_ESC)) {
 			pData->nCurrentPart = -1;
 			pData->mapParts.clear();
 			UpdateStrings(pDlg, pData);
-			return TRUE;
+			return true;
 		}
 		break;
 #endif

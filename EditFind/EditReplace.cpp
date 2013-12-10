@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "..\RESearch.h"
 
-BOOL NoAsking;
+bool NoAsking;
 int  ReplaceStartLine;
 enum eReplaceResult {RR_OK, RR_SKIP, RR_CANCEL};
 
@@ -81,7 +81,7 @@ void DoEditReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, cons
 	RefreshEditorInfo();
 	CEditorSetString SetString(-1, NewString.c_str(), NULL);
 
-	while (TRUE) {
+	while (true) {
 		const TCHAR *CR = (const TCHAR *)_tmemchr(SetString.StringText, '\r', NewString.length());
 		const TCHAR *LF = (const TCHAR *)_tmemchr(SetString.StringText, '\n', NewString.length());
 		const TCHAR *EOL, *NextLine;
@@ -311,7 +311,7 @@ eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &
 
 	switch (Result) {
 	case 1:
-		NoAsking = TRUE;
+		NoAsking = true;
 		bShowNoFound = false;
 		Select.BlockType = BTYPE_NONE;
 		StartupInfo.EditorControl(ECTL_SELECT, &Select);
@@ -327,23 +327,23 @@ eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &
 		return RR_SKIP;
 	default:
 		g_bInterrupted = true;
-		NoAsking = TRUE;
+		NoAsking = true;
 		return RR_CANCEL;
 	}
 }
 
-BOOL ReplaceInText(int FirstLine, int StartPos, int LastLine, int EndPos)
+bool ReplaceInText(int FirstLine, int StartPos, int LastLine, int EndPos)
 {
 	do {
 		int MatchFirstLine = FirstLine, MatchStartPos = StartPos;
 		int MatchLastLine = LastLine, MatchEndPos = EndPos;
-		if (!SearchInText(MatchFirstLine, MatchStartPos, MatchLastLine, MatchEndPos)) return FALSE;
+		if (!SearchInText(MatchFirstLine, MatchStartPos, MatchLastLine, MatchEndPos)) return false;
 
 		// Assuming that MatchedLine starts from the needed line
 		RefreshEditorInfo();
 
 		int FoundLastLine = MatchLastLine;
-		BOOL ZeroMatch = (MatchFirstLine == MatchLastLine)&&(MatchStartPos == MatchEndPos);
+		bool ZeroMatch = (MatchFirstLine == MatchLastLine)&&(MatchStartPos == MatchEndPos);
 
 		REParam.AddENumbers(MatchFirstLine, MatchFirstLine-ReplaceStartLine, FindNumber, ReplaceNumber);
 #ifdef UNICODE
@@ -351,7 +351,7 @@ BOOL ReplaceInText(int FirstLine, int StartPos, int LastLine, int EndPos)
 #else
 		string Replace_O2E = CSO::CreateReplaceString(ERReplace_O2E.c_str(),"\n", ScriptEngine(EREvaluate), REParam);
 #endif
-		if (g_bInterrupted) return FALSE;	// Script failed
+		if (g_bInterrupted) return false;	// Script failed
 
 #ifdef UNICODE
 		eReplaceResult Result = EditorReplaceOK(MatchFirstLine, MatchStartPos, MatchLastLine, MatchEndPos, REParam.m_szString, Replace);
@@ -367,7 +367,7 @@ BOOL ReplaceInText(int FirstLine, int StartPos, int LastLine, int EndPos)
 		eReplaceResult Result = EditorReplaceOK(MatchFirstLine, MatchStartPos, MatchLastLine, MatchEndPos, Original.c_str(), Replace, Replace_O2E);
 #endif
 
-		if (Result == RR_CANCEL) return TRUE;
+		if (Result == RR_CANCEL) return true;
 		if (!EReverse) LastLine += MatchLastLine-FoundLastLine;
 
 		if (EReverse) {
@@ -377,23 +377,23 @@ BOOL ReplaceInText(int FirstLine, int StartPos, int LastLine, int EndPos)
 		}
 
 		FindNumber++;
-	} while (TRUE);
+	} while (true);
 
-	return FALSE;
+	return false;
 }
 
-BOOL ReplaceInTextByLine(int FirstLine, int StartPos, int LastLine, int EndPos, BOOL EachLineLimited)
+bool ReplaceInTextByLine(int FirstLine, int StartPos, int LastLine, int EndPos, bool EachLineLimited)
 {
 	int Line = (EReverse)?LastLine:FirstLine;
 
 	do {
-		BOOL Matched = FALSE;
+		bool Matched = false;
 		int MatchFirstLine = Line, MatchStartPos = (Line == FirstLine)||EachLineLimited?StartPos:0;
 		int MatchLastLine = Line, MatchEndPos = (Line == LastLine)||EachLineLimited?EndPos:-1;
 		int FoundStartPos = MatchStartPos, FoundEndPos = MatchEndPos;
 
 		while (SearchInText(MatchFirstLine, FoundStartPos, MatchLastLine, FoundEndPos, bCachedReplace)) {
-			Matched = TRUE;
+			Matched = true;
 			// Assuming that MatchedLine starts from the needed line
 			RefreshEditorInfo();
 
@@ -403,7 +403,7 @@ BOOL ReplaceInTextByLine(int FirstLine, int StartPos, int LastLine, int EndPos, 
 #else
 			string Replace_O2E = CSO::CreateReplaceString(ERReplace_O2E.c_str(),"\n", ScriptEngine(EREvaluate), REParam);
 #endif
-			if (g_bInterrupted) return FALSE;	// Script failed
+			if (g_bInterrupted) return false;	// Script failed
 
 #ifndef UNICODE
 			string Replace = Replace_O2E;
@@ -414,14 +414,14 @@ BOOL ReplaceInTextByLine(int FirstLine, int StartPos, int LastLine, int EndPos, 
 
 			int TailLength = MatchEndPos-FoundEndPos;
 			int FoundLastLine = MatchLastLine;
-			BOOL ZeroMatch = (FoundStartPos == FoundEndPos);
+			bool ZeroMatch = (FoundStartPos == FoundEndPos);
 #ifdef UNICODE
 			eReplaceResult Result = EditorReplaceOK(MatchFirstLine, FoundStartPos, MatchLastLine, FoundEndPos, REParam.m_szString, Replace);
 #else
 			eReplaceResult Result = EditorReplaceOK(MatchFirstLine, FoundStartPos, MatchLastLine, FoundEndPos, Original.c_str(), Replace, Replace_O2E);
 #endif
 
-			if (Result == RR_CANCEL) return TRUE;
+			if (Result == RR_CANCEL) return true;
 			if (!EReverse) LastLine += MatchLastLine-FoundLastLine;
 
 			if (ERRemoveEmpty && (Result == RR_OK) && (MatchFirstLine == MatchLastLine)) {
@@ -473,16 +473,16 @@ BOOL ReplaceInTextByLine(int FirstLine, int StartPos, int LastLine, int EndPos, 
 
 	} while (!g_bInterrupted && ((EReverse)?Line >= FirstLine:Line <= LastLine));
 
-	return FALSE;
+	return false;
 }
 
-BOOL _EditorReplaceAgain()
+bool _EditorReplaceAgain()
 {
-	NoAsking = FALSE;
+	NoAsking = false;
 	return EditorReplaceAgain();
 }
 
-BOOL EditorReplaceAgain()
+bool EditorReplaceAgain()
 {
 	RefreshEditorInfo();
 	RefreshEditorColorInfo();
@@ -529,10 +529,10 @@ BOOL EditorReplaceAgain()
 		}
 
 		if (ERRemoveEmpty || ERRemoveNoMatch) {
-			ReplaceInTextByLine(FirstLine, StartPos, LastLine, EndPos, FALSE);
+			ReplaceInTextByLine(FirstLine, StartPos, LastLine, EndPos, false);
 		} else if (!ESeveralLine) {
 			bCachedReplace = true;
-			ReplaceInTextByLine(FirstLine, StartPos, LastLine, EndPos, FALSE);
+			ReplaceInTextByLine(FirstLine, StartPos, LastLine, EndPos, false);
 		} else {
 			ReplaceInText(FirstLine, StartPos, LastLine, EndPos);
 		}
@@ -547,10 +547,11 @@ BOOL EditorReplaceAgain()
 
 	tm.Stop();
 
-	if (!bShowNoFound || (FindNumber > 0) || g_bInterrupted) return TRUE;
+	if (!bShowNoFound || (FindNumber > 0) || g_bInterrupted) return true;
 
 	ShowErrorMsg(GetMsg(MCannotFind), EText.c_str(), _T("ECannotFind"));
-	return FALSE;
+
+	return false;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -599,7 +600,7 @@ LONG_PTR WINAPI EditorReplaceDialogProc(CFarDialog *pDlg, int nMsg, int nParam1,
 }
 
 
-BOOL EditorReplace()
+bool EditorReplace()
 {
 	g_LineBuffer.reserve(SeveralLinesKB*1024);
 
@@ -669,11 +670,11 @@ BOOL EditorReplace()
 			break;
 		case MBtnREBuilder:
 			if (RunREBuilder(SearchText, ReplaceText)) {
-				ERegExp = TRUE;
+				ERegExp = true;
 			}
 			break;
 		case -1:
-			return FALSE;
+			return false;
 		}
 	} while (((ExitCode != MReplace) && (ExitCode != MAll)&& (ExitCode != MBtnClose)) || !EPreparePattern(SearchText));
 
@@ -687,11 +688,12 @@ BOOL EditorReplace()
 
 	NoAsking = (ExitCode == MAll);
 	ReplaceStartLine = -1;
-	g_bInterrupted = FALSE;
+	g_bInterrupted = false;
 	REParam.m_setInitParam.clear();
 
 	if ((ExitCode != MBtnClose) && !EText.empty()) EditorReplaceAgain();
-	return TRUE;
+
+	return true;
 }
 
 OperationResult EditorReplaceExecutor()
@@ -706,19 +708,19 @@ OperationResult EditorReplaceExecutor()
 	OEMToEditor(ERReplace_O2E);
 #endif
 
-	NoAsking = TRUE;
+	NoAsking = true;
 	FindNumber = ReplaceNumber = 0;
 	REParam.m_setInitParam.clear();
 	SanitateEngine();
 
 	EditorUpdatePresetPosition();
 
-	BOOL bResult = EditorReplaceAgain();
+	bool bResult = EditorReplaceAgain();
 	StartupInfo.EditorControl(ECTL_REDRAW, NULL);
 	return bResult ? OR_OK : OR_CANCEL;
 }
 
-BOOL CERPresetCollection::EditPreset(CPreset *pPreset)
+bool CERPresetCollection::EditPreset(CPreset *pPreset)
 {
 	CFarDialog Dialog(80, 23, _T("ERPresetDlg"));
 	Dialog.AddFrame(MERPreset);
@@ -750,13 +752,13 @@ BOOL CERPresetCollection::EditPreset(CPreset *pPreset)
 	do {
 		switch (Dialog.Display(2, -2, -5)) {
 		case 0:
-			return TRUE;
+			return true;
 		case 1:
 			RunExternalEditor(pPreset->m_mapStrings["Replace"]);
 			break;
 
 		default:
-			return FALSE;
+			return false;
 		}
 	} while (true);
 }

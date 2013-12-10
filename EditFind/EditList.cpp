@@ -20,7 +20,7 @@ tstring CanonicalLCName(const TCHAR *szName) {
 	return strResult;
 }
 
-BOOL EditorListAllAgain()
+bool EditorListAllAgain()
 {
 	RefreshEditorInfo();
 	RefreshEditorColorInfo();
@@ -74,14 +74,14 @@ BOOL EditorListAllAgain()
 		const TCHAR *Lines[]={GetMsg(MRESearch),GetMsg(MCannotFind),EText.c_str(),GetMsg(MOk)};
 		StartupInfo.Message(FMSG_WARNING,_T("ECannotFind"),Lines,4,1);
 		RestorePosition(StartEdInfo);
-		return TRUE;
+		return true;
 	}
 
 	EdInfo = StartEdInfo;
 	return EditorListAllShowResults(true);
 }
 
-BOOL EditorListAllHasResults() {
+bool EditorListAllHasResults() {
 	RefreshEditorInfo();
 
 #ifdef UNICODE
@@ -93,7 +93,7 @@ BOOL EditorListAllHasResults() {
 	return !Info.arrLines.empty();
 }
 
-BOOL EditorListAllShowResults(bool bImmediate) {
+bool EditorListAllShowResults(bool bImmediate) {
 	if (!bImmediate) RefreshEditorInfo();
 
 #ifdef UNICODE
@@ -101,7 +101,7 @@ BOOL EditorListAllShowResults(bool bImmediate) {
 #else
 	sFindAllInfo &Info = FindAllInfos[CanonicalLCName(EdInfo.FileName)];
 #endif
-	if (Info.arrLines.size() == 0) return TRUE;
+	if (Info.arrLines.size() == 0) return true;
 
 	tstring strTotal = FormatStr(GetMsg(MTotalLines), Info.arrLines.size());
 	int nResult = ChooseMenu(Info.arrString, GetMsg(MListAllLines), strTotal.c_str(), _T("ListAll"), 0, FMENU_WRAPMODE|FMENU_SHOWAMPERSAND);
@@ -114,5 +114,5 @@ BOOL EditorListAllShowResults(bool bImmediate) {
 		EctlForceSetPosition(&Position);
 	}
 
-	return TRUE;
+	return true;
 }

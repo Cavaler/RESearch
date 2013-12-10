@@ -61,7 +61,7 @@ public:
 	int ShowMenu(bool bExecute, int nDefaultID = 0);
 	virtual CPreset *LoadPreset(const tstring &strName, CFarSettingsKey &hKey) = 0;
 	virtual CPreset *NewPreset() = 0;
-	virtual BOOL EditPreset(CPreset *pPreset) = 0;
+	virtual bool EditPreset(CPreset *pPreset) = 0;
 	virtual int  ID() = 0;	// For batches
 	CPreset *operator()(int nID);
 

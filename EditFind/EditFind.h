@@ -8,28 +8,28 @@
 class CESPresetCollection:public CStdPresetCollection {
 public:
 	CESPresetCollection(CParameterSet &ParamSet) : CStdPresetCollection(ParamSet, _T("EditFind"), MESPreset) {}
-	virtual BOOL EditPreset(CPreset *pPreset);
+	virtual bool EditPreset(CPreset *pPreset);
 	virtual int  ID() { return 3; }
 };
 
 class CERPresetCollection:public CStdPresetCollection {
 public:
 	CERPresetCollection(CParameterSet &ParamSet) : CStdPresetCollection(ParamSet, _T("EditReplace"), MERPreset) {}
-	virtual BOOL EditPreset(CPreset *pPreset);
+	virtual bool EditPreset(CPreset *pPreset);
 	virtual int  ID() { return 0; }
 };
 
 class CEFPresetCollection:public CStdPresetCollection {
 public:
 	CEFPresetCollection(CParameterSet &ParamSet) : CStdPresetCollection(ParamSet, _T("EditFilter"), MEFPreset) {}
-	virtual BOOL EditPreset(CPreset *pPreset);
+	virtual bool EditPreset(CPreset *pPreset);
 	virtual int  ID() { return 1; }
 };
 
 class CETPresetCollection:public CStdPresetCollection {
 public:
 	CETPresetCollection(CParameterSet &ParamSet) : CStdPresetCollection(ParamSet, _T("EditTransliterate"), METPreset) {}
-	virtual BOOL EditPreset(CPreset *pPreset);
+	virtual bool EditPreset(CPreset *pPreset);
 	virtual int  ID() { return 2; }
 };
 
@@ -52,13 +52,13 @@ EXTERN int LastAction VALUE(-1);
 #ifndef UNICODE
 EXTERN tstring ERReplace_O2E;
 #endif
-EXTERN BOOL ERRemoveEmpty;
-EXTERN BOOL ERRemoveNoMatch;
+EXTERN bool ERRemoveEmpty;
+EXTERN bool ERRemoveNoMatch;
 EXTERN bool EREvaluate VALUE(false);
-EXTERN BOOL EReverse VALUE(FALSE);
-EXTERN BOOL EIncremental VALUE(FALSE);
-EXTERN BOOL ESearchAgainCalled VALUE(FALSE);
-EXTERN BOOL EInSelection;
+EXTERN bool EReverse VALUE(false);
+EXTERN bool EIncremental VALUE(false);
+EXTERN bool ESearchAgainCalled VALUE(false);
+EXTERN bool EInSelection;
 EXTERN bool EFromCurrentPosition VALUE(false);
 
 EXTERN tstring ETextUpcase;
@@ -88,25 +88,25 @@ bool RefreshEditorInfo();
 void RefreshEditorColorInfo();
 void EditorFillNamedParameters();
 
-BOOL EditorSearch();
-BOOL EditorSearchAgain();
-BOOL EditorReplace();
-BOOL EditorReplaceAgain();
-BOOL _EditorReplaceAgain();
-BOOL EditorFilter();
-BOOL EditorFilterAgain();
-BOOL EditorTransliterate();
-BOOL EditorTransliterateAgain();
-BOOL EditorListAll();
-BOOL EditorListAllAgain();
+bool EditorSearch();
+bool EditorSearchAgain();
+bool EditorReplace();
+bool EditorReplaceAgain();
+bool _EditorReplaceAgain();
+bool EditorFilter();
+bool EditorFilterAgain();
+bool EditorTransliterate();
+bool EditorTransliterateAgain();
+bool EditorListAll();
+bool EditorListAllAgain();
 
 void UpdateESDialog(CFarDialog *pDlg, bool bCheckSel = true);
 LONG_PTR WINAPI EditorSearchDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LONG_PTR lParam2);
 
-BOOL EditorListAllHasResults();
-BOOL EditorListAllShowResults(bool bImmediate);
+bool EditorListAllHasResults();
+bool EditorListAllShowResults(bool bImmediate);
 
-EXTERN BOOL EListAllFromPreset;
+EXTERN bool EListAllFromPreset;
 OperationResult EditorSearchExecutor();
 OperationResult EditorReplaceExecutor();
 OperationResult EditorFilterExecutor();
@@ -116,8 +116,8 @@ void EditorUpdatePresetPosition();
 
 void PatchEditorInfo(EditorInfo &EdInfo);
 
-BOOL SearchInLine(const TCHAR *Line,int Length,int Start,int End,int *MatchStart,int *MatchLength);
-BOOL SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,bool bSkipClear=false);
+bool SearchInLine(const TCHAR *Line,int Length,int Start,int End,int *MatchStart,int *MatchLength);
+bool SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,bool bSkipClear=false);
 void AdjustPosition(TCHAR *Lines, int &FirstLine, int &StartPos);
 #if defined(FAR3) && defined(_WIN64)
 void AdjustPosition(TCHAR *Lines, intptr_t &FirstLine, intptr_t &StartPos);
@@ -135,7 +135,7 @@ void GetHighlightPosition(EditorSetPosition &Position, int FirstLine,int StartPo
 void SaveSelection();
 void RestoreSelection();
 void RestorePosition(const EditorInfo &StartEdInfo);
-BOOL EPreparePattern(tstring &SearchText);
+bool EPreparePattern(tstring &SearchText);
 
 void FindIfClockPresent();
 void ShowCurrentLine(int CurLine,int TotalLines,int TotalColumns);
@@ -152,7 +152,7 @@ void OEMToEditor(string &String);
 void SynchronizeWithFile(bool bReplace);
 void EReadRegistry (CFarSettingsKey Key);
 void EWriteRegistry(CFarSettingsKey Key);
-void ECleanup(BOOL PatternOnly);
+void ECleanup(bool PatternOnly);
 
 extern "C" const unsigned char *far_maketables(struct CharTableSet *pTable);
 

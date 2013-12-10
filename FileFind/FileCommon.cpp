@@ -92,7 +92,7 @@ void FWriteRegistry(CFarSettingsKey Key)
 	#include "PersistVars.h"
 }
 
-void FCleanup(BOOL PatternOnly)
+void FCleanup(bool PatternOnly)
 {
 	REParam.BackupParam();
 
@@ -121,10 +121,11 @@ void FCleanup(BOOL PatternOnly)
 	}
 }
 
-int FPrepareMaskPattern() {
-	FCleanup(TRUE);
+int FPrepareMaskPattern()
+{
+	FCleanup(true);
 
-	if (FAdvanced && !CompileAdvancedSettings()) return FALSE;
+	if (FAdvanced && !CompileAdvancedSettings()) return false;
 	if (FASkipSystemFolders) {
 		if (FASystemFoldersMask) delete FASystemFoldersMask;
 
@@ -138,25 +139,27 @@ int FPrepareMaskPattern() {
 	REErrorField  = MMask;
 	if (FMaskAsRegExp) {
 		tstring strPattern = REParam.FillNamedReferences(FMask);
-		if (!PreparePattern(&FMaskPattern,&FMaskPatternExtra,strPattern,FALSE)) return FALSE;
+		if (!PreparePattern(&FMaskPattern,&FMaskPatternExtra,strPattern,false)) return false;
 	} else {
 		FMaskSet = new CFarMaskSet(FMask.c_str());
 		if (!FMaskSet->Valid()) {
-			delete FMaskSet; FMaskSet = NULL;
-			return FALSE;
+			delete FMaskSet;
+			FMaskSet = NULL;
+			return false;
 		}
 	}
 
-	return TRUE;
+	return true;
 }
 
-int FPreparePattern(bool bAcceptEmpty) {
-	if (!FPrepareMaskPattern()) return FALSE;
+int FPreparePattern(bool bAcceptEmpty)
+{
+	if (!FPrepareMaskPattern()) return false;
 
-	if (FText.empty() && !bAcceptEmpty) return FALSE;
+	if (FText.empty() && !bAcceptEmpty) return false;
 
 	FRegExp = (FSearchAs != SA_PLAINTEXT) && (FSearchAs != SA_MULTITEXT);
-	if (!CheckUsage(FText, FRegExp, FALSE/*FSearchAs == SA_SEVERALLINE*/)) return FALSE;
+	if (!CheckUsage(FText, FRegExp, false/*FSearchAs == SA_SEVERALLINE*/)) return false;
 
 	if (!FRegExp) {
 		FTextUpcase = (FCaseSensitive) ? FText : UpCaseString(FText);
@@ -175,7 +178,7 @@ int FPreparePattern(bool bAcceptEmpty) {
 		PrepareBMHSearchA(FOEMTextUpcase.data(), FOEMTextUpcase.size());
 #endif
 		REErrorOffset = -1;
-		return TRUE;
+		return true;
 
 	case SA_MULTITEXT:
 	case SA_MULTIREGEXP:{
@@ -190,13 +193,13 @@ int FPreparePattern(bool bAcceptEmpty) {
 		} while (Word.size()&&(!g_bInterrupted));
 
 		REErrorOffset = -1;
-		return TRUE;
+		return true;
 						}
 
 	case SA_REGEXP:
 	case SA_SEVERALLINE:
 	case SA_MULTILINE:{
-		if (FText.empty()) return TRUE;
+		if (FText.empty()) return true;
 		tstring strPattern = REParam.FillNamedReferences(FText);
 
 #ifdef UNICODE
@@ -208,16 +211,18 @@ int FPreparePattern(bool bAcceptEmpty) {
 #endif
 					  }
 	default:
-		return FALSE;
+		return false;
 	}
 }
 
-void InitFoundPosition() {
+void InitFoundPosition()
+{
 	g_nFoundLine = 0;
 	g_nFoundColumn = 1;
 }
 
-void AddFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems, bool bSearch) {
+void AddFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems, bool bSearch)
+{
 	CPluginPanelItem Item;
 
 	Item.SetFindData(*FindData);
@@ -236,7 +241,8 @@ void AddFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems, bool bSear
 	PanelItems.push_back(Item);
 }
 
-void AddFile(const TCHAR *szFileName, panelitem_vector &PanelItems, bool bSearch) {
+void AddFile(const TCHAR *szFileName, panelitem_vector &PanelItems, bool bSearch)
+{
 	WIN32_FIND_DATA FD;
 	HANDLE hFind = FindFirstFile(szFileName, &FD);
 	if (hFind != INVALID_HANDLE_VALUE) {
@@ -245,7 +251,8 @@ void AddFile(const TCHAR *szFileName, panelitem_vector &PanelItems, bool bSearch
 	}
 }
 
-int AddSlashLen(TCHAR *Directory) {
+int AddSlashLen(TCHAR *Directory)
+{
 	int Len = _tcslen(Directory);
 	if ((Len == 0) || (Directory[Len-1] != '\\')) {_tcscat(Directory, _T("\\"));Len++;}
 	return Len;
@@ -276,7 +283,8 @@ void FileFillNamedParameters(const TCHAR *szFileName)
 #endif
 }
 
-void ShortenFileName(const TCHAR *szFrom, TCHAR *szTo) {
+void ShortenFileName(const TCHAR *szFrom, TCHAR *szTo)
+{
 	int nLength = _tcslen(szFrom);
 	if (nLength <= 74) {
 		_tcscpy(szTo, szFrom);
@@ -332,42 +340,44 @@ void ShowProgress(const TCHAR *Directory, panelitem_vector &PanelItems)
 	SetConsoleTitle(FormatStr(GetMsg(MFileConsoleTitle), PanelItems.size(), Directory).c_str());
 }
 
-BOOL AdvancedApplies(WIN32_FIND_DATA *FindData) {
+bool AdvancedApplies(WIN32_FIND_DATA *FindData)
+{
 	SYSTEMTIME st1, st2;
 	FileTimeToSystemTime(&FindData->ftLastWriteTime, &st1);
 	FileTimeToSystemTime(&FADateAfterThis, &st2);
 
 	if (FADateBefore&&(CompareFileTime(
 		(FAModificationDate) ? &FindData->ftLastWriteTime : &FindData->ftCreationTime,
-		g_bScanningLocalTime ? &FADateBeforeThisLocal : &FADateBeforeThis) > 0)) return FALSE;
+		g_bScanningLocalTime ? &FADateBeforeThisLocal : &FADateBeforeThis) > 0)) return false;
 	if (FADateAfter&&(CompareFileTime(
 		(FAModificationDate) ? &FindData->ftLastWriteTime : &FindData->ftCreationTime,
-		g_bScanningLocalTime ? &FADateAfterThisLocal : &FADateAfterThis) < 0)) return FALSE;
+		g_bScanningLocalTime ? &FADateAfterThisLocal : &FADateAfterThis) < 0)) return false;
 
-	if (FASizeLess && (FindData->nFileSizeLow >= FASizeLessLimit)) return FALSE;
-	if (FASizeGreater && (FindData->nFileSizeLow <= FASizeGreaterLimit)) return FALSE;
+	if (FASizeLess && (FindData->nFileSizeLow >= FASizeLessLimit)) return false;
+	if (FASizeGreater && (FindData->nFileSizeLow <= FASizeGreaterLimit)) return false;
 
-	if (FindData->dwFileAttributes & FAAttributesCleared) return FALSE;
-	if ((FindData->dwFileAttributes & FAAttributesSet) != FAAttributesSet) return FALSE;
+	if (FindData->dwFileAttributes & FAAttributesCleared) return false;
+	if ((FindData->dwFileAttributes & FAAttributesSet) != FAAttributesSet) return false;
 
 	if (FAFullFileNameMatch && FAFullFileNamePattern) {
 		bool bNameMatches = do_pcre_exec(FAFullFileNamePattern,FAFullFileNamePatternExtra,FindData->cFileName,_tcslen(FindData->cFileName),0,0,NULL,0) >= 0;
-		if (FAFullFileNameInverse ? bNameMatches : !bNameMatches) return FALSE;
+		if (FAFullFileNameInverse ? bNameMatches : !bNameMatches) return false;
 	}
 
-	return TRUE;
+	return true;
 }
 
-int DoScanDirectory(TCHAR *Directory, panelitem_vector &PanelItems, ProcessFileProc ProcessFile) {
+bool DoScanDirectory(TCHAR *Directory, panelitem_vector &PanelItems, ProcessFileProc ProcessFile)
+{
 	if (FASkipSystemFolders && FASystemFoldersMask) {
-		if ((*FASystemFoldersMask)(Directory)) return TRUE;
+		if ((*FASystemFoldersMask)(Directory)) return true;
 	}
 
 	if (FAdvanced) {
-		if (FARecursionLevel && (CurrentRecursionLevel > FARecursionLevel)) return TRUE;
+		if (FARecursionLevel && (CurrentRecursionLevel > FARecursionLevel)) return true;
 		if (FADirectoryMatch && FADirectoryPattern && (CurrentRecursionLevel > 0)) {
 			bool bNameMatches = do_pcre_exec(FADirectoryPattern,FADirectoryPatternExtra,Directory,_tcslen(Directory),0,0,NULL,0) >= 0;
-			if (FADirectoryInverse ? bNameMatches : !bNameMatches) return TRUE;
+			if (FADirectoryInverse ? bNameMatches : !bNameMatches) return true;
 		}
 	}
 
@@ -415,11 +425,11 @@ int DoScanDirectory(TCHAR *Directory, panelitem_vector &PanelItems, ProcessFileP
 
 	free(FindDataArray);
 	StartupInfo.RestoreScreen(hScreen);
-	if (FSearchIn==SI_CURRENTONLY) return TRUE;
-	if (g_bInterrupted) return FALSE;
+	if (FSearchIn==SI_CURRENTONLY) return true;
+	if (g_bInterrupted) return false;
 
 	_tcscpy(Directory+Len, _T("*"));
-	if ((HSearch=FindFirstFile(Directory,&FindData))==INVALID_HANDLE_VALUE) return TRUE;
+	if ((HSearch=FindFirstFile(Directory,&FindData))==INVALID_HANDLE_VALUE) return true;
 	CurrentRecursionLevel++;
 	do {
 //		Sleep(0);
@@ -430,18 +440,21 @@ int DoScanDirectory(TCHAR *Directory, panelitem_vector &PanelItems, ProcessFileP
 		_tcscpy(FindData.cFileName,Directory);
 		if (!DoScanDirectory(Directory, PanelItems, ProcessFile)) {
 			CurrentRecursionLevel--;
-			FindClose(HSearch);return FALSE;
+			FindClose(HSearch);return false;
 		}
 	} while (FindNextFile(HSearch,&FindData));
+	
 	CurrentRecursionLevel--;
 	FindClose(HSearch);
 	Directory[Len]=0;
-	return TRUE;
+
+	return true;
 }
 
-int ScanPluginDirectories(CPanelInfo &Info,panelitem_vector &PanelItems,ProcessFileProc ProcessFile) {
+bool ScanPluginDirectories(CPanelInfo &Info,panelitem_vector &PanelItems,ProcessFileProc ProcessFile)
+{
 	int Number=(FSearchIn==SI_SELECTED) ? Info.SelectedItemsNumber : Info.ItemsNumber;
-	if (Number == 0) return TRUE;
+	if (Number == 0) return true;
 #ifdef UNICODE
 	PluginPanelItem *Items=(FSearchIn==SI_SELECTED) ? &Info.SelectedItems[0] : &Info.PanelItems[0];
 #else
@@ -465,10 +478,12 @@ int ScanPluginDirectories(CPanelInfo &Info,panelitem_vector &PanelItems,ProcessF
 			FilesScanned++;
 		}
 	}
-	return TRUE;
+
+	return true;
 }
 
-int ScanDirectories(panelitem_vector &PanelItems,ProcessFileProc ProcessFile) {
+bool ScanDirectories(panelitem_vector &PanelItems,ProcessFileProc ProcessFile)
+{
 	CPanelInfo PInfo;
 	PInfo.GetInfo(false);
 #ifdef UNICODE
@@ -479,7 +494,7 @@ int ScanDirectories(panelitem_vector &PanelItems,ProcessFileProc ProcessFile) {
 #endif
 
 	PanelItems.clear();
-	g_bInterrupted=FALSE;
+	g_bInterrupted=false;
 	FilesScanned=0;
 	ScanProgressX = 40;	// Minimal width
 	CurrentRecursionLevel=0;
@@ -507,7 +522,7 @@ int ScanDirectories(panelitem_vector &PanelItems,ProcessFileProc ProcessFile) {
 				DoScanDirectory(RootDir, PanelItems, ProcessFile);
 				RootDir[3]=0;
 		}
-		return TRUE;
+		return true;
 					 }
 
 	case SI_FROMROOT:
@@ -515,13 +530,13 @@ int ScanDirectories(panelitem_vector &PanelItems,ProcessFileProc ProcessFile) {
 	case SI_FROMCURRENT:
 	case SI_CURRENTONLY:
 		DoScanDirectory(PInfoCurDir, PanelItems, ProcessFile);
-		return TRUE;
+		return true;
 
 	case SI_SELECTED:{
-		if (PInfo.ItemsNumber==0) return FALSE;
+		if (PInfo.ItemsNumber==0) return false;
 		int Len=AddSlashLen(PInfoCurDir);
 
-		for (int I=0; I<PInfo.SelectedItemsNumber; I++) {
+		for (size_t I=0; I<PInfo.SelectedItemsNumber; I++) {
 			WIN32_FIND_DATA CurFindData = PanelToWFD(PInfo.SelectedItems[I]);
 
 			if (CurFindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
@@ -548,10 +563,10 @@ int ScanDirectories(panelitem_vector &PanelItems,ProcessFileProc ProcessFile) {
 				FilesScanned++;
 			}
 		}
-		return TRUE;
+		return true;
 					 }
 	}
-	return TRUE;
+	return true;
 }
 
 OperationResult NoFilesFound()
@@ -565,21 +580,21 @@ OperationResult NoFilesFound()
 	return OR_OK;
 }
 
-BOOL ConfirmFile(int Title,const TCHAR *FileName)
+bool ConfirmFile(int Title, const TCHAR *FileName)
 {
-	if (FileConfirmed) return TRUE;
+	if (FileConfirmed) return true;
 
 	const TCHAR *Lines[]={
 		GetMsg(Title),GetMsg(MConfirmRequest),FileName,GetMsg(MOk),GetMsg(MAll),GetMsg(MSkip),GetMsg(MCancel)
 	};
 	switch (StartupInfo.Message(0,_T("FRConfirmFile"),Lines,7,4)) {
-	case 1:FRConfirmFileThisRun=FALSE;
-	case 0:return (FileConfirmed=TRUE);
+	case 1:FRConfirmFileThisRun=false;
+	case 0:return (FileConfirmed=true);
 	case -1:
-	case 3:g_bInterrupted=TRUE;
+	case 3:g_bInterrupted=true;
 	}
 
-	return FALSE;
+	return false;
 }
 
 
@@ -595,7 +610,7 @@ bool ConfirmFileReadonly(const TCHAR *FileName)
 	};
 	switch (StartupInfo.Message(0,_T("FRConfirmReadonly"),Lines,8,4)) {
 	case 1:
-		FRConfirmReadonlyThisRun = FALSE;
+		FRConfirmReadonlyThisRun = false;
 	case 0:
 		return true;
 	case 2:
@@ -845,7 +860,8 @@ void CFarDateTimeStorage::Put(const TCHAR *pszBuffer) {
 	}
 }
 
-BOOL AdvancedSettings() {
+bool AdvancedSettings()
+{
 	CFarDialog Dialog(78,24,_T("AdvancedFileSearchDlg"));
 	Dialog.AddFrame(MAdvancedOptions);
 	Dialog.Add(new CFarCheckBoxItem(5,2,0,MFullFileNameMatch,&FAFullFileNameMatch));
@@ -862,12 +878,12 @@ BOOL AdvancedSettings() {
 
 	Dialog.Add(new CFarCheckBoxItem(5,8,0,MDateAfter,&FADateAfter));
 	Dialog.Add(new CFarEditItem(30,8,50,0,NULL,new CFarDateTimeStorage(&FADateAfterThis)));
-	Dialog.Add(new CFarButtonItem(52,8,0,FALSE,MCurrent));
+	Dialog.Add(new CFarButtonItem(52,8,0,false,MCurrent));
 	Dialog.Add(new CFarCheckBoxItem(5,9,0,MDateBefore,&FADateBefore));
 	Dialog.Add(new CFarEditItem(30,9,50,0,NULL,new CFarDateTimeStorage(&FADateBeforeThis)));
-	Dialog.Add(new CFarButtonItem(52,9,0,FALSE,MCurrent));
-	Dialog.Add(new CFarRadioButtonItem(5,10,0,MCreationDate,&FAModificationDate,FALSE));
-	Dialog.Add(new CFarRadioButtonItem(30,10,0,MModificationDate,&FAModificationDate,TRUE));
+	Dialog.Add(new CFarButtonItem(52,9,0,false,MCurrent));
+	Dialog.Add(new CFarRadioButtonItem(5,10,0,MCreationDate,&FAModificationDate,false));
+	Dialog.Add(new CFarRadioButtonItem(30,10,0,MModificationDate,&FAModificationDate,true));
 
 	Dialog.Add(new CFarCheckBoxItem(5,12,0,MSizeGreater,&FASizeGreater));
 	Dialog.Add(new CFarEditItem(32,12,40,0,NULL,
@@ -891,7 +907,7 @@ BOOL AdvancedSettings() {
 	Dialog.Add(new CFarCheckBox3Item(47,16,DIF_3STATE,MCompressed,&FAAttributesCleared,&FAAttributesSet,FILE_ATTRIBUTE_COMPRESSED));
 	Dialog.Add(new CFarCheckBox3Item(47,17,DIF_3STATE,MEncrypted,&FAAttributesCleared,&FAAttributesSet,FILE_ATTRIBUTE_ENCRYPTED));
 	Dialog.AddButtons(MOk,MCancel);
-	Dialog.Add(new CFarButtonItem(62, 20, 0, FALSE, MBtnPresets));
+	Dialog.Add(new CFarButtonItem(62, 20, 0, false, MBtnPresets));
 	Dialog.SetFocus(2);
 
 	int Result;
@@ -916,14 +932,15 @@ BOOL AdvancedSettings() {
 			}
 			continue;
 		default:
-			return FALSE;
+			return false;
 		}
 
 	} while (!CompileAdvancedSettings() || (Result != 0));
-	return TRUE;
+
+	return true;
 }
 
-BOOL CompileAdvancedSettings()
+bool CompileAdvancedSettings()
 {
 	PCRE_FREE(FAFullFileNamePattern);
 	PCRE_FREE(FAFullFileNamePatternExtra);
@@ -931,14 +948,14 @@ BOOL CompileAdvancedSettings()
 	PCRE_FREE(FADirectoryPatternExtra);
 
 	if (FAFullFileNameMatch) {
-		if (!PreparePattern(&FAFullFileNamePattern,&FAFullFileNamePatternExtra,FAFullFileName,FACaseSensitive)) return FALSE;
+		if (!PreparePattern(&FAFullFileNamePattern,&FAFullFileNamePatternExtra,FAFullFileName,FACaseSensitive)) return false;
 	}
 
 	if (FADirectoryMatch) {
-		if (!PreparePattern(&FADirectoryPattern,&FADirectoryPatternExtra,FADirectoryName,FADirectoryCaseSensitive)) return FALSE;
+		if (!PreparePattern(&FADirectoryPattern,&FADirectoryPatternExtra,FADirectoryName,FADirectoryCaseSensitive)) return false;
 	}
 
-	return TRUE;
+	return true;
 }
 
 void SelectAdvancedPreset(int &nID, bool &bSel)
@@ -986,7 +1003,8 @@ void CFPreset::Apply()
 	ApplyAdvancedPreset();
 }
 
-BOOL CFAPresetCollection::EditPreset(CPreset *pPreset) {
+bool CFAPresetCollection::EditPreset(CPreset *pPreset)
+{
 	CFarDialog Dialog(78,26,_T("FAPresetDlg"));
 	Dialog.AddFrame(MFAPreset);
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
@@ -1010,8 +1028,8 @@ BOOL CFAPresetCollection::EditPreset(CPreset *pPreset) {
 	Dialog.Add(new CFarCheckBoxItem(5,11,0,MDateBefore,&pPreset->m_mapInts["DateBefore"]));
 	Dialog.Add(new CFarEditItem(30,11,50,0,NULL,new CFarDateTimeStorage((time_t *)&pPreset->m_mapInts["DateBeforeThis"])));
 	Dialog.Add(new CFarButtonItem(52,11,0,FALSE,MCurrent));
-	Dialog.Add(new CFarRadioButtonItem(5,12,0,MCreationDate,&pPreset->m_mapInts["ModificationDate"],FALSE));
-	Dialog.Add(new CFarRadioButtonItem(30,12,0,MModificationDate,&pPreset->m_mapInts["ModificationDate"],TRUE));
+	Dialog.Add(new CFarRadioButtonItem(5,12,0,MCreationDate,&pPreset->m_mapInts["ModificationDate"],false));
+	Dialog.Add(new CFarRadioButtonItem(30,12,0,MModificationDate,&pPreset->m_mapInts["ModificationDate"],true));
 
 	Dialog.Add(new CFarCheckBoxItem(5,14,0,MSizeGreater,&pPreset->m_mapInts["SizeGreater"]));
 	Dialog.Add(new CFarEditItem(32,14,40,0,NULL,
@@ -1041,7 +1059,7 @@ BOOL CFAPresetCollection::EditPreset(CPreset *pPreset) {
 		int Result=Dialog.Display(3,-2,15,18);
 		switch (Result) {
 		case 0:
-			return TRUE;
+			return true;
 		case 1:
 		case 2:{
 			SYSTEMTIME stCurTime;
@@ -1053,26 +1071,28 @@ BOOL CFAPresetCollection::EditPreset(CPreset *pPreset) {
 			continue;
 			  }
 		default:
-			return FALSE;
+			return false;
 		}
 	} while (true);
 }
 
-BOOL MaskCaseHere() {
+bool MaskCaseHere()
+{
 	switch (FMaskCase) {
-	case MC_SENSITIVE:return TRUE;
-	case MC_INSENSITIVE:return FALSE;
+	case MC_SENSITIVE:return true;
+	case MC_INSENSITIVE:return false;
 	case MC_VOLUME:{
 		DWORD Flags;
 		TCHAR szFSName[64];
-		if (!GetVolumeInformation(NULL,NULL,0,NULL,NULL,&Flags,szFSName,arrsizeof(szFSName))) return FALSE;
+		if (!GetVolumeInformation(NULL,NULL,0,NULL,NULL,&Flags,szFSName,arrsizeof(szFSName))) return false;
 		return _tcsicmp(szFSName, _T("NTFS")) && (Flags&FS_CASE_SENSITIVE);
 				   }
 	}
-	return FALSE;
+	return false;
 }
 
-bool LocalFileTime(TCHAR cDrive) {
+bool LocalFileTime(TCHAR cDrive)
+{
 	TCHAR szRoot[] = {cDrive, ':', '\\', 0};
 	DWORD Flags;
 	TCHAR szFSName[64];

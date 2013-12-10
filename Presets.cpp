@@ -207,7 +207,7 @@ void CPresetCollection::Load()
 		tstring strName;
 		if (!hKey.GetNextEnum(strName)) break;
 		push_back(LoadPreset(strName.c_str(), hKey));
-	} while (TRUE);
+	} while (true);
 
 	ValidateIDs();
 }
@@ -645,7 +645,7 @@ CBatchActionCollection::CBatchActionCollection(CBatchType &Type, CFarSettingsKey
 		tstring strName;
 		if (!hKey.GetNextEnum(strName)) break;
 		push_back(new CBatchAction(m_Type, strName.c_str(), hKey));
-	} while (TRUE);
+	} while (true);
 }
 
 void CBatchActionCollection::Save(CFarSettingsKey &hKey)

@@ -104,9 +104,10 @@ bool CheckUsage(const tstring &strText, bool bRegExp, bool bSeveralLine)
 	return true;
 }
 
-BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const tstring &Text,int CaseSensitive,const unsigned char *pTables)
+bool PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const tstring &Text,int CaseSensitive,const unsigned char *pTables)
 {
-	if (Text.empty()) return FALSE;		// WAS: Not needed if empty NOW: what is search for nothing?
+	if (Text.empty()) return false;		// WAS: Not needed if empty NOW: what is search for nothing?
+
 	const TCHAR *ErrPtr;
 	int ErrOffset;
 #ifdef UNICODE
@@ -126,19 +127,20 @@ BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const tstring &Text
 		StartupInfo.Message(FMSG_WARNING,_T("RegExpError"),Lines,6,1);
 
 		REErrorOffset = ErrOffset;
-		return FALSE;
+		return false;
 	} else {
 		if (PatternExtra) {
 			*PatternExtra=pcre_study(*Pattern,PCRE_STUDY_JIT_COMPILE,&ErrPtr);
 		}
-		return TRUE;
+		return true;
 	}
 }
 
 #ifdef UNICODE
-BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,int CaseSensitive,const unsigned char *pTables)
+bool PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,int CaseSensitive,const unsigned char *pTables)
 {
-	if (Text.empty()) return FALSE;		// WAS: Not needed if empty NOW: what is search for nothing?
+	if (Text.empty()) return false;		// WAS: Not needed if empty NOW: what is search for nothing?
+
 	const char *ErrPtr;
 	int ErrOffset;
 	int iFlags=PCRE_MULTILINE|PCRE_UCP;
@@ -153,18 +155,18 @@ BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,
 		const TCHAR *Lines[]={GetMsg(MRegExpError),strErrPtr.c_str(),_T("\x01"),strText.c_str(),ErrPos.c_str(),GetMsg(MOk)};
 		ErrPos[ErrOffset]='^';
 		StartupInfo.Message(FMSG_WARNING,_T("RegExpError"),Lines,6,1);
-		return FALSE;
+		return false;
 	} else {
 		if (PatternExtra) {
 			*PatternExtra=pcre_study(*Pattern,PCRE_STUDY_JIT_COMPILE,&ErrPtr);
 		}
-		return TRUE;
+		return true;
 	}
 }
 
-BOOL PreparePattern(pcre16 **Pattern,pcre16_extra **PatternExtra,const wstring &Text,int CaseSensitive)
+bool PreparePattern(pcre16 **Pattern,pcre16_extra **PatternExtra,const wstring &Text,int CaseSensitive)
 {
-	if (Text.empty()) return FALSE;		// WAS: Not needed if empty NOW: what is search for nothing?
+	if (Text.empty()) return false;		// WAS: Not needed if empty NOW: what is search for nothing?
 	const char *ErrPtr;
 	int ErrOffset;
 	int iFlags=PCRE_MULTILINE|PCRE_UCP|PCRE_UTF8;
@@ -178,12 +180,12 @@ BOOL PreparePattern(pcre16 **Pattern,pcre16_extra **PatternExtra,const wstring &
 		const TCHAR *Lines[]={GetMsg(MRegExpError),strErrPtr.c_str(),_T("\x01"),Text.c_str(),ErrPos.c_str(),GetMsg(MOk)};
 		ErrPos[ErrOffset]='^';
 		StartupInfo.Message(FMSG_WARNING,_T("RegExpError"),Lines,6,1);
-		return FALSE;
+		return false;
 	} else {
 		if (PatternExtra) {
 			*PatternExtra=pcre16_study(*Pattern,PCRE_STUDY_JIT_COMPILE,&ErrPtr);
 		}
-		return TRUE;
+		return true;
 	}
 }
 #endif
@@ -627,7 +629,7 @@ DWORD WINAPI REThreadProc(LPVOID lpParameter)
 	HANDLE hRE[] = {g_hREReady, g_hREReadyA};
 
 	while (true) {
-		DWORD dwResult = WaitForMultipleObjects(2, hRE, FALSE, 60000);
+		DWORD dwResult = WaitForMultipleObjects(2, hRE, false, 60000);
 		if (dwResult == WAIT_TIMEOUT) {
 			CloseHandle(g_hREThread);
 			g_hREThread = NULL;
@@ -724,7 +726,7 @@ int do_pcre_execA(const pcre *external_re, const pcre_extra *extra_data,
 }
 #endif
 
-BOOL SystemToLocalTime(FILETIME &ft)
+bool SystemToLocalTime(FILETIME &ft)
 {
 	TIME_ZONE_INFORMATION tzi;
 	DWORD dwRes = GetTimeZoneInformation(&tzi);
@@ -737,10 +739,10 @@ BOOL SystemToLocalTime(FILETIME &ft)
 		ft.dwHighDateTime = ul.HighPart;
 		ft.dwLowDateTime = ul.LowPart;
 	}
-	return TRUE;
+	return true;
 }
 
-BOOL LocalToSystemTime(FILETIME &ft)
+bool LocalToSystemTime(FILETIME &ft)
 {
 	TIME_ZONE_INFORMATION tzi;
 	DWORD dwRes = GetTimeZoneInformation(&tzi);
@@ -753,7 +755,7 @@ BOOL LocalToSystemTime(FILETIME &ft)
 		ft.dwHighDateTime = ul.HighPart;
 		ft.dwLowDateTime = ul.LowPart;
 	}
-	return TRUE;
+	return true;
 }
 
 void RunExternalEditor(tstring &strText)
@@ -856,7 +858,7 @@ size_t QuoteStrings(const TCHAR *Source, vector<tstring> &arrQuoted, int MaxWidt
 			QuoteString(Source, Pos-Source, arrQuoted, MaxWidth);
 			Source = Pos + 1;
 		} else break;
-	} while (TRUE);
+	} while (true);
 
 	QuoteString(Source, _tcslen(Source), arrQuoted, MaxWidth);
 

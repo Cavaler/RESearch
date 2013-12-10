@@ -167,7 +167,8 @@ void CTemporaryPanel::UpdateList() {
 	}
 }
 
-int CTemporaryPanel::GetFindData(PluginPanelItem **PanelItem,int *ItemsNumber,int OpMode) {
+int CTemporaryPanel::GetFindData(PluginPanelItem **PanelItem,int *ItemsNumber,int OpMode)
+{
 	UpdateList();
 	*PanelItem  = m_arrItems.empty() ? NULL : &m_arrItems[0];
 	*ItemsNumber = m_arrItems.size();
@@ -286,9 +287,9 @@ int CTemporaryPanel::ProcessKey(int Key, unsigned int ControlState)
 		PInfo.GetInfo((HANDLE)this);
 
 		for (size_t nItem = 0; nItem < m_arrItems.size(); nItem++) {
-			for (int J=0; J<PInfo.SelectedItemsNumber; J++) {
+			for (size_t J=0; J<PInfo.SelectedItemsNumber; J++) {
 				if (!_tcscmp(FarPanelFileName(PInfo.SelectedItems[J]), FarPanelFileName(m_arrItems[nItem]))) {
-					Deleted(nItem)=TRUE;break;
+					Deleted(nItem)=true;break;
 				}
 			}
 		}
@@ -314,6 +315,7 @@ int CTemporaryPanel::ProcessKey(int Key, unsigned int ControlState)
 #endif
 		return TRUE;
 	}
+
 	return FALSE;
 }
 

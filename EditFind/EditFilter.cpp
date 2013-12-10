@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "..\RESearch.h"
 
-BOOL EditorFilterAgain()
+bool EditorFilterAgain()
 {
 	RefreshEditorInfo();
 	RefreshEditorColorInfo();
@@ -48,10 +48,10 @@ BOOL EditorFilterAgain()
 
 	EditorEndUndo();
 
-	return TRUE;
+	return true;
 }
 
-BOOL EditorFilter()
+bool EditorFilter()
 {
 	EditorFillNamedParameters();
 
@@ -69,8 +69,8 @@ BOOL EditorFilter()
 	Dialog.Add(new CFarCheckBoxItem(5,5,0,MRegExp,&ERegExp));
 	Dialog.Add(new CFarCheckBoxItem(5,6,0,MCaseSensitive,&ECaseSensitive));
 	Dialog.Add(new CFarCheckBoxItem(5,7,0,MReverseSearch,&EReverse));
-	Dialog.Add(new CFarRadioButtonItem(30,5,0,MLeaveMatching,&EFLeaveFilter,TRUE));
-	Dialog.Add(new CFarRadioButtonItem(30,6,0,MRemoveMatching,&EFLeaveFilter,FALSE));
+	Dialog.Add(new CFarRadioButtonItem(30,5,0,MLeaveMatching,&EFLeaveFilter,true));
+	Dialog.Add(new CFarRadioButtonItem(30,6,0,MRemoveMatching,&EFLeaveFilter,false));
 	Dialog.AddButtons(MOk,MCancel,MBtnClose);
 	Dialog.Add(new CFarButtonItem(62,9,0,0,MBtnPresets));
 
@@ -89,16 +89,16 @@ BOOL EditorFilter()
 			EFPresets->ShowMenu(true);
 			break;
 		default:
-			return FALSE;
+			return false;
 		}
 	} while (!IsOKClose(ExitCode) || !EPreparePattern(SearchText));
 
 	EText=SearchText;
-	g_bInterrupted = FALSE;
+	g_bInterrupted = false;
 
 	if ((ExitCode == MOk) && !EText.empty()) EditorFilterAgain();
 
-	return TRUE;
+	return true;
 }
 
 OperationResult EditorFilterExecutor()
@@ -109,12 +109,12 @@ OperationResult EditorFilterExecutor()
 
 	EditorUpdatePresetPosition();
 
-	BOOL bResult = EditorFilterAgain();
+	bool bResult = EditorFilterAgain();
 	StartupInfo.EditorControl(ECTL_REDRAW, NULL);
 	return bResult ? OR_OK : OR_CANCEL;
 }
 
-BOOL CEFPresetCollection::EditPreset(CPreset *pPreset)
+bool CEFPresetCollection::EditPreset(CPreset *pPreset)
 {
 	CFarDialog Dialog(76,18,_T("EFPresetDlg"));
 	Dialog.AddFrame(MEFPreset);
@@ -126,8 +126,8 @@ BOOL CEFPresetCollection::EditPreset(CPreset *pPreset)
 
 	Dialog.Add(new CFarCheckBoxItem(5,7,0,MRegExp,&pPreset->m_mapInts["IsRegExp"]));
 	Dialog.Add(new CFarCheckBoxItem(5,8,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
-	Dialog.Add(new CFarRadioButtonItem(30,7,0,MLeaveMatching,&pPreset->m_mapInts["LeaveFilter"],TRUE));
-	Dialog.Add(new CFarRadioButtonItem(30,8,0,MRemoveMatching,&pPreset->m_mapInts["LeaveFilter"],FALSE));
+	Dialog.Add(new CFarRadioButtonItem(30,7,0,MLeaveMatching,&pPreset->m_mapInts["LeaveFilter"],true));
+	Dialog.Add(new CFarRadioButtonItem(30,8,0,MRemoveMatching,&pPreset->m_mapInts["LeaveFilter"],false));
 	Dialog.Add(new CFarCheckBoxItem(5, 9, 0, MReverseSearch,&pPreset->m_mapInts["Reverse"]));
 	Dialog.Add(new CFarCheckBoxItem(5,11,0,MAddToMenu,&pPreset->m_bAddToMenu));
 	Dialog.Add(new CFarCheckBoxItem(5,12,0,MFromCurrentPosition,&pPreset->m_mapInts["FromCurrent"]));
@@ -136,9 +136,9 @@ BOOL CEFPresetCollection::EditPreset(CPreset *pPreset)
 	do {
 		switch (Dialog.Display(1, -2)) {
 		case 0:
-			return TRUE;
+			return true;
 		default:
-			return FALSE;
+			return false;
 		}
 	} while (true);
 }

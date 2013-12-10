@@ -68,6 +68,6 @@ protected:
 
 	vector<BYTE> m_arrWriteBuffer;
 	INT_PTR		m_nBuffered;
-	BOOL		BufferOutput(LPCVOID lpBuffer, DWORD dwWrite);
-	BOOL		FlushBuffer();
+	bool		BufferOutput(LPCVOID lpBuffer, DWORD dwWrite);
+	bool		FlushBuffer();
 };

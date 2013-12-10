@@ -47,8 +47,8 @@ struct sActiveScript {
 EXTERN vector<sActiveScript> m_arrEngines;
 EXTERN CFarListData m_lstEngines CONSTRUCT((NULL, 0));
 
-BOOL SystemToLocalTime(FILETIME &ft);
-BOOL LocalToSystemTime(FILETIME &ft);
+bool SystemToLocalTime(FILETIME &ft);
+bool LocalToSystemTime(FILETIME &ft);
 
 EXTERN CFarSettingsKey Settings;
 CFarSettingsKey GetSettings();
@@ -110,7 +110,7 @@ EXTERN int REErrorField  VALUE(-1);
 EXTERN int REErrorOffset VALUE(-1);
 
 bool CheckUsage(const tstring &strText, bool bRegExp, bool bSeveralLine);
-BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const tstring &Text,int CaseSensitive,const unsigned char *pTables=NULL);
+bool PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const tstring &Text,int CaseSensitive,const unsigned char *pTables=NULL);
 void HighlightREError(CFarDialog *pDlg);
 
 void FillDefaultNamedParameters(const TCHAR *szFileName);
@@ -120,12 +120,12 @@ template<class CHAR>
 basic_string<CHAR> EvaluateReplaceString(CREParameters<CHAR> &Param, const CHAR *Replace, const CHAR *EOL, LPCTSTR szEngine);
 
 #ifdef UNICODE
-BOOL PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,int CaseSensitive,const unsigned char *pTables=NULL);
-BOOL PreparePattern(pcre16 **Pattern,pcre16_extra **PatternExtra,const wstring &Text,int CaseSensitive);
+bool PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,int CaseSensitive,const unsigned char *pTables=NULL);
+bool PreparePattern(pcre16 **Pattern,pcre16_extra **PatternExtra,const wstring &Text,int CaseSensitive);
 #endif
 
-BOOL LoadPresets(char *Which,char **StringNames,int StringCount,char **IntNames,int IntCount,void **PresetData,int *PresetCount);
-BOOL SavePresets(char *Which,char **StringNames,int StringCount,char **IntNames,int IntCount,void *PresetData,int PresetCount);
+bool LoadPresets(char *Which,char **StringNames,int StringCount,char **IntNames,int IntCount,void **PresetData,int *PresetCount);
+bool SavePresets(char *Which,char **StringNames,int StringCount,char **IntNames,int IntCount,void *PresetData,int PresetCount);
 
 void ShowErrorMsg(const TCHAR *sz1, const TCHAR *sz2 = NULL, const TCHAR *szHelp = NULL);
 void ShowHResultError(int nError, HRESULT hResult, const TCHAR *szHelp = NULL);

@@ -34,7 +34,7 @@ void FTWriteRegistry(CFarSettingsKey Key)
 	#include "PersistVars.h"
 }
 
-void FTCleanup(BOOL PatternOnly)
+void FTCleanup(bool PatternOnly)
 {
 	if (!PatternOnly) {
 		delete RnPresets;
@@ -42,7 +42,8 @@ void FTCleanup(BOOL PatternOnly)
 	}
 }
 
-LONG_PTR WINAPI FileSelectDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LONG_PTR lParam2) {
+LONG_PTR WINAPI FileSelectDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LONG_PTR lParam2)
+{
 	switch (nMsg) {
 	case DN_INITDIALOG:
 		HighlightREError(pDlg);
@@ -77,7 +78,7 @@ void ChangeSelection(int How) {
 	CPanelInfo PInfo;
 	PInfo.GetInfo(false);
 
-	for (int I=0; I<PInfo.ItemsNumber; I++) {
+	for (size_t I=0; I<PInfo.ItemsNumber; I++) {
 		if (MultipleMasksApply(FarPanelFileName(PInfo.PanelItems[I]))) {
 			switch (How) {
 			case MSelect:
@@ -102,44 +103,46 @@ void ChangeSelection(int How) {
 #endif
 }
 
-BOOL ConfirmWholeFileRename(const TCHAR *From, const TCHAR *To) {
-	if (g_bInterrupted) return FALSE;
-	if (FileConfirmed) return TRUE;
+bool ConfirmWholeFileRename(const TCHAR *From, const TCHAR *To)
+{
+	if (g_bInterrupted) return false;
+	if (FileConfirmed) return true;
 
 	const TCHAR *Lines[]={
 		GetMsg(MMenuRename),GetMsg(MAskRename),From,GetMsg(MAskTo),To,
 		GetMsg(MOk),GetMsg(MAll),GetMsg(MSkip),GetMsg(MCancel)
 	};
 	switch (StartupInfo.Message(0,_T("FRAskRename"),Lines,9,4)) {
-	case 1:FRConfirmFileThisRun=FALSE;
-	case 0:return (FileConfirmed=TRUE);
+	case 1:FRConfirmFileThisRun=false;
+	case 0:return (FileConfirmed=true);
 	case -1:
-	case 3:g_bInterrupted=TRUE;
+	case 3:g_bInterrupted=true;
 	}
-	return FALSE;
+	return false;
 }
 
-BOOL ConfirmRename(const TCHAR *From,const TCHAR *To) {
-	if (g_bInterrupted) return FALSE;
-	if (!FRConfirmLineThisFile) return TRUE;
-	if (_tcscmp(From, To) == 0) return TRUE;
+bool ConfirmRename(const TCHAR *From,const TCHAR *To)
+{
+	if (g_bInterrupted) return false;
+	if (!FRConfirmLineThisFile) return true;
+	if (_tcscmp(From, To) == 0) return true;
 
 	const TCHAR *Lines[]={
 		GetMsg(MMenuRename),GetMsg(MAskRename),From,GetMsg(MAskTo),To,
 		GetMsg(MOk),GetMsg(MAll),GetMsg(MAllFiles),GetMsg(MSkip),GetMsg(MCancel)
 	};
 	switch (StartupInfo.Message(0,_T("FRAskRename"),Lines,10,5)) {
-	case 2:FRConfirmLineThisRun=FALSE;
-	case 1:FRConfirmLineThisFile=FALSE;
-	case 0:return TRUE;
+	case 2:FRConfirmLineThisRun=false;
+	case 1:FRConfirmLineThisFile=false;
+	case 0:return true;
 	case -1:
-	case 3:return FALSE;
+	case 3:return false;
 	}
-	g_bInterrupted=TRUE;
-	return FALSE;
+	g_bInterrupted=true;
+	return false;
 }
 
-BOOL FindRename(const TCHAR *FileName, int &MatchStart, int &MatchLength)
+bool FindRename(const TCHAR *FileName, int &MatchStart, int &MatchLength)
 {
 	REParam.Clear();
 	REParam.AddSource(FileName, _tcslen(FileName));
@@ -150,7 +153,7 @@ BOOL FindRename(const TCHAR *FileName, int &MatchStart, int &MatchLength)
 		if (do_pcre_exec(FPattern,FPatternExtra,FileName,_tcslen(FileName),MatchStart,0,REParam.Match(),REParam.Count())>=0) {
 			MatchDone();
 			REParam.FillStartLength(&MatchStart, &MatchLength);
-			return TRUE;
+			return true;
 		}
 	} else {
 		int NewMatchStart;
@@ -160,10 +163,11 @@ BOOL FindRename(const TCHAR *FileName, int &MatchStart, int &MatchLength)
 		if (NewMatchStart>=0) {
 			MatchStart+=NewMatchStart;
 			MatchLength=FText.size();
-			return TRUE;
+			return true;
 		}
 	}
-	return FALSE;
+
+	return false;
 }
 
 void PostPerformRename(rename_pair &Item)
@@ -211,7 +215,7 @@ bool PerformSingleRename(rename_pair &Item)
 					bOverwrite = true;
 					continue;
 				case 3:
-					g_bInterrupted = TRUE;
+					g_bInterrupted = true;
 				case -1:
 				case 2:
 					return false;
@@ -229,7 +233,7 @@ bool PerformSingleRename(rename_pair &Item)
 				case 0:
 					break;
 				case 3:
-					g_bInterrupted=TRUE;
+					g_bInterrupted=true;
 				case -1:
 				case 2:
 					return false;
@@ -242,7 +246,7 @@ bool PerformSingleRename(rename_pair &Item)
 					GetMsg(MSkip),GetMsg(MCancel)};
 				switch (StartupInfo.Message(FMSG_WARNING|FMSG_ERRORTYPE,_T("FRenameCreatePathError"),Lines,5,2)) {
 				case 1:
-					g_bInterrupted=TRUE;
+					g_bInterrupted=true;
 				case -1:
 				case 0:
 					return false;
@@ -258,7 +262,7 @@ bool PerformSingleRename(rename_pair &Item)
 		case 0:
 			continue;
 		case 2:
-			g_bInterrupted=TRUE;
+			g_bInterrupted=true;
 		case -1:
 		case 1:
 			return false;
@@ -332,7 +336,7 @@ void RenamePreview(panelitem_vector &PanelItems)
 			if (nResult >= 0) {
 				PerformFinalRename(PanelItems);
 			} else {
-				g_bInterrupted = TRUE;
+				g_bInterrupted = true;
 			}
 			return;
 		case 0:
@@ -358,7 +362,7 @@ void RenamePreview(panelitem_vector &PanelItems)
 		}
 
 		if (m_arrPendingRename.empty()) {
-			g_bInterrupted = TRUE;
+			g_bInterrupted = true;
 			return;
 		}
 	} while (true);
@@ -396,7 +400,7 @@ void RenameFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems)
 
 		MatchStart += (strNewSubName.empty()) ? 1 : strNewSubName.length();
 
-		BOOL bConfirm = TRUE;
+		bool bConfirm = true;
 
 		if (!bOnlyGlobalConfirm) {
 			if (!ConfirmFile(MMenuRename,strOriginalName.c_str())) break;
@@ -426,7 +430,7 @@ void RenameFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems)
 	}
 }
 
-BOOL RenameFilesPrompt()
+bool RenameFilesPrompt()
 {
 	CFarDialog Dialog(76, 21, _T("FileRenameDlg"));
 	Dialog.SetWindowProc(FileSearchDialogProc, 0);
@@ -444,7 +448,7 @@ BOOL RenameFilesPrompt()
 	Dialog.Add(new CFarTextItem(5,6,0,MReplaceWith));
 	Dialog.Add(new CFarEditItem(5,7,70,DIF_HISTORY,_T("ReplaceText"), ReplaceText));
 
-	Dialog.Add(new CFarCheckBoxItem(25,4,0,MRegExp,(BOOL *)&FSearchAs));
+	Dialog.Add(new CFarCheckBoxItem(25,4,0,MRegExp,(bool *)&FSearchAs));
 	Dialog.Add(new CFarCheckBoxItem(52,4,0,MCaseSensitive,&FCaseSensitive));
 	Dialog.Add(new CFarCheckBoxItem(25,6,0,MRepeating,&FRepeating));
 	Dialog.Add(new CFarTextItem(5,8,DIF_BOXCOLOR|DIF_SEPARATOR,_T("")));
@@ -454,7 +458,7 @@ BOOL RenameFilesPrompt()
 
 	Dialog.Add(new CFarCheckBoxItem(5, 10, 0, MEvaluateAsScript, &FREvaluate));
 	Dialog.Add(new CFarComboBoxItem(30, 10, 55, 0, new CFarListData(m_lstEngines, false), new CFarEngineStorage(EREvaluateScript)));
-	Dialog.Add(new CFarButtonItem(60, 10, 0, FALSE, MRunEditor));
+	Dialog.Add(new CFarButtonItem(60, 10, 0, false, MRunEditor));
 
 	Dialog.Add(new CFarCheckBoxItem(56,11,0,_T(""),&FAdvanced));
 	Dialog.Add(new CFarButtonItem(60,11,0,0,MBtnAdvanced));
@@ -496,17 +500,18 @@ BOOL RenameFilesPrompt()
 			RunExternalEditor(ReplaceText);
 			break;
 		case MBtnAdvanced:
-			if (AdvancedSettings()) FAdvanced=TRUE;
+			if (AdvancedSettings()) FAdvanced=true;
 			break;
 		default:
-			return FALSE;
+			return false;
 		}
 	} while (!IsOKClose(ExitCode) || !FPreparePattern(false));
 
 	return (ExitCode == MOk);
 }
 
-OperationResult RenameFiles(panelitem_vector &PanelItems, BOOL ShowDialog) {
+OperationResult RenameFiles(panelitem_vector &PanelItems, bool ShowDialog)
+{
 	CPanelInfo PInfo;
 	PInfo.GetInfo(false);
 	if (PInfo.Plugin||(PInfo.PanelType!=PTYPE_FILEPANEL)) return OR_FAILED;
@@ -521,7 +526,7 @@ OperationResult RenameFiles(panelitem_vector &PanelItems, BOOL ShowDialog) {
 	FRConfirmLineThisRun=FRConfirmLine;
 	FTAskOverwrite = FTAskCreatePath = true;
 	FileNumber=-1;
-	g_bInterrupted=FALSE;
+	g_bInterrupted=false;
 
 	m_arrPendingRename.clear();
 	m_arrLastRename.clear();
@@ -537,21 +542,22 @@ OperationResult RenameFiles(panelitem_vector &PanelItems, BOOL ShowDialog) {
 	} else return OR_FAILED;
 }
 
-OperationResult RenameFilesExecutor() {
+OperationResult RenameFilesExecutor()
+{
 	FMask=MaskText;
 	FText=SearchText;
 	FRReplace=ReplaceText;
 	if (!FPreparePattern(false)) return OR_FAILED;
 	FTAskOverwrite = FTAskCreatePath = true;
 	FileNumber=-1;
-	g_bInterrupted=FALSE;
+	g_bInterrupted=false;
 
 	m_arrPendingRename.clear();
 	m_arrLastRename.clear();
 
-	FRConfirmFileThisRun = FALSE;	//FRConfirmFile;
-	FRConfirmLineThisRun = FALSE;	//FRConfirmLine;
-	FRPreviewRename = FALSE;
+	FRConfirmFileThisRun = false;	//FRConfirmFile;
+	FRConfirmLineThisRun = false;	//FRConfirmLine;
+	FRPreviewRename = false;
 	SanitateEngine();
 
 	if (ScanDirectories(g_PanelItems, RenameFile)) {
@@ -561,10 +567,10 @@ OperationResult RenameFilesExecutor() {
 	} else return OR_FAILED;
 }
 
-BOOL PerformRenameSelectedFiles(CPanelInfo &PInfo, panelitem_vector &PanelItems)
+bool PerformRenameSelectedFiles(CPanelInfo &PInfo, panelitem_vector &PanelItems)
 {
 	FileNumber=-1;
-	g_bInterrupted=FALSE;
+	g_bInterrupted=false;
 
 	m_arrPendingRename.clear();
 	m_arrLastRename.clear();
@@ -572,12 +578,12 @@ BOOL PerformRenameSelectedFiles(CPanelInfo &PInfo, panelitem_vector &PanelItems)
 	//	To allow 'Restore selection' of _unmodified_ files
 	vector<tstring> arrOrigNames;
 
-	BOOL bRestoreSelection = FRLeaveSelection;
-	if ((PInfo.SelectedItemsNumber==0)&&(PInfo.ItemsNumber>0)&&
+	bool bRestoreSelection = FRLeaveSelection;
+	if ((PInfo.SelectedItemsNumber==0) && (PInfo.ItemsNumber>0) &&
 		(_tcscmp(FarPanelFileName(PInfo.PanelItems[PInfo.CurrentItem]),_T(".."))==0)) {
 
-		bRestoreSelection = FALSE;
-		for (int I=0;I<PInfo.ItemsNumber;I++) {
+		bRestoreSelection = false;
+		for (size_t I=0; I<PInfo.ItemsNumber; I++) {
 			if (I==PInfo.CurrentItem) continue;
 			if (g_bInterrupted) break;
 
@@ -589,8 +595,8 @@ BOOL PerformRenameSelectedFiles(CPanelInfo &PInfo, panelitem_vector &PanelItems)
 		}
 	} else {
 		if ((PInfo.SelectedItemsNumber == 1) && ((PInfo.SelectedItems[0].Flags & PPIF_SELECTED) == 0))
-			bRestoreSelection = FALSE;
-		for (int I=0;I<PInfo.SelectedItemsNumber;I++) {
+			bRestoreSelection = false;
+		for (size_t I=0; I<PInfo.SelectedItemsNumber ;I++) {
 			if (g_bInterrupted) break;
 
 			LPCTSTR szFileName = FarPanelFileName(PInfo.SelectedItems[I]);
@@ -624,17 +630,18 @@ BOOL PerformRenameSelectedFiles(CPanelInfo &PInfo, panelitem_vector &PanelItems)
 		}
 		SetPanelSelection(PNewInfo, false, true);
 	}
-	return TRUE;
+	return true;
 }
 
-BOOL RenameSelectedFilesPrompt() {
+bool RenameSelectedFilesPrompt()
+{
 	CFarDialog Dialog(76, 15, _T("SelectedFileRenameDlg"));
 	Dialog.SetWindowProc(FileSearchDialogProc, 0);
 
 	Dialog.AddFrame(MRenameSelected);
 	Dialog.SetUseID(true);
 
-	Dialog.Add(new CFarCheckBoxItem(25,2,0,MRegExp,(BOOL *)&FSearchAs));
+	Dialog.Add(new CFarCheckBoxItem(25,2,0,MRegExp,(bool *)&FSearchAs));
 	Dialog.Add(new CFarCheckBoxItem(50,2,0,MCaseSensitive,&FCaseSensitive));
 	Dialog.Add(new CFarTextItem(5,2,0,MText));
 	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,_T("SearchText"), SearchText));
@@ -675,14 +682,15 @@ BOOL RenameSelectedFilesPrompt() {
 			}
 			break;
 		default:
-			return FALSE;
+			return false;
 		}
 	} while (!IsOKClose(ExitCode) || !FPreparePattern(false));
 
 	return (ExitCode == MOk);
 }
 
-OperationResult RenameSelectedFiles(panelitem_vector &PanelItems, BOOL ShowDialog) {
+OperationResult RenameSelectedFiles(panelitem_vector &PanelItems, bool ShowDialog)
+{
 	CPanelInfo PInfo;
 	PInfo.GetInfo(false);
 	if (PInfo.Plugin||(PInfo.PanelType!=PTYPE_FILEPANEL)) return OR_FAILED;
@@ -694,7 +702,7 @@ OperationResult RenameSelectedFiles(panelitem_vector &PanelItems, BOOL ShowDialo
 	}
 
 	PanelItems.clear();
-	FRConfirmFileThisRun=FALSE;
+	FRConfirmFileThisRun=false;
 	FRConfirmLineThisRun=FRConfirmLine;
 	FTAskOverwrite = FTAskCreatePath = true;
 
@@ -702,15 +710,16 @@ OperationResult RenameSelectedFiles(panelitem_vector &PanelItems, BOOL ShowDialo
 	return (PanelItems.empty() && !g_bInterrupted) ? NoFilesFound() : OR_OK;
 }
 
-OperationResult QuickRenameFilesExecutor() {
+OperationResult QuickRenameFilesExecutor()
+{
 	FText=SearchText;
 	FRReplace=ReplaceText;
 	if (!FPreparePattern(false)) return OR_FAILED;
 	FTAskOverwrite = FTAskCreatePath = true;
 
-	FRConfirmFileThisRun = FALSE;
-	FRConfirmLineThisRun = FALSE;
-	FRPreviewRename = FALSE;
+	FRConfirmFileThisRun = false;
+	FRConfirmLineThisRun = false;
+	FRPreviewRename = false;
 
 	CPanelInfo PInfo;
 	PInfo.GetInfo(false);
@@ -721,7 +730,8 @@ OperationResult QuickRenameFilesExecutor() {
 
 //////////////////////////////////////////////////////////////////////////
 
-void StripCommonPart(vector<tstring> &arrFileNames) {
+void StripCommonPart(vector<tstring> &arrFileNames)
+{
 	int nCommon = -1;
 	for (size_t nStr = 0; nStr < arrFileNames.size(); nStr++) {
 		if (arrFileNames[nStr].empty()) continue;
@@ -739,7 +749,8 @@ void StripCommonPart(vector<tstring> &arrFileNames) {
 		arrFileNames[nStr].erase(0, nCommon);
 }
 
-void ProcessNames(vector<tstring> &arrFileNames, vector<tstring> &arrProcessedNames) {
+void ProcessNames(vector<tstring> &arrFileNames, vector<tstring> &arrProcessedNames)
+{
 	arrProcessedNames.resize(0);
 	CRegExp reStrip(g_strStrip, PCRE_CASELESS);
 
@@ -785,7 +796,8 @@ void ProcessNames(vector<tstring> &arrFileNames, vector<tstring> &arrProcessedNa
 	}
 }
 
-void PerformRenumber(vector<tstring> &arrFileNames, vector<tstring> &arrProcessedNames, LPCTSTR szCurDir) {
+void PerformRenumber(vector<tstring> &arrFileNames, vector<tstring> &arrProcessedNames, LPCTSTR szCurDir)
+{
 	m_arrLastRename.clear();
 
 	for (size_t nItem = 0; nItem < arrFileNames.size(); nItem++) {
@@ -827,7 +839,7 @@ OperationResult RenumberFiles()
 	g_nStartWithNow = g_nStartWith;
 
 	vector<tstring> arrFileNames;
-	for (int nItem = 0; nItem < PInfo.SelectedItemsNumber; nItem++)
+	for (size_t nItem = 0; nItem < PInfo.SelectedItemsNumber; nItem++)
 		arrFileNames.push_back(FarPanelFileName(PInfo.SelectedItems[nItem]));
 
 	int BreakKeys[] = {
@@ -947,8 +959,9 @@ OperationResult RenumberFiles()
 	return OR_CANCEL;
 }
 
-OperationResult UndoRenameFiles() {
-	FRConfirmFileThisRun = TRUE;
+OperationResult UndoRenameFiles()
+{
+	FRConfirmFileThisRun = true;
 
 	for (int nFile = m_arrLastRename.size()-1; nFile >= 0; nFile--) {
 		FileConfirmed = !FRConfirmFileThisRun;
@@ -969,7 +982,7 @@ OperationResult UndoRenameFiles() {
 	return OR_CANCEL;
 }
 
-BOOL CRnPresetCollection::EditPreset(CPreset *pPreset)
+bool CRnPresetCollection::EditPreset(CPreset *pPreset)
 {
 	CFarDialog Dialog(76,19,_T("RPresetDlg"));
 	Dialog.AddFrame(MRnPreset);
@@ -993,7 +1006,7 @@ BOOL CRnPresetCollection::EditPreset(CPreset *pPreset)
 
 	Dialog.Add(new CFarCheckBoxItem(5, 11, 0, MEvaluateAsScript, &pPreset->m_mapInts["AsScript"]));
 	Dialog.Add(new CFarComboBoxItem(30, 11, 55, 0, new CFarListData(m_lstEngines, false), new CFarEngineStorage(pPreset->m_mapStrings["Script"])));
-	Dialog.Add(new CFarButtonItem(60, 11, 0, FALSE, MRunEditor));
+	Dialog.Add(new CFarButtonItem(60, 11, 0, false, MRunEditor));
 
 	int  nAdvancedID = pPreset->m_mapInts["AdvancedID"];
 	bool bFAdvanced = nAdvancedID > 0;
@@ -1009,7 +1022,7 @@ BOOL CRnPresetCollection::EditPreset(CPreset *pPreset)
 		switch (Dialog.Display()) {
 		case MOk:
 			pPreset->m_mapInts["AdvancedID"] = bFAdvanced ? nAdvancedID : 0;
-			return TRUE;
+			return true;
 		case MRunEditor:
 			RunExternalEditor(pPreset->m_mapStrings["Replace"]);
 			break;
@@ -1017,12 +1030,12 @@ BOOL CRnPresetCollection::EditPreset(CPreset *pPreset)
 			SelectAdvancedPreset(nAdvancedID, bFAdvanced);
 			break;
 		default:
-			return FALSE;
+			return false;
 		}
 	} while (true);
 }
 
-BOOL CQRPresetCollection::EditPreset(CPreset *pPreset)
+bool CQRPresetCollection::EditPreset(CPreset *pPreset)
 {
 	CFarDialog Dialog(76,15,_T("QRPresetDlg"));
 	Dialog.AddFrame(MQRPreset);

@@ -3,8 +3,9 @@
 
 #include "FileOperations.h"
 
-void SearchFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
-	BOOL IsFound;
+void SearchFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems)
+{
+	bool IsFound;
 
 	InitFoundPosition();
 
@@ -20,8 +21,8 @@ void SearchFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 	if (FPattern) REParamA.AddRE(FPattern);
 #endif
 
-	if (FText.empty()) IsFound=TRUE; else 
-	if (FindData->nFileSizeLow==0) IsFound=FALSE; else 
+	if (FText.empty()) IsFound=true; else 
+	if (FindData->nFileSizeLow==0) IsFound=false; else 
 	switch (FSearchAs) {
 	case SA_PLAINTEXT:{
 		CSearchPlainTextFrontend Frontend;
@@ -48,7 +49,7 @@ void SearchFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems) {
 		IsFound = RunSearch(FindData->cFileName, &Frontend, false);
 		break;
 					  }
-	default:IsFound=FALSE;
+	default:IsFound=false;
 	}
 
 	// This is exclusive 'OR'...
@@ -102,7 +103,7 @@ LONG_PTR WINAPI FileSearchDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LO
 	return pDlg->DefDlgProc(nMsg, nParam1, lParam2);
 }
 
-int SearchPrompt(BOOL Plugin)
+bool SearchPrompt(bool Plugin)
 {
 	CFarDialog Dialog(76,23,_T("FileSearchDlg"));
 	Dialog.SetWindowProc(FileSearchDialogProc, 0);
@@ -165,17 +166,18 @@ int SearchPrompt(BOOL Plugin)
 			if (Plugin&&(FSearchIn<SI_FROMCURRENT)) FSearchIn=SI_FROMCURRENT;
 			break;
 		case MBtnAdvanced:
-			if (AdvancedSettings()) FAdvanced=TRUE;
+			if (AdvancedSettings()) FAdvanced=true;
 			break;
 		default:
-			return FALSE;
+			return false;
 		}
 	} while (!IsOKClose(ExitCode) || !PrepareFileSearchPattern());
 
 	return (ExitCode == MOk);
 }
 
-OperationResult FileFind(panelitem_vector &PanelItems, BOOL ShowDialog, BOOL bSilent) {
+OperationResult FileFind(panelitem_vector &PanelItems, bool ShowDialog, bool bSilent)
+{
 	CPanelInfo PInfo;
 	PInfo.GetInfo(false);
 	if (PInfo.PanelType!=PTYPE_FILEPANEL) return OR_FAILED;
@@ -196,13 +198,14 @@ OperationResult FileFind(panelitem_vector &PanelItems, BOOL ShowDialog, BOOL bSi
 	} else return OR_FAILED;
 }
 
-OperationResult FileSearchExecutor() {
+OperationResult FileSearchExecutor()
+{
 	FMask = MaskText;
 	FText = SearchText;
-	return FileFind(g_PanelItems, FALSE, TRUE);
+	return FileFind(g_PanelItems, false, true);
 }
 
-BOOL CFSPresetCollection::EditPreset(CPreset *pPreset)
+bool CFSPresetCollection::EditPreset(CPreset *pPreset)
 {
 	CFarDialog Dialog(76,24,_T("FSPresetDlg"));
 	Dialog.AddFrame(MFSPreset);
@@ -240,12 +243,12 @@ BOOL CFSPresetCollection::EditPreset(CPreset *pPreset)
 		switch (Dialog.Display(2, -2, -4)) {
 		case 0:
 			pPreset->m_mapInts["AdvancedID"] = bFAdvanced ? nAdvancedID : 0;
-			return TRUE;
+			return true;
 		case 1:
 			SelectAdvancedPreset(nAdvancedID, bFAdvanced);
 			break;
 		default:
-			return FALSE;
+			return false;
 		}
 	} while (true);
 }

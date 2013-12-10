@@ -367,35 +367,35 @@ bool CFileBackend::OpenOutput()
 	return true;
 }
 
-BOOL CFileBackend::BufferOutput(LPCVOID lpBuffer, DWORD dwWrite)
+bool CFileBackend::BufferOutput(LPCVOID lpBuffer, DWORD dwWrite)
 {
 	if (m_nBuffered + dwWrite <= m_arrWriteBuffer.size()) {
 		memmove(&m_arrWriteBuffer[m_nBuffered], lpBuffer, dwWrite);
 		m_nBuffered += dwWrite;
-		return TRUE;
+		return true;
 	}
 
-	if (!FlushBuffer()) return FALSE;
+	if (!FlushBuffer()) return false;
 
 	if (dwWrite >= m_arrWriteBuffer.size()/16) {
 		DWORD dwWritten;
-		if (!WriteFile(m_hOutFile, lpBuffer, dwWrite, &dwWritten, NULL)) return FALSE;
-		if (dwWritten != dwWrite) return FALSE;
-		return TRUE;
+		if (!WriteFile(m_hOutFile, lpBuffer, dwWrite, &dwWritten, NULL)) return false;
+		if (dwWritten != dwWrite) return false;
+		return true;
 	} else {
 		return BufferOutput(lpBuffer, dwWrite);
 	}
 }
 
-BOOL CFileBackend::FlushBuffer()
+bool CFileBackend::FlushBuffer()
 {
 	DWORD dwWritten;
 
-	if (!WriteFile(m_hOutFile, &m_arrWriteBuffer[0], m_nBuffered, &dwWritten, NULL)) return FALSE;
-	if (dwWritten != m_nBuffered) return FALSE;
+	if (!WriteFile(m_hOutFile, &m_arrWriteBuffer[0], m_nBuffered, &dwWritten, NULL)) return false;
+	if (dwWritten != m_nBuffered) return false;
 	m_nBuffered = 0;
 
-	return TRUE;
+	return true;
 }
 
 LPCTSTR CFileBackend::FileName()

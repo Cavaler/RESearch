@@ -86,23 +86,23 @@ void BadCmdLine() {
 	StartupInfo.Message(FMSG_WARNING,_T("REInvalidCmdLine"),Lines,3,1);
 }
 
-BOOL ProcessFFLine(const TCHAR *Line, BOOL *ShowDialog, INT_PTR *Item)
+bool ProcessFFLine(const TCHAR *Line, bool *ShowDialog, INT_PTR *Item)
 {
 	*Item = 0;
 	TCHAR Switch = Line[0];
-	if (Switch == 0) { *ShowDialog = TRUE; return TRUE; }
+	if (Switch == 0) { *ShowDialog = true; return true; }
 
 	Line++;
-	*ShowDialog = FALSE;
+	*ShowDialog = false;
 
 	if ((Switch==' ')||(Switch=='\t')) {
 		FText=Line;
 		*Item=0;
-		return TRUE;
+		return true;
 	}
 
 	const TCHAR *NextSwitch = _tcschr(Line,Switch);
-	if (!NextSwitch) { BadCmdLine(); return FALSE; }
+	if (!NextSwitch) { BadCmdLine(); return false; }
 
 	FMask = tstring(Line, NextSwitch-Line);
 	Line  = NextSwitch+1;
@@ -117,51 +117,51 @@ BOOL ProcessFFLine(const TCHAR *Line, BOOL *ShowDialog, INT_PTR *Item)
 
 	while (NextSwitch&&*Line) {
 		switch (*Line) {
-		case 'c':FCaseSensitive=TRUE;break;
-		case 'C':FCaseSensitive=FALSE;break;
-		case 'i':FSInverse=TRUE;break;
-		case 'I':FSInverse=FALSE;break;
+		case 'c':FCaseSensitive=true;break;
+		case 'C':FCaseSensitive=false;break;
+		case 'i':FSInverse=true;break;
+		case 'I':FSInverse=false;break;
 		case 'p':case 'P':FSearchAs=SA_PLAINTEXT;break;
 		case 'r':case 'R':FSearchAs=SA_REGEXP;break;
 		case 's':case 'S':FSearchAs=SA_SEVERALLINE;break;
 		case 'm':case 'M':FSearchAs=SA_MULTILINE;break;
 		case 'a':case 'A':FSearchAs=SA_MULTITEXT;break;
 		case 'l':case 'L':FSearchAs=SA_MULTIREGEXP;break;
-		case 'd':*ShowDialog=TRUE;break;
-		case 'D':*ShowDialog=FALSE;break;
+		case 'd':*ShowDialog=true;break;
+		case 'D':*ShowDialog=false;break;
 		case '0':FSearchIn=SI_ALLDRIVES;break;
 		case '1':FSearchIn=SI_ALLLOCAL;break;
 		case '2':FSearchIn=SI_FROMROOT;break;
 		case '3':FSearchIn=SI_FROMCURRENT;break;
 		case '4':FSearchIn=SI_CURRENTONLY;break;
 		case '5':FSearchIn=SI_SELECTED;break;
-		default:BadCmdLine();return FALSE;
+		default:BadCmdLine();return false;
 		}
 		Line++;
 	}
-	return TRUE;
+	return true;
 }
 
-BOOL ProcessFRLine(const TCHAR *Line,BOOL *ShowDialog,INT_PTR *Item)
+bool ProcessFRLine(const TCHAR *Line,bool *ShowDialog,INT_PTR *Item)
 {
 	*Item = 1;
 	TCHAR Switch = Line[0];
-	if (!Switch) { *ShowDialog = TRUE; return TRUE; }
+	if (!Switch) { *ShowDialog = true; return true; }
 
 	Line++;
-	*ShowDialog = FALSE;
+	*ShowDialog = false;
 
 	if ((Switch==' ')||(Switch=='\t')) {
-		FText=Line;*Item=0;return TRUE;
+		FText=Line;*Item=0;return true;
 	}
 
 	const TCHAR *NextSwitch = _tcschr(Line,Switch);
-	if (!NextSwitch) { BadCmdLine(); return FALSE; }
+	if (!NextSwitch) { BadCmdLine(); return false; }
 	FMask = tstring(Line, NextSwitch-Line);
 	Line  = NextSwitch+1;
 
 	NextSwitch = _tcschr(Line,Switch);
-	if (!NextSwitch) { BadCmdLine(); return FALSE; }
+	if (!NextSwitch) { BadCmdLine(); return false; }
 	FText = tstring(Line, NextSwitch-Line);
 	Line  = NextSwitch+1;
 
@@ -175,60 +175,60 @@ BOOL ProcessFRLine(const TCHAR *Line,BOOL *ShowDialog,INT_PTR *Item)
 
 	while (NextSwitch&&*Line) {
 		switch (*Line) {
-		case 'c':FCaseSensitive=TRUE;break;
-		case 'C':FCaseSensitive=FALSE;break;
+		case 'c':FCaseSensitive=true;break;
+		case 'C':FCaseSensitive=false;break;
 		case 'p':case 'P':FSearchAs=SA_PLAINTEXT;break;
 		case 'r':case 'R':FSearchAs=SA_REGEXP;break;
 		case 's':case 'S':FSearchAs=SA_SEVERALLINE;break;
-		case 'v':FROpenModified=TRUE;break;
-		case 'V':FROpenModified=FALSE;break;
-		case 'f':FRConfirmFile=TRUE;break;
-		case 'F':FRConfirmFile=FALSE;break;
-		case 'l':FRConfirmLine=TRUE;break;
-		case 'L':FRConfirmLine=FALSE;break;
-		case 'o':FRSaveOriginal=TRUE;break;
-		case 'O':FRSaveOriginal=FALSE;break;
-		case 'b':FROverwriteBackup=TRUE;break;
-		case 'B':FROverwriteBackup=FALSE;break;
-		case 'w':FRReplaceToNew=TRUE;break;
-		case 'W':FRReplaceToNew=FALSE;break;
-		case 'd':*ShowDialog=TRUE;break;
-		case 'D':*ShowDialog=FALSE;break;
+		case 'v':FROpenModified=true;break;
+		case 'V':FROpenModified=false;break;
+		case 'f':FRConfirmFile=true;break;
+		case 'F':FRConfirmFile=false;break;
+		case 'l':FRConfirmLine=true;break;
+		case 'L':FRConfirmLine=false;break;
+		case 'o':FRSaveOriginal=true;break;
+		case 'O':FRSaveOriginal=false;break;
+		case 'b':FROverwriteBackup=true;break;
+		case 'B':FROverwriteBackup=false;break;
+		case 'w':FRReplaceToNew=true;break;
+		case 'W':FRReplaceToNew=false;break;
+		case 'd':*ShowDialog=true;break;
+		case 'D':*ShowDialog=false;break;
 		case '0':FSearchIn=SI_ALLDRIVES;break;
 		case '1':FSearchIn=SI_ALLLOCAL;break;
 		case '2':FSearchIn=SI_FROMROOT;break;
 		case '3':FSearchIn=SI_FROMCURRENT;break;
 		case '4':FSearchIn=SI_CURRENTONLY;break;
 		case '5':FSearchIn=SI_SELECTED;break;
-		default:BadCmdLine();return FALSE;
+		default:BadCmdLine();return false;
 		}
 		Line++;
 	}
-	return TRUE;
+	return true;
 }
 
-BOOL ProcessRNLine(const TCHAR *Line,BOOL *ShowDialog,INT_PTR *Item)
+bool ProcessRNLine(const TCHAR *Line,bool *ShowDialog,INT_PTR *Item)
 {
 	*Item = 7;
 	TCHAR Switch = Line[0];
-	if (!Switch) { *ShowDialog = TRUE; return TRUE; }
+	if (!Switch) { *ShowDialog = true; return true; }
 
 	Line++;
-	*ShowDialog = FALSE;
+	*ShowDialog = false;
 
 	if ((Switch==' ')||(Switch=='\t')) {
 		FText=Line;
 		*Item=0;
-		return TRUE;
+		return true;
 	}
 
 	const TCHAR *NextSwitch = _tcschr(Line,Switch);
-	if (!NextSwitch) { BadCmdLine(); return FALSE; }
+	if (!NextSwitch) { BadCmdLine(); return false; }
 	FMask = tstring(Line, NextSwitch-Line);
 	Line  = NextSwitch+1;
 
 	NextSwitch = _tcschr(Line,Switch);
-	if (!NextSwitch) { BadCmdLine(); return FALSE; }
+	if (!NextSwitch) { BadCmdLine(); return false; }
 	FText = tstring(Line, NextSwitch-Line);
 	Line  = NextSwitch+1;
 
@@ -242,42 +242,42 @@ BOOL ProcessRNLine(const TCHAR *Line,BOOL *ShowDialog,INT_PTR *Item)
 
 	while (NextSwitch&&*Line) {
 		switch (*Line) {
-		case 'c':FCaseSensitive=TRUE;break;
-		case 'C':FCaseSensitive=FALSE;break;
+		case 'c':FCaseSensitive=true;break;
+		case 'C':FCaseSensitive=false;break;
 		case 'r':FSearchAs=SA_REGEXP;break;
 		case 'R':FSearchAs=SA_PLAINTEXT;break;
-		case 'p':FRepeating=TRUE;break;
-		case 'P':FRepeating=FALSE;break;
-		case 'f':FRConfirmFile=TRUE;break;
-		case 'F':FRConfirmFile=FALSE;break;
-		case 'l':FRConfirmLine=TRUE;break;
-		case 'L':FRConfirmLine=FALSE;break;
-		case 'd':*ShowDialog=TRUE;break;
-		case 'D':*ShowDialog=FALSE;break;
+		case 'p':FRepeating=true;break;
+		case 'P':FRepeating=false;break;
+		case 'f':FRConfirmFile=true;break;
+		case 'F':FRConfirmFile=false;break;
+		case 'l':FRConfirmLine=true;break;
+		case 'L':FRConfirmLine=false;break;
+		case 'd':*ShowDialog=true;break;
+		case 'D':*ShowDialog=false;break;
 		case '0':FSearchIn=SI_ALLDRIVES;break;
 		case '1':FSearchIn=SI_ALLLOCAL;break;
 		case '2':FSearchIn=SI_FROMROOT;break;
 		case '3':FSearchIn=SI_FROMCURRENT;break;
 		case '4':FSearchIn=SI_CURRENTONLY;break;
 		case '5':FSearchIn=SI_SELECTED;break;
-		default:BadCmdLine();return FALSE;
+		default:BadCmdLine();return false;
 		}
 		Line++;
 	}
-	return TRUE;
+	return true;
 }
 
-BOOL ProcessQRLine(const TCHAR *Line,BOOL *ShowDialog,INT_PTR *Item)
+bool ProcessQRLine(const TCHAR *Line,bool *ShowDialog,INT_PTR *Item)
 {
 	*Item = 8;
 	TCHAR Switch = Line[0];
-	if (!Switch) { *ShowDialog = TRUE; return TRUE; }
+	if (!Switch) { *ShowDialog = true; return true; }
 
 	Line++;
-	*ShowDialog = FALSE;
+	*ShowDialog = false;
 
 	const TCHAR *NextSwitch = _tcschr(Line,Switch);
-	if (!NextSwitch) { BadCmdLine(); return FALSE; }
+	if (!NextSwitch) { BadCmdLine(); return false; }
 	FText = tstring(Line, NextSwitch-Line);
 	Line  = NextSwitch+1;
 
@@ -291,26 +291,26 @@ BOOL ProcessQRLine(const TCHAR *Line,BOOL *ShowDialog,INT_PTR *Item)
 
 	while (NextSwitch&&*Line) {
 		switch (*Line) {
-		case 'c':FCaseSensitive=TRUE;break;
-		case 'C':FCaseSensitive=FALSE;break;
+		case 'c':FCaseSensitive=true;break;
+		case 'C':FCaseSensitive=false;break;
 		case 'r':FSearchAs=SA_REGEXP;break;
 		case 'R':FSearchAs=SA_PLAINTEXT;break;
-		case 'p':FRepeating=TRUE;break;
-		case 'P':FRepeating=FALSE;break;
-		case 'f':FRConfirmFile=TRUE;break;
-		case 'F':FRConfirmFile=FALSE;break;
-		case 'l':FRConfirmLine=TRUE;break;
-		case 'L':FRConfirmLine=FALSE;break;
-		case 'd':*ShowDialog=TRUE;break;
-		case 'D':*ShowDialog=FALSE;break;
-		default:BadCmdLine();return FALSE;
+		case 'p':FRepeating=true;break;
+		case 'P':FRepeating=false;break;
+		case 'f':FRConfirmFile=true;break;
+		case 'F':FRConfirmFile=false;break;
+		case 'l':FRConfirmLine=true;break;
+		case 'L':FRConfirmLine=false;break;
+		case 'd':*ShowDialog=true;break;
+		case 'D':*ShowDialog=false;break;
+		default:BadCmdLine();return false;
 		}
 		Line++;
 	}
-	return TRUE;
+	return true;
 }
 
-BOOL ProcessCommandLine(const TCHAR *Line,BOOL *ShowDialog,INT_PTR *Item)
+bool ProcessCommandLine(const TCHAR *Line,bool *ShowDialog,INT_PTR *Item)
 {
 //	f?:/mask/findtext/options
 //	f?:/mask/findtext/replacetext/options
@@ -325,7 +325,7 @@ BOOL ProcessCommandLine(const TCHAR *Line,BOOL *ShowDialog,INT_PTR *Item)
 	if (_tcsnicmp(Line,_T("qr:"),3)==0) return ProcessQRLine(Line+3,ShowDialog,Item);
 
 	TCHAR Switch=Line[0];
-	if (!Switch) { BadCmdLine(); return FALSE; }
+	if (!Switch) { BadCmdLine(); return false; }
 
 	const TCHAR *NextSwitch;
 	if ((Switch!=' ')&&(Switch!='\t')) {
@@ -525,7 +525,7 @@ OperationResult OpenPluginFromFilePreset(int nItem, int nBreakCode)
 	return OR_CANCEL;
 }
 
-HANDLE OpenPluginFromFileMenu(int Item, BOOL ShowDialog = TRUE)
+HANDLE OpenPluginFromFileMenu(int Item, bool ShowDialog = true)
 {
 	OperationResult Result = OR_CANCEL;
 	int nBreakCode = -1;
@@ -599,7 +599,7 @@ HANDLE OpenPluginFromFileMenu(int Item, BOOL ShowDialog = TRUE)
 		return (HANDLE)Panel;
 	} else {
 #ifdef UNICODE
-		StartupInfo.Control(PANEL_ACTIVE, FCTL_UPDATEPANEL, TRUE, NULL);
+		StartupInfo.Control(PANEL_ACTIVE, FCTL_UPDATEPANEL, true, NULL);
 		StartupInfo.Control(PANEL_ACTIVE, FCTL_REDRAWPANEL, 0, NULL);
 #else
 		StartupInfo.Control(INVALID_HANDLE_VALUE,FCTL_UPDATEPANEL,(void *)~NULL);
@@ -672,12 +672,12 @@ HANDLE OpenPluginFromEditorMenu(int nItem)
 			EReverse = !EReverse;
 			//	fall-through
 		case 5:
-			ESearchAgainCalled = TRUE;
+			ESearchAgainCalled = true;
 			EPreparePattern(EText);		// In case codepage changed etc
 
 			switch (LastAction) {
 			case -1:
-				ESearchAgainCalled = FALSE;
+				ESearchAgainCalled = false;
 				if (EditorSearch()) LastAction=0;
 				break;
 			case 0:
@@ -743,10 +743,10 @@ HANDLE OpenPluginFromViewerMenu(int nItem)
 	//	case 2:
 	//		EReverse = !EReverse;
 		case 1:
-			ESearchAgainCalled = TRUE;
+			ESearchAgainCalled = true;
 			switch (LastAction) {
 			case -1:
-				ESearchAgainCalled = FALSE;
+				ESearchAgainCalled = false;
 				if (ViewerSearch()) LastAction = 0;
 				break;
 			default:
@@ -878,8 +878,8 @@ HANDLE OpenFromMacro(const OpenMacroInfo *MInfo)
 HANDLE WINAPI OpenW(const struct OpenInfo *Info)
 {
 	g_bFromCmdLine = false;
-	g_bInterrupted = FALSE;
-	ESearchAgainCalled = FALSE;
+	g_bInterrupted = false;
+	ESearchAgainCalled = false;
 
 	switch (Info->OpenFrom) {
 	case OPEN_PLUGINSMENU:
@@ -893,7 +893,7 @@ HANDLE WINAPI OpenW(const struct OpenInfo *Info)
 
 	case OPEN_COMMANDLINE:{
 		OpenCommandLineInfo *CmdInfo = (OpenCommandLineInfo *)Info->Data;
-		BOOL ShowDialog = TRUE;
+		bool ShowDialog = true;
 		INT_PTR Item;
 		if (ProcessCommandLine(CmdInfo->CommandLine, &ShowDialog, &Item)) {
 			g_bFromCmdLine = true;
@@ -914,11 +914,11 @@ HANDLE WINAPI OpenPluginW(int OpenFrom, INT_PTR Item)
 HANDLE WINAPI OpenPlugin(int OpenFrom, INT_PTR Item)
 #endif
 {
-	BOOL ShowDialog = TRUE;
+	bool ShowDialog = true;
 	g_bFromCmdLine = false;
-	g_bInterrupted = FALSE;
+	g_bInterrupted = false;
 
-	ESearchAgainCalled = FALSE;
+	ESearchAgainCalled = false;
 
 	switch (OpenFrom) {
 	case OPEN_COMMANDLINE:
@@ -953,12 +953,12 @@ HANDLE WINAPI OpenPlugin(int OpenFrom, INT_PTR Item)
 }
 #endif
 
-BOOL AtoI(char *String,int *Number,int Min,int Max) {
+bool AtoI(char *String,int *Number,int Min,int Max) {
 	int I;
 	if ((sscanf(String,"%d",&I)==1)&&(I>=Min)&&(I<=Max)) {
 		*Number=I;
-		return TRUE;
-	} else return FALSE;
+		return true;
+	} else return false;
 }
 
 int ConfigureSeveralLines() {
@@ -1044,7 +1044,7 @@ int ConfigureCP()
 			if (nResult >= 0) {
 				g_setAllCPs = setCPs;
 			}
-			return TRUE;
+			return true;
 		}
 
 		if (arrCPs[nItem] != 0) {
@@ -1085,7 +1085,7 @@ void ConfigureCommon()
 	Dialog.Add(new CFarCheckBoxItem(5,12,0,MUseEscapesInPlainText,&g_bEscapesInPlainText));
 	Dialog.Add(new CFarCheckBoxItem(5,13,0,MIgnoreIdentReplace,&g_bIgnoreIdentReplace));
 
-	Dialog.Add(new CFarButtonItem(5, 15, DIF_CENTERGROUP, FALSE, MUpdateScriptEngines));
+	Dialog.Add(new CFarButtonItem(5, 15, DIF_CENTERGROUP, false, MUpdateScriptEngines));
 
 	Dialog.AddButtons(MOk, MCancel);
 
@@ -1113,12 +1113,12 @@ void ConfigureFile()
 	Dialog.EnableAutoHotkeys(true);
 	Dialog.AddFrame(MFileSearchSettings);
 
-	Dialog.Add(new CFarBoxItem(FALSE,5,3,33,7,DIF_LEFTTEXT,MDefaultMaskCase));
+	Dialog.Add(new CFarBoxItem(false,5,3,33,7,DIF_LEFTTEXT,MDefaultMaskCase));
 	Dialog.Add(new CFarRadioButtonItem(7,4,DIF_GROUP,MMaskSensitive,(int *)&FMaskCase,MC_SENSITIVE));
 	Dialog.Add(new CFarRadioButtonItem(7,5,0,MMaskInsensitive,(int *)&FMaskCase,MC_INSENSITIVE));
 	Dialog.Add(new CFarRadioButtonItem(7,6,0,MMaskVolumeDependent,(int *)&FMaskCase,MC_VOLUME));
 
-	Dialog.Add(new CFarBoxItem(FALSE,35,3,64,7,DIF_LEFTTEXT,MReplaceReadonly));
+	Dialog.Add(new CFarBoxItem(false,35,3,64,7,DIF_LEFTTEXT,MReplaceReadonly));
 	Dialog.Add(new CFarRadioButtonItem(37,4,DIF_GROUP,MNever,(int *)&FRReplaceReadonly,RR_NEVER));
 	Dialog.Add(new CFarRadioButtonItem(37,5,0,MAsk,(int *)&FRReplaceReadonly,RR_ASK));
 	Dialog.Add(new CFarRadioButtonItem(37,6,0,MAlways,(int *)&FRReplaceReadonly,RR_ALWAYS));
@@ -1134,10 +1134,10 @@ void ConfigureFile()
 
 #ifdef UNICODE
 	Dialog.Add(new CFarTextItem(5,17,0,MDefaultCP));
-	Dialog.Add(new CFarRadioButtonItem(35,17,0,MDefaultOEM,&g_bDefaultOEM,TRUE));
-	Dialog.Add(new CFarRadioButtonItem(45,17,0,MDefaultANSI,&g_bDefaultOEM,FALSE));
+	Dialog.Add(new CFarRadioButtonItem(35,17,0,MDefaultOEM,&g_bDefaultOEM,true));
+	Dialog.Add(new CFarRadioButtonItem(45,17,0,MDefaultANSI,&g_bDefaultOEM,false));
 	Dialog.Add(new CFarTextItem(5,18,0,MAllCPInclude));
-	Dialog.Add(new CFarButtonItem(35,18,0,FALSE,MAllCPSelect));
+	Dialog.Add(new CFarButtonItem(35,18,0,false,MAllCPSelect));
 
 	Dialog.AddButtons(MOk,MCancel);
 	do {
@@ -1266,9 +1266,9 @@ int WINAPI FAR_EXPORT(Configure)(int ItemNumber)
 		case 2:ConfigureGrep();break;
 		case 3:ConfigureRenumbering(false);break;
 		case 4:ConfigureEditor();break;
-		default:WriteRegistry();return TRUE;
+		default:WriteRegistry();return true;
 		}
-	} while (TRUE);
+	} while (true);
 }
 
 #ifdef FAR3
@@ -1288,9 +1288,9 @@ void WINAPI ExitFARW(const ExitInfo *Info) {
 void WINAPI FAR_EXPORT(ExitFAR)() {
 #endif
 	WriteRegistry();
-	ECleanup(FALSE);
-	FCleanup(FALSE);
-	FTCleanup(FALSE);
+	ECleanup(false);
+	FCleanup(false);
+	FTCleanup(false);
 	StopREThread();
 	CoUninitialize();
 }

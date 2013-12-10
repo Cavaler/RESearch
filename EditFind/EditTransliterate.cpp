@@ -32,7 +32,7 @@ void EditorTransliterateString(EditorGetString &String, int nStartPos = 0, int n
 	}
 }
 
-BOOL EditorTransliterateAgain()
+bool EditorTransliterateAgain()
 {
 	RefreshEditorInfo();
 	RefreshEditorColorInfo();
@@ -75,10 +75,10 @@ BOOL EditorTransliterateAgain()
 
 	EditorEndUndo();
 
-	return TRUE;
+	return true;
 }
 
-BOOL EditorTransliterate()
+bool EditorTransliterate()
 {
 	EInSelection = EAutoFindInSelection && (EdInfo.BlockType != BTYPE_NONE);
 
@@ -108,29 +108,31 @@ BOOL EditorTransliterate()
 			ETPresets->ShowMenu(true);
 			break;
 		default:
-			return FALSE;
+			return false;
 		}
 	} while (!IsOKClose(ExitCode));
 
 	ETSource = SearchText;
 	ETTarget = ReplaceText;
-	g_bInterrupted = FALSE;
+	g_bInterrupted = false;
 
 	if ((ExitCode == MOk) && !ETSource.empty()) EditorTransliterateAgain();
 
-	return TRUE;
+	return true;
 }
 
-OperationResult EditorTransliterateExecutor() {
+OperationResult EditorTransliterateExecutor()
+{
 	ETSource = SearchText;
 	ETTarget = ReplaceText;
 
-	BOOL bResult = EditorTransliterateAgain();
+	bool bResult = EditorTransliterateAgain();
 	StartupInfo.EditorControl(ECTL_REDRAW, NULL);
 	return bResult ? OR_OK : OR_CANCEL;
 }
 
-BOOL CETPresetCollection::EditPreset(CPreset *pPreset) {
+bool CETPresetCollection::EditPreset(CPreset *pPreset)
+{
 	CFarDialog Dialog(76,15,_T("ETPresetDlg"));
 	Dialog.AddFrame(METPreset);
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));

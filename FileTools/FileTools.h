@@ -8,14 +8,14 @@
 class CRnPresetCollection:public CFPresetCollection {
 public:
 	CRnPresetCollection(CParameterSet &ParamSet) : CFPresetCollection(ParamSet, _T("FileRename"), MRnPreset) {}
-	virtual BOOL EditPreset(CPreset *pPreset);
+	virtual bool EditPreset(CPreset *pPreset);
 	virtual int  ID() { return 1; }
 };
 
 class CQRPresetCollection:public CStdPresetCollection {
 public:
 	CQRPresetCollection(CParameterSet &ParamSet) : CStdPresetCollection(ParamSet, _T("FileQuickRename"), MQRPreset) {}
-	virtual BOOL EditPreset(CPreset *pPreset);
+	virtual bool EditPreset(CPreset *pPreset);
 	virtual int  ID() { return 2; }
 };
 
@@ -34,11 +34,11 @@ EXTERN rename_vector m_arrLastRename;
 
 void FTReadRegistry (CFarSettingsKey Key);
 void FTWriteRegistry(CFarSettingsKey Key);
-void FTCleanup(BOOL PatternOnly);
+void FTCleanup(bool PatternOnly);
 
 void ChangeSelection(int How);
-OperationResult RenameFiles(panelitem_vector &PanelItems,BOOL ShowDialog);
-OperationResult RenameSelectedFiles(panelitem_vector &PanelItems,BOOL ShowDialog);
+OperationResult RenameFiles(panelitem_vector &PanelItems,bool ShowDialog);
+OperationResult RenameSelectedFiles(panelitem_vector &PanelItems,bool ShowDialog);
 OperationResult RenumberFiles();
 OperationResult UndoRenameFiles();
 

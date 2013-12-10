@@ -19,28 +19,28 @@ typedef CPresetCollectionT<CFPreset> CFPresetCollection;
 class CFSPresetCollection:public CFPresetCollection {
 public:
 	CFSPresetCollection(CParameterSet &ParamSet) : CFPresetCollection(ParamSet, _T("FileFind"), MFSPreset) {}
-	virtual BOOL EditPreset(CPreset *pPreset);
+	virtual bool EditPreset(CPreset *pPreset);
 	virtual int  ID() { return 3; }
 };
 
 class CFRPresetCollection:public CFPresetCollection {
 public:
 	CFRPresetCollection(CParameterSet &ParamSet) : CFPresetCollection(ParamSet, _T("FileReplace"), MFRPreset) {}
-	virtual BOOL EditPreset(CPreset *pPreset);
+	virtual bool EditPreset(CPreset *pPreset);
 	virtual int  ID() { return 0; }
 };
 
 class CFGPresetCollection:public CFPresetCollection {
 public:
 	CFGPresetCollection(CParameterSet &ParamSet) : CFPresetCollection(ParamSet, _T("FileGrep"), MFGPreset) {}
-	virtual BOOL EditPreset(CPreset *pPreset);
+	virtual bool EditPreset(CPreset *pPreset);
 	virtual int  ID() { return 4; }
 };
 
 class CFAPresetCollection:public CStdPresetCollection {
 public:
 	CFAPresetCollection(CParameterSet &ParamSet) : CStdPresetCollection(ParamSet, _T("FileAdvanced"), MFAPreset) {}
-	virtual BOOL EditPreset(CPreset *pPreset);
+	virtual bool EditPreset(CPreset *pPreset);
 	virtual int  ID() { return 5; }
 };
 
@@ -56,7 +56,7 @@ EXTERN CFAPresetCollection *FAPresets;
 #define DECLARE_PERSIST_VARS
 #include "PersistVars.h"
 
-EXTERN BOOL FAdvanced VALUE(FALSE);
+EXTERN bool FAdvanced VALUE(false);
 EXTERN int  FAdvancedID VALUE(0);
 EXTERN bool FRegExp;
 EXTERN bool FREvaluate VALUE(false);
@@ -113,17 +113,17 @@ EXTERN vector<CharTableSet2> XLatTables;
 
 typedef void (*ProcessFileProc)(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems);
 
-OperationResult FileFind(panelitem_vector &PanelItems,BOOL ShowDialog,BOOL bSilent=FALSE);
-OperationResult FileReplace(panelitem_vector &PanelItems,BOOL ShowDialog,BOOL bSilent=FALSE);
-OperationResult FileGrep(BOOL ShowDialog);
-BOOL AdvancedSettings();
-BOOL CompileAdvancedSettings();
+OperationResult FileFind(panelitem_vector &PanelItems,bool ShowDialog,bool bSilent=false);
+OperationResult FileReplace(panelitem_vector &PanelItems,bool ShowDialog,bool bSilent=false);
+OperationResult FileGrep(bool ShowDialog);
+bool AdvancedSettings();
+bool CompileAdvancedSettings();
 void SelectAdvancedPreset(int &nID, bool &bSel);
 void ApplyAdvancedPreset();
 
 LONG_PTR WINAPI FileSearchDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LONG_PTR lParam2);
 
-BOOL MaskCaseHere();
+bool MaskCaseHere();
 bool LocalFileTime(TCHAR cDrive);
 
 OperationResult FileSearchExecutor();
@@ -137,18 +137,18 @@ bool MultipleMasksApply(const TCHAR *Filename);
 void FileFillNamedParameters(const TCHAR *szFileName);
 void AddFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems, bool bSearch = false);
 void AddFile(const TCHAR *szFileName, panelitem_vector &PanelItems, bool bSearch = false);
-int  ScanDirectories(panelitem_vector &PanelItems,ProcessFileProc ProcessFile);
+bool ScanDirectories(panelitem_vector &PanelItems,ProcessFileProc ProcessFile);
 int  FPrepareMaskPattern();
 int  FPreparePattern(bool bAcceptEmpty);
 
-BOOL ConfirmFile(int Title,const TCHAR *FileName);
+bool ConfirmFile(int Title,const TCHAR *FileName);
 bool ConfirmFileReadonly(const TCHAR *FileName);
 bool ConfirmReplacement();
 bool ConfirmReplacement(const TCHAR *Found, const TCHAR *Replaced, const TCHAR *FileName);
 
 void FReadRegistry (CFarSettingsKey Key);
 void FWriteRegistry(CFarSettingsKey Key);
-void FCleanup(BOOL PatternOnly);
+void FCleanup(bool PatternOnly);
 
 #ifndef UNICODE
 void XLatBuffer(BYTE *Buffer,int Length,int Table);

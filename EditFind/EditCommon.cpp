@@ -44,7 +44,7 @@ void EWriteRegistry(CFarSettingsKey Key)
 	#include "PersistVars.h"
 }
 
-BOOL SearchIn(const TCHAR *Line,int Start,int Length,int *MatchStart,int *MatchLength)
+bool SearchIn(const TCHAR *Line,int Start,int Length,int *MatchStart,int *MatchLength)
 {
 	REParam.Clear();
 	REParam.AddSource(Line, Start+Length);
@@ -59,7 +59,7 @@ BOOL SearchIn(const TCHAR *Line,int Start,int Length,int *MatchStart,int *MatchL
 #endif
 			MatchDone();
 			REParam.FillStartLength(MatchStart, MatchLength);
-			return TRUE;
+			return true;
 		}
 	}
 	else if (ERegExp && EReverse)
@@ -72,7 +72,7 @@ BOOL SearchIn(const TCHAR *Line,int Start,int Length,int *MatchStart,int *MatchL
 #else
 		bool bFound = pcre_exec(EPattern,EPatternExtra,Line,Start+Length,Start,0,REParam.Match(),REParam.Count()) >= 0;
 #endif
-		if (!bFound) return FALSE;
+		if (!bFound) return false;
 
 		//	Look for last match
 		for (int Offset = Length-1; Offset >=0; Offset--) {
@@ -84,7 +84,7 @@ BOOL SearchIn(const TCHAR *Line,int Start,int Length,int *MatchStart,int *MatchL
 			if (bFound && ((Offset == 0) || (REParam.Match()[0] > Offset))) {
 				MatchDone();
 				REParam.FillStartLength(MatchStart, MatchLength);
-				return TRUE;
+				return true;
 			}
 		}
 	}
@@ -96,20 +96,21 @@ BOOL SearchIn(const TCHAR *Line,int Start,int Length,int *MatchStart,int *MatchL
 		if (Position>=0) {
 			if (MatchStart) *MatchStart=Start+Position;
 			if (MatchLength) *MatchLength=EText.length();
-			return TRUE;
+			return true;
 		}
 	}
-	return FALSE;
+
+	return false;
 }
 
-BOOL SearchInLine(const TCHAR *Line,int Length,int Start,int End,int *MatchStart,int *MatchLength)
+bool SearchInLine(const TCHAR *Line,int Length,int Start,int End,int *MatchStart,int *MatchLength)
 {
 	int Len;
 
-	if (Start>Length) return FALSE;
+	if (Start>Length) return false;
 	if (Start==-1) Start=0;
 	if ((End==-1)||(End>Length)) Len=Length-Start; else Len=End-Start;
-	if (Len<0) return FALSE;
+	if (Len<0) return false;
 
 #ifdef UNICODE
 	return SearchIn(Line,Start,Len,MatchStart,MatchLength);
@@ -123,8 +124,7 @@ BOOL SearchInLine(const TCHAR *Line,int Length,int Start,int End,int *MatchStart
 			static string OEMLine;
 			OEMLine = string(Line, Length);
 			EditorToOEM(OEMLine);
-			int Result=SearchIn(OEMLine.c_str(),Start,Len,MatchStart,MatchLength);
-			return Result;
+			return SearchIn(OEMLine.c_str(),Start,Len,MatchStart,MatchLength);
 		} else {
 			return SearchIn(Line, Start, Len, MatchStart, MatchLength);
 		}
@@ -142,7 +142,7 @@ void AdjustPosition(TCHAR *Lines, int &FirstLine, int &StartPos)
 			StartPos -= Pos+1;
 			FirstLine++;
 		} else break;
-	} while (TRUE);
+	} while (true);
 }
 
 #if defined(FAR3) && defined(_WIN64)
@@ -156,7 +156,7 @@ void AdjustPosition(TCHAR *Lines, intptr_t &FirstLine, intptr_t &StartPos)
 			StartPos -= Pos+1;
 			FirstLine++;
 		} else break;
-	} while (TRUE);
+	} while (true);
 }
 #endif
 
@@ -285,7 +285,8 @@ void FillLineBuffer(size_t FirstLine, size_t LastLine)
 	}
 }
 
-BOOL SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,bool bSkipClear) {
+bool SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,bool bSkipClear)
+{
 	int Line,MatchStart,MatchLength;
 	TCHAR *Lines;
 	int LinesLength;
@@ -296,7 +297,7 @@ BOOL SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,bool bS
 	if (EReverse) {
 		for (Line=LastLine;Line>=FirstLine;Line--) {
 			ShowCurrentLine(Line,EdInfo.TotalLines,EdInfo.WindowSizeX);
-			if (Interrupted()) return FALSE;
+			if (Interrupted()) return false;
 
 			int CurLastLine = min(LastLine+SeveralLines-1, LastLine);
 			FillLineBuffer(Line, CurLastLine);
@@ -312,14 +313,14 @@ BOOL SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,bool bS
 
 			if (SearchInLine(Lines, LinesLength, (Line==FirstLine) ? StartPos : 0, -1, &MatchStart, &MatchLength)) {
 				Relative2Absolute(Line, Lines, MatchStart, MatchLength, FirstLine, StartPos, LastLine, EndPos);
-				return TRUE;
+				return true;
 			}
 		}
 	} else {
 		int FirstLineLength;
 		for (Line=FirstLine;Line<=LastLine;Line++) {
 			ShowCurrentLine(Line,EdInfo.TotalLines,EdInfo.WindowSizeX);
-			if (Interrupted()) return FALSE;
+			if (Interrupted()) return false;
 
 			FillLineBuffer(Line, min(LastLine, Line+SeveralLines-1));
 			Lines = (!g_LineBuffer.empty()) ? &g_LineBuffer[0] : _T("");
@@ -337,12 +338,12 @@ BOOL SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,bool bS
 			if (SearchInLine(Lines,LinesLength,(Line==FirstLine)?StartPos:0,-1,&MatchStart,&MatchLength)) {
 				if (MatchStart<=FirstLineLength) {
 					Relative2Absolute(Line,Lines,MatchStart,MatchLength,FirstLine,StartPos,LastLine,EndPos);
-					return TRUE;
+					return true;
 				}
 			}
 		}
 	}
-	return FALSE;
+	return false;
 }
 
 int TopLine(int NeededLine)
@@ -481,13 +482,13 @@ void RestorePosition(const EditorInfo &StartEdInfo)
 	EctlForceSetPosition(&Position);
 }
 
-BOOL EPreparePattern(tstring &SearchText)
+bool EPreparePattern(tstring &SearchText)
 {
-	ECleanup(TRUE);
+	ECleanup(true);
 
-	if (SearchText.empty()) return FALSE;
+	if (SearchText.empty()) return false;
 
-	if (!CheckUsage(SearchText, ERegExp!=0, ESeveralLine!=0)) return FALSE;
+	if (!CheckUsage(SearchText, ERegExp!=0, ESeveralLine!=0)) return false;
 
 	REErrorField  = MSearchFor;
 	if (ERegExp) {
@@ -495,7 +496,7 @@ BOOL EPreparePattern(tstring &SearchText)
 
 #ifdef UNICODE
 		tstring FillSearchText = REParam.FillNamedReferences(SearchText, true);
-		BOOL Result = PreparePattern(&EPattern,&EPatternExtra,FillSearchText,ECaseSensitive,NULL);
+		bool Result = PreparePattern(&EPattern,&EPatternExtra,FillSearchText,ECaseSensitive,NULL);
 		if (Result) {
 			PreparePattern(&EPattern16,&EPattern16Extra,FillSearchText,ECaseSensitive);
 		}
@@ -520,18 +521,18 @@ BOOL EPreparePattern(tstring &SearchText)
 		OEMToEditor(OEMLine);
 		OEMLine = REParam.FillNamedReferences(OEMLine);
 
-		BOOL Result = PreparePattern(&EPattern,&EPatternExtra,OEMLine,ECaseSensitive,ECharacterTables);
+		bool Result = PreparePattern(&EPattern,&EPatternExtra,OEMLine,ECaseSensitive,ECharacterTables);
 #endif
 		return Result;
 	} else {
 		ETextUpcase = (ECaseSensitive) ? SearchText : UpCaseString(SearchText);
 		PrepareBMHSearch(ETextUpcase.data(), ETextUpcase.length());
 		REErrorOffset = -1;
-		return TRUE;
+		return true;
 	}
 }
 
-void ECleanup(BOOL PatternOnly)
+void ECleanup(bool PatternOnly)
 {
 	REParam.BackupParam();
 	PCRE_FREE(EPattern);
@@ -554,7 +555,7 @@ void ECleanup(BOOL PatternOnly)
 void SynchronizeWithFile(bool bReplace)
 {
 	ECaseSensitive = FCaseSensitive;
-	EReverse = FALSE;
+	EReverse = false;
 
 	if (FSearchAs <= SA_MULTILINE) {
 		ERegExp = (FSearchAs != SA_PLAINTEXT);
@@ -562,7 +563,7 @@ void SynchronizeWithFile(bool bReplace)
 		EText = FText;
 	} else {
 		ERegExp = (FSearchAs == SA_MULTIREGEXP);
-		ESeveralLine = FALSE;
+		ESeveralLine = false;
 		EText = FSWords.empty() ? tstring() : FSWords[0];
 		if (!EText.empty() && ((EText[0] == '-') || (EText[0] == '+'))) EText.erase(0,1);
 	}
@@ -576,13 +577,13 @@ void SynchronizeWithFile(bool bReplace)
 }
 
 int LastLine=0;
-BOOL ClockPresent=FALSE;
+bool ClockPresent=false;
 
 void FindIfClockPresent()
 {
 #ifdef FAR3
-	ClockPresent = FALSE;
-#endif
+	ClockPresent = false;
+#else
 	HKEY Key;
 #ifdef UNICODE
 	RegCreateKeyEx(HKEY_CURRENT_USER,_T("Software\\Far2\\Screen"),0,NULL,0,KEY_ALL_ACCESS,NULL,&Key,NULL);
@@ -590,8 +591,9 @@ void FindIfClockPresent()
 	RegCreateKeyEx(HKEY_CURRENT_USER,_T("Software\\Far\\Screen"),0,NULL,0,KEY_ALL_ACCESS,NULL,&Key,NULL);
 #endif
 	if (Key==INVALID_HANDLE_VALUE) return;
-	QueryRegIntValue(Key,_T("ViewerEditorClock"),&ClockPresent,0,0,1);
+	QueryRegBoolValue(Key,_T("ViewerEditorClock"),&ClockPresent,false);
 	RegCloseKey(Key);
+#endif
 }
 
 void ShowCurrentLine(int CurLine,int TotalLines,int TotalColumns)
@@ -660,11 +662,11 @@ tstring PickupSelection()
 }
 
 #ifdef UNICODE
-BOOL IsWordChar(TCHAR C) {
+bool IsWordChar(TCHAR C) {
 	return iswalnum(C)||(C=='_');
 }
 #else
-BOOL IsWordChar(char C) {
+bool IsWordChar(char C) {
 	WCHAR WChar;
 	MultiByteToWideChar(CP_OEMCP,0,&C,1,&WChar,1);
 	return iswalnum(WChar)||(C=='_');
@@ -872,9 +874,9 @@ void EditorUpdatePresetPosition()
 		EFromCurrentPosition = false;
 		RefreshEditorInfo();
 		if (EdInfo.BlockType == BTYPE_NONE)
-			EInSelection = FALSE;
+			EInSelection = false;
 	} else {
 		EditorSeekToBeginEnd();
-		EInSelection = FALSE;
+		EInSelection = false;
 	}
 }

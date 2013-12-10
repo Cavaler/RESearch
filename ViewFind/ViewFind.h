@@ -7,7 +7,7 @@
 class CVSPresetCollection : public CStdPresetCollection {
 public:
 	CVSPresetCollection(CParameterSet &ParamSet) : CStdPresetCollection(ParamSet, _T("ViewFind"), MVSPreset) {}
-	virtual BOOL EditPreset(CPreset *pPreset);
+	virtual bool EditPreset(CPreset *pPreset);
 	virtual int  ID() { return 0; }
 };
 
@@ -19,8 +19,8 @@ bool RefreshViewerInfo();
 
 void VReadRegistry (CFarSettingsKey Key);
 void VWriteRegistry(CFarSettingsKey Key);
-BOOL ViewerSearch();
-BOOL ViewerSearchAgain();
+bool ViewerSearch();
+bool ViewerSearchAgain();
 
 OperationResult ViewSearchExecutor();
 

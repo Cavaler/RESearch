@@ -293,9 +293,9 @@ LONG_PTR WINAPI FileGrepDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LONG
 	return pDlg->DefDlgProc(nMsg, nParam1, lParam2);
 }
 
-bool GrepPrompt(BOOL bPlugin)
+bool GrepPrompt(bool bPlugin)
 {
-	BOOL AsRegExp = (FSearchAs == SA_REGEXP) || (FSearchAs == SA_SEVERALLINE) || (FSearchAs == SA_MULTILINE) || (FSearchAs == SA_MULTIREGEXP);
+	bool AsRegExp = (FSearchAs == SA_REGEXP) || (FSearchAs == SA_SEVERALLINE) || (FSearchAs == SA_MULTILINE) || (FSearchAs == SA_MULTIREGEXP);
 
 	CFarDialog Dialog(77, 27, _T("FileGrepDlg"));
 	Dialog.SetWindowProc(FileGrepDialogProc, 0);
@@ -364,7 +364,7 @@ bool GrepPrompt(BOOL bPlugin)
 			FGPresets->ShowMenu(true);
 			break;
 		case MBtnAdvanced:
-			if (AdvancedSettings()) FAdvanced=TRUE;
+			if (AdvancedSettings()) FAdvanced=true;
 			break;
 		case MBtnSettings:
 			ConfigureGrep();
@@ -377,7 +377,7 @@ bool GrepPrompt(BOOL bPlugin)
 	return (ExitCode == MOk);
 }
 
-OperationResult FileGrep(BOOL ShowDialog)
+OperationResult FileGrep(bool ShowDialog)
 {
 	CPanelInfo PInfo;
 	PInfo.GetInfo(false);
@@ -433,13 +433,13 @@ OperationResult FileGrepExecutor() {
 	FMask = MaskText;
 	FText = SearchText;
 
-	return FileGrep(FALSE);
+	return FileGrep(false);
 }
 
-BOOL CFGPresetCollection::EditPreset(CPreset *pPreset)
+bool CFGPresetCollection::EditPreset(CPreset *pPreset)
 {
 	SearchAs FSA = (SearchAs)pPreset->m_mapInts["SearchAs"];
-	BOOL AsRegExp = (FSA == SA_REGEXP) || (FSA == SA_SEVERALLINE) || (FSA == SA_MULTILINE) || (FSA == SA_MULTIREGEXP);
+	bool AsRegExp = (FSA == SA_REGEXP) || (FSA == SA_SEVERALLINE) || (FSA == SA_MULTILINE) || (FSA == SA_MULTIREGEXP);
 
 	CFarDialog Dialog(76,26,_T("FGPresetDlg"));
 	Dialog.SetWindowProc(FileGrepDialogProc, 0);
@@ -487,13 +487,14 @@ BOOL CFGPresetCollection::EditPreset(CPreset *pPreset)
 		case MOk:
 			pPreset->m_mapInts["SearchAs"] = AsRegExp ? SA_REGEXP : SA_PLAINTEXT;
 			pPreset->m_mapInts["AdvancedID"] = bFAdvanced ? nAdvancedID : 0;
-			return TRUE;
+			return true;
 		case MBtnAdvanced:
 			SelectAdvancedPreset(nAdvancedID, bFAdvanced);
 			break;
 		default:
-			return FALSE;
+			return false;
 		}
 	} while (true);
-	return FALSE;
+
+	return false;
 }

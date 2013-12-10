@@ -81,15 +81,15 @@ void SetViewerSelection(__int64 nStart, int nLength, int nCharSize)
 
 	ViewerSetPosition VPos = {ITEM_SS(ViewerSetPosition) /*VSP_NOREDRAW*/0, (nStart > 256) ? nStart-256 : 0, 0};
 	StartupInfo.ViewerControl(VCTL_SETPOSITION, &VPos);
-	g_bInterrupted = TRUE;
+	g_bInterrupted = true;
 }
 
-BOOL ViewerSearchAgain()
+bool ViewerSearchAgain()
 {
 	ViewerInfo VInfo;
 	VInfo.StructSize=sizeof(VInfo);
 	StartupInfo.ViewerControl(VCTL_GETINFO, &VInfo);
-	g_bInterrupted = FALSE;
+	g_bInterrupted = false;
 
 	CDebugTimer tm(_T("ViewSearch() took %d ms"));
 
@@ -118,9 +118,9 @@ BOOL ViewerSearchAgain()
 	CFileMapping mapInput(VInfo.FileName);
 #endif
 
-	if (!mapInput) return FALSE;
+	if (!mapInput) return false;
 	char *szData = mapInput;
-	if (!szData) return FALSE;
+	if (!szData) return false;
 
 	long nOffset = (long)Info.CurPos;
 	if (bUnicode) {
@@ -179,7 +179,7 @@ BOOL ViewerSearchAgain()
 		const TCHAR *Lines[]={GetMsg(MRESearch),GetMsg(MCannotFind),EText.c_str(),GetMsg(MOk)};
 		StartupInfo.Message(FMSG_WARNING,_T("VCannotFind"),Lines,4,1);
 	}
-	return TRUE;
+	return true;
 }
 
 bool RefreshViewerInfo()
@@ -190,7 +190,7 @@ bool RefreshViewerInfo()
 	return true;
 }
 
-BOOL ViewerSearch()
+bool ViewerSearch()
 {
 	RefreshViewerInfo();
 	g_ViewerInfo.erase(VInfo.ViewerID);
@@ -214,8 +214,8 @@ BOOL ViewerSearch()
 	Dialog.Add(new CFarButtonItem(60,9,0,0,MBtnPresets));
 
 	SearchText = EText;
-	ESeveralLine = FALSE;
-	EReverse = FALSE;
+	ESeveralLine = false;
+	EReverse = false;
 
 	int ExitCode;
 	do {
@@ -230,17 +230,17 @@ BOOL ViewerSearch()
 			VSPresets->ShowMenu(true);
 			break;
 		default:
-			return FALSE;
+			return false;
 		}
 	} while (!IsOKClose(ExitCode) || !EPreparePattern(SearchText));
 
 	EText=SearchText;
 	if ((ExitCode == MOk) && !EText.empty()) ViewerSearchAgain();
 
-	return TRUE;
+	return true;
 }
 
-BOOL CVSPresetCollection::EditPreset(CPreset *pPreset)
+bool CVSPresetCollection::EditPreset(CPreset *pPreset)
 {
 	CFarDialog Dialog(76,16,_T("VSPresetDlg"));
 	Dialog.AddFrame(MVSPreset);
@@ -259,9 +259,9 @@ BOOL CVSPresetCollection::EditPreset(CPreset *pPreset)
 	do {
 		switch (Dialog.Display(1, -2)) {
 		case 0:
-			return TRUE;
+			return true;
 		default:
-			return FALSE;
+			return false;
 		}
 	} while (true);
 }

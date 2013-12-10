@@ -1,7 +1,8 @@
 #include "StdAfx.h"
 #include "..\RESearch.h"
 
-void EditorSearchOK(int FirstLine,int StartPos,int LastLine,int EndPos) {
+void EditorSearchOK(int FirstLine,int StartPos,int LastLine,int EndPos)
+{
 	RefreshEditorInfo();
 
 	EditorSelect Select={ITEM_SS(EditorSelect) BTYPE_STREAM,FirstLine,StartPos,EndPos-StartPos,LastLine-FirstLine+1};
@@ -16,7 +17,8 @@ void EditorSearchOK(int FirstLine,int StartPos,int LastLine,int EndPos) {
 	EctlForceSetPosition(&Position);
 }
 
-void PatchEditorInfo(EditorInfo &EdInfo) {
+void PatchEditorInfo(EditorInfo &EdInfo)
+{
 	// Skipping over selection - for "Search Again inverse"
 
 	if (ESearchAgainCalled && (EdInfo.BlockType == BTYPE_STREAM)) {
@@ -51,14 +53,14 @@ void PatchEditorInfo(EditorInfo &EdInfo) {
 	}
 }
 
-BOOL EditorSearchAgain()
+bool EditorSearchAgain()
 {
 	RefreshEditorInfo();
 	RefreshEditorColorInfo();
 	EctlForceSetPosition(NULL);
 	ClearLineBuffer();
 
-	if (!EPreparePattern(SearchText)) return FALSE;
+	if (!EPreparePattern(SearchText)) return false;
 
 	CDebugTimer tm(_T("EditSearch() took %d ms"));
 
@@ -106,7 +108,7 @@ BOOL EditorSearchAgain()
 	if (ESeveralLine) {
 		if (SearchInText(FirstLine,StartPos,LastLine,EndPos)) {
 			EditorSearchOK(FirstLine,StartPos,LastLine,EndPos);
-			return TRUE;
+			return true;
 		}
 	} else {
 		if (EReverse) {
@@ -116,7 +118,7 @@ BOOL EditorSearchAgain()
 				int CurEndPos = (Line == LastLine) ? EndPos : -1;
 				if (SearchInText(Line, CurStartPos, CurLastLine, CurEndPos)) {
 					EditorSearchOK(Line, CurStartPos, CurLastLine, CurEndPos);
-					return TRUE;
+					return true;
 				}
 			}
 		} else {
@@ -126,7 +128,7 @@ BOOL EditorSearchAgain()
 				int CurEndPos = (Line == LastLine) ? EndPos : -1;
 				if (SearchInText(Line, CurStartPos, CurLastLine, CurEndPos)) {
 					EditorSearchOK(Line, CurStartPos, CurLastLine, CurEndPos);
-					return TRUE;
+					return true;
 				}
 			}
 		}
@@ -142,7 +144,8 @@ BOOL EditorSearchAgain()
 	}
 
 	if (EInSelection) RestoreSelection();
-	return FALSE;
+
+	return false;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -195,8 +198,8 @@ bool FetchEditorSearchSettings(CFarDialog *pDlg)
 	ERegExp        = pDlg->IsDlgItemChecked(MRegExp);
 	ESeveralLine   = pDlg->IsDlgItemChecked(MSeveralLine);
 	ECaseSensitive = pDlg->IsDlgItemChecked(MCaseSensitive);
-	EInSelection   = FALSE;
-	EReverse       = FALSE;
+	EInSelection   = false;
+	EReverse       = false;
 
 	return true;
 }
@@ -257,13 +260,13 @@ LONG_PTR WINAPI EditorSearchDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, 
 				(record->Event.KeyEvent.dwControlKeyState & (LEFT_ALT_PRESSED|RIGHT_ALT_PRESSED)))
 			{
 				CheckIncrementalSearch(pDlg, true, false);
-				return TRUE;
+				return true;
 			}
 			if ((record->Event.KeyEvent.wVirtualKeyCode == VK_LEFT) &&
 				(record->Event.KeyEvent.dwControlKeyState & (LEFT_ALT_PRESSED|RIGHT_ALT_PRESSED)))
 			{
 				CheckIncrementalSearch(pDlg, false, true);
-				return TRUE;
+				return true;
 			}
 		}
 		break;
@@ -272,7 +275,7 @@ LONG_PTR WINAPI EditorSearchDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, 
 		if (!pDlg->IsDlgItemChecked(MIncrementalSearch)) break;
 		if ((nParam1 == 2) && (lParam2 == KEY_ALTRIGHT)) {
 			CheckIncrementalSearch(pDlg, true);
-			return TRUE;
+			return true;
 		}
 		break;
 #endif
@@ -281,7 +284,7 @@ LONG_PTR WINAPI EditorSearchDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, 
 	return pDlg->DefDlgProc(nMsg, nParam1, lParam2);
 }
 
-BOOL EditorSearch()
+bool EditorSearch()
 {
 	EditorFillNamedParameters();
 
@@ -328,17 +331,17 @@ BOOL EditorSearch()
 			ESPresets->ShowMenu(true);
 			break;
 		default:
-			return FALSE;
+			return false;
 		}
 	} while (((ExitCode != MOk) && (ExitCode != MShowAll) && (ExitCode != MBtnClose)) || !EPreparePattern(SearchText));
 
 	EText=SearchText;
-	g_bInterrupted=FALSE;
+	g_bInterrupted=false;
 
 	if ((ExitCode != MBtnClose) && !EText.empty())
 		(ExitCode == MOk) ? EditorSearchAgain() : EditorListAllAgain();
 
-	return TRUE;
+	return true;
 }
 
 OperationResult EditorSearchExecutor()
@@ -353,7 +356,7 @@ OperationResult EditorSearchExecutor()
 		EditorSearchAgain()  ? OR_OK : OR_CANCEL;
 }
 
-BOOL CESPresetCollection::EditPreset(CPreset *pPreset)
+bool CESPresetCollection::EditPreset(CPreset *pPreset)
 {
 	CFarDialog Dialog(80, 19, _T("ESPresetDlg"));
 	Dialog.AddFrame(MESPreset);
@@ -377,9 +380,9 @@ BOOL CESPresetCollection::EditPreset(CPreset *pPreset)
 	do {
 		switch (Dialog.Display(1, -2)) {
 		case 0:
-			return TRUE;
+			return true;
 		default:
-			return FALSE;
+			return false;
 		}
 	} while (true);
 }

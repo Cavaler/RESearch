@@ -273,7 +273,7 @@ public:
 		} else {
 			ShowErrorMsg(GetMsg(MErrorExecutingScript));
 		}
-		g_bInterrupted = TRUE;
+		g_bInterrupted = true;
 		return S_OK;
 	}
 	STDMETHOD(OnEnterScript)() {return S_OK;}
@@ -299,7 +299,7 @@ void EvaluateReplaceStringT(IReplaceParameters *pParams, LPCTSTR szReplace, LPCT
 	hResult = spEngine.CreateInstance(clsid);
 	if (FAILED(hResult)) {
 		ShowHResultError(MErrorCreatingEngine, hResult);
-		g_bInterrupted = TRUE;
+		g_bInterrupted = true;
 		return;
 	}
 
@@ -315,7 +315,7 @@ void EvaluateReplaceStringT(IReplaceParameters *pParams, LPCTSTR szReplace, LPCT
 		if (!mapScript.Open(szReplace)) {
 			const TCHAR *Lines[]={GetMsg(MREReplace),GetMsg(MFileOpenError),szReplace,GetMsg(MOk)};
 			StartupInfo.Message(FMSG_WARNING,_T("FSOpenError"),Lines,4,1);
-			g_bInterrupted = TRUE;
+			g_bInterrupted = true;
 			return;
 		}
 		bstrText = ANSIToUnicode(string(mapScript, mapScript.Size())).c_str();
@@ -328,7 +328,7 @@ void EvaluateReplaceStringT(IReplaceParameters *pParams, LPCTSTR szReplace, LPCT
 	hResult = spParser->ParseScriptText(bstrText, NULL, NULL, NULL, 0, 0, 0, NULL, &ExcepInfo);
 	if (FAILED(hResult)) {
 		ShowHResultError(MErrorParsingText, hResult);
-		g_bInterrupted = TRUE;
+		g_bInterrupted = true;
 		return;
 	}
 

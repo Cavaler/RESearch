@@ -20,19 +20,19 @@ LONG_PTR WINAPI ConfirmReplacementDialogProc(CFarDialog *pDlg, int nMsg, int nPa
 			pColors->Colors[0].Flags = FCF_4BITMASK;
 			pColors->Colors[0].BackgroundColor = 0x0A;
 			pColors->Colors[0].ForegroundColor = 0x00;
-			return TRUE;
+			return true;
 		}
 		if ((nParam1 >= 3+nFoundCount) && (nParam1 < 3+nFoundCount+nReplacedCount)) {
 			pColors->Colors[0].Flags = FCF_4BITMASK;
 			pColors->Colors[0].BackgroundColor = 0x0B;
 			pColors->Colors[0].ForegroundColor = 0x00;
-			return TRUE;
+			return true;
 		}
 		if (nParam1 == 4+nFoundCount+nReplacedCount) {
 			pColors->Colors[0].Flags = FCF_4BITMASK;
 			pColors->Colors[0].BackgroundColor = 0x02;
 			pColors->Colors[0].ForegroundColor = 0x00;
-			return TRUE;
+			return true;
 		}
 		break;
 							}
@@ -86,12 +86,12 @@ bool ConfirmReplacement(const TCHAR *Found, const TCHAR *Replaced, const TCHAR *
 	Dialog.Add(new CFarTextItem(-1, 4 + nCount, 0, MInFile));
 	Dialog.Add(new CFarTextItem(-1, 5 + nCount,  DIF_SHOWAMPERSAND|DLG_SETCOLOR(0x20), FileName));
 
-	Dialog.Add(new CFarButtonItem(0, 7 + nCount, DIF_CENTERGROUP|DIF_NOBRACKETS, TRUE,  MReplace));
-	Dialog.Add(new CFarButtonItem(0, 7 + nCount, DIF_CENTERGROUP|DIF_NOBRACKETS, FALSE, MAll));
-	Dialog.Add(new CFarButtonItem(0, 7 + nCount, DIF_CENTERGROUP|DIF_NOBRACKETS, FALSE, MAllFiles));
-	Dialog.Add(new CFarButtonItem(0, 7 + nCount, DIF_CENTERGROUP|DIF_NOBRACKETS, FALSE, MSkip));
-	Dialog.Add(new CFarButtonItem(0, 7 + nCount, DIF_CENTERGROUP|DIF_NOBRACKETS, FALSE, MSkipFile));
-	Dialog.Add(new CFarButtonItem(0, 7 + nCount, DIF_CENTERGROUP|DIF_NOBRACKETS, FALSE, MCancel));
+	Dialog.Add(new CFarButtonItem(0, 7 + nCount, DIF_CENTERGROUP|DIF_NOBRACKETS, true,  MReplace));
+	Dialog.Add(new CFarButtonItem(0, 7 + nCount, DIF_CENTERGROUP|DIF_NOBRACKETS, false, MAll));
+	Dialog.Add(new CFarButtonItem(0, 7 + nCount, DIF_CENTERGROUP|DIF_NOBRACKETS, false, MAllFiles));
+	Dialog.Add(new CFarButtonItem(0, 7 + nCount, DIF_CENTERGROUP|DIF_NOBRACKETS, false, MSkip));
+	Dialog.Add(new CFarButtonItem(0, 7 + nCount, DIF_CENTERGROUP|DIF_NOBRACKETS, false, MSkipFile));
+	Dialog.Add(new CFarButtonItem(0, 7 + nCount, DIF_CENTERGROUP|DIF_NOBRACKETS, false, MCancel));
 	int Result = Dialog.Display(6, -6, -5, -4, -3, -2, -1);
 
 	switch (Result) {
@@ -113,14 +113,15 @@ bool ConfirmReplacement(const TCHAR *Found, const TCHAR *Replaced, const TCHAR *
 	return false;
 }
 
-BOOL WriteBuffer(HANDLE hFile,const void *Buffer,DWORD BufLen,const TCHAR *FileName) {
+bool WriteBuffer(HANDLE hFile,const void *Buffer,DWORD BufLen,const TCHAR *FileName)
+{
 	DWORD WrittenBytes;
 	if (!WriteFile(hFile,Buffer,BufLen,&WrittenBytes,NULL)||
 		(WrittenBytes!=BufLen)) {
 		const TCHAR *Lines[]={GetMsg(MREReplace),GetMsg(MFileWriteError),FileName,GetMsg(MOk)};
 		StartupInfo.Message(FMSG_WARNING,_T("FRWriteError"),Lines,4,1);
-		return FALSE;
-	} else return TRUE;
+		return false;
+	} else return true;
 }
 
 bool RunReplace(LPCTSTR szFileName, __int64 dwFileSize)
@@ -229,7 +230,7 @@ bool ReplaceSingleFile_Normal(WIN32_FIND_DATA &FindData)
 //	Using slow but reliable mechanism for files with hardlinks
 bool ReplaceSingleFile_CopyFirst(WIN32_FIND_DATA &FindData)
 {
-	if (FRReplaceToNew || !CopyFile(FindData.cFileName, g_strBackupFileName.c_str(), FALSE)) {
+	if (FRReplaceToNew || !CopyFile(FindData.cFileName, g_strBackupFileName.c_str(), false)) {
 		return ReplaceSingleFile_Normal(FindData);
 	}
 
@@ -340,7 +341,7 @@ LONG_PTR WINAPI FileReplaceDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, L
 	return FileSearchDialogProc(pDlg, nMsg, nParam1, lParam2);
 }
 
-int ReplacePrompt(BOOL Plugin)
+bool ReplacePrompt(bool Plugin)
 {
 	CFarDialog Dialog(76, 27, _T("FileReplaceDlg"));
 	Dialog.SetWindowProc(FileReplaceDialogProc, 0);
@@ -372,11 +373,11 @@ int ReplacePrompt(BOOL Plugin)
 
 	Dialog.Add(new CFarCheckBoxItem( 5, 15, 0, MEvaluateAsScript, &FREvaluate));
 	Dialog.Add(new CFarComboBoxItem(30, 15, 55, 0, new CFarListData(m_lstEngines, false), new CFarEngineStorage(EREvaluateScript)));
-	Dialog.Add(new CFarButtonItem  (60, 15, 0, FALSE, MRunEditor));
+	Dialog.Add(new CFarButtonItem  (60, 15, 0, false, MRunEditor));
 
 	Dialog.Add(new CFarCheckBoxItem(55, 10,0,_T(""),&FAdvanced));
 	Dialog.Add(new CFarButtonItem(59, 10,0,0,MBtnAdvanced));
-	Dialog.Add(new CFarButtonItem(57, 11, 0, FALSE, MBtnREBuilder));
+	Dialog.Add(new CFarButtonItem(57, 11, 0, false, MBtnREBuilder));
 
 	Dialog.Add(new CFarTextItem(5,17,0,MSearchIn));
 	if (Plugin) {
@@ -423,7 +424,7 @@ int ReplacePrompt(BOOL Plugin)
 			if (Plugin&&(FSearchIn<SI_FROMCURRENT)) FSearchIn=SI_FROMCURRENT;
 			break;
 		case MBtnAdvanced:
-			if (AdvancedSettings()) FAdvanced=TRUE;
+			if (AdvancedSettings()) FAdvanced=true;
 			break;
 		case MBtnREBuilder:
 			if (RunREBuilder(SearchText, ReplaceText)) {
@@ -434,14 +435,15 @@ int ReplacePrompt(BOOL Plugin)
 			RunExternalEditor(ReplaceText);
 			break;
 		default:
-			return FALSE;
+			return false;
 		}
 	} while (!IsOKClose(ExitCode) || !PrepareFileReplacePattern());
 
 	return (ExitCode == MOk);
 }
 
-OperationResult FileReplace(panelitem_vector &PanelItems, BOOL ShowDialog, BOOL bSilent) {
+OperationResult FileReplace(panelitem_vector &PanelItems, bool ShowDialog, bool bSilent)
+{
 	CPanelInfo PInfo;
 	PInfo.GetInfo(false);
 	if (PInfo.PanelType!=PTYPE_FILEPANEL) return OR_FAILED;
@@ -468,17 +470,18 @@ OperationResult FileReplace(panelitem_vector &PanelItems, BOOL ShowDialog, BOOL 
 	} else return OR_FAILED;
 }
 
-OperationResult FileReplaceExecutor() {
+OperationResult FileReplaceExecutor()
+{
 	FMask = MaskText;
 	FText = SearchText;
 	FRReplace = ReplaceText;
-	FROpenModified = FALSE;
+	FROpenModified = false;
 	SanitateEngine();
 
-	return FileReplace(g_PanelItems, FALSE, TRUE);
+	return FileReplace(g_PanelItems, false, true);
 }
 
-BOOL CFRPresetCollection::EditPreset(CPreset *pPreset)
+bool CFRPresetCollection::EditPreset(CPreset *pPreset)
 {
 	CFarDialog Dialog(76, 25, _T("FRPresetDlg"));
 	Dialog.AddFrame(MFRPreset);
@@ -522,7 +525,7 @@ BOOL CFRPresetCollection::EditPreset(CPreset *pPreset)
 		switch (Dialog.Display(3, -2, -4, -6)) {
 		case 0:
 			pPreset->m_mapInts["AdvancedID"] = bFAdvanced ? nAdvancedID : 0;
-			return TRUE;
+			return true;
 		case 1:
 			SelectAdvancedPreset(nAdvancedID, bFAdvanced);
 			break;
@@ -530,7 +533,7 @@ BOOL CFRPresetCollection::EditPreset(CPreset *pPreset)
 			RunExternalEditor(pPreset->m_mapStrings["Replace"]);
 			break;
 		default:
-			return FALSE;
+			return false;
 		}
 	} while (true);
 }
