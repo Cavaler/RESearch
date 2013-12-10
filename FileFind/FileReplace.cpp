@@ -377,7 +377,8 @@ bool ReplacePrompt(bool Plugin)
 
 	Dialog.Add(new CFarCheckBoxItem(55, 10,0,_T(""),&FAdvanced));
 	Dialog.Add(new CFarButtonItem(59, 10,0,0,MBtnAdvanced));
-	Dialog.Add(new CFarButtonItem(57, 11, 0, false, MBtnREBuilder));
+	Dialog.Add(new CFarButtonItem  (_tcslen(GetMsg(MSeveralLineRegExp))+10,11,0,0,MEllipsis));
+	Dialog.Add(new CFarButtonItem(57, 12, 0, false, MBtnREBuilder));
 
 	Dialog.Add(new CFarTextItem(5,17,0,MSearchIn));
 	if (Plugin) {
@@ -433,6 +434,9 @@ bool ReplacePrompt(bool Plugin)
 			break;
 		case MRunEditor:
 			RunExternalEditor(ReplaceText);
+			break;
+		case MEllipsis:
+			ConfigureSeveralLines();
 			break;
 		default:
 			return false;

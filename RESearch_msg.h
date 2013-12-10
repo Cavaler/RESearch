@@ -140,6 +140,7 @@ enum eStringTable {
 	MWarnContinue,
 
 	MCommonSettings,
+	MSeveralLineSettings,
 	MSeveralLinesIs,
 	MLinesOr,
 	MDotMatchesNewline,

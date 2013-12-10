@@ -140,6 +140,7 @@ MWarnRNInSeveralLine	"Single '\\n' should be used in several-line search"		"Ис
 MWarnContinue		"Continue?"				"Продолжить?"
 
 MCommonSettings		"Common settings"						"Общие настройки"
+MSeveralLineSettings	"Several-line settings"				"Настройки поиска в несколько строк"
 MSeveralLinesIs		"'&Several' lines means"				"'&Несколько' строк - значит"
 MLinesOr			"lines o&r"								"строк или"
 MDotMatchesNewline	"&Dot matches newline also"				"&Точка совпадает с символом перевода строки"

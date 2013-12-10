@@ -208,6 +208,7 @@ bool ViewerSearch()
 	Dialog.Add(new CFarTextItem(5,4,DIF_BOXCOLOR|DIF_SEPARATOR,_T("")));
 	Dialog.Add(new CFarCheckBoxItem(5,5,0,MRegExp,&ERegExp));
 	Dialog.Add(new CFarCheckBoxItem(30,5,DIF_DISABLE,MSeveralLine,&ESeveralLine));
+	Dialog.Add(new CFarButtonItem  (53,5,DIF_DISABLE,0,MEllipsis));
 	Dialog.Add(new CFarCheckBoxItem(5,6,0,MCaseSensitive,&ECaseSensitive));
 	Dialog.Add(new CFarCheckBoxItem(5,7,DIF_DISABLE,MReverseSearch,&EReverse));
 	Dialog.AddButtons(MOk,MCancel,MBtnClose);
@@ -228,6 +229,9 @@ bool ViewerSearch()
 			break;
 		case MBtnPresets:
 			VSPresets->ShowMenu(true);
+			break;
+		case MEllipsis:
+			ConfigureSeveralLines();
 			break;
 		default:
 			return false;

@@ -133,6 +133,7 @@ bool SearchPrompt(bool Plugin)
 
 	Dialog.Add(new CFarCheckBoxItem(56,8,0,_T(""),&FAdvanced));
 	Dialog.Add(new CFarButtonItem  (60,8,0,0,MBtnAdvanced));
+	Dialog.Add(new CFarButtonItem(_tcslen(GetMsg(MSeveralLineRegExp))+10,9,0,0,MEllipsis));
 
 	Dialog.Add(new CFarTextItem(5,17,0,MSearchIn));
 	if (Plugin) {
@@ -167,6 +168,9 @@ bool SearchPrompt(bool Plugin)
 			break;
 		case MBtnAdvanced:
 			if (AdvancedSettings()) FAdvanced=true;
+			break;
+		case MEllipsis:
+			ConfigureSeveralLines();
 			break;
 		default:
 			return false;
