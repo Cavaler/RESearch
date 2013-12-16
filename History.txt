@@ -8,10 +8,29 @@ Regular Expression Search and Replace
 Planned:
 	- Search in share-opened files
 	? Searching in streams
+	? Extended batch properties, overriding preset properties (e.g. Search from beginning)
 	+ Command to "lock" read-only file before replacing
 
 Known bugs:
 	- Replace changing part of (real) EOL crashes
+
+Version 8.00 (16.12.2013)
+	+ [X] Advanced file options added to File Rename
+	+ Added Multi-line RegExp Replace (see Hints.txt)
+	+ Properly-working Reverse regexp search in Editor (except maybe ungreedy search - depends on interpretation)
+	+ "Reverse search" and "In Selection" added to Search/Replace presets
+	* F5 copies current preset in menu
+	* Presets button moved to bottom right corner everywhere
+	* Every major dialog has "Close" button, which saves settings but doesn't do anything else
+	* Numpad Plus in preset/batch lists adds new item at the end
+	* Increased limits for Several-line operations
+	- ! Removed horrible bottleneck in Regexp file replace
+	- Fixed alignment issues in ANSI version
+	- Fixed crashing Far3 after closing TmpPanel via disk menu
+	- Updated positioning of Replace prompt in editor
+	- Removed last mentions of "Multiple regexp search"
+	- Properly updating saved selection after replace in selection
+	- Fixed missing files in results panel after File Rename
 
 Version 7.85 (29.11.2013)
 	* Hotkey fixes

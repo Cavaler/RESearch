@@ -1,9 +1,11 @@
-Regular Expression Search and Replace, version 7.85
+Regular Expression Search and Replace, version 8.00
 by Kostromitinov Pavel, pavel@kostrom.spb.ru
 
-- Search using plain-text and regular expressions in files.
+- Search and Replace using plain-text and regular expressions in files.
 
-- Search and Replace in editor using regular expressions and even script evaluation
+- Search and Replace in editor using plain-text and regular expressions
+
+- Perform script evaluation as part of replace process
 
 - Grep, Filter operations and much more
 
