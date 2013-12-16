@@ -246,6 +246,7 @@ void AddFile(const TCHAR *szFileName, panelitem_vector &PanelItems, bool bSearch
 	WIN32_FIND_DATA FD;
 	HANDLE hFind = FindFirstFile(szFileName, &FD);
 	if (hFind != INVALID_HANDLE_VALUE) {
+		_tcscpy(FD.cFileName, szFileName);
 		AddFile(&FD, PanelItems, bSearch);
 		FindClose(hFind);
 	}
