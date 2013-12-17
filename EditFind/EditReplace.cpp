@@ -334,10 +334,12 @@ eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &
 
 bool ReplaceInText(int FirstLine, int StartPos, int LastLine, int EndPos)
 {
+	int LastReplaceLine = -1;
 	do {
 		int MatchFirstLine = FirstLine, MatchStartPos = StartPos;
 		int MatchLastLine = LastLine, MatchEndPos = EndPos;
-		if (!SearchInText(MatchFirstLine, MatchStartPos, MatchLastLine, MatchEndPos)) return false;
+		bool bNotBOL = (LastReplaceLine == MatchFirstLine);
+		if (!SearchInText(MatchFirstLine, MatchStartPos, MatchLastLine, MatchEndPos, false, bNotBOL)) return false;
 
 		// Assuming that MatchedLine starts from the needed line
 		RefreshEditorInfo();
@@ -377,6 +379,7 @@ bool ReplaceInText(int FirstLine, int StartPos, int LastLine, int EndPos)
 		}
 
 		FindNumber++;
+		LastReplaceLine = MatchFirstLine;
 	} while (true);
 
 	return false;
@@ -391,8 +394,9 @@ bool ReplaceInTextByLine(int FirstLine, int StartPos, int LastLine, int EndPos, 
 		int MatchFirstLine = Line, MatchStartPos = (Line == FirstLine)||EachLineLimited?StartPos:0;
 		int MatchLastLine = Line, MatchEndPos = (Line == LastLine)||EachLineLimited?EndPos:-1;
 		int FoundStartPos = MatchStartPos, FoundEndPos = MatchEndPos;
+		bool bNotBOL = false;
 
-		while (SearchInText(MatchFirstLine, FoundStartPos, MatchLastLine, FoundEndPos, bCachedReplace)) {
+		while (SearchInText(MatchFirstLine, FoundStartPos, MatchLastLine, FoundEndPos, bCachedReplace, bNotBOL)) {
 			Matched = true;
 			// Assuming that MatchedLine starts from the needed line
 			RefreshEditorInfo();
@@ -447,6 +451,7 @@ bool ReplaceInTextByLine(int FirstLine, int StartPos, int LastLine, int EndPos, 
 			}
 
 			FindNumber++;
+			bNotBOL = true;
 		}
 
 		if (bCachedReplace && Matched && NoAsking) {

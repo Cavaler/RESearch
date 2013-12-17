@@ -21,7 +21,7 @@ bool EditorFilterAgain()
 			EctlSetPosition(&Position);
 			EctlGetString(&String);
 
-			if (SearchInLine(String.StringText, String.StringLength, 0, -1, NULL, NULL) != EFLeaveFilter) {
+			if (SearchInLine(String.StringText, String.StringLength, 0, -1, NULL, NULL, 0) != EFLeaveFilter) {
 				StartupInfo.EditorControl(ECTL_DELETESTRING, NULL);
 				Position.CurLine--;
 				EdInfo.TotalLines--;
@@ -36,7 +36,7 @@ bool EditorFilterAgain()
 			EctlSetPosition(&Position);
 			EctlGetString(&String);
 
-			if (SearchInLine(String.StringText, String.StringLength, 0, -1, NULL, NULL) != EFLeaveFilter) {
+			if (SearchInLine(String.StringText, String.StringLength, 0, -1, NULL, NULL, 0) != EFLeaveFilter) {
 				StartupInfo.EditorControl(ECTL_DELETESTRING, NULL);
 				Position.CurLine--;
 				EdInfo.TotalLines--;

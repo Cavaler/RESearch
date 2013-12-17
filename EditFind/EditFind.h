@@ -116,8 +116,8 @@ void EditorUpdatePresetPosition();
 
 void PatchEditorInfo(EditorInfo &EdInfo);
 
-bool SearchInLine(const TCHAR *Line,int Length,int Start,int End,int *MatchStart,int *MatchLength);
-bool SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,bool bSkipClear=false);
+bool SearchInLine(const TCHAR *Line,int Length,int Start,int End,int *MatchStart,int *MatchLength,int nExecOptions);
+bool SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,bool bSkipClear=false,bool bNotBOL=false);
 void AdjustPosition(TCHAR *Lines, int &FirstLine, int &StartPos);
 #if defined(FAR3) && defined(_WIN64)
 void AdjustPosition(TCHAR *Lines, intptr_t &FirstLine, intptr_t &StartPos);

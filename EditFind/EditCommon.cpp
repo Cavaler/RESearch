@@ -44,7 +44,7 @@ void EWriteRegistry(CFarSettingsKey Key)
 	#include "PersistVars.h"
 }
 
-bool SearchIn(const TCHAR *Line,int Start,int Length,int *MatchStart,int *MatchLength)
+bool SearchIn(const TCHAR *Line,int Start,int Length,int *MatchStart,int *MatchLength,int nExecOptions)
 {
 	REParam.Clear();
 	REParam.AddSource(Line, Start+Length);
@@ -53,9 +53,9 @@ bool SearchIn(const TCHAR *Line,int Start,int Length,int *MatchStart,int *MatchL
 		REParam.AddRE(EPattern);
 
 #ifdef UNICODE
-		if (pcre16_exec(EPattern16,EPattern16Extra,(PCRE_SPTR16)Line,Start+Length,Start,0,REParam.Match(),REParam.Count())>=0) {
+		if (pcre16_exec(EPattern16,EPattern16Extra,(PCRE_SPTR16)Line,Start+Length,Start,nExecOptions,REParam.Match(),REParam.Count())>=0) {
 #else
-		if (pcre_exec(EPattern,EPatternExtra,Line,Start+Length,Start,0,REParam.Match(),REParam.Count())>=0) {
+		if (pcre_exec(EPattern,EPatternExtra,Line,Start+Length,Start,nExecOptions,REParam.Match(),REParam.Count())>=0) {
 #endif
 			MatchDone();
 			REParam.FillStartLength(MatchStart, MatchLength);
@@ -68,18 +68,18 @@ bool SearchIn(const TCHAR *Line,int Start,int Length,int *MatchStart,int *MatchL
 
 		//	Optimize for the case of no match at all
 #ifdef UNICODE
-		bool bFound = pcre16_exec(EPattern16,EPattern16Extra,(PCRE_SPTR16)Line,Start+Length,Start,0,REParam.Match(),REParam.Count()) >= 0;
+		bool bFound = pcre16_exec(EPattern16,EPattern16Extra,(PCRE_SPTR16)Line,Start+Length,Start,nExecOptions,REParam.Match(),REParam.Count()) >= 0;
 #else
-		bool bFound = pcre_exec(EPattern,EPatternExtra,Line,Start+Length,Start,0,REParam.Match(),REParam.Count()) >= 0;
+		bool bFound = pcre_exec(EPattern,EPatternExtra,Line,Start+Length,Start,nExecOptions,REParam.Match(),REParam.Count()) >= 0;
 #endif
 		if (!bFound) return false;
 
 		//	Look for last match
 		for (int Offset = Length-1; Offset >=0; Offset--) {
 #ifdef UNICODE
-			bFound = pcre16_exec(EPattern16,EPattern16Extra,(PCRE_SPTR16)Line,Start+Length,Start+Offset,0,REParam.Match(),REParam.Count()) >= 0;
+			bFound = pcre16_exec(EPattern16,EPattern16Extra,(PCRE_SPTR16)Line,Start+Length,Start+Offset,nExecOptions,REParam.Match(),REParam.Count()) >= 0;
 #else
-			bFound = pcre_exec(EPattern,EPatternExtra,Line,Start+Length,Start+Offset,0,REParam.Match(),REParam.Count()) >= 0;
+			bFound = pcre_exec(EPattern,EPatternExtra,Line,Start+Length,Start+Offset,nExecOptions,REParam.Match(),REParam.Count()) >= 0;
 #endif
 			if (bFound && ((Offset == 0) || (REParam.Match()[0] > Offset))) {
 				MatchDone();
@@ -103,7 +103,7 @@ bool SearchIn(const TCHAR *Line,int Start,int Length,int *MatchStart,int *MatchL
 	return false;
 }
 
-bool SearchInLine(const TCHAR *Line,int Length,int Start,int End,int *MatchStart,int *MatchLength)
+bool SearchInLine(const TCHAR *Line,int Length,int Start,int End,int *MatchStart,int *MatchLength,int nExecOptions)
 {
 	int Len;
 
@@ -113,10 +113,10 @@ bool SearchInLine(const TCHAR *Line,int Length,int Start,int End,int *MatchStart
 	if (Len<0) return false;
 
 #ifdef UNICODE
-	return SearchIn(Line,Start,Len,MatchStart,MatchLength);
+	return SearchIn(Line,Start,Len,MatchStart,MatchLength,nExecOptions);
 #else
 	if (ERegExp) {
-		return SearchIn(Line,Start,Len,MatchStart,MatchLength);
+		return SearchIn(Line,Start,Len,MatchStart,MatchLength,nExecOptions);
 	} else {
 		if (EdInfo.AnsiMode || (EdInfo.TableNum != -1)) {
 			//	static - to allow REParam somewhere inside to store just a pointer, not a copy
@@ -124,9 +124,9 @@ bool SearchInLine(const TCHAR *Line,int Length,int Start,int End,int *MatchStart
 			static string OEMLine;
 			OEMLine = string(Line, Length);
 			EditorToOEM(OEMLine);
-			return SearchIn(OEMLine.c_str(),Start,Len,MatchStart,MatchLength);
+			return SearchIn(OEMLine.c_str(),Start,Len,MatchStart,MatchLength,nExecOptions);
 		} else {
-			return SearchIn(Line, Start, Len, MatchStart, MatchLength);
+			return SearchIn(Line, Start, Len, MatchStart, MatchLength,nExecOptions);
 		}
 	}
 #endif
@@ -285,7 +285,7 @@ void FillLineBuffer(size_t FirstLine, size_t LastLine)
 	}
 }
 
-bool SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,bool bSkipClear)
+bool SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,bool bSkipClear,bool bNotBOL)
 {
 	int Line,MatchStart,MatchLength;
 	TCHAR *Lines;
@@ -311,10 +311,12 @@ bool SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,bool bS
 				}
 			}
 
-			if (SearchInLine(Lines, LinesLength, (Line==FirstLine) ? StartPos : 0, -1, &MatchStart, &MatchLength)) {
+			int nExecOptions = bNotBOL ? PCRE_NOTBOL : 0;
+			if (SearchInLine(Lines, LinesLength, (Line==FirstLine) ? StartPos : 0, -1, &MatchStart, &MatchLength, nExecOptions)) {
 				Relative2Absolute(Line, Lines, MatchStart, MatchLength, FirstLine, StartPos, LastLine, EndPos);
 				return true;
 			}
+			bNotBOL = false;
 		}
 	} else {
 		int FirstLineLength;
@@ -335,12 +337,14 @@ bool SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,bool bS
 				}
 			}
 
-			if (SearchInLine(Lines,LinesLength,(Line==FirstLine)?StartPos:0,-1,&MatchStart,&MatchLength)) {
+			int nExecOptions = bNotBOL ? PCRE_NOTBOL : 0;
+			if (SearchInLine(Lines,LinesLength,(Line==FirstLine)?StartPos:0,-1,&MatchStart,&MatchLength,nExecOptions)) {
 				if (MatchStart<=FirstLineLength) {
 					Relative2Absolute(Line,Lines,MatchStart,MatchLength,FirstLine,StartPos,LastLine,EndPos);
 					return true;
 				}
 			}
+			bNotBOL = false;
 		}
 	}
 	return false;
