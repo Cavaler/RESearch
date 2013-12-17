@@ -15,7 +15,7 @@ $ #Regular Expression Search and Replace, version 7.85#
     Its difference from standard Far tools, it allows using ~Regular Expressions~@RegularExpressions@
 in file masks, searched text, and using various macros in replacement text.
     Due to this, you can perform complicated searches and context-dependent replacing.
-	Furthermore, it supports ~scripting replacement~@RegularReplaceScripting@.
+    Furthermore, it supports ~scripting replacement~@RegularReplaceScripting@.
 
     This plugin uses ~PCRE~@PCRE@ regular expression library.
 
@@ -75,7 +75,7 @@ string, but a set of them. For full information, see included pcrepattern.html f
     #\b#      matches word boundary
     #\B#      matches not word boundary
     #\C#      matches any single character, #including# newline
-	#\R#      matches any newline sequence - \r, \n, or \r\n
+    #\R#      matches any newline sequence - \r, \n, or \r\n
     Also standard C metacharacters work (with '\n' matching only newline character).
 
     #?#     after a pattern matches it zero or one time
@@ -648,7 +648,7 @@ to symbol case. ANSI and OEM codepages are supported.
 $ #Search Results panel#
     This panel is much the same as standard temporary panel, except for that
 it does not support manual adding files to it.
-	Use F7 to delete files from here, and Ctrl+PgUp to go directly to highlighted file.
+    Use F7 to delete files from here, and Ctrl+PgUp to go directly to highlighted file.
 @FSOpenError
 $ #Cannot open file#
     Error occured trying to open specified file for reading. The file will be skipped.
@@ -779,7 +779,7 @@ $ #Presets menu#
 
   #Enter#      to use highlighted preset
   #Ins#        to insert a new preset (based on what was in the dialog you called menu from)
-  #NumPlus#    to add a new preset at the end
+  #Gray +#     to add a new preset at the end
   #F4#         to edit highlighted preset
   #F5#         to copy highlighted preset
   #Ctrl-Enter# to run highlighted preset
@@ -843,7 +843,7 @@ $ #Batches menu#
  Commands:
   #Enter#      Run highlighted batch
   #Ins#        Insert a new batch
-  #NumPlus#    Add a new batch
+  #Gray +#     Add a new batch
   #F4#         Edit highlighted batch
   #F6#         Rename current batch, or change other options
   #Del#        Delete highlighted batch
@@ -853,7 +853,7 @@ $ #Batch menu#
 
  Commands:
   #Ins#            Insert a new preset to a batch
-  #NumPlus#        Add a new preset to a batch
+  #Gray +#         Add a new preset to a batch
   #Del#            Remove preset from a batch
   #Ctrl-#        Move preset up/down in a batch
   #F4#             Edit selected preset
