@@ -8,9 +8,10 @@ typedef OperationResult (*PresetExecutor)();
 //	Mapping of parameter names to existing variables
 class CParameterSet {
 public:
-	CParameterSet(PresetExecutor Executor, int nStringCount, int nIntCount, ...);
+	CParameterSet(PresetExecutor Executor, ...);
 	map<string, tstring *> m_mapStrings;
 	map<string, int *> m_mapInts;
+	map<string, bool *> m_mapBools;
 	PresetExecutor m_Executor;
 };
 

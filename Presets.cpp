@@ -9,41 +9,36 @@
 #define NameKey(name) name
 #endif
 
-CParameterSet::CParameterSet(PresetExecutor Executor, int nStringCount, int nIntCount, ...)
+CParameterSet::CParameterSet(PresetExecutor Executor, ...)
 : m_Executor(Executor)
 {
 	va_list List;
-	va_start(List, nIntCount);
+	va_start(List, Executor);
 	
-	if (nStringCount >= 0) {
-		while (nStringCount--) {
-			const char *szName = va_arg(List, const char *);
+	while (true) {
+		const char *szName = va_arg(List, const char *);
+		if (szName != NULL)
 			m_mapStrings[szName] = va_arg(List, tstring *);
-		}
-	} else {
-		while (true) {
-			const char *szName = va_arg(List, const char *);
-			if (szName != NULL)
-				m_mapStrings[szName] = va_arg(List, tstring *);
-			else
-				break;
-		} 
+		else
+			break;
+	} 
+
+	while (true) {
+		const char *szName = va_arg(List, const char *);
+		if (szName != NULL)
+			m_mapInts[szName] = va_arg(List, int *);
+		else
+			break;
+	} 
+
+	while (true) {
+		const char *szName = va_arg(List, const char *);
+		if (szName != NULL)
+			m_mapBools[szName] = va_arg(List, bool *);
+		else
+			break;
 	}
 
-	if (nIntCount >= 0) {
-		while (nIntCount--) {
-			const char *szName = va_arg(List, const char *);
-			m_mapInts[szName] = va_arg(List, int *);
-		}
-	} else {
-		while (true) {
-			const char *szName = va_arg(List, const char *);
-			if (szName != NULL)
-				m_mapInts[szName] = va_arg(List, int *);
-			else
-				break;
-		} 
-	}
 	va_end(List);
 }
 
@@ -57,9 +52,14 @@ CParameterBackup::CParameterBackup(CParameterSet &Set, bool bAutoRestore)
 	for (map<string, int *>::iterator iti = m_Set.m_mapInts.begin(); iti != m_Set.m_mapInts.end(); iti++) {
 		m_mapInts[iti->first] = *(iti->second);
 	}
+
+	for (map<string, bool *>::iterator itb = m_Set.m_mapBools.begin(); itb != m_Set.m_mapBools.end(); itb++) {
+		m_mapInts[itb->first] = *(itb->second);
+	}
 }
 
-void CParameterBackup::Restore() {
+void CParameterBackup::Restore()
+{
 	for (map<string, tstring *>::iterator its = m_Set.m_mapStrings.begin(); its != m_Set.m_mapStrings.end(); its++) {
 		*(its->second) = m_mapStrings[its->first];
 	}
@@ -68,10 +68,15 @@ void CParameterBackup::Restore() {
 		*(iti->second) = m_mapInts[iti->first];
 	}
 
+	for (map<string, bool *>::iterator itb = m_Set.m_mapBools.begin(); itb != m_Set.m_mapBools.end(); itb++) {
+		*(itb->second) = m_mapInts[itb->first] != 0;
+	}
+
 	m_bAutoRestore = false;
 }
 
-CParameterBackup::~CParameterBackup() {
+CParameterBackup::~CParameterBackup()
+{
 	if (m_bAutoRestore) Restore();
 }
 
@@ -98,6 +103,12 @@ void CPreset::FillDefaults()
 	while (it2 != m_ParamSet.m_mapInts.end()) {
 		m_mapInts[it2->first] = *(it2->second);
 		it2++;
+	}
+
+	map<string, bool *>::iterator it3 = m_ParamSet.m_mapBools.begin();
+	while (it3 != m_ParamSet.m_mapBools.end()) {
+		m_mapInts[it3->first] = *(it3->second);
+		it3++;
 	}
 }
 
@@ -130,13 +141,15 @@ CPreset::CPreset(CParameterSet &ParamSet, const tstring &strName, CFarSettingsKe
 	}
 }
 
-OperationResult CPreset::ExecutePreset() {
+OperationResult CPreset::ExecutePreset()
+{
 	CParameterBackup _Backup(m_ParamSet);
 	Apply();
 	return m_ParamSet.m_Executor();
 }
 
-void CPreset::Apply() {
+void CPreset::Apply()
+{
 	map<string, tstring *>::iterator it1 = m_ParamSet.m_mapStrings.begin();
 	while (it1 != m_ParamSet.m_mapStrings.end()) {
 		if (it1->first[0] != '@') {
@@ -153,6 +166,15 @@ void CPreset::Apply() {
 			if (it != m_mapInts.end()) *(it2->second) = it->second;
 		}
 		it2++;
+	}
+
+	map<string, bool *>::iterator it3 = m_ParamSet.m_mapBools.begin();
+	while (it3 != m_ParamSet.m_mapBools.end()) {
+		if (it3->first[0] != '@') {
+			map<string, int>::iterator it = m_mapInts.find(it3->first);
+			if (it != m_mapInts.end()) *(it3->second) = it->second != 0;
+		}
+		it3++;
 	}
 }
 

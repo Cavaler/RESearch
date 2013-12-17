@@ -1,16 +1,17 @@
 #include "StdAfx.h"
 #include "..\RESearch.h"
 
-CParameterSet g_RnParamSet(RenameFilesExecutor, 6, 6,
+CParameterSet g_RnParamSet(RenameFilesExecutor,
 	"Mask", &MaskText, "Text", &SearchText, "Replace", &ReplaceText, "Script", &EREvaluateScript,
-	"@Mask", &FMask, "@Text", &FText, "@Replace", &FRReplace,
+	"@Mask", &FMask, "@Text", &FText, "@Replace", &FRReplace, NULL,
+	"AdvancedID", &FAdvancedID, NULL,
 	"MaskAsRegExp", &FMaskAsRegExp, "TextAsRegExp", &FSearchAs, "Repeating", &FRepeating,
-	"AsScript", &FREvaluate, "AdvancedID", &FAdvancedID
+	"AsScript", &FREvaluate, NULL
 	);
-CParameterSet g_QRParamSet(QuickRenameFilesExecutor, 4, 2,
+CParameterSet g_QRParamSet(QuickRenameFilesExecutor,
 	"Text", &SearchText, "Replace", &ReplaceText,
-	"@Text", &FText, "@Replace", &FRReplace,
-	"TextAsRegExp", &FSearchAs, "Repeating", &FRepeating
+	"@Text", &FText, "@Replace", &FRReplace, NULL, NULL,
+	"TextAsRegExp", &FSearchAs, "Repeating", &FRepeating, NULL
 	);
 
 bool FTAskOverwrite;

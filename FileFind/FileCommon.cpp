@@ -1,26 +1,27 @@
 #include "StdAfx.h"
 #include "..\RESearch.h"
 
-CParameterSet g_FSParamSet(FileSearchExecutor, 4, 5,
-	"Mask", &MaskText, "Text", &SearchText, "@Mask", &FMask, "@Text", &FText,
-	"MaskAsRegExp", &FMaskAsRegExp, "CaseSensitive", &FCaseSensitive,
-	"SearchAs", &FSearchAs, "IsInverse", &FSInverse,
-	"AdvancedID", &FAdvancedID
-	);
-CParameterSet g_FRParamSet(FileReplaceExecutor, 6, 7,
-	"Mask", &MaskText, "Text", &SearchText, "Replace", &ReplaceText, "Script", &EREvaluateScript,
-	"@Mask", &FMask, "@Text", &FText, "@Replace", &FRReplace,
-	"MaskAsRegExp", &FMaskAsRegExp, "CaseSensitive", &FCaseSensitive, "AllCharTables", &FAllCharTables,
-	"SearchAs", &FSearchAs, "AdvancedID", &FAdvancedID, "AsScript", &FREvaluate
-	);
-CParameterSet g_FGParamSet(FileGrepExecutor, -1, -1,
+CParameterSet g_FSParamSet(FileSearchExecutor,
 	"Mask", &MaskText, "Text", &SearchText, "@Mask", &FMask, "@Text", &FText, NULL,
+	"AdvancedID", &FAdvancedID, NULL,
+	"MaskAsRegExp", &FMaskAsRegExp, "CaseSensitive", &FCaseSensitive,
+	"SearchAs", &FSearchAs, "IsInverse", &FSInverse, NULL
+	);
+CParameterSet g_FRParamSet(FileReplaceExecutor,
+	"Mask", &MaskText, "Text", &SearchText, "Replace", &ReplaceText, "Script", &EREvaluateScript,
+	"@Mask", &FMask, "@Text", &FText, "@Replace", &FRReplace, NULL,
+	"AdvancedID", &FAdvancedID, NULL,
+	"MaskAsRegExp", &FMaskAsRegExp, "CaseSensitive", &FCaseSensitive, "AllCharTables", &FAllCharTables,
+	"SearchAs", &FSearchAs, "AsScript", &FREvaluate, NULL
+	);
+CParameterSet g_FGParamSet(FileGrepExecutor,
+	"Mask", &MaskText, "Text", &SearchText, "@Mask", &FMask, "@Text", &FText, NULL,
+	"AdvancedID", &FAdvancedID, "ContextLines", &FGContextLines, NULL,
 	"MaskAsRegExp", &FMaskAsRegExp, "CaseSensitive", &FCaseSensitive,
 	"SearchAs", &FSearchAs, "IsInverse", &FSInverse,
 	"OutputNames", &FGOutputNames, "AddLineCount", &FGAddLineCount, "AddMatchCount", &FGAddMatchCount,
 	"OutputLines", &FGOutputLines, "AddLineNumbers", &FGAddLineNumbers,
-	"AddContext", &FGAddContext, "ContextLines", &FGContextLines,
-	"MatchingLinePart", &FGMatchingLinePart, "AdvancedID", &FAdvancedID, NULL
+	"AddContext", &FGAddContext, "MatchingLinePart", &FGMatchingLinePart, NULL
 	);
 
 DWORD g_dwDateAfterThis, g_dwDateBeforeThis;
@@ -29,14 +30,17 @@ bool g_bScanningLocalTime;
 FILETIME FADateBeforeThisLocal;
 FILETIME FADateAfterThisLocal;
 
-CParameterSet g_FAParamSet(NULL, 2, 20,
-	"FullFileName", &FAFullFileName, "DirectoryName", &FADirectoryName,
+CParameterSet g_FAParamSet(NULL,
+	"FullFileName", &FAFullFileName, "DirectoryName", &FADirectoryName, NULL,
+
+	"DateAfterThis", &g_dwDateAfterThis, "DateBeforeThis", &g_dwDateBeforeThis,
+	"SizeGreaterLimit", &FASizeGreaterLimit, "SizeLessLimit", &FASizeLessLimit, "SearchHeadLimit", &FASearchHeadLimit,
+	"AttributesCleared", &FAAttributesCleared, "AttributesSet", &FAAttributesSet,  "RecursionLevel", &FARecursionLevel, NULL,
 
 	"FullFileNameMatch", &FAFullFileNameMatch, "CaseSensitive", &FACaseSensitive, "FullFileNameInverse", &FAFullFileNameInverse,
-	"DirectoryMatch", &FADirectoryMatch, "DirectoryCaseSensitive", &FADirectoryCaseSensitive, "DirectoryInverse", &FADirectoryInverse, "RecursionLevel", &FARecursionLevel,
-	"DateAfter", &FADateAfter, "DateAfterThis", &g_dwDateAfterThis, "DateBefore", &FADateBefore, "DateBeforeThis", &g_dwDateBeforeThis, "ModificationDate", &FAModificationDate,
-	"SizeGreater", &FASizeGreater, "SizeGreaterLimit", &FASizeGreaterLimit, "SizeLess", &FASizeLess, "SizeLessLimit", &FASizeLessLimit, "SearchHead", &FASearchHead, "SearchHeadLimit", &FASearchHeadLimit,
-	"AttributesCleared", &FAAttributesCleared, "AttributesSet", &FAAttributesSet
+	"DirectoryMatch", &FADirectoryMatch, "DirectoryCaseSensitive", &FADirectoryCaseSensitive, "DirectoryInverse", &FADirectoryInverse,
+	"DateAfter", &FADateAfter, "DateBefore", &FADateBefore, "ModificationDate", &FAModificationDate,
+	"SizeGreater", &FASizeGreater, "SizeLess", &FASizeLess, "SearchHead", &FASearchHead, NULL
 	);
 
 void FReadRegistry(CFarSettingsKey Key)

@@ -1,28 +1,28 @@
 #include "StdAfx.h"
 #include "..\RESearch.h"
 
-CParameterSet g_ESParamSet(EditorSearchExecutor, -1, -1,
-	"Text", &SearchText, "@Text", &EText, NULL,
+CParameterSet g_ESParamSet(EditorSearchExecutor,
+	"Text", &SearchText, "@Text", &EText, NULL, NULL,
 	"IsRegExp", &ERegExp, "CaseSensitive", &ECaseSensitive, "SeveralLine", &ESeveralLine,
 	"Reverse", &EReverse, "InSelection", &EInSelection,
 	"ListAll", &EListAllFromPreset, "FromCurrent", &EFromCurrentPosition, NULL
 					 );
-CParameterSet g_ERParamSet(EditorReplaceExecutor, -1, -1,
+CParameterSet g_ERParamSet(EditorReplaceExecutor,
 	"Text", &SearchText, "Replace", &ReplaceText, "Script", &EREvaluateScript, 
-	 "@Text", &EText,  "@Replace", &ERReplace, NULL,
+	 "@Text", &EText,  "@Replace", &ERReplace, NULL, NULL,
 	"IsRegExp", &ERegExp, "CaseSensitive", &ECaseSensitive, "SeveralLine", &ESeveralLine,
 	"Reverse", &EReverse, "InSelection", &EInSelection,
 	"RemoveEmpty", &ERRemoveEmpty, "RemoveNoMatch", &ERRemoveNoMatch,
 	"AsScript", &EREvaluate, "FromCurrent", &EFromCurrentPosition, NULL
 					 );
-CParameterSet g_EFParamSet(EditorFilterExecutor, -1, -1,
-	"Text", &SearchText, "@Text", &EText, NULL,
+CParameterSet g_EFParamSet(EditorFilterExecutor,
+	"Text", &SearchText, "@Text", &EText, NULL, NULL,
 	"LeaveFilter", &EFLeaveFilter, "IsRegExp", &ERegExp, "CaseSensitive", &ECaseSensitive,
 	"Reverse", &EReverse, "FromCurrent", &EFromCurrentPosition, NULL
 					 );
-CParameterSet g_ETParamSet(EditorTransliterateExecutor, -1, -1,
+CParameterSet g_ETParamSet(EditorTransliterateExecutor,
 	"Text", &SearchText, "Replace", &ReplaceText,
-	"@Text", &EText,  "@Replace", &ERReplace, NULL, NULL
+	"@Text", &EText,  "@Replace", &ERReplace, NULL, NULL, NULL
 					 );
 
 void EReadRegistry(CFarSettingsKey Key)

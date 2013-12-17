@@ -1,9 +1,9 @@
 #include "StdAfx.h"
 #include "..\RESearch.h"
 
-CParameterSet g_VSParamSet(ViewSearchExecutor, 2, 3,
-	"Text", &SearchText, "@Text", &EText,
-	"IsRegExp", &ERegExp, "CaseSensitive", &ECaseSensitive, "SeveralLine", &ESeveralLine
+CParameterSet g_VSParamSet(ViewSearchExecutor,
+	"Text", &SearchText, "@Text", &EText, NULL, NULL,
+	"IsRegExp", &ERegExp, "CaseSensitive", &ECaseSensitive, "SeveralLine", &ESeveralLine, NULL
 );
 
 void VReadRegistry(CFarSettingsKey Key)
