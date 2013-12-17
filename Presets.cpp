@@ -538,8 +538,8 @@ bool CBatchAction::EditItems()
 		int nBreakKey;
 		tstring strTitle = FormatStr(GetMsg(MBatchCommands), RemoveAmpersand(m_strName).c_str());
 
-		int nResult = StartupInfo.Menu(-1, -1, 0,
-			FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT|FMENU_USEEXT|FMENU_RETURNCODE, strTitle.c_str(), _T("Ins,Ctrl-\x18\x19,Ctrl-Enter,Del"), _T("Batch"),
+		int nResult = ChooseMenu(FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT|FMENU_USEEXT|FMENU_RETURNCODE, strTitle.c_str(),
+			_T("Ins,Ctrl-\x18\x19,Ctrl-Enter,Del"), _T("Batch"),
 			piBreakKeys, &nBreakKey, (const FarMenuItem *)&arrItems[0], arrItems.size());
 		if (nResult >= 0) m_nCurrent = nResult;
 
