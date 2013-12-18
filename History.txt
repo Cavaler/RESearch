@@ -14,6 +14,11 @@ Planned:
 Known bugs:
 	- Replace changing part of (real) EOL crashes
 
+Version 8.01 (17.12.2013)
+	- Fixed editing preset lists in batches
+	- Fixed problems with flags in presets
+	- ^ (beginning of line) matches only once per line when replacing - so "^." => "" will remove only first character, not whole line
+
 Version 8.00 (16.12.2013)
 	+ [X] Advanced file options added to File Rename
 	+ Added Multi-line RegExp Replace (see Hints.txt)
