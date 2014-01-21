@@ -197,7 +197,7 @@ bool PerformSingleRename(rename_pair &Item)
 		DWORD dwFlags = MOVEFILE_COPY_ALLOWED;
 		if (bOverwrite) dwFlags |= MOVEFILE_REPLACE_EXISTING;
 		
-		if (MoveFileEx(Item.first.c_str(), Item.second.c_str(), dwFlags)) {
+		if (MoveFileEx(ExtendedFileName(Item.first).c_str(), ExtendedFileName(Item.second).c_str(), dwFlags)) {
 			PostPerformRename(Item);
 			return true;
 		}
@@ -806,7 +806,7 @@ void PerformRenumber(vector<tstring> &arrFileNames, vector<tstring> &arrProcesse
 			tstring strSrc = szCurDir + arrFileNames[nItem];
 			tstring strTgt = szCurDir + arrProcessedNames[nItem];
 
-			if (MoveFile(strSrc.c_str(), strTgt.c_str())) {
+			if (MoveFile(ExtendedFileName(strSrc).c_str(), ExtendedFileName(strTgt).c_str())) {
 				m_arrLastRename.push_back(make_pair(strSrc, strTgt));
 			}
 		}
@@ -968,7 +968,7 @@ OperationResult UndoRenameFiles()
 		FileConfirmed = !FRConfirmFileThisRun;
 
 		if (ConfirmWholeFileRename(m_arrLastRename[nFile].second.c_str(), m_arrLastRename[nFile].first.c_str()))
-			MoveFile(m_arrLastRename[nFile].second.c_str(), m_arrLastRename[nFile].first.c_str());
+			MoveFile(ExtendedFileName(m_arrLastRename[nFile].second).c_str(), ExtendedFileName(m_arrLastRename[nFile].first).c_str());
 
 		if (g_bInterrupted) break;
 	}

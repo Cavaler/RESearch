@@ -413,7 +413,7 @@ bool DoScanDirectory(tstring strDirectory, panelitem_vector &PanelItems, Process
 
 	strDirectory = AddSlash(strDirectory);
 #ifdef UNICODE
-	tstring strDirAndMask = L"\\\\?\\" + strDirectory + L"*";
+	tstring strDirAndMask = ExtendedFileName(strDirectory) + L"*";
 #else
 	tstring strDirAndMask = strDirectory + "*";
 #endif

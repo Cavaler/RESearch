@@ -160,11 +160,7 @@ void CTemporaryPanel::UpdateList()
 		}
 
 		WIN32_FIND_DATA FindData;
-#ifdef UNICODE
-		HANDLE hFind = FindFirstFile((wstring(L"\\\\?\\") + FarPanelFileName(m_arrItems[nItem])).c_str(), &FindData);
-#else
-		HANDLE hFind = FindFirstFile(FarPanelFileName(m_arrItems[nItem]), &FindData);
-#endif
+		HANDLE hFind = FindFirstFile(ExtendedFileName(FarPanelFileName(m_arrItems[nItem])).c_str(), &FindData);
 		FindClose(hFind);
 		if (hFind == INVALID_HANDLE_VALUE) {
 			m_arrItems.erase(m_arrItems.begin()+nItem);

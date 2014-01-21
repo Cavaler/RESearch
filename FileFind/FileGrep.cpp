@@ -400,7 +400,7 @@ OperationResult FileGrep(bool ShowDialog)
 		strFileName = szName;
 	}
 
-	g_hOutput = CreateFile(strFileName.c_str(), GENERIC_WRITE, FILE_SHARE_READ, NULL,
+	g_hOutput = CreateFile(ExtendedFileName(strFileName).c_str(), GENERIC_WRITE, FILE_SHARE_READ, NULL,
 		CREATE_ALWAYS, 0, NULL);
 	if (!g_hOutput) {
 		ShowLastError(GetMsg(MFileCreateError), strFileName.c_str());

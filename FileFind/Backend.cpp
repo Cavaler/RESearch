@@ -75,7 +75,7 @@ void CFileBackend::Free()
 
 bool CFileBackend::OpenInputFile(LPCTSTR szFileName)
 {
-	m_hFile = CreateFile(szFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, NULL, NULL);
+	m_hFile = CreateFile(ExtendedFileName(szFileName).c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, NULL, NULL);
 	if (m_hFile == INVALID_HANDLE_VALUE) return false;
 
 	DWORD dwSizeHigh;
@@ -346,14 +346,14 @@ bool CFileBackend::OpenOutput()
 {
 	if (m_hOutFile != INVALID_HANDLE_VALUE) return true;
 
-	DWORD dwAttr = GetFileAttributes(m_strFileName.c_str());
+	DWORD dwAttr = GetFileAttributes(ExtendedFileName(m_strFileName).c_str());
 	if (dwAttr & FILE_ATTRIBUTE_READONLY) {
 		if (!ConfirmFileReadonly(m_strFileName.c_str())) return false;
 	} else {
 		if (!ConfirmFile(MREReplace, m_strFileName.c_str())) return false;
 	}
 
-	m_hOutFile = CreateFile(m_strOutFileName.c_str(), GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, NULL, NULL);
+	m_hOutFile = CreateFile(ExtendedFileName(m_strOutFileName).c_str(), GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, NULL, NULL);
 	if (m_hOutFile == INVALID_HANDLE_VALUE) {
 		ShowLastError(GetMsg(MFileCreateError), m_strOutFileName.c_str());
 		return false;

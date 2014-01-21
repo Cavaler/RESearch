@@ -159,18 +159,20 @@ bool RunReplace(LPCTSTR szFileName, __int64 dwFileSize)
 	return false;
 }
 
-char *AddExtension(char *FileName,char *Extension) {
+char *AddExtension(char *FileName,char *Extension)
+{
 	char *New=(char *)malloc(strlen(FileName)+strlen(Extension)+1);
 	return strcat(strcpy(New,FileName),Extension);
 }
 
-tstring GetUniqueFileName(const TCHAR *szCurrent, const TCHAR *szExt) {
+tstring GetUniqueFileName(const TCHAR *szCurrent, const TCHAR *szExt)
+{
 	int nTry = 0;
 	do {
 		tstring strName = szCurrent;
 		if (nTry > 0) strName += FormatStr(_T(".%d"), nTry);
 		strName += szExt;
-		if (GetFileAttributes(strName.c_str()) == INVALID_FILE_ATTRIBUTES) {
+		if (GetFileAttributes(ExtendedFileName(strName).c_str()) == INVALID_FILE_ATTRIBUTES) {
 			if (GetLastError() == ERROR_FILE_NOT_FOUND) return strName;
 			return tstring();
 		}
@@ -183,16 +185,16 @@ class ROBackup
 public:
 	ROBackup(LPCTSTR szFileName)
 	{
-		m_dwAttr = GetFileAttributes(szFileName);
+		m_dwAttr = GetFileAttributes(ExtendedFileName(szFileName).c_str());
 		if ((m_dwAttr != INVALID_FILE_ATTRIBUTES) && (m_dwAttr & FILE_ATTRIBUTE_READONLY)) {
-			SetFileAttributes(szFileName, m_dwAttr & ~FILE_ATTRIBUTE_READONLY);
+			SetFileAttributes(ExtendedFileName(szFileName).c_str(), m_dwAttr & ~FILE_ATTRIBUTE_READONLY);
 			m_strFileName = szFileName;
 		}
 	}
 	void Done()
 	{
 		if (!m_strFileName.empty()) {
-			SetFileAttributes(m_strFileName.c_str(), m_dwAttr);
+			SetFileAttributes(ExtendedFileName(m_strFileName).c_str(), m_dwAttr);
 			m_strFileName.clear();
 		}
 	}
@@ -212,8 +214,8 @@ bool ReplaceSingleFile_Normal(const FIND_DATA &FindData)
 	if (bProcess) {
 		if (!FRReplaceToNew) {
 			ROBackup _ro(FindData.cFileName);
-			while (!ReplaceFile(FindData.cFileName, g_strNewFileName.c_str(),
-				(FRSaveOriginal) ? g_strBackupFileName.c_str() : NULL,
+			while (!ReplaceFile(ExtendedFileName(FindData.strFileName).c_str(), ExtendedFileName(g_strNewFileName).c_str(),
+				(FRSaveOriginal) ? ExtendedFileName(g_strBackupFileName).c_str() : NULL,
 				REPLACEFILE_IGNORE_MERGE_ERRORS, NULL, NULL))
 			{
 				const TCHAR *Lines[]={GetMsg(MREReplace),GetMsg(MFileBackupError),FindData.cFileName,GetMsg(MOk),GetMsg(MBtnRetry)};
@@ -244,7 +246,7 @@ bool ReplaceSingleFile_CopyFirst(const FIND_DATA &FindData)
 			DeleteFile(g_strBackupFileName.c_str());
 		}
 	} else {
-		MoveFileEx(g_strBackupFileName.c_str(), FindData.cFileName, MOVEFILE_REPLACE_EXISTING|MOVEFILE_COPY_ALLOWED);
+		MoveFileEx(ExtendedFileName(g_strBackupFileName).c_str(), ExtendedFileName(FindData.strFileName).c_str(), MOVEFILE_REPLACE_EXISTING|MOVEFILE_COPY_ALLOWED);
 	}
 
 	return bProcess;
@@ -275,9 +277,9 @@ void ReplaceSingleFile(const FIND_DATA *FindData, panelitem_vector &PanelItems)
 		: GetUniqueFileName(FindData->cFileName, _T(".bak"));
 	g_strNewFileName = GetUniqueFileName(FindData->cFileName, _T(".new"));
 
-	HANDLE hFile = CreateFile(FindData->cFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, NULL, NULL);
-	if (hFile != INVALID_HANDLE_VALUE) {
-
+	HANDLE hFile = CreateFile(ExtendedFileName(FindData->cFileName).c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, NULL, NULL);
+	if (hFile != INVALID_HANDLE_VALUE)
+	{
 		BY_HANDLE_FILE_INFORMATION hfInfo;
 		GetFileInformationByHandle(hFile, &hfInfo);
 		CloseHandle(hFile);
