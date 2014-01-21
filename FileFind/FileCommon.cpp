@@ -372,16 +372,16 @@ bool AdvancedApplies(WIN32_FIND_DATA *FindData)
 	return true;
 }
 
-bool DoScanDirectory(TCHAR *Directory, panelitem_vector &PanelItems, ProcessFileProc ProcessFile)
+bool DoScanDirectory(tstring strDirectory, panelitem_vector &PanelItems, ProcessFileProc ProcessFile)
 {
 	if (FASkipSystemFolders && FASystemFoldersMask) {
-		if ((*FASystemFoldersMask)(Directory)) return true;
+		if ((*FASystemFoldersMask)(strDirectory.c_str())) return true;
 	}
 
 	if (FAdvanced) {
 		if (FARecursionLevel && (CurrentRecursionLevel > FARecursionLevel)) return true;
 		if (FADirectoryMatch && FADirectoryPattern && (CurrentRecursionLevel > 0)) {
-			bool bNameMatches = do_pcre_exec(FADirectoryPattern,FADirectoryPatternExtra,Directory,_tcslen(Directory),0,0,NULL,0) >= 0;
+			bool bNameMatches = do_pcre_exec(FADirectoryPattern,FADirectoryPatternExtra,strDirectory.c_str(),strDirectory.length(),0,0,NULL,0) >= 0;
 			if (FADirectoryInverse ? bNameMatches : !bNameMatches) return true;
 		}
 	}
@@ -390,28 +390,31 @@ bool DoScanDirectory(TCHAR *Directory, panelitem_vector &PanelItems, ProcessFile
 	WIN32_FIND_DATA *FindDataArray=NULL;
 	int FindDataCount=0;
 	HANDLE HSearch;
-	int Len = AddSlashLen(Directory);
 	HANDLE hScreen=StartupInfo.SaveScreen(0,0,-1,-1);
 
-	_tcscat(Directory, _T("*"));
-	if ((HSearch=FindFirstFile(Directory,&FindData))!=INVALID_HANDLE_VALUE) do {
-//		Sleep(0);
+	strDirectory = AddSlash(strDirectory);
+#ifdef UNICODE
+	tstring strDirAndMask = L"\\\\?\\" + strDirectory + L"*";
+#else
+	tstring strDirAndMask = strDirectory + "*";
+#endif
+
+	if ((HSearch=FindFirstFile(strDirAndMask.c_str(), &FindData)) != INVALID_HANDLE_VALUE) do
+	{
 		g_bInterrupted|=Interrupted();
 		if (FindData.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) {
 			if (!_tcscmp(FindData.cFileName,_T("."))) continue;
 			if (!_tcscmp(FindData.cFileName,_T(".."))) continue;
 		}
 		if (!MultipleMasksApply(FindData.cFileName)) continue;
-		_tcscpy(Directory+Len,FindData.cFileName);
-		_tcscpy(FindData.cFileName,Directory);
+		_tcsncpy_s(FindData.cFileName, MAX_PATH, (strDirectory + FindData.cFileName).c_str(), _TRUNCATE);
 
 		FindDataArray=(WIN32_FIND_DATA *)realloc(FindDataArray,(++FindDataCount)*sizeof(WIN32_FIND_DATA));
 		FindDataArray[FindDataCount-1]=FindData;
 	} while (FindNextFile(HSearch,&FindData)&&!g_bInterrupted);
 	FindClose(HSearch);
 
-	Directory[Len]=0;
-	ShowProgress(Directory, PanelItems);
+	ShowProgress(strDirectory.c_str(), PanelItems);
 
 	for (int I=0;I<FindDataCount;I++) {
 		g_bInterrupted|=Interrupted();if (g_bInterrupted) break;
@@ -425,25 +428,22 @@ bool DoScanDirectory(TCHAR *Directory, panelitem_vector &PanelItems, ProcessFile
 			ProcessFile(&FindDataArray[I],PanelItems);
 			Sleep(0);FilesScanned++;
 		}
-		if ((I==0)||((FText[0]==0)?(FilesScanned%100==0):(FilesScanned%25==0))) ShowProgress(Directory, PanelItems);
+		if ((I==0)||((FText[0]==0)?(FilesScanned%100==0):(FilesScanned%25==0))) ShowProgress(strDirectory.c_str(), PanelItems);
 	}
 
 	free(FindDataArray);
 	StartupInfo.RestoreScreen(hScreen);
-	if (FSearchIn==SI_CURRENTONLY) return true;
+	if (FSearchIn == SI_CURRENTONLY) return true;
 	if (g_bInterrupted) return false;
 
-	_tcscpy(Directory+Len, _T("*"));
-	if ((HSearch=FindFirstFile(Directory,&FindData))==INVALID_HANDLE_VALUE) return true;
+	if ((HSearch=FindFirstFile(strDirAndMask.c_str(), &FindData))==INVALID_HANDLE_VALUE) return true;
 	CurrentRecursionLevel++;
 	do {
 //		Sleep(0);
 		if ((FindData.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY)==0) continue;
 		if (_tcscmp(FindData.cFileName, _T(".")) == 0) continue;
 		if (_tcscmp(FindData.cFileName, _T("..")) == 0) continue;
-		_tcscpy(Directory+Len,FindData.cFileName);
-		_tcscpy(FindData.cFileName,Directory);
-		if (!DoScanDirectory(Directory, PanelItems, ProcessFile)) {
+		if (!DoScanDirectory(strDirectory + FindData.cFileName, PanelItems, ProcessFile)) {
 			CurrentRecursionLevel--;
 			FindClose(HSearch);return false;
 		}
@@ -451,7 +451,6 @@ bool DoScanDirectory(TCHAR *Directory, panelitem_vector &PanelItems, ProcessFile
 	
 	CurrentRecursionLevel--;
 	FindClose(HSearch);
-	Directory[Len]=0;
 
 	return true;
 }
