@@ -205,9 +205,9 @@ protected:
 	DWORD m_dwAttr;
 };
 
-bool ReplaceSingleFile_Normal(WIN32_FIND_DATA &FindData)
+bool ReplaceSingleFile_Normal(const FIND_DATA &FindData)
 {
-	bool bProcess = RunReplace(FindData.cFileName, ((__int64)FindData.nFileSizeHigh << 32) + FindData.nFileSizeLow);
+	bool bProcess = RunReplace(FindData.cFileName, FindData.nFileSize);
 
 	if (bProcess) {
 		if (!FRReplaceToNew) {
@@ -228,7 +228,7 @@ bool ReplaceSingleFile_Normal(WIN32_FIND_DATA &FindData)
 }
 
 //	Using slow but reliable mechanism for files with hardlinks
-bool ReplaceSingleFile_CopyFirst(WIN32_FIND_DATA &FindData)
+bool ReplaceSingleFile_CopyFirst(const FIND_DATA &FindData)
 {
 	if (FRReplaceToNew || !CopyFile(FindData.cFileName, g_strBackupFileName.c_str(), false)) {
 		return ReplaceSingleFile_Normal(FindData);
@@ -236,7 +236,7 @@ bool ReplaceSingleFile_CopyFirst(WIN32_FIND_DATA &FindData)
 
 	ROBackup _ro(FindData.cFileName);
 	g_strNewFileName = FindData.cFileName;
-	bool bProcess = RunReplace(g_strBackupFileName.c_str(), ((__int64)FindData.nFileSizeHigh << 32) + FindData.nFileSizeLow);
+	bool bProcess = RunReplace(g_strBackupFileName.c_str(), FindData.nFileSize);
 
 	if (bProcess) {
 		if (!FRSaveOriginal) {
@@ -250,7 +250,7 @@ bool ReplaceSingleFile_CopyFirst(WIN32_FIND_DATA &FindData)
 	return bProcess;
 }
 
-void ReplaceSingleFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems)
+void ReplaceSingleFile(const FIND_DATA *FindData, panelitem_vector &PanelItems)
 {
 	FRConfirmLineThisFile = FRConfirmLineThisRun;
 	FRSkipThisFile = false;

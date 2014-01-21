@@ -3,7 +3,7 @@
 
 #include "FileOperations.h"
 
-void SearchFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems)
+void SearchFile(const FIND_DATA *FindData, panelitem_vector &PanelItems)
 {
 	bool IsFound;
 
@@ -22,7 +22,7 @@ void SearchFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems)
 #endif
 
 	if (FText.empty()) IsFound=true; else 
-	if (FindData->nFileSizeLow==0) IsFound=false; else 
+	if (FindData->nFileSize == 0) IsFound=false; else 
 	switch (FSearchAs) {
 	case SA_PLAINTEXT:{
 		CSearchPlainTextFrontend Frontend;

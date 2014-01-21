@@ -369,14 +369,14 @@ void RenamePreview(panelitem_vector &PanelItems)
 	} while (true);
 }
 
-void RenameFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems)
+void RenameFile(const FIND_DATA *FindData, panelitem_vector &PanelItems)
 {
 	int MatchStart = 0, MatchLength;
 	int FindNumber = 0, ReplaceNumber = 0;
 
 	tstring strPath, strOriginalName, strCurrentName;
 
-	TCHAR *szSlash=_tcsrchr(FindData->cFileName,'\\');
+	const TCHAR *szSlash=_tcsrchr(FindData->cFileName,'\\');
 	if (szSlash) {
 		strPath = tstring(FindData->cFileName, szSlash - FindData->cFileName + 1);
 		strOriginalName = szSlash+1;
@@ -592,7 +592,7 @@ bool PerformRenameSelectedFiles(CPanelInfo &PInfo, panelitem_vector &PanelItems)
 			FileFillNamedParameters(CatFile(PInfo.CurDir, szFileName).c_str());
 			arrOrigNames.push_back(szFileName);
 
-			RenameFile(&PanelToWFD(PInfo.PanelItems[I]), PanelItems);
+			RenameFile(&PanelToFD(PInfo.PanelItems[I]), PanelItems);
 		}
 	} else {
 		if ((PInfo.SelectedItemsNumber == 1) && ((PInfo.SelectedItems[0].Flags & PPIF_SELECTED) == 0))
@@ -604,7 +604,7 @@ bool PerformRenameSelectedFiles(CPanelInfo &PInfo, panelitem_vector &PanelItems)
 			FileFillNamedParameters(CatFile(PInfo.CurDir, szFileName).c_str());
 			arrOrigNames.push_back(szFileName);
 
-			RenameFile(&PanelToWFD(PInfo.SelectedItems[I]), PanelItems);
+			RenameFile(&PanelToFD(PInfo.SelectedItems[I]), PanelItems);
 		}
 	}
 

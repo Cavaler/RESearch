@@ -111,7 +111,7 @@ struct CharTableSet2 : public CharTableSet {
 EXTERN vector<CharTableSet2> XLatTables;
 #endif
 
-typedef void (*ProcessFileProc)(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems);
+typedef void (*ProcessFileProc)(const FIND_DATA *FindData, panelitem_vector &PanelItems);
 
 OperationResult FileFind(panelitem_vector &PanelItems,bool ShowDialog,bool bSilent=false);
 OperationResult FileReplace(panelitem_vector &PanelItems,bool ShowDialog,bool bSilent=false);
@@ -135,7 +135,8 @@ void InitFoundPosition();
 
 bool MultipleMasksApply(const TCHAR *Filename);
 void FileFillNamedParameters(const TCHAR *szFileName);
-void AddFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems, bool bSearch = false);
+void AddFile(const WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems, bool bSearch = false);
+void AddFile(const FIND_DATA *FindData, panelitem_vector &PanelItems, bool bSearch = false);
 void AddFile(const TCHAR *szFileName, panelitem_vector &PanelItems, bool bSearch = false);
 bool ScanDirectories(panelitem_vector &PanelItems,ProcessFileProc ProcessFile);
 int  FPrepareMaskPattern();

@@ -151,7 +151,8 @@ void CTemporaryPanel::GetOpenPluginInfo(OpenPluginInfo *Info)
 
 #define Deleted(i) ((TempUserData *)m_arrItems[i].UData())->ToBeDeleted
 
-void CTemporaryPanel::UpdateList() {
+void CTemporaryPanel::UpdateList()
+{
 	for (int nItem = m_arrItems.size()-1; nItem >= 0; nItem--) {
 		if (Deleted(nItem)) {
 			m_arrItems.erase(m_arrItems.begin()+nItem);
@@ -159,7 +160,11 @@ void CTemporaryPanel::UpdateList() {
 		}
 
 		WIN32_FIND_DATA FindData;
+#ifdef UNICODE
+		HANDLE hFind = FindFirstFile((wstring(L"\\\\?\\") + FarPanelFileName(m_arrItems[nItem])).c_str(), &FindData);
+#else
 		HANDLE hFind = FindFirstFile(FarPanelFileName(m_arrItems[nItem]), &FindData);
+#endif
 		FindClose(hFind);
 		if (hFind == INVALID_HANDLE_VALUE) {
 			m_arrItems.erase(m_arrItems.begin()+nItem);

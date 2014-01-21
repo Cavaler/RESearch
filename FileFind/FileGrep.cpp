@@ -224,7 +224,7 @@ bool CGrepFrontend::Process(IBackend *pBackend)
 	return nFoundLineCount > 0;
 }
 
-void GrepFile(WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems)
+void GrepFile(const FIND_DATA *FindData, panelitem_vector &PanelItems)
 {
 	if (FText.empty()) {
 		AddFile(FindData, PanelItems);
