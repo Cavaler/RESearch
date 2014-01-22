@@ -97,8 +97,8 @@ bool EditorFilter();
 bool EditorFilterAgain();
 bool EditorTransliterate();
 bool EditorTransliterateAgain();
-bool EditorListAll();
 bool EditorListAllAgain();
+bool EditorCountAllAgain();
 
 void UpdateESDialog(CFarDialog *pDlg, bool bCheckSel = true);
 LONG_PTR WINAPI EditorSearchDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LONG_PTR lParam2);

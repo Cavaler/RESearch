@@ -124,8 +124,12 @@ MFilterLines		"Filter text"				"Фильтрация текста"
 MLeaveMatching		"&Leave matching lines"		"&Оставить совпадающие строки"
 MRemoveMatching		"R&emove matching lines"	"&Убрать совпадающие строки"
 
-MListAllLines		"List all lines"			"Вывести все строки"
-MTotalLines			"Total %d lines"			"Всего %d строк"
+MListAllLines		"List all lines"				"Вывести все строки"
+MTotalLines			"Total %d lines"				"Всего %d строк"
+MCountAllLines		"Count all matches"				"Посчитать совпадения"               	
+MTotalMatches		"Total %d matches in %d lines"	"Всего %d совпадений в %d строках"
+MFirstMatchLine		"First match in line %d"		"Первое совпадение в строке %d"
+MLastMatchLine		"Last match in line %d"			"Последнее совпадение в строке %d"
 
 MRenumber			"Renumber"			"Перенумеровать"
 
@@ -259,6 +263,7 @@ MAllFiles			"All &files"					"Все &файлы"
 MSkip				"&Skip"							"&Пропустить"
 MSkipFile			"S&kip file"					"&Пропустить файл"
 MShowAll			"Show &all"						"Показать &все"
+MCountAll			"Count all"						"Посчитать все"
 
 MAskRename			"Rename"						"Переименовать"
 MAskTo				"to"							"в"

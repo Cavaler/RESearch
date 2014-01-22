@@ -126,6 +126,10 @@ enum eStringTable {
 
 	MListAllLines,
 	MTotalLines,
+	MCountAllLines,
+	MTotalMatches,
+	MFirstMatchLine,
+	MLastMatchLine,
 
 	MRenumber,
 
@@ -259,6 +263,7 @@ enum eStringTable {
 	MSkip,
 	MSkipFile,
 	MShowAll,
+	MCountAll,
 
 	MAskRename,
 	MAskTo,
