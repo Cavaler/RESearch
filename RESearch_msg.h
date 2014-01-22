@@ -242,6 +242,7 @@ enum eStringTable {
 	MErrorExecutingScript,
 	MListAllFromPreset,
 	MFromCurrentPosition,
+	MCountAllFromPreset,
 
 	MTransliterate,
 	MTransSource,

@@ -107,6 +107,7 @@ bool EditorListAllHasResults();
 bool EditorListAllShowResults(bool bImmediate);
 
 EXTERN bool EListAllFromPreset;
+EXTERN bool ECountAllFromPreset;
 OperationResult EditorSearchExecutor();
 OperationResult EditorReplaceExecutor();
 OperationResult EditorFilterExecutor();

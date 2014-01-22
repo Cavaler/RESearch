@@ -361,13 +361,51 @@ OperationResult EditorSearchExecutor()
 	EditorUpdatePresetPosition();
 
 	return (EListAllFromPreset) ?
-		EditorListAllAgain() ? OR_OK : OR_CANCEL :
-		EditorSearchAgain()  ? OR_OK : OR_CANCEL;
+		(EditorListAllAgain() ? OR_OK : OR_CANCEL) :
+		(ECountAllFromPreset) ?
+		(EditorCountAllAgain() ? OR_OK : OR_CANCEL) :
+		(EditorSearchAgain()   ? OR_OK : OR_CANCEL);
+}
+
+void UpdateESPDialog(CFarDialog *pDlg)
+{
+	bool bListAll = pDlg->IsDlgItemChecked(MListAllFromPreset);
+	bool bCountAll = pDlg->IsDlgItemChecked(MCountAllFromPreset);
+
+	pDlg->EnableCheckDlgItem(MFromCurrentPosition, !bListAll && !bCountAll);
+	pDlg->EnableCheckDlgItem(MInSelection,         !bListAll && !bCountAll);
+
+	bool bFromCurrent = pDlg->IsDlgItemChecked(MFromCurrentPosition);
+	bool bInSelection = pDlg->IsDlgItemChecked(MInSelection);
+	bool bAddToMenu   = pDlg->IsDlgItemChecked(MAddToMenu);
+
+	pDlg->EnableCheckDlgItem(MListAllFromPreset,  !bFromCurrent && !bInSelection && !bCountAll && bAddToMenu);
+	pDlg->EnableCheckDlgItem(MCountAllFromPreset, !bFromCurrent && !bInSelection && !bListAll  && bAddToMenu);
+}
+
+LONG_PTR WINAPI EditorSearchPresetDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LONG_PTR lParam2)
+{
+	int nCtlID  = pDlg->GetID(nParam1);
+
+	switch (nMsg) {
+	case DN_INITDIALOG:
+		UpdateESPDialog(pDlg);
+		break;
+	case DN_BTNCLICK:
+		UpdateESPDialog(pDlg);
+		break;
+	}
+
+	return pDlg->DefDlgProc(nMsg, nParam1, lParam2);
 }
 
 bool CESPresetCollection::EditPreset(CPreset *pPreset)
 {
-	CFarDialog Dialog(80, 19, _T("ESPresetDlg"));
+	CFarDialog Dialog(80, 20, _T("ESPresetDlg"));
+	Dialog.SetWindowProc(EditorSearchPresetDialogProc, 0);
+	Dialog.SetUseID(true);
+	Dialog.SetCancelID(MCancel);
+
 	Dialog.AddFrame(MESPreset);
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
 	Dialog.Add(new CFarEditItem(5,3,74,DIF_HISTORY,_T("RESearch.PresetName"),pPreset->Name()));
@@ -381,17 +419,12 @@ bool CESPresetCollection::EditPreset(CPreset *pPreset)
 	Dialog.Add(new CFarCheckBoxItem(5,9,0,MReverseSearch,&pPreset->m_mapInts["Reverse"]));
 	Dialog.Add(new CFarCheckBoxItem(35,9,0,MInSelection, &pPreset->m_mapInts["InSelection"]));
 
-	Dialog.Add(new CFarCheckBoxItem(5,11,0,MAddToMenu,&pPreset->m_bAddToMenu));
-	Dialog.Add(new CFarCheckBoxItem(5,12,0,MListAllFromPreset,&pPreset->m_mapInts["ListAll"]));
-	Dialog.Add(new CFarCheckBoxItem(5,13,0,MFromCurrentPosition,&pPreset->m_mapInts["FromCurrent"]));
+	Dialog.Add(new CFarCheckBoxItem(5,11,0,MFromCurrentPosition,&pPreset->m_mapInts["FromCurrent"]));
+	Dialog.Add(new CFarCheckBoxItem(5,12,0,MAddToMenu,&pPreset->m_bAddToMenu));
+	Dialog.Add(new CFarCheckBoxItem(5,13,0,MListAllFromPreset,&pPreset->m_mapInts["ListAll"]));
+	Dialog.Add(new CFarCheckBoxItem(5,14,0,MCountAllFromPreset,&pPreset->m_mapInts["CountAll"]));
+
 	Dialog.AddButtons(MOk, MCancel);
 
-	do {
-		switch (Dialog.Display(1, -2)) {
-		case 0:
-			return true;
-		default:
-			return false;
-		}
-	} while (true);
+	return (Dialog.Display() == MOk);
 }

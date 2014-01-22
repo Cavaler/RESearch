@@ -242,6 +242,7 @@ MErrorLoadingTypeLib	"Error loading type library"		"Ошибка при загр
 MErrorExecutingScript	"Error executing script"			"Ошибка при выполнении скрипта"
 MListAllFromPreset		"Execute as 'Show &all'"			"Выполнить как 'Показать &все'"
 MFromCurrentPosition	"Execute from current position"		"Выполнить с текущей позиции"
+MCountAllFromPreset		"Execute as 'Count all'"			"Выполнить как 'Посчитать все'"
 
 MTransliterate		"Transliterate"					"Транслитерация"
 MTransSource		"&Source characters"			"Исходные символы"

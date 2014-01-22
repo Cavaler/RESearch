@@ -5,7 +5,7 @@ CParameterSet g_ESParamSet(EditorSearchExecutor,
 	"Text", &SearchText, "@Text", &EText, NULL, NULL,
 	"IsRegExp", &ERegExp, "CaseSensitive", &ECaseSensitive, "SeveralLine", &ESeveralLine,
 	"Reverse", &EReverse, "InSelection", &EInSelection,
-	"ListAll", &EListAllFromPreset, "FromCurrent", &EFromCurrentPosition, NULL
+	"ListAll", &EListAllFromPreset, "FromCurrent", &EFromCurrentPosition, "CountAll", &ECountAllFromPreset, NULL
 					 );
 CParameterSet g_ERParamSet(EditorReplaceExecutor,
 	"Text", &SearchText, "Replace", &ReplaceText, "Script", &EREvaluateScript, 
