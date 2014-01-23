@@ -212,7 +212,8 @@ CREParameters<CHAR>::CREParameters()
 }
 
 template<class CHAR>
-void CREParameters<CHAR>::Clear() {
+void CREParameters<CHAR>::Clear()
+{
 	if (m_re) BackupParam();
 	m_arrMatch.clear();
 	m_re = NULL;
@@ -220,7 +221,8 @@ void CREParameters<CHAR>::Clear() {
 }
 
 template<class CHAR>
-bool CREParameters<CHAR>::Empty() {
+bool CREParameters<CHAR>::Empty()
+{
 	return ((m_re == NULL) || (m_szString == NULL));
 }
 
@@ -277,6 +279,11 @@ void CREParameters<CHAR>::AddRE(pcre *re)
 {
 	m_re = re;
 
+	if (m_re == NULL) {
+		m_arrMatch.clear();
+		return;
+	}
+
 	int count;
 	pcre_fullinfo(re, NULL, PCRE_INFO_CAPTURECOUNT, &count);
 	m_arrMatch.resize((count+1)*3);
@@ -299,7 +306,10 @@ typename CREParameters<CHAR>::cstring CREParameters<CHAR>::GetParam(int nNumber)
 }
 
 template<class CHAR>
-int CREParameters<CHAR>::FindParam(const cstring &strName, bool bCheckNumber) {
+int CREParameters<CHAR>::FindParam(const cstring &strName, bool bCheckNumber)
+{
+	if (m_re == NULL) return -1;
+
 	int nNumber;
 	if (bCheckNumber && CSO::GetNumber(strName, nNumber))
 		return nNumber;
