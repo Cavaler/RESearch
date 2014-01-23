@@ -14,6 +14,11 @@ Planned:
 Known bugs:
 	- Replace changing part of (real) EOL crashes
 
+Version 8.20 (23.01.2014)
+	+ Versions for Far2/Far3 should properly process paths longer than 260 symbols
+	+ [Count all] in Editor Search
+	- Fix crash in plain-text Grep
+
 Version 8.01 (17.12.2013)
 	- Fixed editing preset lists in batches
 	- Fixed problems with flags in presets
