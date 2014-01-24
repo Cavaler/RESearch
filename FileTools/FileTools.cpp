@@ -197,7 +197,7 @@ bool PerformSingleRename(rename_pair &Item)
 		DWORD dwFlags = MOVEFILE_COPY_ALLOWED;
 		if (bOverwrite) dwFlags |= MOVEFILE_REPLACE_EXISTING;
 		
-		if (MoveFileEx(ExtendedFileName(Item.first).c_str(), ExtendedFileName(Item.second).c_str(), dwFlags)) {
+		if (MoveFileEx(FullExtendedFileName(Item.first).c_str(), FullExtendedFileName(Item.second).c_str(), dwFlags)) {
 			PostPerformRename(Item);
 			return true;
 		}
