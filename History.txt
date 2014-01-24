@@ -14,6 +14,10 @@ Planned:
 Known bugs:
 	- Replace changing part of (real) EOL crashes
 
+Version 8.21 (24.01.2014)
+	- Rename files fixed
+	- Grep output to file fixed
+
 Version 8.20 (23.01.2014)
 	+ Versions for Far2/Far3 should properly process paths longer than 260 symbols
 	+ [Count all] in Editor Search
