@@ -603,10 +603,11 @@ void ShowHResultError(int nError, HRESULT hResult, const TCHAR *szHelp)
 	LocalFree(szMessage);
 }
 
-HANDLE g_hREThread = NULL;
-HANDLE g_hREReady = CreateSemaphore(NULL, 0, 1, NULL);
+HANDLE g_hREThread  = NULL;
+HANDLE g_hREReady   = CreateSemaphore(NULL, 0, 1, NULL);
 #ifdef UNICODE
-HANDLE g_hREReadyA = CreateSemaphore(NULL, 0, 1, NULL);
+HANDLE g_hREReadyA  = CreateSemaphore(NULL, 0, 1, NULL);
+HANDLE g_hREReady16 = CreateSemaphore(NULL, 0, 1, NULL);
 #endif
 HANDLE g_hREDone = CreateSemaphore(NULL, 0, 1, NULL);
 
@@ -615,6 +616,10 @@ const pcre_extra *g_extra_data;
 const TCHAR *g_subject;
 #ifdef UNICODE
 const char *g_subjectA;
+
+const pcre16 *g_external_re16;
+const pcre16_extra *g_extra_data16;
+PCRE_SPTR16 g_subject16;
 #endif
 int g_length;
 int g_start_offset;
@@ -626,21 +631,29 @@ int g_result;
 #ifdef UNICODE
 DWORD WINAPI REThreadProc(LPVOID lpParameter)
 {
-	HANDLE hRE[] = {g_hREReady, g_hREReadyA};
+	HANDLE hRE[] = {g_hREReady, g_hREReadyA, g_hREReady16};
 
 	while (true) {
-		DWORD dwResult = WaitForMultipleObjects(2, hRE, false, 60000);
-		if (dwResult == WAIT_TIMEOUT) {
+		DWORD dwResult = WaitForMultipleObjects(3, hRE, false, 60000);
+
+		switch (dwResult) {
+		case WAIT_OBJECT_0:
+			g_result = pcre_exec(g_external_re, g_extra_data, g_subject, g_length,
+				g_start_offset, g_options, g_offsets, g_offsetcount);
+			break;
+		case WAIT_OBJECT_0+1:
+			g_result = pcre_exec(g_external_re, g_extra_data, g_subjectA, g_length,
+				g_start_offset, g_options, g_offsets, g_offsetcount);
+			break;
+		case WAIT_OBJECT_0+2:
+			g_result = pcre16_exec(g_external_re16, g_extra_data16, g_subject16, g_length,
+				g_start_offset, g_options, g_offsets, g_offsetcount);
+			break;
+		case WAIT_TIMEOUT:
+		default:
 			CloseHandle(g_hREThread);
 			g_hREThread = NULL;
 			return 0;
-		}
-		if (dwResult == WAIT_OBJECT_0) {
-			g_result = pcre_exec(g_external_re, g_extra_data, g_subject, g_length,
-				g_start_offset, g_options, g_offsets, g_offsetcount);
-		} else {
-			g_result = pcre_exec(g_external_re, g_extra_data, g_subjectA, g_length,
-				g_start_offset, g_options, g_offsets, g_offsetcount);
 		}
 		ReleaseSemaphore(g_hREDone, 1, NULL);
 	}
@@ -723,6 +736,30 @@ int do_pcre_execA(const pcre *external_re, const pcre_extra *extra_data,
 		}
 	}
 	return pcre_exec(external_re, extra_data, subject, length, start_offset, options, offsets, offsetcount);
+}
+
+int do_pcre16_exec(const pcre16 *external_re, const pcre16_extra *extra_data,
+	PCRE_SPTR16 subject, int length, int start_offset, int options, int *offsets,
+	int offsetcount)
+{
+	if (g_bUseSeparateThread && (length-start_offset > g_nMaxInThreadLength)) {
+		if (!g_hREThread)
+			StartREThread();
+		if (g_hREThread) {
+			g_external_re16 = external_re;
+			g_extra_data16 = extra_data;
+			g_subject16 = subject;
+			g_length = length;
+			g_start_offset = start_offset;
+			g_options = options;
+			g_offsets = offsets;
+			g_offsetcount = offsetcount;
+			ReleaseSemaphore(g_hREReady16, 1, NULL);
+			WaitForSingleObject(g_hREDone, INFINITE);
+			return g_result;
+		}
+	}
+	return pcre16_exec(external_re, extra_data, subject, length, start_offset, options, offsets, offsetcount);
 }
 #endif
 

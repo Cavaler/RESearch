@@ -185,6 +185,9 @@ int do_pcre_exec(const pcre *external_re, const pcre_extra *extra_data,
 int do_pcre_execA(const pcre *external_re, const pcre_extra *extra_data,
 	const char *subject, int length, int start_offset, int options, int *offsets,
 	int offsetcount);
+int do_pcre16_exec(const pcre16 *external_re, const pcre16_extra *extra_data,
+	PCRE_SPTR16 subject, int length, int start_offset, int options, int *offsets,
+	int offsetcount);
 #else
 #define do_pcre_execA do_pcre_exec
 #define FPatternA FPattern
