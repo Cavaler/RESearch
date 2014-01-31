@@ -14,6 +14,11 @@ Planned:
 Known bugs:
 	- Replace changing part of (real) EOL crashes
 
+Version 8.25 (31.01.2014)
+	! Panel operations use pcre16 inUnicode versions, instead of UTF-8
+	* PCRE updated to version 8.34
+	- Significantly reduced memory consumption for Panels operations
+
 Version 8.21 (24.01.2014)
 	- Rename files fixed
 	- Grep output to file fixed

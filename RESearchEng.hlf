@@ -2,7 +2,7 @@
 .PluginContents=Regular Expression Search
 
 @Contents
-$ #Regular Expression Search and Replace, version 7.85#
+$ #Regular Expression Search and Replace, version 8.25#
     This plugin allows you to:
 
     - Perform text search and replace in editor
@@ -535,7 +535,7 @@ is treated as regular expression.
   #Inverse search#           Only files that do NOT match search criteria will be shown.
 
   #Use all character tables# All character tables installed will be used
-    From version 5.50, this also enables searching in Unicode and UTF-8 files. If you plan
+    From version 8.22, this also enables searching in Unicode and UTF-8 files. If you plan
     to use it often, make sure your files have Unicode signature - this speeds up search a lot.
 
   #[ Advanced ]#             Turn on to use ~Advanced File Search options~@AdvancedFileSearchDlg@,
