@@ -193,6 +193,129 @@ IDecoder *CSingleByteCRLFDecoder::GetEncoder()
 }
 
 //////////////////////////////////////////////////////////////////////////
+// CUnicodeCRLFDecoder
+
+CUnicodeCRLFDecoder::CUnicodeCRLFDecoder(IDecoder *pBackDecoder)
+: m_pBackDecoder(pBackDecoder)
+{
+}
+
+INT_PTR	CUnicodeCRLFDecoder::Size()
+{
+	return m_nSize*2;
+}
+
+bool CUnicodeCRLFDecoder::Decode(const char *szBuffer, INT_PTR &nLength)
+{
+	if (!m_pBackDecoder->Decode(szBuffer, nLength)) return false;
+
+	Clear();
+
+	if (!AllocBuffer(m_pBackDecoder->Size())) return false;
+
+	m_mapSkipped.clear();
+	m_mapSkipped.reserve(m_pBackDecoder->Size() / 32);
+	m_nSize = 0;
+
+	const wchar_t *szDecBuffer = (const wchar_t *)m_pBackDecoder->Buffer();
+	INT_PTR nDecSize = m_pBackDecoder->Size() / 2;
+	wchar_t *szOurBuffer = (wchar_t *)m_szBuffer;
+
+	const wchar_t *szCR;
+	while (szCR = (const wchar_t *)wmemchr(szDecBuffer, '\r', nDecSize)) {
+		INT_PTR nSkip = szCR-szDecBuffer;
+
+		wmemmove(szOurBuffer, szDecBuffer, nSkip);
+		szOurBuffer += nSkip;
+		m_nSize     += nSkip;
+
+		if (m_mapSkipped.empty() || (m_mapSkipped.back().first != szOurBuffer-(wchar_t *)m_szBuffer))
+			m_mapSkipped.push_back(skip_element(szOurBuffer-(wchar_t *)m_szBuffer, 1));
+		else
+			m_mapSkipped.back().second++;
+
+		szDecBuffer += nSkip+1;
+		nDecSize    -= nSkip+1;
+	}
+
+	wmemmove(szOurBuffer, szDecBuffer, nDecSize);
+	m_nSize += nDecSize;
+	m_nDOIn = -1;
+	m_nOOIn = -1;
+
+	return true;
+}
+
+INT_PTR	CUnicodeCRLFDecoder::DecodedOffset(INT_PTR nOffset)
+{
+	nOffset = m_pBackDecoder->DecodedOffset(nOffset);
+	if (nOffset < 0) return nOffset;
+
+	assert_even(nOffset);
+	nOffset /= 2;
+
+	INT_PTR nNewOffset = nOffset;
+	size_t nSkipped = 0;
+	if ((m_nDOIn >= 0) && (nOffset >= m_nDOIn)) {
+		nSkipped    = m_nDOSkip;
+		nNewOffset -= m_nDOOut;
+	}
+
+	for (; nSkipped < m_mapSkipped.size(); nSkipped++)
+	{
+		const skip_element &Skip = m_mapSkipped[nSkipped];
+		if (nNewOffset <= Skip.first)
+			break;
+		else if (nNewOffset >= Skip.first+Skip.second)
+			nNewOffset -= Skip.second;
+		else {	// Weird case of \r\r\n
+			nNewOffset = Skip.first;
+			break;
+		}
+	}
+
+	m_nDOIn   = nOffset;
+	m_nDOSkip = nSkipped;
+	m_nDOOut  = nOffset - nNewOffset;
+
+	return nNewOffset * 2;
+}
+
+INT_PTR	CUnicodeCRLFDecoder::OriginalOffset(INT_PTR nOffset)
+{
+	assert_even(nOffset);
+	nOffset /= 2;
+
+	INT_PTR nNewOffset = nOffset;
+	size_t nSkipped = 0;
+
+	if ((m_nOOIn >= 0) && (nOffset >= m_nOOIn)) {
+		nSkipped    = m_nOOSkip;
+		nNewOffset += m_nOOOut;
+	}
+
+	for (; nSkipped < m_mapSkipped.size(); nSkipped++)
+	{
+		const skip_element &Skip = m_mapSkipped[nSkipped];
+		if (Skip.first < nOffset)
+			nNewOffset += Skip.second;
+		else
+			break;
+	}
+
+	m_nOOIn   = nOffset;
+	m_nOOSkip = nSkipped;
+	m_nOOOut  = nNewOffset - nOffset;
+
+	return m_pBackDecoder->OriginalOffset(nNewOffset*2);
+}
+
+IDecoder *CUnicodeCRLFDecoder::GetEncoder()
+{
+	return m_pBackDecoder->GetEncoder();
+}
+
+//////////////////////////////////////////////////////////////////////////
 // CUTF8Traverse
 
 template<class Vector> void resize_vector(Vector &vec, size_t nLength)

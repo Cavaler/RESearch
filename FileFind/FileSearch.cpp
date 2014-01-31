@@ -31,17 +31,17 @@ void SearchFile(const FIND_DATA *FindData, panelitem_vector &PanelItems)
 					  }
 	case SA_REGEXP:{
 		CSearchRegExpFrontend Frontend;
-		IsFound = RunSearch(FindData->cFileName, &Frontend, true);
+		IsFound = RunSearch(FindData->cFileName, &Frontend, false);
 		break;
 				   }
 	case SA_SEVERALLINE:{
 		CSearchSeveralLineRegExpFrontend Frontend;
-		IsFound = RunSearch(FindData->cFileName, &Frontend, true);
+		IsFound = RunSearch(FindData->cFileName, &Frontend, false);
 		break;
 						}
 	case SA_MULTILINE:{
 		CSearchMultiLineRegExpFrontend Frontend;
-		IsFound = RunSearch(FindData->cFileName, &Frontend, true);
+		IsFound = RunSearch(FindData->cFileName, &Frontend, false);
 		break;
 					  }
 	case SA_MULTITEXT:{

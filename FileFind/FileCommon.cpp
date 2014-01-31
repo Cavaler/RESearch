@@ -107,6 +107,8 @@ void FCleanup(bool PatternOnly)
 #ifdef UNICODE
 	PCRE_FREE(FPatternA);
 	PCRE_FREE(FPatternExtraA);
+	PCRE_FREE(FPattern16);
+	PCRE_FREE(FPatternExtra16);
 #endif
 
 	if (FMaskSet) {delete FMaskSet;FMaskSet=NULL;}
@@ -208,7 +210,9 @@ int FPreparePattern(bool bAcceptEmpty)
 
 #ifdef UNICODE
 		return PreparePattern(&FPattern, &FPatternExtra, strPattern, FCaseSensitive, NULL)
-			&& PreparePattern(&FPatternA, &FPatternExtraA, DefFromUnicode(strPattern), FCaseSensitive, DefCharTables());
+			&& PreparePattern(&FPatternA, &FPatternExtraA, DefFromUnicode(strPattern), FCaseSensitive, DefCharTables())
+			&& PreparePattern(&FPattern16, &FPatternExtra16, strPattern, FCaseSensitive)
+			;
 #else
 		setlocale(LC_ALL, FormatStr(_T(".%d"), GetOEMCP()).c_str());
 		return PreparePattern(&FPattern, &FPatternExtra, strPattern, FCaseSensitive, OEMCharTables);

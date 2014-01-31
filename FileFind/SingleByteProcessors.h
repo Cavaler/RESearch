@@ -77,25 +77,3 @@ protected:
 
 	bool Overflow();
 };
-
-//	Needed only for Unicode Plain-text Grep
-class CUnicodeSplitLineProcessor : public ISplitLineProcessor
-{
-public:
-	CUnicodeSplitLineProcessor(IBackend *pBackend);
-
-	virtual bool			GetNextLine();
-	virtual const char *	Buffer();
-	virtual INT_PTR			Size();
-	virtual INT_PTR		    Start();
-
-	virtual bool	WriteBack(INT_PTR nOffset);
-	virtual bool	WriteThru(const char *szBuffer, INT_PTR nLength, INT_PTR nSkipLength);
-	virtual void	SkipTo   (INT_PTR nOffset);
-
-protected:
-	IBackend *m_pBackend;
-
-	const wchar_t *m_szBuffer;
-	const wchar_t *m_szEOL;
-};

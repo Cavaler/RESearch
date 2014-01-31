@@ -44,27 +44,30 @@ void AddGrepFileName(const tstring &strFileName)
 	AddGrepLine(FGFileNameAppend, false);
 }
 
-void AddGrepResultLine(const string &strLine, int nLineNumber)
+void AddGrepResultLine(const tstring &strLine, int nLineNumber)
 {
 	if (FGAddLineNumbers) {
 		AddGrepLine(FormatStr(_T("%d:"), nLineNumber), false);
 	}
-#ifdef UNICODE
-	if (FSearchAs == SA_REGEXP) {
-		AddGrepLine(UTF8ToUnicode(strLine));
-	} else {
-		WriteGrepOutput(strLine.data(), strLine.size());
-		AddGrepLine(L"");
-	}
-#else
 	AddGrepLine(strLine);
-#endif
 }
 
-bool GrepLineFound(const string &strBuf, string &strMatch)
+bool GrepLineFound(const tstring &strBuf, tstring &strMatch)
 {
 	bool bResult;
 
+#ifdef UNICODE
+	if (FSearchAs == SA_REGEXP) {
+		bResult = do_pcre16_exec(FPattern16, FPatternExtra16, strBuf.data(), strBuf.length(), 0, 0, REParam.Match(), REParam.Count()) >= 0;
+		if (bResult) {
+			REParam.AddSource(strBuf.data(), strBuf.length());
+			strMatch = REParam.GetParam(0);
+		}
+	} else {
+		TCHAR *szTable = (FCaseSensitive) ? NULL : UpCaseTable;
+		bResult = BMHSearch((WCHAR *)strBuf.data(), strBuf.length()/2, FTextUpcase.data(), FTextUpcase.size(), szTable) >= 0;
+	}
+#else
 	if (FSearchAs == SA_REGEXP) {
 		bResult = do_pcre_execA(FPattern, FPatternExtra, strBuf.data(), strBuf.length(), 0, 0, REParamA.Match(), REParamA.Count()) >= 0;
 		if (bResult) {
@@ -72,27 +75,29 @@ bool GrepLineFound(const string &strBuf, string &strMatch)
 			strMatch = REParamA.GetParam(0);
 		}
 	} else {
-#ifdef UNICODE
-		TCHAR *szTable = (FCaseSensitive) ? NULL : UpCaseTable;
-		bResult = BMHSearch((WCHAR *)strBuf.data(), strBuf.length()/2, FTextUpcase.data(), FTextUpcase.size(), szTable) >= 0;
-#else
 		TCHAR *szTable = (FCaseSensitive) ? NULL : UpCaseTable;
 		bResult = BMHSearch(strBuf.data(), strBuf.length(), FTextUpcase.data(), FTextUpcase.size(), szTable) >= 0;
-#endif
 	}
+#endif
 
 	return bResult != (FSInverse != 0);
 }
 
-bool GrepMatchesFound(const string &strBuf, vector<string> &arrMatch)
+bool GrepMatchesFound(const tstring &strBuf, vector<tstring> &arrMatch)
 {
-	REParamA.AddSource(strBuf.data(), strBuf.length());
+	REParam.AddSource(strBuf.data(), strBuf.length());
 
 	size_t nStart = 0;
 	while (nStart < strBuf.size())  {
+#ifdef UNICODE
+		if (do_pcre16_exec(FPattern16, FPatternExtra16, strBuf.data(), strBuf.length(), nStart, 0, REParam.Match(), REParam.Count()) < 0) break;
+		arrMatch.push_back(REParam.GetParam(0));
+		nStart = REParam.m_arrMatch[1];
+#else
 		if (do_pcre_execA(FPattern, FPatternExtra, strBuf.data(), strBuf.length(), nStart, 0, REParamA.Match(), REParamA.Count()) < 0) break;
 		arrMatch.push_back(REParamA.GetParam(0));
 		nStart = REParamA.m_arrMatch[1];
+#endif
 	}
 
 	return !arrMatch.empty();
@@ -101,47 +106,48 @@ bool GrepMatchesFound(const string &strBuf, vector<string> &arrMatch)
 class CGrepFrontend : public IFrontend
 {
 public:
-	CGrepFrontend(bool bUTF8 = true) : m_pProc(NULL), m_bUTF8(bUTF8) {}
+	CGrepFrontend() : m_pProc(NULL) {}
 	~CGrepFrontend() { if (m_pProc) delete m_pProc; }
 
 	virtual bool	Process(IBackend *pBackend);
 
 protected:
 	ISplitLineProcessor *m_pProc;
-	bool m_bUTF8;
 };
 
 bool CGrepFrontend::Process(IBackend *pBackend)
 {
 #ifdef UNICODE
-	if (m_bUTF8)
-		m_pProc = new CSingleByteSplitLineProcessor(pBackend);
-	else
-		m_pProc = new CUnicodeSplitLineProcessor(pBackend);
+	m_pProc = new CUnicodeSplitLineProcessor(pBackend);
 #else
 	m_pProc = new CSingleByteSplitLineProcessor(pBackend);
 #endif
 
-	deque<string> arrStringBuffer;
+	deque<tstring> arrStringBuffer;
 	int nFoundLineCount = 0;
 	int nFoundMatchCount = 0;
 	int nFirstBufferLine = 0;
 	int nLastMatched = -1;
 
-	REParamA.Clear();
-	REParamA.AddRE(FPattern);
+	REParam.Clear();
+	REParam.AddRE(FPattern);
 
 	g_bCacheOutput = true;
 	g_arrOutput.clear();
 
 	do {
+#ifdef UNICODE
+		const wchar_t *szBuffer = (const wchar_t *)m_pProc->Buffer();
+		INT_PTR nSize  = m_pProc->Size() / 2;
+#else
 		const char *szBuffer = m_pProc->Buffer();
 		INT_PTR nSize  = m_pProc->Size();
+#endif
 
-		arrStringBuffer.push_back(string(szBuffer, szBuffer+nSize));
+		arrStringBuffer.push_back(tstring(szBuffer, szBuffer+nSize));
 
-		vector<string> arrMatch;
-		string strMatch;
+		vector<tstring> arrMatch;
+		tstring strMatch;
 
 		bool bFound = (FGOutputLines && FGMatchingLinePart) || (FGOutputNames && FGAddMatchCount)
 			? GrepMatchesFound(arrStringBuffer.back(), arrMatch)
@@ -165,7 +171,7 @@ bool CGrepFrontend::Process(IBackend *pBackend)
 				nLastMatched = arrStringBuffer.size()-1;
 			} else if (FGOutputLines) {
 				if (FGMatchingLinePart) {
-					for each (const string &strFound in arrMatch)
+					for each (const tstring &strFound in arrMatch)
 						AddGrepResultLine(strFound, nFirstBufferLine + 1);
 				} else {
 					AddGrepResultLine(/*FGMatchingLinePart ? strMatch : */arrStringBuffer.back(), nFirstBufferLine + 1);
@@ -232,14 +238,8 @@ void GrepFile(const FIND_DATA *FindData, panelitem_vector &PanelItems)
 		return;
 	}
 
-	bool bAnyFound;
-	if (FSearchAs == SA_REGEXP) {
-		CGrepFrontend Frontend(true);
-		bAnyFound = RunSearch(FindData->cFileName, &Frontend, true);
-	} else {
-		CGrepFrontend Frontend(false);
-		bAnyFound = RunSearch(FindData->cFileName, &Frontend, false);
-	}
+	CGrepFrontend Frontend;
+	bool bAnyFound = RunSearch(FindData->cFileName, &Frontend, false);
 
 	if (bAnyFound) AddFile(FindData, PanelItems, true);
 }

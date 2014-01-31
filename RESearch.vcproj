@@ -1087,11 +1087,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\FileFind\Processors.cpp"
+					RelativePath=".\FileFind\SingleByteProcessors.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\FileFind\Processors.h"
+					RelativePath=".\FileFind\SingleByteProcessors.h"
 					>
 				</File>
 				<File
@@ -1100,6 +1100,14 @@
 				</File>
 				<File
 					RelativePath=".\FileFind\UnicodeDecoders.h"
+					>
+				</File>
+				<File
+					RelativePath=".\FileFind\UnicodeProcessors.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\FileFind\UnicodeProcessors.h"
 					>
 				</File>
 				<File

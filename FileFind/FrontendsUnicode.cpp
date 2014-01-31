@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "Frontends.h"
-#include "Processors.h"
+#include "SingleByteProcessors.h"
+#include "UnicodeProcessors.h"
 #include "..\RESearch.h"
 
 #ifdef UNICODE
@@ -30,10 +31,10 @@ bool CSearchPlainTextFrontend::Process(IBackend *pBackend)
 
 bool CSearchRegExpFrontend::Process(IBackend *pBackend)
 {
-	CSingleByteSplitLineProcessor Proc(pBackend);
+	CUnicodeSplitLineProcessor Proc(pBackend);
 
 	do {
-		int nResult = do_pcre_execA(FPattern, FPatternExtra, Proc.Buffer(), Proc.Size(), 0, PCRE_NO_UTF8_CHECK, REParamA.Match(), REParamA.Count());
+		int nResult = do_pcre16_exec(FPattern16, FPatternExtra16, Proc.BufferW(), Proc.SizeW(), 0, PCRE_NO_UTF8_CHECK, REParam.Match(), REParam.Count());
 		if (nResult >= 0) return true;
 		g_nFoundLine++;
 	} while (!Interrupted() && Proc.GetNextLine());
@@ -45,10 +46,10 @@ bool CSearchRegExpFrontend::Process(IBackend *pBackend)
 
 bool CSearchSeveralLineRegExpFrontend::Process(IBackend *pBackend)
 {
-	CSingleByteSeveralLineProcessor Proc(pBackend, SeveralLines, SeveralLinesKB);
+	CUnicodeSeveralLineProcessor Proc(pBackend, SeveralLines, SeveralLinesKB);
 
 	do {
-		int nResult = do_pcre_execA(FPattern, FPatternExtra, Proc.Buffer(), Proc.Size(), 0, PCRE_NO_UTF8_CHECK, REParamA.Match(), REParamA.Count());
+		int nResult = do_pcre16_exec(FPattern16, FPatternExtra16, Proc.BufferW(), Proc.SizeW(), 0, PCRE_NO_UTF8_CHECK, REParam.Match(), REParam.Count());
 		if (nResult >= 0) return true;
 		g_nFoundLine++;
 	} while (!Interrupted() && Proc.GetNextLine());
@@ -61,10 +62,10 @@ bool CSearchSeveralLineRegExpFrontend::Process(IBackend *pBackend)
 bool CSearchMultiLineRegExpFrontend::Process(IBackend *pBackend)
 {
 	do {
-		const char *szBuffer = pBackend->Buffer();
-		INT_PTR nSize  = pBackend->Size();
+		const wchar_t *szBuffer = pBackend->BufferW();
+		INT_PTR nSize  = pBackend->SizeW();
 
-		int nResult = do_pcre_execA(FPattern, FPatternExtra, szBuffer, nSize, 0, PCRE_NO_UTF8_CHECK, REParamA.Match(), REParamA.Count());
+		int nResult = do_pcre16_exec(FPattern16, FPatternExtra16, szBuffer, nSize, 0, PCRE_NO_UTF8_CHECK, REParam.Match(), REParam.Count());
 		if (nResult >= 0) return true;
 
 		if (pBackend->Last()) break;
@@ -141,36 +142,36 @@ bool CReplacePlainTextFrontend::Process(IBackend *pBackend)
 
 bool ReplaceRegExpProcess(IBackend *pBackend, ISplitLineProcessor &Proc)
 {
-	REParamA.Clear();
-	REParamA.AddRE(FPattern);
+	REParam.Clear();
+	REParam.AddRE(FPattern);
 
 	do {
-		const char *szBuffer = Proc.Buffer();
-		INT_PTR nSize  = Proc.Size();
-		INT_PTR nStart = Proc.Start();
+		const wchar_t *szBuffer = (const wchar_t *)Proc.Buffer();
+		INT_PTR nSize  = Proc.Size() / 2;
+		INT_PTR nStart = Proc.Start() / 2;
 
 		int nResult;
-		while ((nResult = do_pcre_execA(FPattern, FPatternExtra, szBuffer, nSize, nStart, PCRE_NO_UTF8_CHECK, REParamA.Match(), REParamA.Count())) >= 0)
+		while ((nResult = do_pcre16_exec(FPattern16, FPatternExtra16, szBuffer, nSize, nStart, PCRE_NO_UTF8_CHECK, REParam.Match(), REParam.Count())) >= 0)
 		{
 			if (!pBackend->CheckWriteReady()) return false;
 
 			int nOffset, nLength;
-			REParamA.FillStartLength(&nOffset, &nLength);
+			REParam.FillStartLength(&nOffset, &nLength);
 
-			REParamA.AddSource(szBuffer, nOffset+nLength);
-			REParamA.AddFNumbers(FileNumber, FindNumber, ReplaceNumber);
-			string strReplace = CSOA::CreateReplaceString(UTF8FromUnicode(FRReplace).c_str(), "\n", ScriptEngine(FREvaluate), REParamA);
+			REParam.AddSource(szBuffer, nOffset+nLength);
+			REParam.AddFNumbers(FileNumber, FindNumber, ReplaceNumber);
+			wstring strReplace = CSO::CreateReplaceString(FRReplace.c_str(), L"\n", ScriptEngine(FREvaluate), REParam);
 
 			FindNumber++;
 
-			if (ConfirmReplacement() || ConfirmReplacement(UTF8ToUnicode(REParamA.GetParam(0)).c_str(), UTF8ToUnicode(strReplace).c_str(), pBackend->FileName())) {
-				if (!Proc.WriteBack(nOffset)) break;
-				if (!Proc.WriteThru(strReplace.data(), strReplace.size(), nLength)) break;
+			if (ConfirmReplacement() || ConfirmReplacement(REParam.GetParam(0).c_str(), strReplace.c_str(), pBackend->FileName())) {
+				if (!Proc.WriteBack(nOffset*2)) break;
+				if (!Proc.WriteThru((const char *)strReplace.data(), strReplace.size()*2, nLength*2)) break;
 
 				ReplaceNumber++;
 			} else {
 				if (Interrupted()) break;
-				Proc.SkipTo(nOffset + nLength);
+				Proc.SkipTo((nOffset + nLength)*2);
 			}
 
 			nStart = nOffset + (nLength ? nLength : 1);
@@ -181,18 +182,18 @@ bool ReplaceRegExpProcess(IBackend *pBackend, ISplitLineProcessor &Proc)
 	return !g_bInterrupted && (ReplaceNumber > 0);
 }
 
+//////////////////////////////////////////////////////////////////////////
+
 bool CReplaceRegExpFrontend::Process(IBackend *pBackend)
 {
-	CSingleByteSplitLineProcessor Proc(pBackend);
+	CUnicodeSplitLineProcessor Proc(pBackend);
 
 	return ReplaceRegExpProcess(pBackend, Proc);
 }
 
-//////////////////////////////////////////////////////////////////////////
-
 bool CReplaceSeveralLineRegExpFrontend::Process(IBackend *pBackend)
 {
-	CSingleByteSeveralLineProcessor Proc(pBackend, SeveralLines, SeveralLinesKB);
+	CUnicodeSeveralLineProcessor Proc(pBackend, SeveralLines, SeveralLinesKB);
 
 	return ReplaceRegExpProcess(pBackend, Proc);
 }

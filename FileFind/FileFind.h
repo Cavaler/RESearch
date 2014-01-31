@@ -71,8 +71,10 @@ EXTERN vector<tstring> FSWords;
 EXTERN string FOEMTextUpcase;
 EXTERN string FOEMReplace;
 EXTERN bool FCanUseDefCP;
-EXTERN pcre *FPatternA;
-EXTERN pcre_extra *FPatternExtraA;
+EXTERN pcre *FPatternA VALUE(NULL);
+EXTERN pcre_extra *FPatternExtraA VALUE(NULL);
+EXTERN pcre16 *FPattern16 VALUE(NULL);
+EXTERN pcre16_extra *FPatternExtra16 VALUE(NULL);
 #endif
 
 EXTERN pcre *FMaskPattern VALUE(NULL);

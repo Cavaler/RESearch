@@ -2,7 +2,8 @@
 
 #include "Backend.h"
 #include "Decoders.h"
-#include "Processors.h"
+#include "SingleByteProcessors.h"
+#include "UnicodeProcessors.h"
 #include "Frontends.h"
 
 bool RunSearch (LPCTSTR szFileName, IFrontend *pFrontend, bool bUTF8);

@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "..\RESearch.h"
-#include "Processors.h"
+#include "SingleByteProcessors.h"
 
 CSingleBytePassThroughProcessor::CSingleBytePassThroughProcessor(IBackend *pBackend)
 : m_pBackend(pBackend)
@@ -276,80 +276,4 @@ bool CSingleByteSeveralLineProcessor::WriteThru(const char *szBuffer, INT_PTR nL
 void CSingleByteSeveralLineProcessor::SkipTo(INT_PTR nOffset)
 {
 	m_nSkipOffset = nOffset;
-}
-
-//////////////////////////////////////////////////////////////////////////
-
-CUnicodeSplitLineProcessor::CUnicodeSplitLineProcessor(IBackend *pBackend)
-: m_pBackend(pBackend)
-{
-	m_szBuffer = m_pBackend->BufferW();
-
-	m_szEOL = m_szBuffer;
-
-	int nSize = m_pBackend->SizeW();
-	SkipNoCRLF(m_szEOL, &nSize);
-}
-
-bool CUnicodeSplitLineProcessor::GetNextLine()
-{
-	int nSize = m_pBackend->SizeW() - (m_szEOL - m_pBackend->BufferW());
-	if (nSize < 2) {
-		if (!m_pBackend->Last()) {
-			if (!m_pBackend->Move(m_szEOL - m_pBackend->BufferW())) return false;
-			m_szEOL = m_pBackend->BufferW();
-			nSize = m_pBackend->SizeW();
-		} else {
-			if (nSize == 0) return false;
-		}
-	}
-
-	SkipCRLF(m_szEOL, &nSize);
-	m_szBuffer = m_szEOL;
-	//	Нашли начало строки
-
-	SkipNoCRLF(m_szEOL, &nSize);
-	if (nSize == 0) {
-		if (!m_pBackend->Last()) {
-			if (!m_pBackend->Move(m_szBuffer - m_pBackend->BufferW())) return false;
-			m_szBuffer = m_pBackend->BufferW();
-			nSize = m_pBackend->SizeW();
-
-			m_szEOL = m_szBuffer;
-			SkipNoCRLF(m_szEOL, &nSize);
-		} else {
-			if (m_szBuffer == m_szEOL) return false;
-		}
-	}
-
-	return true;
-}
-
-const char *CUnicodeSplitLineProcessor::Buffer()
-{
-	return (const char *)m_szBuffer;
-}
-
-INT_PTR	CUnicodeSplitLineProcessor::Size()
-{
-	return (m_szEOL - m_szBuffer)*2;
-}
-
-INT_PTR	CUnicodeSplitLineProcessor::Start()
-{
-	return 0;
-}
-
-bool CUnicodeSplitLineProcessor::WriteBack(INT_PTR nOffset)
-{
-	return m_pBackend->WriteBack((m_szBuffer - m_pBackend->BufferW())*2 + nOffset);
-}
-
-bool CUnicodeSplitLineProcessor::WriteThru(const char *szBuffer, INT_PTR nLength, INT_PTR nSkipLength)
-{
-	return m_pBackend->WriteThru(szBuffer, nLength, nSkipLength);
-}
-
-void CUnicodeSplitLineProcessor::SkipTo(INT_PTR nOffset)
-{
 }

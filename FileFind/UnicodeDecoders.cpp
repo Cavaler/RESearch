@@ -31,7 +31,7 @@ INT_PTR	CSingleByteToUnicodeDecoder::DecodedOffset (INT_PTR nOffset)
 
 INT_PTR	CSingleByteToUnicodeDecoder::OriginalOffset(INT_PTR nOffset)
 {
-	if (nOffset & 1) return -1;
+	assert_even(nOffset);
 	return nOffset / 2;
 }
 
@@ -70,7 +70,7 @@ INT_PTR	CUTF8ToUnicodeDecoder::DecodedOffset (INT_PTR nOffset)
 
 INT_PTR	CUTF8ToUnicodeDecoder::OriginalOffset(INT_PTR nOffset)
 {
-	if (nOffset & 1) return -1;
+	assert_even(nOffset);
 	return m_UT.CharToByte(nOffset/2);
 }
 

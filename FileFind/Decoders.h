@@ -60,6 +60,33 @@ protected:
 	INT_PTR		m_nOOOut;
 };
 
+class CUnicodeCRLFDecoder : public CDecoder
+{
+public:
+	CUnicodeCRLFDecoder(IDecoder *pBackDecoder);
+
+	virtual INT_PTR	Size();
+	virtual bool	Decode(const char *szBuffer, INT_PTR &nLength);
+	virtual INT_PTR	DecodedOffset (INT_PTR nOffset);
+	virtual INT_PTR	OriginalOffset(INT_PTR nOffset);
+	virtual IDecoder *GetEncoder();
+
+protected:
+	IDecoder *m_pBackDecoder;
+
+	typedef pair<INT_PTR, int> skip_element;
+	typedef vector<skip_element> skip_map;
+	skip_map m_mapSkipped;
+
+	INT_PTR		m_nDOIn;
+	size_t		m_nDOSkip;
+	INT_PTR		m_nDOOut;
+
+	INT_PTR		m_nOOIn;
+	size_t		m_nOOSkip;
+	INT_PTR		m_nOOOut;
+};
+
 class CUTF8Traverse {
 public:
 	CUTF8Traverse();

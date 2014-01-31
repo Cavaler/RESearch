@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "Frontends.h"
-#include "Processors.h"
+#include "SingleByteProcessors.h"
 #include "..\RESearch.h"
 
 #ifndef UNICODE

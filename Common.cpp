@@ -739,7 +739,7 @@ int do_pcre_execA(const pcre *external_re, const pcre_extra *extra_data,
 }
 
 int do_pcre16_exec(const pcre16 *external_re, const pcre16_extra *extra_data,
-	PCRE_SPTR16 subject, int length, int start_offset, int options, int *offsets,
+	const wchar_t *subject, int length, int start_offset, int options, int *offsets,
 	int offsetcount)
 {
 	if (g_bUseSeparateThread && (length-start_offset > g_nMaxInThreadLength)) {
@@ -748,7 +748,7 @@ int do_pcre16_exec(const pcre16 *external_re, const pcre16_extra *extra_data,
 		if (g_hREThread) {
 			g_external_re16 = external_re;
 			g_extra_data16 = extra_data;
-			g_subject16 = subject;
+			g_subject16 = (PCRE_SPTR16)subject;
 			g_length = length;
 			g_start_offset = start_offset;
 			g_options = options;
@@ -759,7 +759,7 @@ int do_pcre16_exec(const pcre16 *external_re, const pcre16_extra *extra_data,
 			return g_result;
 		}
 	}
-	return pcre16_exec(external_re, extra_data, subject, length, start_offset, options, offsets, offsetcount);
+	return pcre16_exec(external_re, extra_data, (PCRE_SPTR16)subject, length, start_offset, options, offsets, offsetcount);
 }
 #endif
 

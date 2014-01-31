@@ -90,7 +90,7 @@ bool CUnicodeToOEMDecoder::Decode(const char *szBuffer, INT_PTR &nLength)
 
 INT_PTR CUnicodeToOEMDecoder::DecodedOffset (INT_PTR nOffset)
 {
-	if (nOffset & 1) return -1;
+	assert_even(nOffset);
 	return nOffset / 2;
 }
 
@@ -132,7 +132,7 @@ bool CReverseUnicodeToOEMDecoder::Decode(const char *szBuffer, INT_PTR &nLength)
 
 INT_PTR CReverseUnicodeToOEMDecoder::DecodedOffset (INT_PTR nOffset)
 {
-	if (nOffset & 1) return -1;
+	assert_even(nOffset);
 	return nOffset / 2;
 }
 

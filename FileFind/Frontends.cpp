@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "Frontends.h"
-#include "Processors.h"
+#include "SingleByteProcessors.h"
+#include "UnicodeProcessors.h"
 #include "..\RESearch.h"
 
 bool CSearchMultiTextFrontend::Process(IBackend *pBackend)
