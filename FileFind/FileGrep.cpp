@@ -69,10 +69,10 @@ bool GrepLineFound(const tstring &strBuf, tstring &strMatch)
 	}
 #else
 	if (FSearchAs == SA_REGEXP) {
-		bResult = do_pcre_execA(FPattern, FPatternExtra, strBuf.data(), strBuf.length(), 0, 0, REParamA.Match(), REParamA.Count()) >= 0;
+		bResult = do_pcre_exec(FPattern, FPatternExtra, strBuf.data(), strBuf.length(), 0, 0, REParam.Match(), REParam.Count()) >= 0;
 		if (bResult) {
-			REParamA.AddSource(strBuf.data(), strBuf.length());
-			strMatch = REParamA.GetParam(0);
+			REParam.AddSource(strBuf.data(), strBuf.length());
+			strMatch = REParam.GetParam(0);
 		}
 	} else {
 		TCHAR *szTable = (FCaseSensitive) ? NULL : UpCaseTable;
@@ -94,9 +94,9 @@ bool GrepMatchesFound(const tstring &strBuf, vector<tstring> &arrMatch)
 		arrMatch.push_back(REParam.GetParam(0));
 		nStart = REParam.m_arrMatch[1];
 #else
-		if (do_pcre_execA(FPattern, FPatternExtra, strBuf.data(), strBuf.length(), nStart, 0, REParamA.Match(), REParamA.Count()) < 0) break;
-		arrMatch.push_back(REParamA.GetParam(0));
-		nStart = REParamA.m_arrMatch[1];
+		if (do_pcre_exec(FPattern, FPatternExtra, strBuf.data(), strBuf.length(), nStart, 0, REParam.Match(), REParam.Count()) < 0) break;
+		arrMatch.push_back(REParam.GetParam(0));
+		nStart = REParam.m_arrMatch[1];
 #endif
 	}
 
@@ -239,7 +239,7 @@ void GrepFile(const FIND_DATA *FindData, panelitem_vector &PanelItems)
 	}
 
 	CGrepFrontend Frontend;
-	bool bAnyFound = RunSearch(FindData->cFileName, &Frontend, false);
+	bool bAnyFound = RunSearch(FindData->cFileName, &Frontend);
 
 	if (bAnyFound) AddFile(FindData, PanelItems, true);
 }

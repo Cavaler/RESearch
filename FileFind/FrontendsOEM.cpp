@@ -33,7 +33,7 @@ bool CSearchRegExpFrontend::Process(IBackend *pBackend)
 	CSingleByteSplitLineProcessor Proc(pBackend);
 
 	do {
-		int nResult = do_pcre_exec(FPattern, FPatternExtra, Proc.Buffer(), Proc.Size(), 0, 0, REParamA.Match(), REParamA.Count());
+		int nResult = do_pcre_exec(FPattern, FPatternExtra, Proc.Buffer(), Proc.Size(), 0, 0, REParam.Match(), REParam.Count());
 		if (nResult >= 0) return true;
 		g_nFoundLine++;
 	} while (!Interrupted() && Proc.GetNextLine());
@@ -48,7 +48,7 @@ bool CSearchSeveralLineRegExpFrontend::Process(IBackend *pBackend)
 	CSingleByteSeveralLineProcessor Proc(pBackend, SeveralLines, SeveralLinesKB);
 
 	do {
-		int nResult = do_pcre_exec(FPattern, FPatternExtra, Proc.Buffer(), Proc.Size(), 0, 0, REParamA.Match(), REParamA.Count());
+		int nResult = do_pcre_exec(FPattern, FPatternExtra, Proc.Buffer(), Proc.Size(), 0, 0, REParam.Match(), REParam.Count());
 		if (nResult >= 0) return true;
 		g_nFoundLine++;
 	} while (!Interrupted() && Proc.GetNextLine());
@@ -64,7 +64,7 @@ bool CSearchMultiLineRegExpFrontend::Process(IBackend *pBackend)
 		const char *szBuffer = pBackend->Buffer();
 		INT_PTR nSize  = pBackend->Size();
 
-		int nResult = do_pcre_exec(FPattern, FPatternExtra, szBuffer, nSize, 0, 0, REParamA.Match(), REParamA.Count());
+		int nResult = do_pcre_exec(FPattern, FPatternExtra, szBuffer, nSize, 0, 0, REParam.Match(), REParam.Count());
 		if (nResult >= 0) return true;
 
 		if (pBackend->Last()) break;

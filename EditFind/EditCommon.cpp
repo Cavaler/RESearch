@@ -847,7 +847,6 @@ void EditorFillNamedParameters()
 	RefreshEditorInfo();
 #ifdef UNICODE
 	FillDefaultNamedParameters(EditorFileName.c_str());
-	REParam.CopyParam(REParamA);
 #else
 	FillDefaultNamedParameters(EdInfo.FileName);
 #endif

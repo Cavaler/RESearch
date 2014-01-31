@@ -16,37 +16,33 @@ void SearchFile(const FIND_DATA *FindData, panelitem_vector &PanelItems)
 
 	REParam.Clear();
 	if (FPattern) REParam.AddRE(FPattern);
-#ifdef UNICODE
-	REParamA.Clear();
-	if (FPattern) REParamA.AddRE(FPattern);
-#endif
 
 	if (FText.empty()) IsFound=true; else 
 	if (FindData->nFileSize == 0) IsFound=false; else 
 	switch (FSearchAs) {
 	case SA_PLAINTEXT:{
 		CSearchPlainTextFrontend Frontend;
-		IsFound = RunSearch(FindData->cFileName, &Frontend, false);
+		IsFound = RunSearch(FindData->cFileName, &Frontend);
 		break;
 					  }
 	case SA_REGEXP:{
 		CSearchRegExpFrontend Frontend;
-		IsFound = RunSearch(FindData->cFileName, &Frontend, false);
+		IsFound = RunSearch(FindData->cFileName, &Frontend);
 		break;
 				   }
 	case SA_SEVERALLINE:{
 		CSearchSeveralLineRegExpFrontend Frontend;
-		IsFound = RunSearch(FindData->cFileName, &Frontend, false);
+		IsFound = RunSearch(FindData->cFileName, &Frontend);
 		break;
 						}
 	case SA_MULTILINE:{
 		CSearchMultiLineRegExpFrontend Frontend;
-		IsFound = RunSearch(FindData->cFileName, &Frontend, false);
+		IsFound = RunSearch(FindData->cFileName, &Frontend);
 		break;
 					  }
 	case SA_MULTITEXT:{
 		CSearchMultiTextFrontend Frontend;
-		IsFound = RunSearch(FindData->cFileName, &Frontend, false);
+		IsFound = RunSearch(FindData->cFileName, &Frontend);
 		break;
 					  }
 	default:IsFound=false;

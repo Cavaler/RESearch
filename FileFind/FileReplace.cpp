@@ -129,15 +129,15 @@ bool RunReplace(LPCTSTR szFileName, __int64 dwFileSize)
 	switch (FSearchAs) {
 	case SA_PLAINTEXT:{
 		CReplacePlainTextFrontend Frontend;
-		return RunReplace(szFileName, g_strNewFileName.c_str(), &Frontend, false);
+		return RunReplace(szFileName, g_strNewFileName.c_str(), &Frontend);
 					  }
 	case SA_REGEXP:{
 		CReplaceRegExpFrontend Frontend;
-		return RunReplace(szFileName, g_strNewFileName.c_str(), &Frontend, false);
+		return RunReplace(szFileName, g_strNewFileName.c_str(), &Frontend);
 				   }
 	case SA_SEVERALLINE:{
 		CReplaceSeveralLineRegExpFrontend Frontend;
-		return RunReplace(szFileName, g_strNewFileName.c_str(), &Frontend, false);
+		return RunReplace(szFileName, g_strNewFileName.c_str(), &Frontend);
 						}
 	case SA_MULTILINE:
 #ifdef _WIN64
@@ -147,12 +147,12 @@ bool RunReplace(LPCTSTR szFileName, __int64 dwFileSize)
 #endif
 		{
 			CReplaceMultiLineRegExpFrontend Frontend;
-			return RunReplace(szFileName, g_strNewFileName.c_str(), &Frontend, false);
+			return RunReplace(szFileName, g_strNewFileName.c_str(), &Frontend);
 		}
 		else
 		{
 			CReplaceSeveralLineRegExpFrontend Frontend;
-			return RunReplace(szFileName, g_strNewFileName.c_str(), &Frontend, false);
+			return RunReplace(szFileName, g_strNewFileName.c_str(), &Frontend);
 		}
 	}
 

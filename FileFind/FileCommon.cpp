@@ -307,9 +307,6 @@ bool MultipleMasksApply(const TCHAR *FileName)
 void FileFillNamedParameters(const TCHAR *szFileName)
 {
 	FillDefaultNamedParameters(szFileName);
-#ifdef UNICODE
-	REParam.CopyParam(REParamA);
-#endif
 }
 
 void ShortenFileName(const TCHAR *szFrom, TCHAR *szTo)

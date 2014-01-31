@@ -219,23 +219,11 @@ void FillDefaultNamedParameters(const TCHAR *szFileName)
 void ClearVariables()
 {
 	REParam.m_mapStrParam.clear();
-	REParamA.m_mapStrParam.clear();
 }
 
 void MatchDone()
 {
 	REParam.BackupParam();
-#ifdef UNICODE
-	REParam.CopyParam(REParamA);
-#endif
-}
-
-void OEMMatchDone()
-{
-	REParamA.BackupParam();
-#ifdef UNICODE
-	REParamA.CopyParam(REParam);
-#endif
 }
 
 void HighlightREError(CFarDialog *pDlg)
@@ -606,7 +594,6 @@ void ShowHResultError(int nError, HRESULT hResult, const TCHAR *szHelp)
 HANDLE g_hREThread  = NULL;
 HANDLE g_hREReady   = CreateSemaphore(NULL, 0, 1, NULL);
 #ifdef UNICODE
-HANDLE g_hREReadyA  = CreateSemaphore(NULL, 0, 1, NULL);
 HANDLE g_hREReady16 = CreateSemaphore(NULL, 0, 1, NULL);
 #endif
 HANDLE g_hREDone = CreateSemaphore(NULL, 0, 1, NULL);
@@ -615,8 +602,6 @@ const pcre *g_external_re;
 const pcre_extra *g_extra_data;
 const TCHAR *g_subject;
 #ifdef UNICODE
-const char *g_subjectA;
-
 const pcre16 *g_external_re16;
 const pcre16_extra *g_extra_data16;
 PCRE_SPTR16 g_subject16;
@@ -631,10 +616,10 @@ int g_result;
 #ifdef UNICODE
 DWORD WINAPI REThreadProc(LPVOID lpParameter)
 {
-	HANDLE hRE[] = {g_hREReady, g_hREReadyA, g_hREReady16};
+	HANDLE hRE[] = {g_hREReady, g_hREReady16};
 
 	while (true) {
-		DWORD dwResult = WaitForMultipleObjects(3, hRE, false, 60000);
+		DWORD dwResult = WaitForMultipleObjects(2, hRE, false, 60000);
 
 		switch (dwResult) {
 		case WAIT_OBJECT_0:
@@ -642,10 +627,6 @@ DWORD WINAPI REThreadProc(LPVOID lpParameter)
 				g_start_offset, g_options, g_offsets, g_offsetcount);
 			break;
 		case WAIT_OBJECT_0+1:
-			g_result = pcre_exec(g_external_re, g_extra_data, g_subjectA, g_length,
-				g_start_offset, g_options, g_offsets, g_offsetcount);
-			break;
-		case WAIT_OBJECT_0+2:
 			g_result = pcre16_exec(g_external_re16, g_extra_data16, g_subject16, g_length,
 				g_start_offset, g_options, g_offsets, g_offsetcount);
 			break;
@@ -714,30 +695,6 @@ int do_pcre_exec(const pcre *external_re, const pcre_extra *extra_data,
 }
 
 #ifdef UNICODE
-int do_pcre_execA(const pcre *external_re, const pcre_extra *extra_data,
-	const char *subject, int length, int start_offset, int options, int *offsets,
-	int offsetcount)
-{
-	if (g_bUseSeparateThread && (length-start_offset > g_nMaxInThreadLength)) {
-		if (!g_hREThread)
-			StartREThread();
-		if (g_hREThread) {
-			g_external_re = external_re;
-			g_extra_data = extra_data;
-			g_subjectA = subject;
-			g_length = length;
-			g_start_offset = start_offset;
-			g_options = options;
-			g_offsets = offsets;
-			g_offsetcount = offsetcount;
-			ReleaseSemaphore(g_hREReadyA, 1, NULL);
-			WaitForSingleObject(g_hREDone, INFINITE);
-			return g_result;
-		}
-	}
-	return pcre_exec(external_re, extra_data, subject, length, start_offset, options, offsets, offsetcount);
-}
-
 int do_pcre16_exec(const pcre16 *external_re, const pcre16_extra *extra_data,
 	const wchar_t *subject, int length, int start_offset, int options, int *offsets,
 	int offsetcount)
