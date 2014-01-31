@@ -16,9 +16,6 @@ public:
 	virtual bool	WriteThru(const char *szBuffer, INT_PTR nLength, INT_PTR nSkipLength);
 	virtual void	SkipTo   (INT_PTR nOffset);
 
-	const wchar_t *	BufferW();
-	INT_PTR			SizeW();
-
 protected:
 	IBackend *m_pBackend;
 

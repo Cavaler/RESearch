@@ -146,8 +146,8 @@ bool ReplaceRegExpProcess(IBackend *pBackend, ISplitLineProcessor &Proc)
 	REParam.AddRE(FPattern);
 
 	do {
-		const wchar_t *szBuffer = (const wchar_t *)Proc.Buffer();
-		INT_PTR nSize  = Proc.Size() / 2;
+		const wchar_t *szBuffer = Proc.BufferW();
+		INT_PTR nSize  = Proc.SizeW();
 		INT_PTR nStart = Proc.Start() / 2;
 
 		int nResult;

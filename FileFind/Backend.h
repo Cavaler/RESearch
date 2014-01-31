@@ -24,9 +24,7 @@ public:
 
 public:
 	virtual const char *Buffer();
-	virtual const wchar_t *BufferW();
 	virtual INT_PTR	Size();
-	virtual INT_PTR	SizeW();
 	virtual bool	Last();
 	virtual bool	Move(INT_PTR nLength);
 	virtual bool	CheckWriteReady();

@@ -57,16 +57,6 @@ INT_PTR	CUnicodeSplitLineProcessor::Size()
 	return (m_szEOL - m_szBuffer)*2;
 }
 
-const wchar_t * CUnicodeSplitLineProcessor::BufferW()
-{
-	return (const wchar_t *)m_szBuffer;
-}
-
-INT_PTR CUnicodeSplitLineProcessor::SizeW()
-{
-	return (m_szEOL - m_szBuffer);
-}
-
 INT_PTR	CUnicodeSplitLineProcessor::Start()
 {
 	return 0;

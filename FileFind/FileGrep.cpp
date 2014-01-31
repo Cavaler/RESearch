@@ -137,8 +137,8 @@ bool CGrepFrontend::Process(IBackend *pBackend)
 
 	do {
 #ifdef UNICODE
-		const wchar_t *szBuffer = (const wchar_t *)m_pProc->Buffer();
-		INT_PTR nSize  = m_pProc->Size() / 2;
+		const wchar_t *szBuffer = m_pProc->BufferW();
+		INT_PTR nSize  = m_pProc->SizeW();
 #else
 		const char *szBuffer = m_pProc->Buffer();
 		INT_PTR nSize  = m_pProc->Size();

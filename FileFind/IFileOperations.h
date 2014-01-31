@@ -4,20 +4,25 @@
 
 //	Everything operates on char * since even for Unicode mode we use UTF-8
 
-class IVirtual {
+class IVirtual
+{
 public:
 	virtual ~IVirtual() {}
 };
 
-class IBackend : public IVirtual
+class IBufferSize : public IVirtual
 {
-public:		//	Search functions
+public:
 	virtual const char *Buffer() = 0;	//	OEM or UTF-8
 	virtual INT_PTR	Size() = 0;			//	Bytes
-	virtual const wchar_t *BufferW() = 0;	//	Unicode
-	virtual INT_PTR	SizeW() = 0;			//	Characters
-	virtual bool	Last() = 0;
+	virtual const wchar_t *BufferW() { return (const wchar_t *)Buffer(); }	//	Unicode
+	virtual INT_PTR	SizeW()          { return Size() / 2; }					//	Characters
+};
 
+class IBackend : public IBufferSize
+{
+public:		//	Search functions
+	virtual bool	Last() = 0;
 	virtual bool	Move(INT_PTR nLength) = 0;
 
 public:		//	Replace functions
@@ -40,12 +45,10 @@ public:
 //	Source encoding is determined by created instance
 //	Target encoding in OEM for ANSI mode and UTF-8 for Unicode
 
-class IDecoder : public IVirtual
+class IDecoder : public IBufferSize
 {
 public:
 	virtual bool		Decode(const char *szBuffer, INT_PTR &nLength) = 0;
-	virtual const char *Buffer() = 0;
-	virtual INT_PTR		Size() = 0;
 
 	virtual INT_PTR		DecodedOffset (INT_PTR nOffset) = 0;
 	virtual INT_PTR		OriginalOffset(INT_PTR nOffset) = 0;
@@ -53,12 +56,10 @@ public:
 	virtual IDecoder *	GetEncoder() = 0;
 };
 
-class ISplitLineProcessor : public IVirtual
+class ISplitLineProcessor : public IBufferSize
 {
 public:
 	virtual bool		GetNextLine() = 0;
-	virtual const char *Buffer() = 0;
-	virtual INT_PTR		Size() = 0;
 	virtual INT_PTR		Start() = 0;
 
 	virtual bool	WriteBack(INT_PTR nOffset) = 0;

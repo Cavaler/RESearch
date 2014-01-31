@@ -217,8 +217,8 @@ bool CUnicodeCRLFDecoder::Decode(const char *szBuffer, INT_PTR &nLength)
 	m_mapSkipped.reserve(m_pBackDecoder->Size() / 32);
 	m_nSize = 0;
 
-	const wchar_t *szDecBuffer = (const wchar_t *)m_pBackDecoder->Buffer();
-	INT_PTR nDecSize = m_pBackDecoder->Size() / 2;
+	const wchar_t *szDecBuffer = m_pBackDecoder->BufferW();
+	INT_PTR nDecSize = m_pBackDecoder->SizeW();
 	wchar_t *szOurBuffer = (wchar_t *)m_szBuffer;
 
 	const wchar_t *szCR;
