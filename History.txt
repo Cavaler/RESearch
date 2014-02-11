@@ -14,8 +14,11 @@ Planned:
 Known bugs:
 	- Replace changing part of (real) EOL crashes
 
+Version 8.26 (11.02.2014)
+	- Fixed incorrect pcre 8.34 integration, which led to freeze  wile compiling certain patterns
+
 Version 8.25 (31.01.2014)
-	! Panel operations use pcre16 inUnicode versions, instead of UTF-8
+	! Panel operations use pcre16 in Unicode versions, instead of UTF-8
 	* PCRE updated to version 8.34
 	- Significantly reduced memory consumption for Panels operations
 

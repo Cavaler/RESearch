@@ -1172,10 +1172,6 @@
 				>
 			</File>
 			<File
-				RelativePath="resource.h"
-				>
-			</File>
-			<File
 				RelativePath=".\StdAfx.h"
 				>
 			</File>
@@ -2007,6 +2003,10 @@
 						Name="VCCustomBuildTool"
 					/>
 				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="resource.h"
+				>
 			</File>
 			<File
 				RelativePath=".\version.h"
