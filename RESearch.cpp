@@ -527,6 +527,8 @@ OperationResult OpenPluginFromFilePreset(int nItem, int nBreakCode)
 
 HANDLE OpenPluginFromFileMenu(int Item, bool ShowDialog = true)
 {
+	SetCurrentDirectory(CPanelInfo(false).CurDir);
+
 	OperationResult Result = OR_CANCEL;
 	int nBreakCode = -1;
 
