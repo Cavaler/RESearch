@@ -91,7 +91,7 @@ void DoEditReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, cons
 		} else {
 			if (!LF) break;
 			CR = LF;
-			EOL = g_DefEOL.c_str();
+			EOL = g_bUseRealEOL ? _T("\x0A") : g_DefEOL.c_str();
 			NextLine = CR + 1;
 		}
 
