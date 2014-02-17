@@ -562,26 +562,27 @@ bool ScanDirectories(panelitem_vector &PanelItems, ProcessFileProc ProcessFile)
 		if (PInfo.ItemsNumber==0) return false;
 		strCurDir = AddSlash(strCurDir);
 
-		for (size_t I=0; I<PInfo.SelectedItemsNumber; I++) {
+		for (size_t I=0; I<PInfo.SelectedItemsNumber; I++)
+		{
+			g_bInterrupted |= Interrupted();
+			if (g_bInterrupted) break;
+
 			FIND_DATA CurFindData = PanelToFD(PInfo.SelectedItems[I]);
+			
+			bool bMultipleMasksApply = MultipleMasksApply(CurFindData.cFileName);
+			CurFindData.strFileName = strCurDir + CurFindData.strFileName;
 
 			if (CurFindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-				if (_tcscmp(CurFindData.cFileName, _T(".."))) {
-					// Test if directory itself applies
-					if (MultipleMasksApply(CurFindData.cFileName)) {
-						CurFindData.strFileName = strCurDir + CurFindData.strFileName;
-						ProcessFile(&CurFindData, PanelItems);
-						FilesScanned++;
-					}
-
-					// Scan subdirectory
-					if (!DoScanDirectory(strCurDir + CurFindData.strFileName, PanelItems, ProcessFile)) break;
+				// Test if directory itself applies
+				if (bMultipleMasksApply) {
+					ProcessFile(&CurFindData, PanelItems);
+					FilesScanned++;
 				}
+
+				// Scan subdirectory
+				if (!DoScanDirectory(CurFindData.strFileName, PanelItems, ProcessFile)) break;
 			} else {
-				if (!MultipleMasksApply(CurFindData.cFileName)) continue;
-				g_bInterrupted|=Interrupted();
-				if (g_bInterrupted) break;
-				CurFindData.strFileName = strCurDir + CurFindData.strFileName;
+				if (!bMultipleMasksApply) continue;
 				FileFillNamedParameters(CurFindData.cFileName);
 				ProcessFile(&CurFindData, PanelItems);
 				FilesScanned++;
