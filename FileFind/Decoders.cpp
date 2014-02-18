@@ -334,7 +334,7 @@ void CUTF8Traverse::SetString(const char *szBuffer, INT_PTR nLength)
 	nByte = 0;
 	nChar = 0;
 
-	resize_vector(utf2char, nLength+2);
+	resize_vector(utf2char, nLength+16);
 	resize_vector(char2utf, nLength+2);
 
 	for (; nByte < nLength; ) {
