@@ -329,6 +329,20 @@ CUTF8Traverse::CUTF8Traverse()
 	SetString("", 0);
 }
 
+//	1  for single-byte
+//	-1 for continuation
+//	else sequence length
+inline int TestUTF8Byte(char c)
+{
+	if ((c & 0x80) == 0x00) return 1;
+	if ((c & 0xE0) == 0xC0) return 2;		//	110xxxxx
+	if ((c & 0xF0) == 0xE0) return 3;		//	1110xxxx
+	if ((c & 0xF8) == 0xF0) return 4;		//	11110xxx
+	if ((c & 0xFC) == 0xF8) return 5;		//	111110xx
+	if ((c & 0xFE) == 0xFC) return 6;		//	1111110x
+	return -1;
+}
+
 void CUTF8Traverse::SetString(const char *szBuffer, INT_PTR nLength)
 {
 	nByte = 0;
@@ -340,12 +354,10 @@ void CUTF8Traverse::SetString(const char *szBuffer, INT_PTR nLength)
 	for (; nByte < nLength; ) {
 		utf2char[nByte] = nChar;
 		char2utf[nChar] = nByte;
-		char c = szBuffer[nByte];
-		if		((c & 0x80) == 0x00) nByte += 1;		//	0xxxxxxx
-		else if ((c & 0xE0) == 0xC0) nByte += 2;		//	110xxxxx
-		else if ((c & 0xF0) == 0xE0) nByte += 3;		//	1110xxxx
-		else if ((c & 0xF8) == 0xF0) nByte += 4;		//	11110xxx
-		else nByte += 1;
+
+		int t = TestUTF8Byte(szBuffer[nByte]);
+		nByte += (t > 0) ? t : 1;
+
 		nChar++;
 	}
 
@@ -363,14 +375,19 @@ INT_PTR	CUTF8Traverse::CharToByte(INT_PTR nOffset)
 	return (nOffset <= nChar) ? char2utf[nOffset] : -1;
 }
 
+//	Tries to backtrack a bit to handle invalid utf-8 better
 void CutToValidUTF8(const char *szBuffer, INT_PTR &nLength)
 {
-	while (nLength > 0) {
-		if ((szBuffer[nLength-1] & 0x80) == 0x00) break;		// 1-byte
-		if ((szBuffer[nLength-2] & 0xE0) == 0xC0) break;		// 2-byte
-		if ((szBuffer[nLength-3] & 0xF0) == 0xE0) break;		// 3-byte
-		if ((szBuffer[nLength-4] & 0xF8) == 0xF0) break;		// 4-byte
+	int nPos = (nLength > 32) ? nLength-32 : 0;
 
-		nLength--;
+	while (nPos < nLength)
+	{
+		int t = TestUTF8Byte(szBuffer[nPos]);
+		int l = (t > 0) ? t : 1;
+
+		if (nPos + l > nLength) break;
+		nPos += l;
 	}
+
+	nLength = nPos;
 }
