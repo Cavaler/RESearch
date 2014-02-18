@@ -57,10 +57,11 @@ void DoEditReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, cons
 	tstring NewString;
 
 	if (LastLine == FirstLine) {
+		if (EndPos > GetString.StringLength) EndPos = GetString.StringLength;
 		OriginalEndLength = GetString.StringLength-EndPos;
 
 		NewString = CSO::MakeString(GetString.StringText, StartPos) + Replace +
-			CSO::MakeString(GetString.StringText + EndPos, GetString.StringLength-EndPos);
+			CSO::MakeString(GetString.StringText + EndPos, OriginalEndLength);
 	} else {
 		GetString.StringNumber = -1;
 		Position.CurLine = LastLine;
