@@ -171,10 +171,20 @@ void Relative2Absolute(int Line,TCHAR *Lines,int MatchStart,int MatchLength,int 
 	AdjustPosition(Lines, LastLine, EndPos);
 }
 
-void ClearLineBuffer() {
+void ClearLineBuffer()
+{
 	g_LineBuffer.clear();
 	g_LineOffsets.clear();
 	g_FirstLine = 0;
+}
+
+void SetDefEOL(LPCTSTR szEOL)
+{
+	if (CSO::cstrlen(szEOL) > 0) {
+		g_DefEOL = szEOL;
+	} else if (g_DefEOL.empty()) {
+		g_DefEOL = _T("\r\n");
+	}
 }
 
 void FillSingleLineBuffer(size_t FirstLine)
@@ -185,13 +195,12 @@ void FillSingleLineBuffer(size_t FirstLine)
 
 		EctlSetPosition(&Position);
 		EctlGetString(&String);
+		ToArrayEOL(String, g_LineBuffer);
 
-		g_LineBuffer.resize(String.StringLength);
-		if (String.StringLength > 0) memmove(&g_LineBuffer[0], String.StringText, String.StringLength*sizeof(TCHAR));
 		g_LineOffsets.resize(1);
 		g_LineOffsets[0] = 0;
 
-		g_DefEOL = String.StringEOL ? String.StringEOL : _T("");
+		SetDefEOL(String.StringEOL);
 	} else if (g_LineOffsets.size() > 1) {
 		size_t nCut = g_LineOffsets[1];
 		g_LineBuffer.resize(nCut);
@@ -269,7 +278,7 @@ void FillLineBuffer(size_t FirstLine, size_t LastLine)
 		for (Position.CurLine = (int)(g_FirstLine+g_LineOffsets.size()); Position.CurLine <= (int)LastLine; Position.CurLine++) {
 			EctlSetPosition(&Position);
 			EctlGetString(&String);
-			g_DefEOL = String.StringEOL ? String.StringEOL : _T("");
+			SetDefEOL(String.StringEOL);
 
 			g_LineOffsets.push_back(g_LineBuffer.size());
 			g_LineBuffer.insert(g_LineBuffer.end(), String.StringText, String.StringText+String.StringLength);
@@ -775,9 +784,26 @@ tstring EctlGetString(int nLine)
 	return ToString(String);
 }
 
-tstring ToString(EditorGetString &String)
+tstring ToString(const EditorGetString &String)
 {
 	return CSO::MakeString(String.StringText, String.StringLength);
+}
+
+tstring ToStringEOL(const EditorGetString &String)
+{
+	return CSO::MakeString(String.StringText, String.StringLength) + ((String.StringEOL != NULL) ? String.StringEOL : _T(""));
+}
+
+void ToArrayEOL(const EditorGetString &String, vector<TCHAR> &arrBuffer)
+{
+	arrBuffer.assign(String.StringText, String.StringText + String.StringLength);
+	if (String.StringEOL != NULL) arrBuffer.insert(arrBuffer.end(), String.StringEOL, _tcschr(String.StringEOL, 0));
+}
+
+void ToArrayEOL(const EditorSetString &String, vector<TCHAR> &arrBuffer)
+{
+	arrBuffer.assign(String.StringText, String.StringText + String.StringLength);
+	if (String.StringEOL != NULL) arrBuffer.insert(arrBuffer.end(), String.StringEOL, _tcschr(String.StringEOL, 0));
 }
 
 void EctlSetString(EditorSetString *String)

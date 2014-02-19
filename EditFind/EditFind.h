@@ -159,7 +159,10 @@ extern "C" const unsigned char *far_maketables(struct CharTableSet *pTable);
 
 void EctlGetString(EditorGetString *String);
 tstring EctlGetString(int nLine);
-tstring ToString(EditorGetString &String);
+tstring ToString   (const EditorGetString &String);
+tstring ToStringEOL(const EditorGetString &String);
+void ToArrayEOL(const EditorGetString &String, vector<TCHAR> &arrBuffer);
+void ToArrayEOL(const EditorSetString &String, vector<TCHAR> &arrBuffer);
 void EctlSetString(EditorSetString *String);
 void EctlSetPosition(EditorSetPosition *Position);
 void EctlForceSetPosition(EditorSetPosition *Position);

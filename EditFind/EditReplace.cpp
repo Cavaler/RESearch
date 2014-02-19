@@ -13,11 +13,47 @@ bool bShowNoFound;
 //	Modifying g_LineBuffer directly to avoid multiple Get/SetString in case of multiple replaces in single line
 bool bCachedReplace;
 
+LPCTSTR FindEOL(LPCTSTR szText, int nLength, int &nSize)
+{
+	LPCTSTR CR = (LPCTSTR)_tmemchr(szText, '\r', nLength);
+	LPCTSTR LF = (LPCTSTR)_tmemchr(szText, '\n', nLength);
+
+	if ((CR != NULL) && ((CR < LF) || (LF == NULL))) {
+		nSize = (LF == CR + 1) ? 2 : 1;
+		return CR;
+	}
+
+	if (LF != NULL) {
+		nSize = 1;
+		return LF;
+	}
+
+	nSize = 0;
+	return _T("");
+}
+
+int LengthNoEOL(const tstring &strText)
+{
+	if (strText.empty()) return 0;
+
+	int nLength = strText.length();
+	if (strText[nLength-1] == '\n') {
+		if ((strText.length() > 1) && (strText[nLength-2] == '\r')) return nLength-2;
+		return nLength-1;
+	}
+
+	return nLength;
+}
+
+void CheckDefaultEOL(tstring &strEOL)
+{
+	if (!g_bUseRealEOL && (strEOL == _T("\n")))
+		strEOL = g_DefEOL;
+}
+
 void DoEditReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, const tstring &Replace)
 {
 	EditorSetPosition Position = {ITEM_SS(EditorSetPosition) -1,-1,-1,-1,-1,-1};
-	EditorGetString GetString = {ITEM_SS(EditorGetString) -1};
-	int I;
 
 	// Quite a special case
 	if ((FirstLine == LastLine) && (StartPos == EndPos) && Replace.empty()) {
@@ -31,24 +67,18 @@ void DoEditReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, cons
 		nSelEndOffsY = SelEndLine - LastLine;
 	}
 
-	if (FirstLine < LastLine) {
-		// Delete lines to be fully replaced
-		Position.CurLine = FirstLine + 1;
-		EctlSetPosition(&Position);
-		for (I = LastLine-1; I>FirstLine; I--)
-			StartupInfo.EditorControl(ECTL_DELETESTRING, NULL);
-		if (LastLine>FirstLine + 1) LastLine = FirstLine + 1;
-	}
-
 	Position.CurLine = FirstLine;
 	EctlSetPosition(&Position);
+
+	tstring strGetString;
 	if (bCachedReplace) {
-		GetString.StringText   = g_LineBuffer.empty() ? NULL : &g_LineBuffer[0];
-		GetString.StringLength = g_LineBuffer.size();
+		if (!g_LineBuffer.empty())
+			strGetString.assign(&g_LineBuffer[0], &g_LineBuffer[0]+g_LineBuffer.size());
 	} else {
+		EditorGetString GetString = {ITEM_SS(EditorGetString) -1};
 		EctlGetString(&GetString);
+		strGetString = ToStringEOL(GetString);
 	}
-	tstring strGetString = ToString(GetString);
 
 	tstring EndEOL = g_DefEOL;
 
@@ -57,70 +87,77 @@ void DoEditReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, cons
 	tstring NewString;
 
 	if (LastLine == FirstLine) {
-		if (EndPos > GetString.StringLength) EndPos = GetString.StringLength;
-		OriginalEndLength = GetString.StringLength-EndPos;
+		OriginalEndLength = LengthNoEOL(strGetString)-EndPos;
 
-		NewString = CSO::MakeString(GetString.StringText, StartPos) + Replace +
-			CSO::MakeString(GetString.StringText + EndPos, OriginalEndLength);
+		NewString = strGetString.substr(0, StartPos) + Replace + strGetString.substr(EndPos);
 	} else {
-		GetString.StringNumber = -1;
 		Position.CurLine = LastLine;
 		EctlSetPosition(&Position);
+
+		EditorGetString GetString = {ITEM_SS(EditorGetString) -1};
 		EctlGetString(&GetString);
-		tstring strGetString2 = ToString(GetString);
+		tstring strGetString2 = ToStringEOL(GetString);
 		EndEOL = GetString.StringEOL;
 
 		OriginalEndLength = GetString.StringLength-EndPos;
 
 		NewString = strGetString.substr(0, StartPos) + Replace + strGetString2.substr(EndPos);
-
-		Position.CurLine = FirstLine;
-		EctlSetPosition(&Position);
-		StartupInfo.EditorControl(ECTL_DELETESTRING, NULL);
 	}
+	if (OriginalEndLength < 0) OriginalEndLength = 0;
 
 	RefreshEditorInfo();
-	CEditorSetString SetString(-1, NewString.c_str(), NULL);
+	CEditorSetString SetString(-1, NewString.c_str(), NULL, NewString.length());
+	Position.CurLine = FirstLine;
 
-	while (true) {
-		const TCHAR *CR = (const TCHAR *)_tmemchr(SetString.StringText, '\r', NewString.length());
-		const TCHAR *LF = (const TCHAR *)_tmemchr(SetString.StringText, '\n', NewString.length());
-		const TCHAR *EOL, *NextLine;
-		if (CR) {
-			EOL = (LF == CR + 1) ? _T("\x0D\x0A") : _T("\x0D");
-			NextLine = CR + ((LF == CR + 1)?2:1);
+	bool bLastLine = false;
+	do {
+		int nLength = NewString.length()-(SetString.StringText-NewString.c_str());
+
+		int nEOLSize;
+		LPCTSTR szEOL = FindEOL(SetString.StringText, nLength, nEOLSize);
+		tstring strEOL(szEOL, nEOLSize);
+		CheckDefaultEOL(strEOL);
+
+		if (nEOLSize == 0) {
+			SetString.StringLength = nLength;
+			SetString.StringEOL = _T("");
 		} else {
-			if (!LF) break;
-			CR = LF;
-			EOL = g_bUseRealEOL ? _T("\x0A") : g_DefEOL.c_str();
-			NextLine = CR + 1;
+			SetString.StringLength = szEOL-SetString.StringText;
+			SetString.StringEOL = strEOL.c_str();
 		}
 
-		SetString.StringLength = CR-SetString.StringText;
-		SetString.StringEOL = EOL;
-		EctlSetString(&SetString);
-		Position.CurPos = SetString.StringLength;
-		EctlForceSetPosition(&Position);
+		if (Position.CurLine <= LastLine) {
+			EctlSetPosition(&Position);
+		} else {
+			Position.CurPos = 0;
+			EctlForceSetPosition(&Position);
+			StartupInfo.EditorControl(ECTL_INSERTSTRING, NULL);
+			EctlForceSetPosition(&Position);
+		}
+
+		bool bLastOne = (SetString.StringText + SetString.StringLength + nEOLSize) >= (NewString.c_str() + NewString.length());
+
+		if (bCachedReplace && (g_LineOffsets.size() == 1)) {
+			g_FirstLine = Position.CurLine;
+			ToArrayEOL(SetString, g_LineBuffer);
+
+			//	Doing SetString() here to update view
+			if (!NoAsking) EctlSetString(&SetString);
+		} else {
+			EctlSetString(&SetString);
+		}
+
+		if (bLastOne) break;
+
 		Position.CurLine++;
-		StartupInfo.EditorControl(ECTL_INSERTSTRING, NULL);
+		SetString.StringText += SetString.StringLength+nEOLSize;
+	} while (true);
 
-		NewString.erase(0, NextLine-SetString.StringText);
-		SetString.StringText = NewString.c_str();
-	}
+	if (Position.CurLine < LastLine) {
+		EctlSetPosition(&Position);
+		while (Position.CurLine < LastLine--)
+			StartupInfo.EditorControl(ECTL_DELETESTRING, NULL);
 
-	SetString.StringLength = NewString.length();
-	SetString.StringEOL = EndEOL.empty() ? NULL : EndEOL.c_str();
-
-	if (bCachedReplace && (g_LineOffsets.size() == 1)) {
-		g_FirstLine = Position.CurLine;
-		g_LineBuffer.resize(SetString.StringLength);
-		if (SetString.StringLength > 0)
-			memmove(&g_LineBuffer[0], SetString.StringText, SetString.StringLength*sizeof(TCHAR));
-
-		//	Doing SetString() here to update view
-		if (!NoAsking) EctlSetString(&SetString);
-	} else {
-		EctlSetString(&SetString);
 	}
 
 	if (EInSelection) {
@@ -130,7 +167,7 @@ void DoEditReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, cons
 		}
 	}
 	LastReplaceLine = LastLine = Position.CurLine;
-	LastReplacePos = EndPos = NewString.length()-OriginalEndLength;
+	LastReplacePos  = EndPos   = SetString.StringLength-OriginalEndLength;
 
 	if (EInSelection && (SelType != BTYPE_NONE)) {
 		if (nSelEndOffsY == 0) {
@@ -140,8 +177,8 @@ void DoEditReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, cons
 		}
 	}
 
-	Position.CurPos = (EReverse)?StartPos:EndPos;
-	Position.LeftPos = (EReverse)?-1:LeftColumn(Position.CurPos);
+	Position.CurPos  = (EReverse) ? StartPos : EndPos;
+	Position.LeftPos = (EReverse) ? -1 : LeftColumn(Position.CurPos);
 	if (NoAsking) {
 		EctlSetPosition(&Position);
 	} else {
@@ -462,10 +499,18 @@ bool ReplaceInTextByLine(int FirstLine, int StartPos, int LastLine, int EndPos, 
 				SetString.StringText   = NULL;
 				SetString.StringLength = 0;
 			} else {
-				SetString.StringText = &g_LineBuffer[0];
+				SetString.StringText   = &g_LineBuffer[0];
 				SetString.StringLength = g_LineBuffer.size();
+
+				int nEOLSize;
+				LPCTSTR szEOL  = FindEOL(SetString.StringText, SetString.StringLength, nEOLSize);
+				tstring strEOL = tstring(szEOL, nEOLSize);
+				CheckDefaultEOL(strEOL);
+				g_DefEOL = strEOL;
+
+				SetString.StringLength -= nEOLSize;
 			}
-			SetString.StringEOL = g_DefEOL.c_str();
+			SetString.StringEOL    = g_DefEOL.c_str();
 
 			EctlSetString(&SetString);
 		}
