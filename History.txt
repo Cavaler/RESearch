@@ -12,7 +12,14 @@ Planned:
 	+ Command to "lock" read-only file before replacing
 
 Known bugs:
-	- Replace changing part of (real) EOL crashes
+	- Replace changing part of real EOL in editor doesn't work
+
+Version 8.27 (19.02.2014)
+	- Fixed "Search in selected" not processing subfolders
+	- Fixed "Rename selected"
+	* In "[X] Use real EOL" mode in editor one can change EOL sequences properly
+	- Fixed rare crash on handling invalid utf-8
+	- Fixed $ not matching before "\r\n"
 
 Version 8.26 (11.02.2014)
 	- Fixed incorrect pcre 8.34 integration, which led to freeze  wile compiling certain patterns
