@@ -137,7 +137,7 @@ void DoEditReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, cons
 
 		bool bLastOne = (SetString.StringText + SetString.StringLength + nEOLSize) >= (NewString.c_str() + NewString.length());
 
-		if (bCachedReplace && (g_LineOffsets.size() == 1)) {
+		if (bCachedReplace && (g_LineOffsets.size() == 1) && bLastOne) {
 			g_FirstLine = Position.CurLine;
 			ToArray(SetString, g_LineBuffer);
 
