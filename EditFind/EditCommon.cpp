@@ -195,12 +195,12 @@ void FillSingleLineBuffer(size_t FirstLine)
 
 		EctlSetPosition(&Position);
 		EctlGetString(&String);
-		ToArrayEOL(String, g_LineBuffer);
+		ToArray(String, g_LineBuffer);
 
 		g_LineOffsets.resize(1);
 		g_LineOffsets[0] = 0;
 
-		SetDefEOL(String.StringEOL);
+		g_DefEOL = String.StringEOL;
 	} else if (g_LineOffsets.size() > 1) {
 		size_t nCut = g_LineOffsets[1];
 		g_LineBuffer.resize(nCut);
@@ -211,7 +211,7 @@ void FillSingleLineBuffer(size_t FirstLine)
 
 void FillLineBuffer(size_t FirstLine, size_t LastLine)
 {
-	if (FirstLine == LastLine) {
+	if (!ESeveralLine && (FirstLine == LastLine)) {
 		FillSingleLineBuffer(FirstLine);
 		return;
 	}
@@ -794,16 +794,14 @@ tstring ToStringEOL(const EditorGetString &String)
 	return CSO::MakeString(String.StringText, String.StringLength) + ((String.StringEOL != NULL) ? String.StringEOL : _T(""));
 }
 
-void ToArrayEOL(const EditorGetString &String, vector<TCHAR> &arrBuffer)
+void ToArray(const EditorGetString &String, vector<TCHAR> &arrBuffer)
 {
 	arrBuffer.assign(String.StringText, String.StringText + String.StringLength);
-	if (String.StringEOL != NULL) arrBuffer.insert(arrBuffer.end(), String.StringEOL, _tcschr(String.StringEOL, 0));
 }
 
-void ToArrayEOL(const EditorSetString &String, vector<TCHAR> &arrBuffer)
+void ToArray(const EditorSetString &String, vector<TCHAR> &arrBuffer)
 {
 	arrBuffer.assign(String.StringText, String.StringText + String.StringLength);
-	if (String.StringEOL != NULL) arrBuffer.insert(arrBuffer.end(), String.StringEOL, _tcschr(String.StringEOL, 0));
 }
 
 void EctlSetString(EditorSetString *String)
