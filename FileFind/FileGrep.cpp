@@ -39,9 +39,13 @@ void AddGrepLine(const tstring &strLine, bool bEOL = true)
 
 void AddGrepFileName(const tstring &strFileName)
 {
-	AddGrepLine(FGFileNamePrepend, false);
-	AddGrepLine(strFileName, FGFileNameAppend.empty());
-	AddGrepLine(FGFileNameAppend, false);
+	TREParameters NoParam;
+	tstring strPrepend = CSO::CreateReplaceString(FGFileNamePrepend.c_str(), _T("\n"), NULL, NoParam);
+	tstring strAppend  = CSO::CreateReplaceString(FGFileNameAppend.c_str(),  _T("\n"), NULL, NoParam);
+
+	AddGrepLine(strPrepend, false);
+	AddGrepLine(strFileName, strAppend.empty());
+	AddGrepLine(strAppend, false);
 }
 
 void AddGrepResultLine(const tstring &strLine, int nLineNumber)
