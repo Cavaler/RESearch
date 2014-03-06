@@ -677,7 +677,7 @@ bool RenameSelectedFilesPrompt()
 		case MBtnPresets:
 			QRPresets->ShowMenu(true);
 			break;
-		case MREBuilder:
+		case MBtnREBuilder:
 			if (RunREBuilder(SearchText, ReplaceText)) {
 				FSearchAs = SA_REGEXP;
 			}
