@@ -103,6 +103,9 @@ bool CFileBackend::Open(LPCTSTR szFileName, INT_PTR nMaxSize)
 	InitSlurpMode();
 	m_nOriginalSizeLimit = m_nSizeLimit;
 
+	//	Needed for codepage auto-detect
+	ReadUp(0, 64);
+
 	return true;
 }
 
@@ -141,9 +144,10 @@ bool CFileBackend::ResetDecoder(IDecoder *pDecoder)
 	return SetDecoder(pDecoder, m_nSkip);
 }
 
-bool CFileBackend::ReadUp(INT_PTR nRest)
+bool CFileBackend::ReadUp(INT_PTR nRest, INT_PTR nMax)
 {
 	DWORD dwToRead = m_nBlockSize-nRest;
+	if ((nMax > 0) && (dwToRead > nMax)) dwToRead = (DWORD)nMax;
 	if (dwToRead > m_nSizeLimit) dwToRead = (DWORD)m_nSizeLimit;
 
 	LARGE_INTEGER liZero = {0, 0};

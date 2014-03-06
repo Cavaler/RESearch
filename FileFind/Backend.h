@@ -43,7 +43,7 @@ protected:
 	bool		m_bEOF;
 	bool		OpenInputFile(LPCTSTR szFileName);
 	void 		CloseInputFile();
-	bool		ReadUp(INT_PTR nRest);
+	bool		ReadUp(INT_PTR nRest, INT_PTR nMax = 0);
 
 	bool		m_bSlurpMode;
 	void		InitSlurpMode();
