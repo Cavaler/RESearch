@@ -69,7 +69,7 @@ bool GrepLineFound(const tstring &strBuf, tstring &strMatch)
 		}
 	} else {
 		TCHAR *szTable = (FCaseSensitive) ? NULL : UpCaseTable;
-		bResult = BMHSearch((WCHAR *)strBuf.data(), strBuf.length()/2, FTextUpcase.data(), FTextUpcase.size(), szTable) >= 0;
+		bResult = BMHSearch(strBuf.data(), strBuf.length(), FTextUpcase.data(), FTextUpcase.size(), szTable) >= 0;
 	}
 #else
 	if (FSearchAs == SA_REGEXP) {
