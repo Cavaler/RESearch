@@ -10,9 +10,13 @@ Planned:
 	? Searching in streams
 	? Extended batch properties, overriding preset properties (e.g. Search from beginning)
 	+ Command to "lock" read-only file before replacing
-
-Known bugs:
-	- Replace changing part of real EOL in editor doesn't work
+	
+Version 8.30 (11.03.2014)
+	! Rewritten Editor Replace: supports changing EOLs, and optimized insert/remove string operations
+	- Fixed encoding detection in panels
+	+ Escapes can be used in "Prepend/Append to file name" string in Grep
+	- Plain text Grep fixed
+	* Presets and Batches callable from LUA in Far3
 
 Version 8.27 (19.02.2014)
 	- Fixed "Search in selected" not processing subfolders
