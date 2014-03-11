@@ -68,6 +68,7 @@ public:
 
 	void FillMenuItems(vector<CFarMenuItemEx> &MenuItems);
 	CPreset *FindMenuPreset(int &nIndex);
+	CPreset *FindMenuPreset(LPCTSTR szName);
 
 	const TCHAR *Name()  {return m_strKey.c_str();}
 	const TCHAR *Title() {return GetMsg(m_nTitle);}
@@ -144,6 +145,7 @@ public:
 
 	void FillMenuItems(vector<CFarMenuItemEx> &MenuItems);
 	CBatchAction *FindMenuAction(int &nIndex);
+	CBatchAction *FindMenuAction(LPCTSTR szName);
 
 public:
 	CBatchType &m_Type;

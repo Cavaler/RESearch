@@ -81,262 +81,6 @@ void WINAPI FAR_EXPORT(SetStartupInfo)(const PluginStartupInfo *Info)
 	ReadActiveScripts();
 }
 
-void BadCmdLine() {
-	const TCHAR *Lines[]={GetMsg(MRESearch),GetMsg(MInvalidCmdLine),GetMsg(MOk)};
-	StartupInfo.Message(FMSG_WARNING,_T("REInvalidCmdLine"),Lines,3,1);
-}
-
-bool ProcessFFLine(const TCHAR *Line, bool *ShowDialog, INT_PTR *Item)
-{
-	*Item = 0;
-	TCHAR Switch = Line[0];
-	if (Switch == 0) { *ShowDialog = true; return true; }
-
-	Line++;
-	*ShowDialog = false;
-
-	if ((Switch==' ')||(Switch=='\t')) {
-		FText=Line;
-		*Item=0;
-		return true;
-	}
-
-	const TCHAR *NextSwitch = _tcschr(Line,Switch);
-	if (!NextSwitch) { BadCmdLine(); return false; }
-
-	FMask = tstring(Line, NextSwitch-Line);
-	Line  = NextSwitch+1;
-
-	NextSwitch = _tcsrchr(Line,Switch);
-	if (NextSwitch) {
-		FText = tstring(Line, NextSwitch-Line);
-		Line  = NextSwitch+1;
-	} else {
-		FText=Line;
-	}
-
-	while (NextSwitch&&*Line) {
-		switch (*Line) {
-		case 'c':FCaseSensitive=true;break;
-		case 'C':FCaseSensitive=false;break;
-		case 'i':FSInverse=true;break;
-		case 'I':FSInverse=false;break;
-		case 'p':case 'P':FSearchAs=SA_PLAINTEXT;break;
-		case 'r':case 'R':FSearchAs=SA_REGEXP;break;
-		case 's':case 'S':FSearchAs=SA_SEVERALLINE;break;
-		case 'm':case 'M':FSearchAs=SA_MULTILINE;break;
-		case 'a':case 'A':FSearchAs=SA_MULTITEXT;break;
-		case 'l':case 'L':FSearchAs=SA_MULTIREGEXP;break;
-		case 'd':*ShowDialog=true;break;
-		case 'D':*ShowDialog=false;break;
-		case '0':FSearchIn=SI_ALLDRIVES;break;
-		case '1':FSearchIn=SI_ALLLOCAL;break;
-		case '2':FSearchIn=SI_FROMROOT;break;
-		case '3':FSearchIn=SI_FROMCURRENT;break;
-		case '4':FSearchIn=SI_CURRENTONLY;break;
-		case '5':FSearchIn=SI_SELECTED;break;
-		default:BadCmdLine();return false;
-		}
-		Line++;
-	}
-	return true;
-}
-
-bool ProcessFRLine(const TCHAR *Line,bool *ShowDialog,INT_PTR *Item)
-{
-	*Item = 1;
-	TCHAR Switch = Line[0];
-	if (!Switch) { *ShowDialog = true; return true; }
-
-	Line++;
-	*ShowDialog = false;
-
-	if ((Switch==' ')||(Switch=='\t')) {
-		FText=Line;*Item=0;return true;
-	}
-
-	const TCHAR *NextSwitch = _tcschr(Line,Switch);
-	if (!NextSwitch) { BadCmdLine(); return false; }
-	FMask = tstring(Line, NextSwitch-Line);
-	Line  = NextSwitch+1;
-
-	NextSwitch = _tcschr(Line,Switch);
-	if (!NextSwitch) { BadCmdLine(); return false; }
-	FText = tstring(Line, NextSwitch-Line);
-	Line  = NextSwitch+1;
-
-	NextSwitch=_tcsrchr(Line,Switch);
-	if (NextSwitch) {
-		FRReplace = tstring(Line, NextSwitch-Line);
-		Line = NextSwitch+1;
-	} else {
-		FRReplace = Line;
-	}
-
-	while (NextSwitch&&*Line) {
-		switch (*Line) {
-		case 'c':FCaseSensitive=true;break;
-		case 'C':FCaseSensitive=false;break;
-		case 'p':case 'P':FSearchAs=SA_PLAINTEXT;break;
-		case 'r':case 'R':FSearchAs=SA_REGEXP;break;
-		case 's':case 'S':FSearchAs=SA_SEVERALLINE;break;
-		case 'v':FROpenModified=true;break;
-		case 'V':FROpenModified=false;break;
-		case 'f':FRConfirmFile=true;break;
-		case 'F':FRConfirmFile=false;break;
-		case 'l':FRConfirmLine=true;break;
-		case 'L':FRConfirmLine=false;break;
-		case 'o':FRSaveOriginal=true;break;
-		case 'O':FRSaveOriginal=false;break;
-		case 'b':FROverwriteBackup=true;break;
-		case 'B':FROverwriteBackup=false;break;
-		case 'w':FRReplaceToNew=true;break;
-		case 'W':FRReplaceToNew=false;break;
-		case 'd':*ShowDialog=true;break;
-		case 'D':*ShowDialog=false;break;
-		case '0':FSearchIn=SI_ALLDRIVES;break;
-		case '1':FSearchIn=SI_ALLLOCAL;break;
-		case '2':FSearchIn=SI_FROMROOT;break;
-		case '3':FSearchIn=SI_FROMCURRENT;break;
-		case '4':FSearchIn=SI_CURRENTONLY;break;
-		case '5':FSearchIn=SI_SELECTED;break;
-		default:BadCmdLine();return false;
-		}
-		Line++;
-	}
-	return true;
-}
-
-bool ProcessRNLine(const TCHAR *Line,bool *ShowDialog,INT_PTR *Item)
-{
-	*Item = 7;
-	TCHAR Switch = Line[0];
-	if (!Switch) { *ShowDialog = true; return true; }
-
-	Line++;
-	*ShowDialog = false;
-
-	if ((Switch==' ')||(Switch=='\t')) {
-		FText=Line;
-		*Item=0;
-		return true;
-	}
-
-	const TCHAR *NextSwitch = _tcschr(Line,Switch);
-	if (!NextSwitch) { BadCmdLine(); return false; }
-	FMask = tstring(Line, NextSwitch-Line);
-	Line  = NextSwitch+1;
-
-	NextSwitch = _tcschr(Line,Switch);
-	if (!NextSwitch) { BadCmdLine(); return false; }
-	FText = tstring(Line, NextSwitch-Line);
-	Line  = NextSwitch+1;
-
-	NextSwitch = _tcsrchr(Line,Switch);
-	if (NextSwitch) {
-		FRReplace = tstring(Line, NextSwitch-Line);
-		Line = NextSwitch+1;
-	} else {
-		FRReplace = Line;
-	}
-
-	while (NextSwitch&&*Line) {
-		switch (*Line) {
-		case 'c':FCaseSensitive=true;break;
-		case 'C':FCaseSensitive=false;break;
-		case 'r':FSearchAs=SA_REGEXP;break;
-		case 'R':FSearchAs=SA_PLAINTEXT;break;
-		case 'p':FRepeating=true;break;
-		case 'P':FRepeating=false;break;
-		case 'f':FRConfirmFile=true;break;
-		case 'F':FRConfirmFile=false;break;
-		case 'l':FRConfirmLine=true;break;
-		case 'L':FRConfirmLine=false;break;
-		case 'd':*ShowDialog=true;break;
-		case 'D':*ShowDialog=false;break;
-		case '0':FSearchIn=SI_ALLDRIVES;break;
-		case '1':FSearchIn=SI_ALLLOCAL;break;
-		case '2':FSearchIn=SI_FROMROOT;break;
-		case '3':FSearchIn=SI_FROMCURRENT;break;
-		case '4':FSearchIn=SI_CURRENTONLY;break;
-		case '5':FSearchIn=SI_SELECTED;break;
-		default:BadCmdLine();return false;
-		}
-		Line++;
-	}
-	return true;
-}
-
-bool ProcessQRLine(const TCHAR *Line,bool *ShowDialog,INT_PTR *Item)
-{
-	*Item = 8;
-	TCHAR Switch = Line[0];
-	if (!Switch) { *ShowDialog = true; return true; }
-
-	Line++;
-	*ShowDialog = false;
-
-	const TCHAR *NextSwitch = _tcschr(Line,Switch);
-	if (!NextSwitch) { BadCmdLine(); return false; }
-	FText = tstring(Line, NextSwitch-Line);
-	Line  = NextSwitch+1;
-
-	NextSwitch = _tcsrchr(Line,Switch);
-	if (NextSwitch) {
-		FRReplace = tstring(Line, NextSwitch-Line);
-		Line = NextSwitch+1;
-	} else {
-		FRReplace=Line;
-	}
-
-	while (NextSwitch&&*Line) {
-		switch (*Line) {
-		case 'c':FCaseSensitive=true;break;
-		case 'C':FCaseSensitive=false;break;
-		case 'r':FSearchAs=SA_REGEXP;break;
-		case 'R':FSearchAs=SA_PLAINTEXT;break;
-		case 'p':FRepeating=true;break;
-		case 'P':FRepeating=false;break;
-		case 'f':FRConfirmFile=true;break;
-		case 'F':FRConfirmFile=false;break;
-		case 'l':FRConfirmLine=true;break;
-		case 'L':FRConfirmLine=false;break;
-		case 'd':*ShowDialog=true;break;
-		case 'D':*ShowDialog=false;break;
-		default:BadCmdLine();return false;
-		}
-		Line++;
-	}
-	return true;
-}
-
-bool ProcessCommandLine(const TCHAR *Line,bool *ShowDialog,INT_PTR *Item)
-{
-//	f?:/mask/findtext/options
-//	f?:/mask/findtext/replacetext/options
-//	f?: FindText
-//	ff:/mask/findtext/options
-//	fr:/mask/findtext/replacetext/options
-//	rn:/mask/findtext/replacetext/options
-//	qr:/findtext/replacetext/options
-	if (_tcsnicmp(Line,_T("ff:"),3)==0) return ProcessFFLine(Line+3,ShowDialog,Item);
-	if (_tcsnicmp(Line,_T("fr:"),3)==0) return ProcessFRLine(Line+3,ShowDialog,Item);
-	if (_tcsnicmp(Line,_T("rn:"),3)==0) return ProcessRNLine(Line+3,ShowDialog,Item);
-	if (_tcsnicmp(Line,_T("qr:"),3)==0) return ProcessQRLine(Line+3,ShowDialog,Item);
-
-	TCHAR Switch=Line[0];
-	if (!Switch) { BadCmdLine(); return false; }
-
-	const TCHAR *NextSwitch;
-	if ((Switch!=' ')&&(Switch!='\t')) {
-		if (NextSwitch=_tcschr(Line+1,Switch))
-			if (NextSwitch=_tcschr(NextSwitch+1,Switch))
-				if (NextSwitch=_tcschr(NextSwitch+1,Switch)) 
-					return ProcessFRLine(Line+1,ShowDialog,Item);
-	}
-	return ProcessFFLine(Line+1,ShowDialog,Item);
-}
-
 static LPCWSTR g_szPanelCommands[] = {
 	L"Search", L"Replace", L"Grep", NULL,
 	L"Select", L"Unselect", L"FlipSelection", NULL,
@@ -492,6 +236,15 @@ bool FindRunPreset(CPresetCollection *pColl, int &nItem, int nBreakCode, Operati
 	return true;
 }
 
+bool FindRunPreset(CPresetCollection *pColl, LPCTSTR szName, OperationResult &Result)
+{
+	CPreset *pPreset = pColl->FindMenuPreset(szName);
+	if (pPreset == NULL) return false;
+
+	Result = pPreset->ExecutePreset();
+	return true;
+}
+
 OperationResult OpenPluginFromFilePreset(int nItem, int nBreakCode)
 {
 	OperationResult Result = OR_CANCEL;
@@ -523,6 +276,32 @@ OperationResult OpenPluginFromFilePreset(int nItem, int nBreakCode)
 	}
 
 	return OR_CANCEL;
+}
+
+HANDLE HandleFromOpResult(OperationResult Result)
+{
+	if (Result==OR_PANEL) {
+#ifdef UNICODE
+		wchar_t szCurDir[MAX_PATH];
+		StartupInfo.Control(PANEL_ACTIVE, FCTL_GETCURRENTDIRECTORY, MAX_PATH, (LONG_PTR)szCurDir);
+		CTemporaryPanel *Panel=new CTemporaryPanel(g_PanelItems,szCurDir);
+#else
+		PanelInfo PInfo;
+		StartupInfo.Control(INVALID_HANDLE_VALUE,FCTL_GETPANELINFO,&PInfo);
+		CTemporaryPanel *Panel=new CTemporaryPanel(g_PanelItems,PInfo.CurDir);
+#endif
+		g_PanelItems.clear();
+		return (HANDLE)Panel;
+	} else {
+#ifdef UNICODE
+		StartupInfo.Control(PANEL_ACTIVE, FCTL_UPDATEPANEL, true, NULL);
+		StartupInfo.Control(PANEL_ACTIVE, FCTL_REDRAWPANEL, 0, NULL);
+#else
+		StartupInfo.Control(INVALID_HANDLE_VALUE,FCTL_UPDATEPANEL,(void *)~NULL);
+		StartupInfo.Control(INVALID_HANDLE_VALUE,FCTL_REDRAWPANEL,NULL);
+#endif
+		return NO_PANEL_HANDLE;
+	}
 }
 
 HANDLE OpenPluginFromFileMenu(int Item, bool ShowDialog = true)
@@ -587,28 +366,7 @@ HANDLE OpenPluginFromFileMenu(int Item, bool ShowDialog = true)
 
 	} while (nBreakCode >= 0);
 
-	if (Result==OR_PANEL) {
-#ifdef UNICODE
-		wchar_t szCurDir[MAX_PATH];
-		StartupInfo.Control(PANEL_ACTIVE, FCTL_GETCURRENTDIRECTORY, MAX_PATH, (LONG_PTR)szCurDir);
-		CTemporaryPanel *Panel=new CTemporaryPanel(g_PanelItems,szCurDir);
-#else
-		PanelInfo PInfo;
-		StartupInfo.Control(INVALID_HANDLE_VALUE,FCTL_GETPANELINFO,&PInfo);
-		CTemporaryPanel *Panel=new CTemporaryPanel(g_PanelItems,PInfo.CurDir);
-#endif
-		g_PanelItems.clear();
-		return (HANDLE)Panel;
-	} else {
-#ifdef UNICODE
-		StartupInfo.Control(PANEL_ACTIVE, FCTL_UPDATEPANEL, true, NULL);
-		StartupInfo.Control(PANEL_ACTIVE, FCTL_REDRAWPANEL, 0, NULL);
-#else
-		StartupInfo.Control(INVALID_HANDLE_VALUE,FCTL_UPDATEPANEL,(void *)~NULL);
-		StartupInfo.Control(INVALID_HANDLE_VALUE,FCTL_REDRAWPANEL,NULL);
-#endif
-		return NO_PANEL_HANDLE;
-	}
+	return HandleFromOpResult(Result);
 }
 
 OperationResult OpenPluginFromEditorPreset(int nItem, int nBreakCode)
@@ -787,6 +545,51 @@ bool GetIntValue(FarMacroValue &Value, int &nValue)
 	}
 }
 
+HANDLE RunFilePreset(LPCWSTR szPreset)
+{
+	OperationResult Result = OR_FAILED;
+
+	FindRunPreset(FSPresets, szPreset, Result) ||
+	FindRunPreset(FRPresets, szPreset, Result) ||
+	FindRunPreset(FGPresets, szPreset, Result) ||
+	FindRunPreset(RnPresets, szPreset, Result) ||
+	FindRunPreset(QRPresets, szPreset, Result);
+
+	return HandleFromOpResult(Result);
+}
+
+HANDLE RunEditorPreset(LPCWSTR szPreset)
+{
+	OperationResult Result = OR_FAILED;
+
+	FindRunPreset(ESPresets, szPreset, Result) ||
+	FindRunPreset(ERPresets, szPreset, Result) ||
+	FindRunPreset(EFPresets, szPreset, Result) ||
+	FindRunPreset(ETPresets, szPreset, Result);
+
+	return NO_PANEL_HANDLE;
+}
+
+HANDLE RunViewerPreset(LPCWSTR szPreset)
+{
+	OperationResult Result = OR_FAILED;
+
+	FindRunPreset(VSPresets, szPreset, Result);
+
+	return NO_PANEL_HANDLE;
+}
+
+HANDLE RunBatch(CBatchActionCollection *pBatches, LPCWSTR szBatch)
+{
+	CBatchAction *pAction;
+
+	if (pAction = pBatches->FindMenuAction(szBatch)) {
+		pAction->Execute();
+	}
+
+	return NO_PANEL_HANDLE;
+}
+
 HANDLE OpenFromStringMacro(int nType, LPCWSTR szParam)
 {
 	if (nType == 0) {
@@ -795,18 +598,45 @@ HANDLE OpenFromStringMacro(int nType, LPCWSTR szParam)
 			if (_wcsicmp(g_szPanelCommands[nValue], szParam) == 0)
 				return OpenPluginFromFileMenu(nValue);
 		}
+
+		wstring strLine = szParam, strWord;
+		GetStripWord(strLine, strWord);
+		if (_wcsicmp(strWord.c_str(), L"Preset") == 0) {
+			return RunFilePreset(strLine.c_str());
+		}
+		if (_wcsicmp(strWord.c_str(), L"Batch") == 0) {
+			return RunBatch(g_pPanelBatches, strLine.c_str());
+		}
+
 	} else if (nType == 1) {
 		for (int nValue = 0; nValue < sizeof(g_szEditorCommands)/sizeof(g_szEditorCommands[0]); nValue++) {
 			if (g_szEditorCommands[nValue] == NULL) continue;
 			if (_wcsicmp(g_szEditorCommands[nValue], szParam) == 0)
 				return OpenPluginFromEditorMenu(nValue);
 		}
+
+		wstring strLine = szParam, strWord;
+		GetStripWord(strLine, strWord);
+		if (_wcsicmp(strWord.c_str(), L"Preset") == 0) {
+			return RunEditorPreset(strLine.c_str());
+		}
+		if (_wcsicmp(strWord.c_str(), L"Batch") == 0) {
+			return RunBatch(g_pEditorBatches, strLine.c_str());
+		}
+
 	} else if (nType == 2) {
 		for (int nValue = 0; nValue < sizeof(g_szViewerCommands)/sizeof(g_szViewerCommands[0]); nValue++) {
 			if (g_szViewerCommands[nValue] == NULL) continue;
 			if (_wcsicmp(g_szViewerCommands[nValue], szParam) == 0)
 				return OpenPluginFromViewerMenu(nValue);
 		}
+
+		wstring strLine = szParam, strWord;
+		GetStripWord(strLine, strWord);
+		if (_wcsicmp(strWord.c_str(), L"Preset") == 0) {
+			return RunViewerPreset(strLine.c_str());
+		}
+
 	}
 
 	return NO_PANEL_HANDLE;

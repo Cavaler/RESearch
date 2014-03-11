@@ -1184,6 +1184,10 @@
 			Name="Source Files"
 			>
 			<File
+				RelativePath=".\CommandLine.cpp"
+				>
+			</File>
+			<File
 				RelativePath="Common.cpp"
 				>
 			</File>

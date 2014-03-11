@@ -59,6 +59,8 @@ void ReadActiveScripts();
 void EnumActiveScripts();
 void SaveActiveScripts();
 
+bool ProcessCommandLine(const TCHAR *Line, bool *ShowDialog, INT_PTR *Item);
+
 LPCTSTR ScriptEngine(bool bEnabled);
 int  EngineIndex(const tstring &strValue);
 void SetEngineIndex(int nIndex, tstring &strValue);

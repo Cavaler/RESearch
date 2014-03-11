@@ -362,7 +362,8 @@ void CPresetCollection::FillMenuItems(vector<CFarMenuItemEx> &MenuItems) {
 	}
 }
 
-CPreset *CPresetCollection::FindMenuPreset(int &nIndex) {
+CPreset *CPresetCollection::FindMenuPreset(int &nIndex)
+{
 	for (size_t nPreset = 0; nPreset < size(); nPreset++) {
 		CPreset *pPreset = at(nPreset);
 		if (pPreset->m_bAddToMenu) {
@@ -372,7 +373,17 @@ CPreset *CPresetCollection::FindMenuPreset(int &nIndex) {
 	return NULL;
 }
 
-int CPresetCollection::FindUnusedID() {
+CPreset *CPresetCollection::FindMenuPreset(LPCTSTR szName)
+{
+	for (size_t nPreset = 0; nPreset < size(); nPreset++) {
+		CPreset *pPreset = at(nPreset);
+		if (_tcsicmp(pPreset->Name().c_str(), szName) == 0) return pPreset;
+	}
+	return NULL;
+}
+
+int CPresetCollection::FindUnusedID()
+{
 	int nID = 1;
 	for (size_t nPreset = 0; nPreset < size(); nPreset++) {
 		int nCurID = at(nPreset)->m_nID;
@@ -776,12 +787,24 @@ void CBatchActionCollection::FillMenuItems(vector<CFarMenuItemEx> &MenuItems) {
 	}
 }
 
-CBatchAction *CBatchActionCollection::FindMenuAction(int &nIndex) {
+CBatchAction *CBatchActionCollection::FindMenuAction(int &nIndex)
+{
 	for (size_t nAction = 0; nAction < size(); nAction++) {
 		CBatchAction *pAction = at(nAction);
 		if (pAction->m_bAddToMenu) {
 			if (nIndex == 0) return pAction; else nIndex--;
 		}
 	}
+
+	return NULL;
+}
+
+CBatchAction *CBatchActionCollection::FindMenuAction(LPCTSTR szName)
+{
+	for (size_t nAction = 0; nAction < size(); nAction++) {
+		CBatchAction *pAction = at(nAction);
+		if (_tcsicmp(pAction->m_strName.c_str(), szName) == 0) return pAction;
+	}
+
 	return NULL;
 }
