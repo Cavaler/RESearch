@@ -1,16 +1,29 @@
 Plugin exposed API reference
 
+NOTE: currently Far3 does not allow opening Panel from Plugin call, so you should not really
+use these for File Search for example.
+
 Numeric:
 
-Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", [TTT, ]NNN)
-	TTT is 0 for Panels, 1 for Editor, 2 for Viewer, or can be omitted for auto-detect
-	NNN is a menu item number
+	Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", [TTT, ]NNN)
+		TTT is 0 for Panels, 1 for Editor, 2 for Viewer, or can be omitted for auto-detect
+		NNN is a menu item number
 
 String:
 
-Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", "Search/Replace/Grep/etc")
+	Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", "Search/Replace/Grep/etc")
 
-Not implemented yet:
+	Commands available from panels:
+		Search, Replace, Grep, Select, Unselect, FlipSelection, Rename, RenameSelected,
+		Renumber, UndoRename, ShowLastResults, ClearVariables
 
-Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", "Batch <BatchName>")
-Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", "Preset <PresetName>")
+	Commands available from editor:
+		Search, Replace, Filter, Transliterate, SRAgain, SRAgainRev, ShowLastResults, ClearVariables
+
+	Commands available from viewer:
+		Search, SRAgain, ClearVariables
+
+Batches and presets:
+
+	Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", "Batch <BatchName>")
+	Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", "Preset <PresetName>")
