@@ -397,7 +397,7 @@ bool ReplacePrompt(bool Plugin)
 	Dialog.Add(new CFarCheckBoxItem(40,20,0,MOverwriteBackup,&FROverwriteBackup));
 	Dialog.Add(new CFarCheckBoxItem(40,21,0,MReplaceToNew,&FRReplaceToNew));
 
-	Dialog.AddButtons(MOk,MCancel);
+	Dialog.AddButtons(MOk,MCancel,MBtnClose);
 	Dialog.Add(new CFarButtonItem(60,23,0,0,MBtnPresets));
 
 	Dialog.SetFocus(MMask, 1);
