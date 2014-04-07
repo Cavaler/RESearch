@@ -128,10 +128,21 @@ void DoEditReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, cons
 
 		if (Position.CurLine <= LastLine) {
 			EctlSetPosition(&Position);
-		} else {
+		} else if (Position.CurLine < EdInfo.TotalLines) {
 			Position.CurPos = 0;
 			EctlForceSetPosition(&Position);
 			StartupInfo.EditorControl(ECTL_INSERTSTRING, NULL);
+			EctlForceSetPosition(&Position);
+		} else {
+			//	difficult way to add line at the end
+			Position.CurLine--;
+			EctlForceSetPosition(&Position);
+			EditorGetString GetString = {ITEM_SS(EditorGetString) -1};
+			EctlGetString(&GetString);
+			Position.CurPos = GetString.StringLength;
+			EctlForceSetPosition(&Position);
+			StartupInfo.EditorControl(ECTL_INSERTSTRING, NULL);
+			Position.CurLine++;
 			EctlForceSetPosition(&Position);
 		}
 
