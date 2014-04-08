@@ -129,6 +129,7 @@ void ShowHResultError(int nError, HRESULT hResult, const TCHAR *szHelp = NULL);
 EXTERN CONSOLE_SCREEN_BUFFER_INFO ConInfo;
 void RefreshConsoleInfo();
 
+tstring QuoteString(const TCHAR *Source, int Length, int MaxWidth);
 void   QuoteString (const TCHAR *Source, int Length, vector<tstring> &arrQuoted, int MaxWidth);
 size_t QuoteStrings(const TCHAR *Source, vector<tstring> &arrQuoted, int MaxWidth, int nMaxHeight = -1);
 

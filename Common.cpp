@@ -831,17 +831,21 @@ void RefreshConsoleInfo()
 	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &ConInfo);
 }
 
+tstring QuoteString(const TCHAR *Source, int Length, int MaxWidth)
+{
+	if (Length < 0) Length = _tcslen(Source);
+
+	if (Length > MaxWidth) {
+		size_t nLeft = (MaxWidth-3)/2;
+		return tstring(Source, nLeft) + _T("...") + tstring(Source + Length-nLeft, nLeft);
+	} else {
+		return tstring(Source, Length);
+	}
+}
+
 void QuoteString(const TCHAR *Source, int Length, vector<tstring> &arrQuoted, int MaxWidth)
 {
-	tstring str;
-
-	if (Length>MaxWidth) {
-		size_t nLeft = (MaxWidth-3)/2;
-		str = tstring(Source, nLeft) + _T("...") + tstring(Source + Length-nLeft, nLeft);
-	} else {
-		str = tstring(Source, Length);
-	}
-	arrQuoted.push_back(str);
+	arrQuoted.push_back(QuoteString(Source, Length, MaxWidth));
 }
 
 size_t QuoteStrings(const TCHAR *Source, vector<tstring> &arrQuoted, int MaxWidth, int nMaxHeight)

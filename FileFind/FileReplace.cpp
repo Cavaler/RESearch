@@ -69,6 +69,8 @@ bool ConfirmReplacement(const TCHAR *Found, const TCHAR *Replaced, const TCHAR *
 	size_t nWidth = max(nFoundLen, nReplaceLen);
 	if (nWidth < 60) nWidth = 60;
 
+	tstring strFileName = QuoteString(FileName, -1, nWidth);
+
 	size_t nCount = arrFound.size()+arrReplaced.size();
 
 	CFarDialog Dialog(nWidth+12, nCount+10, _T("FRAskReplace"));
@@ -84,7 +86,7 @@ bool ConfirmReplacement(const TCHAR *Found, const TCHAR *Replaced, const TCHAR *
 		Dialog.Add(new CFarTextItem(-1, 4 + arrFound.size() + I, DIF_SHOWAMPERSAND|DLG_SETCOLOR(0xB0), arrReplaced[I]));
 
 	Dialog.Add(new CFarTextItem(-1, 4 + nCount, 0, MInFile));
-	Dialog.Add(new CFarTextItem(-1, 5 + nCount,  DIF_SHOWAMPERSAND|DLG_SETCOLOR(0x20), FileName));
+	Dialog.Add(new CFarTextItem(-1, 5 + nCount,  DIF_SHOWAMPERSAND|DLG_SETCOLOR(0x20), strFileName.c_str()));
 
 	Dialog.Add(new CFarButtonItem(0, 7 + nCount, DIF_CENTERGROUP|DIF_NOBRACKETS, true,  MReplace));
 	Dialog.Add(new CFarButtonItem(0, 7 + nCount, DIF_CENTERGROUP|DIF_NOBRACKETS, false, MAll));
