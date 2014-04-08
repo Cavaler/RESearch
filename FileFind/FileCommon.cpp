@@ -605,18 +605,58 @@ OperationResult NoFilesFound()
 	return OR_OK;
 }
 
+LONG_PTR WINAPI ConfirmFileDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LONG_PTR lParam2)
+{
+	switch (nMsg) {
+#ifdef FAR3
+	case DN_CTLCOLORDLGITEM:{
+		FarDialogItemColors *pColors = (FarDialogItemColors *)lParam2;
+		if (nParam1 == 2) {
+			pColors->Colors[0].Flags = FCF_4BITMASK;
+			pColors->Colors[0].BackgroundColor = 0x02;
+			pColors->Colors[0].ForegroundColor = 0x00;
+			return true;
+		}
+		break;
+							}
+#endif
+	}
+
+	return pDlg->DefDlgProc(nMsg, nParam1, lParam2);
+}
+
 bool ConfirmFile(int Title, const TCHAR *FileName)
 {
 	if (FileConfirmed) return true;
 
-	const TCHAR *Lines[]={
-		GetMsg(Title),GetMsg(MConfirmRequest),FileName,GetMsg(MOk),GetMsg(MAll),GetMsg(MSkip),GetMsg(MCancel)
-	};
-	switch (StartupInfo.Message(0,_T("FRConfirmFile"),Lines,7,4)) {
-	case 1:FRConfirmFileThisRun=false;
-	case 0:return (FileConfirmed=true);
+	RefreshConsoleInfo();
+
+	tstring strFileName = QuoteString(FileName, -1, ConInfo.dwSize.X-12);
+	int nWidth = max(strFileName.size(), 40);
+
+	CFarDialog Dialog(nWidth+12, 9, _T("FRConfirmFile"));
+	Dialog.SetWindowProc(ConfirmFileDialogProc, 0);
+	Dialog.EnableAutoHotkeys(false);
+	Dialog.AddFrame(Title);
+
+	Dialog.Add(new CFarTextItem(-1, 2, 0, MConfirmRequest));
+	Dialog.Add(new CFarTextItem(-1, 3, DIF_SHOWAMPERSAND|DLG_SETCOLOR(0x20), strFileName.c_str()));
+	Dialog.Add(new CFarTextItem(-1, 4, DIF_SEPARATOR, _T("")));
+
+	Dialog.Add(new CFarButtonItem(0, 5, DIF_CENTERGROUP, true,  MOk));
+	Dialog.Add(new CFarButtonItem(0, 5, DIF_CENTERGROUP, false, MAll));
+	Dialog.Add(new CFarButtonItem(0, 5, DIF_CENTERGROUP, false, MSkip));
+	Dialog.Add(new CFarButtonItem(0, 5, DIF_CENTERGROUP, false, MCancel));
+
+	switch (Dialog.Display(3, -3, -2, -1)) {
+	case 1:
+		FRConfirmFileThisRun = false;
+	case 0:
+		FileConfirmed = true;
+		return true;
+	case 3:
 	case -1:
-	case 3:g_bInterrupted=true;
+		g_bInterrupted = true;
 	}
 
 	return false;
@@ -629,11 +669,27 @@ bool ConfirmFileReadonly(const TCHAR *FileName)
 	if (FRReplaceReadonly == RR_ALWAYS) return true;
 	if (FRReplaceReadonly == RR_NEVER) return false;
 
-	const TCHAR *Lines[]={
-		GetMsg(MREReplace),GetMsg(MTheFile),FileName,GetMsg(MModifyReadonlyRequest),
-		GetMsg(MOk),GetMsg(MAll),GetMsg(MSkip),GetMsg(MCancel)
-	};
-	switch (StartupInfo.Message(0,_T("FRConfirmReadonly"),Lines,8,4)) {
+	RefreshConsoleInfo();
+
+	tstring strFileName = QuoteString(FileName, -1, ConInfo.dwSize.X-12);
+	int nWidth = max(strFileName.size(), 40);
+
+	CFarDialog Dialog(nWidth+12, 10, _T("FRConfirmReadonly"));
+	Dialog.SetWindowProc(ConfirmFileDialogProc, 0);
+	Dialog.EnableAutoHotkeys(false);
+	Dialog.AddFrame(MREReplace);
+
+	Dialog.Add(new CFarTextItem(-1, 2, 0, MTheFile));
+	Dialog.Add(new CFarTextItem(-1, 3, DIF_SHOWAMPERSAND|DLG_SETCOLOR(0x20), strFileName.c_str()));
+	Dialog.Add(new CFarTextItem(-1, 4, 0, MModifyReadonlyRequest));
+	Dialog.Add(new CFarTextItem(-1, 5, DIF_SEPARATOR, _T("")));
+
+	Dialog.Add(new CFarButtonItem(0, 6, DIF_CENTERGROUP, true,  MOk));
+	Dialog.Add(new CFarButtonItem(0, 6, DIF_CENTERGROUP, false, MAll));
+	Dialog.Add(new CFarButtonItem(0, 6, DIF_CENTERGROUP, false, MSkip));
+	Dialog.Add(new CFarButtonItem(0, 6, DIF_CENTERGROUP, false, MCancel));
+
+	switch (Dialog.Display(3, -3, -2, -1)) {
 	case 1:
 		FRConfirmReadonlyThisRun = false;
 	case 0:
@@ -645,6 +701,7 @@ bool ConfirmFileReadonly(const TCHAR *FileName)
 		g_bInterrupted = true;
 		break;
 	}
+
 	return false;
 }
 
