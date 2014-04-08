@@ -14,6 +14,8 @@ enum eStringTable {
 	MQuoteSearch,
 	MQuoteReplace,
 	MEllipsis,
+	MLeftBracket,
+	MRightBracket,
 	MKB,
 	MMB,
 

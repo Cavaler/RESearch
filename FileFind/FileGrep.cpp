@@ -337,7 +337,8 @@ bool GrepPrompt(bool bPlugin)
 	Dialog.Add(new CFarEditItem(20,18,45,DIF_HISTORY,_T("RESearch.GrepOutput"), FGOutputFile));
 	Dialog.Add(new CFarCheckBoxItem(5,19,0,MGrepEditor,&FGOpenInEditor));
 
-	Dialog.Add(new CFarButtonItem(60,11,0,0,MBtnAdvanced));
+	Dialog.Add(new CFarCheckBoxItem(56,11,0,MLeftBracket,&FAdvanced));
+	Dialog.Add(new CFarButtonItem  (62,11,DIF_NOBRACKETS,0,MBtnAdvanced));
 	Dialog.Add(new CFarButtonItem(60,14,0,0,MBtnSettings));
 
 	Dialog.Add(new CFarTextItem(5,21,0,MSearchIn));
@@ -345,7 +346,6 @@ bool GrepPrompt(bool bPlugin)
 
 	Dialog.AddButtons(MOk,MCancel,MBtnClose);
 	Dialog.Add(new CFarButtonItem(60,24,0,0,MBtnPresets));
-	Dialog.Add(new CFarCheckBoxItem(56,11,0,_T(""),&FAdvanced));
 	Dialog.SetFocus(MMask, 1);
 	FACaseSensitive = FADirectoryCaseSensitive = MaskCaseHere();
 
@@ -481,8 +481,8 @@ bool CFGPresetCollection::EditPreset(CPreset *pPreset)
 	int  nAdvancedID = pPreset->m_mapInts["AdvancedID"];
 	bool bFAdvanced = nAdvancedID > 0;
 
-	Dialog.Add(new CFarCheckBoxItem(56,12,0,_T(""),&bFAdvanced));
-	Dialog.Add(new CFarButtonItem(60,12,0,0,MBtnAdvanced));
+	Dialog.Add(new CFarCheckBoxItem(56,12,0,MLeftBracket,&bFAdvanced));
+	Dialog.Add(new CFarButtonItem  (62,12,DIF_NOBRACKETS,0,MBtnAdvanced));
 	Dialog.Add(new CFarCheckBoxItem(5,20,0,MAddToMenu,&pPreset->m_bAddToMenu));
 	Dialog.AddButtons(MOk,MCancel);
 

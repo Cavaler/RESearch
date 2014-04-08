@@ -127,8 +127,8 @@ bool SearchPrompt(bool Plugin)
 	Dialog.Add(new CFarCheckBoxItem(5,14,0,MInverseSearch,&FSInverse));
 	Dialog.Add(new CFarCheckBoxItem(5,15,0,MAllCharTables,&FAllCharTables));
 
-	Dialog.Add(new CFarCheckBoxItem(56,8,0,_T(""),&FAdvanced));
-	Dialog.Add(new CFarButtonItem  (60,8,0,0,MBtnAdvanced));
+	Dialog.Add(new CFarCheckBoxItem(56,8,0,MLeftBracket,&FAdvanced));
+	Dialog.Add(new CFarButtonItem  (62,8,DIF_NOBRACKETS,0,MBtnAdvanced));
 	Dialog.Add(new CFarButtonItem(_tcslen(GetMsg(MSeveralLineRegExp))+10,9,0,0,MEllipsis));
 
 	Dialog.Add(new CFarTextItem(5,17,0,MSearchIn));
@@ -233,8 +233,8 @@ bool CFSPresetCollection::EditPreset(CPreset *pPreset)
 
 	Dialog.Add(new CFarCheckBoxItem(5,15,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
 	Dialog.Add(new CFarCheckBoxItem(5,16,0,MInverseSearch,&pPreset->m_mapInts["Inverse"]));
-	Dialog.Add(new CFarCheckBoxItem(56,9,0,_T(""),&bFAdvanced));
-	Dialog.Add(new CFarButtonItem(60,9,0,0,MBtnAdvanced));
+	Dialog.Add(new CFarCheckBoxItem(56,9,0,MLeftBracket,&bFAdvanced));
+	Dialog.Add(new CFarButtonItem  (62,9,DIF_NOBRACKETS,0,MBtnAdvanced));
 
 	Dialog.Add(new CFarCheckBoxItem(5,18,0,MAddToMenu,&pPreset->m_bAddToMenu));
 	Dialog.AddButtons(MOk,MCancel);

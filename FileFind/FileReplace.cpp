@@ -377,9 +377,9 @@ bool ReplacePrompt(bool Plugin)
 	Dialog.Add(new CFarComboBoxItem(30, 15, 55, 0, new CFarListData(m_lstEngines, false), new CFarEngineStorage(EREvaluateScript)));
 	Dialog.Add(new CFarButtonItem  (60, 15, 0, false, MRunEditor));
 
-	Dialog.Add(new CFarCheckBoxItem(55, 10,0,_T(""),&FAdvanced));
-	Dialog.Add(new CFarButtonItem(59, 10,0,0,MBtnAdvanced));
-	Dialog.Add(new CFarButtonItem  (_tcslen(GetMsg(MSeveralLineRegExp))+10,11,0,0,MEllipsis));
+	Dialog.Add(new CFarCheckBoxItem(56,10,0,MLeftBracket,&FAdvanced));
+	Dialog.Add(new CFarButtonItem  (62,10,DIF_NOBRACKETS,0,MBtnAdvanced));
+	Dialog.Add(new CFarButtonItem(_tcslen(GetMsg(MSeveralLineRegExp))+10,11,0,0,MEllipsis));
 	Dialog.Add(new CFarButtonItem(57, 12, 0, false, MBtnREBuilder));
 
 	Dialog.Add(new CFarTextItem(5,17,0,MSearchIn));
@@ -522,8 +522,8 @@ bool CFRPresetCollection::EditPreset(CPreset *pPreset)
 	Dialog.Add(new CFarComboBoxItem(30, 17, 55, 0, new CFarListData(m_lstEngines, false), new CFarEngineStorage(pPreset->m_mapStrings["Script"])));
 	Dialog.Add(new CFarButtonItem(60, 17, 0, FALSE, MRunEditor));
 
-	Dialog.Add(new CFarCheckBoxItem(56,12,0,_T(""),&bFAdvanced));
-	Dialog.Add(new CFarButtonItem(60,12,0,0,MBtnAdvanced));
+	Dialog.Add(new CFarCheckBoxItem(56,12,0,MLeftBracket,&bFAdvanced));
+	Dialog.Add(new CFarButtonItem  (62,12,DIF_NOBRACKETS,0,MBtnAdvanced));
 	Dialog.Add(new CFarCheckBoxItem(5,19,0,MAddToMenu,&pPreset->m_bAddToMenu));
 	Dialog.AddButtons(MOk,MCancel);
 
