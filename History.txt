@@ -10,7 +10,14 @@ Planned:
 	? Searching in streams
 	? Extended batch properties, overriding preset properties (e.g. Search from beginning)
 	+ Command to "lock" read-only file before replacing
-	
+
+Version 8.35 (15.04.2014)
+	! Editor Replace rewritten again, previous version was a total failure
+	* Cosmetic updates
+	* Option to use short filenames from panels (along with long ones, not instead of)
+	* Syntax for calling Preset/Batches from Lua changed
+	* PCRE updated to version 8.35
+
 Version 8.30 (11.03.2014)
 	! Rewritten Editor Replace: supports changing EOLs, and optimized insert/remove string operations
 	- Fixed encoding detection in panels
