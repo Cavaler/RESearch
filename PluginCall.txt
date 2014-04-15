@@ -23,7 +23,11 @@ String:
 	Commands available from viewer:
 		Search, SRAgain, ClearVariables
 
+Menus:
+	Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", "Menu")		Shows RESearch menu
+	Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", "Batch")	Shows Batches  menu
+
 Batches and presets:
 
-	Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", "Batch <BatchName>")
-	Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", "Preset <PresetName>")
+	Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", "Batch", "<BatchName>")
+	Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", "Preset", "<PresetName>")

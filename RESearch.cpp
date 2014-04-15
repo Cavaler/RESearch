@@ -599,13 +599,12 @@ HANDLE OpenFromStringMacro(int nType, LPCWSTR szParam)
 				return OpenPluginFromFileMenu(nValue);
 		}
 
-		wstring strLine = szParam, strWord;
-		GetStripWord(strLine, strWord);
-		if (_wcsicmp(strWord.c_str(), L"Preset") == 0) {
-			return RunFilePreset(strLine.c_str());
+		if (_wcsicmp(szParam, L"Menu") == 0) {
+			g_bFromCmdLine = false;
+			return OpenPluginFromFileMenu(0);
 		}
-		if (_wcsicmp(strWord.c_str(), L"Batch") == 0) {
-			return RunBatch(g_pPanelBatches, strLine.c_str());
+		if (_wcsicmp(szParam, L"Batch") == 0) {
+			g_pPanelBatches->ShowMenu();
 		}
 
 	} else if (nType == 1) {
@@ -615,13 +614,12 @@ HANDLE OpenFromStringMacro(int nType, LPCWSTR szParam)
 				return OpenPluginFromEditorMenu(nValue);
 		}
 
-		wstring strLine = szParam, strWord;
-		GetStripWord(strLine, strWord);
-		if (_wcsicmp(strWord.c_str(), L"Preset") == 0) {
-			return RunEditorPreset(strLine.c_str());
+		if (_wcsicmp(szParam, L"Menu") == 0) {
+			g_bFromCmdLine = false;
+			return OpenPluginFromEditorMenu(0);
 		}
-		if (_wcsicmp(strWord.c_str(), L"Batch") == 0) {
-			return RunBatch(g_pEditorBatches, strLine.c_str());
+		if (_wcsicmp(szParam, L"Batch") == 0) {
+			g_pEditorBatches->ShowMenu();
 		}
 
 	} else if (nType == 2) {
@@ -631,10 +629,12 @@ HANDLE OpenFromStringMacro(int nType, LPCWSTR szParam)
 				return OpenPluginFromViewerMenu(nValue);
 		}
 
-		wstring strLine = szParam, strWord;
-		GetStripWord(strLine, strWord);
-		if (_wcsicmp(strWord.c_str(), L"Preset") == 0) {
-			return RunViewerPreset(strLine.c_str());
+		if (_wcsicmp(szParam, L"Menu") == 0) {
+			g_bFromCmdLine = false;
+			return OpenPluginFromViewerMenu(0);
+		}
+		if (_wcsicmp(szParam, L"Batch") == 0) {
+//			g_pViewerBatches->ShowMenu();
 		}
 
 	}
@@ -644,10 +644,27 @@ HANDLE OpenFromStringMacro(int nType, LPCWSTR szParam)
 
 HANDLE OpenFromStringMacro(int nType, LPCWSTR szParam1, LPCWSTR szParam2)
 {
-	if (_wcsicmp(szParam1, L"Preset") == 0) {
-	}
+	if (nType == 0) {
+		if (_wcsicmp(szParam1, L"Preset") == 0) {
+			return RunFilePreset(szParam2);
+		}
+		if (_wcsicmp(szParam1, L"Batch") == 0) {
+			return RunBatch(g_pPanelBatches, szParam2);
+		}
 
-	if (_wcsicmp(szParam1, L"Batch") == 0) {
+	} else if (nType == 1) {
+		if (_wcsicmp(szParam1, L"Preset") == 0) {
+			return RunEditorPreset(szParam2);
+		}
+		if (_wcsicmp(szParam1, L"Batch") == 0) {
+			return RunBatch(g_pEditorBatches, szParam2);
+		}
+
+	} else if (nType == 2) {
+		if (_wcsicmp(szParam1, L"Preset") == 0) {
+			return RunViewerPreset(szParam2);
+		}
+
 	}
 
 	return NO_PANEL_HANDLE;
