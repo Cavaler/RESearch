@@ -304,6 +304,11 @@ bool MultipleMasksApply(const TCHAR *FileName)
 	}
 }
 
+bool MultipleMasksApply(const TCHAR *LongFilename, const TCHAR *ShortFilename)
+{
+	return MultipleMasksApply(LongFilename) || (FUseShortFilenames && MultipleMasksApply(ShortFilename));
+}
+
 void FileFillNamedParameters(const TCHAR *szFileName)
 {
 	FillDefaultNamedParameters(szFileName);
@@ -426,7 +431,7 @@ bool DoScanDirectory(tstring strDirectory, panelitem_vector &PanelItems, Process
 			if (!_tcscmp(FindData.cFileName,_T("."))) continue;
 			if (!_tcscmp(FindData.cFileName,_T(".."))) continue;
 		}
-		if (!MultipleMasksApply(FindData.cFileName)) continue;
+		if (!MultipleMasksApply(FindData.cFileName, FindData.cAlternateFileName)) continue;
 
 		FIND_DATA Found = FindData;
 		Found.strFileName = strDirectory+Found.strFileName;
@@ -447,7 +452,8 @@ bool DoScanDirectory(tstring strDirectory, panelitem_vector &PanelItems, Process
 			//	Re-fill named parameters
 			if (FMaskAsRegExp) {
 				LPCTSTR szName = _tcsrchr(Found.cFileName, '\\');
-				MultipleMasksApply(szName ? szName+1 : Found.cFileName);
+				LPCTSTR szShortName = _tcsrchr(Found.cAlternateFileName, '\\');
+				MultipleMasksApply(szName ? szName+1 : Found.cFileName, szShortName ? szShortName+1 : Found.cAlternateFileName);
 			}
 			FileFillNamedParameters(Found.cFileName);
 			ProcessFile(&Found, PanelItems);
@@ -498,7 +504,7 @@ bool ScanPluginDirectories(CPanelInfo &Info,panelitem_vector &PanelItems,Process
 			GetFullPathName(FarPanelFileName(Items[I]),MAX_PATH,CurDir,NULL);
 			if (!DoScanDirectory(CurDir, PanelItems, ProcessFile)) break;
 		} else {
-			if (!MultipleMasksApply(FarPanelFileName(Items[I]))) continue;
+			if (!MultipleMasksApply(FarPanelFileName(Items[I]), FarPanelShortFileName(Items[I]))) continue;
 			g_bInterrupted|=Interrupted();
 			if (g_bInterrupted) break;
 
@@ -569,7 +575,7 @@ bool ScanDirectories(panelitem_vector &PanelItems, ProcessFileProc ProcessFile)
 
 			FIND_DATA CurFindData = PanelToFD(PInfo.SelectedItems[I]);
 			
-			bool bMultipleMasksApply = MultipleMasksApply(CurFindData.cFileName);
+			bool bMultipleMasksApply = MultipleMasksApply(CurFindData.cFileName, CurFindData.cAlternateFileName);
 			CurFindData.strFileName = strCurDir + CurFindData.strFileName;
 
 			if (CurFindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {

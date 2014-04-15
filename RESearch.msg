@@ -178,6 +178,7 @@ MAlways				"&Always"										"&Всегда"
 MSkipSystemFolders	"Skip preconfig&ured system folders:"	"Пропускать заданные системные каталоги:"
 MUseSingleCR		"Search for CR-onl&y EOL"				"Искать переводы строк из одного CR"
 MEditSrchAfterFile	"Au&tomatic search in editor"			"Автомати&ческий поиск в редакторе"
+MUseShortFilenames	"Use short filenames as well"			"Использовать и короткие имена файлов"
 
 MGrepSettings		"Grep settings"						"Нaстройки Grep"
 MGrepFileNamePrepend	"Prepend to file name:"				"Добавлять к началу имени файла:"

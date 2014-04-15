@@ -178,6 +178,7 @@ enum eStringTable {
 	MSkipSystemFolders,
 	MUseSingleCR,
 	MEditSrchAfterFile,
+	MUseShortFilenames,
 
 	MGrepSettings,
 	MGrepFileNamePrepend,

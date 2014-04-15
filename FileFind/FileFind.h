@@ -136,6 +136,7 @@ OperationResult NoFilesFound();
 void InitFoundPosition();
 
 bool MultipleMasksApply(const TCHAR *Filename);
+bool MultipleMasksApply(const TCHAR *LongFilename, const TCHAR *ShortFilename);
 void FileFillNamedParameters(const TCHAR *szFileName);
 void AddFile(const WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems, bool bSearch = false);
 void AddFile(const FIND_DATA *FindData, panelitem_vector &PanelItems, bool bSearch = false);

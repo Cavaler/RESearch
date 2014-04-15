@@ -956,21 +956,22 @@ void ConfigureFile()
 	Dialog.Add(new CFarRadioButtonItem(37,5,0,MAsk,(int *)&FRReplaceReadonly,RR_ASK));
 	Dialog.Add(new CFarRadioButtonItem(37,6,0,MAlways,(int *)&FRReplaceReadonly,RR_ALWAYS));
 
-	Dialog.Add(new CFarCheckBoxItem(5, 9, 0, MSkipSystemFolders, &FASkipSystemFolders));
-	Dialog.Add(new CFarEditItem(9, 10, 60, DIF_HISTORY,_T("RESearch.SystemFolders"), FASystemFolders));
-	Dialog.Add(new CFarCheckBoxItem(5, 12, 0, MUseSingleCR, &FSUseSingleCR));
-	Dialog.Add(new CFarCheckBoxItem(5, 13, 0, MEditSrchAfterFile, &FSEditSrchAfterFile));
+	Dialog.Add(new CFarCheckBoxItem(5, 9,  0, MSkipSystemFolders, &FASkipSystemFolders));
+	Dialog.Add(new CFarEditItem    (9, 10, 60, DIF_HISTORY,_T("RESearch.SystemFolders"), FASystemFolders));
+	Dialog.Add(new CFarCheckBoxItem(5, 11, 0, MUseShortFilenames, &FUseShortFilenames));
+	Dialog.Add(new CFarCheckBoxItem(5, 13, 0, MUseSingleCR, &FSUseSingleCR));
+	Dialog.Add(new CFarCheckBoxItem(5, 14, 0, MEditSrchAfterFile, &FSEditSrchAfterFile));
 
-	Dialog.Add(new CFarTextItem(5,15,0,MBufferSize));
-	Dialog.Add(new CFarEditItem(34,15,40,0,NULL,FBufferSize,new CFarIntegerRangeValidator(1,1024)));
-	Dialog.Add(new CFarTextItem(43,15,DIF_NOAUTOHOTKEY,MMB));
+	Dialog.Add(new CFarTextItem(5,  16, 0, MBufferSize));
+	Dialog.Add(new CFarEditItem(34, 16, 40, 0, NULL, FBufferSize, new CFarIntegerRangeValidator(1, 1024)));
+	Dialog.Add(new CFarTextItem(43, 16, DIF_NOAUTOHOTKEY, MMB));
 
 #ifdef UNICODE
-	Dialog.Add(new CFarTextItem(5,17,0,MDefaultCP));
-	Dialog.Add(new CFarRadioButtonItem(35,17,0,MDefaultOEM,&g_bDefaultOEM,true));
-	Dialog.Add(new CFarRadioButtonItem(45,17,0,MDefaultANSI,&g_bDefaultOEM,false));
-	Dialog.Add(new CFarTextItem(5,18,0,MAllCPInclude));
-	Dialog.Add(new CFarButtonItem(35,18,0,false,MAllCPSelect));
+	Dialog.Add(new CFarTextItem  (5,  18, 0, MDefaultCP));
+	Dialog.Add(new CFarRadioButtonItem(35, 18, 0, MDefaultOEM,  &g_bDefaultOEM, true ));
+	Dialog.Add(new CFarRadioButtonItem(45, 18, 0, MDefaultANSI, &g_bDefaultOEM, false));
+	Dialog.Add(new CFarTextItem  (5,  19, 0, MAllCPInclude));
+	Dialog.Add(new CFarButtonItem(35, 19, 0, false, MAllCPSelect));
 
 	Dialog.AddButtons(MOk,MCancel);
 	do {

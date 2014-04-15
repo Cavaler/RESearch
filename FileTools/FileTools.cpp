@@ -80,7 +80,7 @@ void ChangeSelection(int How) {
 	PInfo.GetInfo(false);
 
 	for (size_t I=0; I<PInfo.ItemsNumber; I++) {
-		if (MultipleMasksApply(FarPanelFileName(PInfo.PanelItems[I]))) {
+		if (MultipleMasksApply(FarPanelFileName(PInfo.PanelItems[I]), FarPanelShortFileName(PInfo.PanelItems[I]))) {
 			switch (How) {
 			case MSelect:
 				PInfo.PanelItems[I].Flags|=PPIF_SELECTED;
