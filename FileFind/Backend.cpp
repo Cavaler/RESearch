@@ -118,6 +118,9 @@ bool CFileBackend::Open(LPCTSTR szInFileName, LPCTSTR szOutFileName)
 
 	m_strOutFileName = szOutFileName;
 
+	//	Needed for codepage auto-detect
+	ReadUp(0, 64);
+
 	return true;
 }
 
