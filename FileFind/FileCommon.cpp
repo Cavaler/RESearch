@@ -1201,39 +1201,46 @@ void XLatBuffer(BYTE *Buffer,int Length,int Table) {
 }
 #endif
 
+int TestUTF8Byte(char c);
+
 bool IsTextUTF8(const char* Buffer,size_t Length)
 {
 	bool Ascii = true;
 	size_t Octets = 0;
+	size_t Utf8 = 0;
 
 	for (size_t i = 0; i < Length; i++)
 	{
-		BYTE c=Buffer[i];
+		BYTE c = Buffer[i];
+		int t = TestUTF8Byte(c);
 
-		if (c & 0x80) Ascii=false;
+		if (t != 1) Ascii = false;
 
 		if (Octets > 0)
 		{
-			if ((c & 0xC0) != 0x80) return false;
-			Octets--;
+			if (t != -1) return false;
+			if (--Octets == 0)
+			{
+				Utf8++;
+				if (Utf8 > 32) return true;
+			}
 		}
 		else
 		{
-			if (c&0x80)
+			switch (t)
 			{
-				while (c&0x80)
-				{
-					c<<=1;
-					Octets++;
-				}
-
-				Octets--;
-				if (Octets == 0) return false;
+			case 1:
+				continue;
+			case -1:
+				return false;
+			default:
+				Octets = t-1;
+				break;
 			}
 		}
 	}
 
-	return (Octets == 0) && !Ascii;
+	return !Ascii;
 }
 
 eLikeUnicode LikeUnicode(const char *Buffer, int Size, int &nSkip)
