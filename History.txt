@@ -11,6 +11,13 @@ Planned:
 	? Extended batch properties, overriding preset properties (e.g. Search from beginning)
 	+ Command to "lock" read-only file before replacing
 
+Version 8.36 (17.04.2014)
+	- Fixed some issues with EOLs in Editor
+	- Fixed encoding detection for Replace in panels
+	- Added Unicode/UTF-8 without BOM auto-detect, using modified code from Far3
+	- Setting for mask case sensitivity works properly
+	* Presets for (Quick)Rename include case-sensitivity
+
 Version 8.35 (15.04.2014)
 	! Editor Replace rewritten again, previous version was a total failure
 	* Cosmetic updates
