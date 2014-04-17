@@ -135,7 +135,7 @@ int FPrepareMaskPattern()
 	if (FASkipSystemFolders) {
 		if (FASystemFoldersMask) delete FASystemFoldersMask;
 
-		FASystemFoldersMask = new CFarMaskSet(FASystemFolders.c_str());
+		FASystemFoldersMask = new CFarMaskSet(FASystemFolders.c_str(), MaskCaseHere());
 		if (!FASystemFoldersMask->Valid()) {
 			delete FASystemFoldersMask;
 			FASystemFoldersMask = NULL;
@@ -145,9 +145,9 @@ int FPrepareMaskPattern()
 	REErrorField  = MMask;
 	if (FMaskAsRegExp) {
 		tstring strPattern = REParam.FillNamedReferences(FMask);
-		if (!PreparePattern(&FMaskPattern,&FMaskPatternExtra,strPattern,false)) return false;
+		if (!PreparePattern(&FMaskPattern, &FMaskPatternExtra, strPattern, MaskCaseHere())) return false;
 	} else {
-		FMaskSet = new CFarMaskSet(FMask.c_str());
+		FMaskSet = new CFarMaskSet(FMask.c_str(), MaskCaseHere());
 		if (!FMaskSet->Valid()) {
 			delete FMaskSet;
 			FMaskSet = NULL;
@@ -954,12 +954,12 @@ bool AdvancedSettings()
 	Dialog.AddFrame(MAdvancedOptions);
 	Dialog.Add(new CFarCheckBoxItem(5,2,0,MFullFileNameMatch,&FAFullFileNameMatch));
 	Dialog.Add(new CFarEditItem(5,3,59,DIF_HISTORY,_T("FullPath"), FAFullFileName));
-	Dialog.Add(new CFarCheckBoxItem(50,2,0,MCaseSensitive,&FACaseSensitive));
+	Dialog.Add(new CFarCheckBoxItem(50,2,0,MCaseSensitiveMask,&FACaseSensitive));
 	Dialog.Add(new CFarCheckBoxItem(62,3,0,MInverse,&FAFullFileNameInverse));
 
 	Dialog.Add(new CFarCheckBoxItem(5,4,0,MDirectoryMatch,&FADirectoryMatch));
 	Dialog.Add(new CFarEditItem(5,5,59,DIF_HISTORY,_T("RecurseDirectory"), FADirectoryName));
-	Dialog.Add(new CFarCheckBoxItem(50,4,0,MCaseSensitive,&FADirectoryCaseSensitive));
+	Dialog.Add(new CFarCheckBoxItem(50,4,0,MCaseSensitiveMask2,&FADirectoryCaseSensitive));
 	Dialog.Add(new CFarCheckBoxItem(62,5,0,MInverse,&FADirectoryInverse));
 	Dialog.Add(new CFarTextItem(5,6,0,MRecursionLevel));
 	Dialog.Add(new CFarEditItem(25,6,30,0,NULL,(int &)FARecursionLevel,new CFarIntegerRangeValidator(0,255)));
@@ -1100,12 +1100,12 @@ bool CFAPresetCollection::EditPreset(CPreset *pPreset)
 
 	Dialog.Add(new CFarCheckBoxItem(5,4,0,MFullFileNameMatch,&pPreset->m_mapInts["FullFileNameMatch"]));
 	Dialog.Add(new CFarEditItem(5,5,59,DIF_HISTORY,_T("FullPath"), pPreset->m_mapStrings["FullFileName"]));
-	Dialog.Add(new CFarCheckBoxItem(50,4,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
+	Dialog.Add(new CFarCheckBoxItem(50,4,0,MCaseSensitiveMask,&pPreset->m_mapInts["CaseSensitive"]));
 	Dialog.Add(new CFarCheckBoxItem(62,5,0,MInverse,&pPreset->m_mapInts["FullFileNameInverse"]));
 
 	Dialog.Add(new CFarCheckBoxItem(5,6,0,MDirectoryMatch,&pPreset->m_mapInts["DirectoryMatch"]));
 	Dialog.Add(new CFarEditItem(5,7,59,DIF_HISTORY,_T("RecurseDirectory"), pPreset->m_mapStrings["DirectoryName"]));
-	Dialog.Add(new CFarCheckBoxItem(50,6,0,MCaseSensitive,&pPreset->m_mapInts["DirectoryCaseSensitive"]));
+	Dialog.Add(new CFarCheckBoxItem(50,6,0,MCaseSensitiveMask2,&pPreset->m_mapInts["DirectoryCaseSensitive"]));
 	Dialog.Add(new CFarCheckBoxItem(62,7,0,MInverse,&pPreset->m_mapInts["DirectoryInverse"]));
 	Dialog.Add(new CFarTextItem(5,8,0,MRecursionLevel));
 	Dialog.Add(new CFarEditItem(32,8,40,0,NULL,&pPreset->m_mapInts["RecursionLevel"],new CFarIntegerRangeValidator(0,255)));

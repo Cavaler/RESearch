@@ -54,6 +54,8 @@ enum eStringTable {
 	MREReplace,
 	MMask,
 	MAsRegExp,
+	MCaseSensitiveMask,
+	MCaseSensitiveMask2,
 	MText,
 	MCaseSensitive,
 	MPlainText,

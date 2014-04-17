@@ -5,13 +5,13 @@ CParameterSet g_RnParamSet(RenameFilesExecutor,
 	"Mask", &MaskText, "Text", &SearchText, "Replace", &ReplaceText, "Script", &EREvaluateScript,
 	"@Mask", &FMask, "@Text", &FText, "@Replace", &FRReplace, NULL,
 	"AdvancedID", &FAdvancedID, NULL,
-	"MaskAsRegExp", &FMaskAsRegExp, "TextAsRegExp", &FSearchAs, "Repeating", &FRepeating,
+	"MaskAsRegExp", &FMaskAsRegExp, "TextAsRegExp", &FSearchAs, "CaseSensitive", &FCaseSensitive, "Repeating", &FRepeating,
 	"AsScript", &FREvaluate, NULL
 	);
 CParameterSet g_QRParamSet(QuickRenameFilesExecutor,
 	"Text", &SearchText, "Replace", &ReplaceText,
 	"@Text", &FText, "@Replace", &FRReplace, NULL, NULL,
-	"TextAsRegExp", &FSearchAs, "Repeating", &FRepeating, NULL
+	"TextAsRegExp", &FSearchAs, "CaseSensitive", &FCaseSensitive, "Repeating", &FRepeating, NULL
 	);
 
 bool FTAskOverwrite;
@@ -440,7 +440,6 @@ bool RenameFilesPrompt()
 	Dialog.AddFrame(MRename);
 
 	Dialog.Add(new CFarCheckBoxItem(25,2,0,MAsRegExp,&FMaskAsRegExp));
-	Dialog.Add(new CFarCheckBoxItem(52,2,0,MCaseSensitive,&FACaseSensitive));
 	Dialog.Add(new CFarTextItem(5,2,0,MMask));
 	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,_T("Masks"), MaskText));
 
@@ -989,7 +988,7 @@ bool CRnPresetCollection::EditPreset(CPreset *pPreset)
 	Dialog.AddFrame(MRnPreset);
 	Dialog.SetUseID(true);
 
-	Dialog.Add(new CFarCheckBoxItem(35,4,0,MAsRegExp,&pPreset->m_mapInts["MaskAsRegExp"]));
+	Dialog.Add(new CFarCheckBoxItem(25,4,0,MAsRegExp,&pPreset->m_mapInts["MaskAsRegExp"]));
 
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
 	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,_T("RESearch.PresetName"), pPreset->Name()));
@@ -1002,8 +1001,9 @@ bool CRnPresetCollection::EditPreset(CPreset *pPreset)
 	Dialog.Add(new CFarTextItem(5,8,0,MReplaceWith));
 	Dialog.Add(new CFarEditItem(5,9,70,DIF_HISTORY,_T("ReplaceText"), pPreset->m_mapStrings["Replace"]));
 
-	Dialog.Add(new CFarCheckBoxItem(35,6,0,MRegExp,&pPreset->m_mapInts["TextAsRegExp"]));
-	Dialog.Add(new CFarCheckBoxItem(35,8,0,MRepeating,&pPreset->m_mapInts["Repeating"]));
+	Dialog.Add(new CFarCheckBoxItem(25,6,0,MRegExp,&pPreset->m_mapInts["TextAsRegExp"]));
+	Dialog.Add(new CFarCheckBoxItem(52,6,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
+	Dialog.Add(new CFarCheckBoxItem(25,8,0,MRepeating,&pPreset->m_mapInts["Repeating"]));
 
 	Dialog.Add(new CFarCheckBoxItem(5, 11, 0, MEvaluateAsScript, &pPreset->m_mapInts["AsScript"]));
 	Dialog.Add(new CFarComboBoxItem(30, 11, 55, 0, new CFarListData(m_lstEngines, false), new CFarEngineStorage(pPreset->m_mapStrings["Script"])));
@@ -1041,7 +1041,8 @@ bool CQRPresetCollection::EditPreset(CPreset *pPreset)
 	CFarDialog Dialog(76,15,_T("QRPresetDlg"));
 	Dialog.AddFrame(MQRPreset);
 
-	Dialog.Add(new CFarCheckBoxItem(35,4,0,MRegExp,&pPreset->m_mapInts["TextAsRegExp"]));
+	Dialog.Add(new CFarCheckBoxItem(25,4,0,MRegExp,&pPreset->m_mapInts["TextAsRegExp"]));
+	Dialog.Add(new CFarCheckBoxItem(52,4,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
 
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
 	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,_T("RESearch.PresetName"), pPreset->Name()));
@@ -1051,7 +1052,7 @@ bool CQRPresetCollection::EditPreset(CPreset *pPreset)
 
 	Dialog.Add(new CFarTextItem(5,6,0,MReplaceWith));
 	Dialog.Add(new CFarEditItem(5,7,70,DIF_HISTORY,_T("ReplaceText"), pPreset->m_mapStrings["Replace"]));
-	Dialog.Add(new CFarCheckBoxItem(35,6,0,MRepeating,&pPreset->m_mapInts["Repeating"]));
+	Dialog.Add(new CFarCheckBoxItem(25,6,0,MRepeating,&pPreset->m_mapInts["Repeating"]));
 
 	Dialog.Add(new CFarCheckBoxItem(5,9,0,MAddToMenu,&pPreset->m_bAddToMenu));
 	Dialog.AddButtons(MOk,MCancel);

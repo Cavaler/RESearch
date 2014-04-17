@@ -54,6 +54,8 @@ MRESearch			"Regular Expression Search"				"Поиск по регулярном
 MREReplace			"Regular Expression Replace"			"Замена по регулярному выражению"
 MMask				"File &mask(s):"						"&Маска(и) файлов:"
 MAsRegExp			"As re&gular expression"				"Как регулярное выражение"
+MCaseSensitiveMask	"Case-sensitive"						"Учитывать регистр"
+MCaseSensitiveMask2	"Case-sensitive"						"Учитывать регистр"
 MText				"Containing te&xt:"						"&Содержащий текст:"
 MCaseSensitive		"Case-sensitive"						"Учитывать регистр"
 MPlainText			"&Plain text"							"&Обычный текст"
