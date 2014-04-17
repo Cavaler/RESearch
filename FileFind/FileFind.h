@@ -154,8 +154,11 @@ void FReadRegistry (CFarSettingsKey Key);
 void FWriteRegistry(CFarSettingsKey Key);
 void FCleanup(bool PatternOnly);
 
+#ifndef UNICODE
+void XLatBuffer(BYTE *Buffer,int Length,int Table);
+#endif
 enum eLikeUnicode {UNI_NONE, UNI_LE, UNI_BE, UNI_UTF8};
-eLikeUnicode LikeUnicode(const char *Buffer, int Size);
+eLikeUnicode LikeUnicode(const char *Buffer, int Size, int &nSkip);
 
 //	All sizes are in characters
 template<class CHAR> void SkipNoCRLF(const CHAR *&Buffer,int *Size);

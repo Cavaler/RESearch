@@ -8,19 +8,20 @@ bool RunSearchANSI(CFileBackend *pBackend, IFrontend *pFrontend)
 {
 	shared_ptr<IDecoder> pDecoder;
 
-	eLikeUnicode nDetect = LikeUnicode(pBackend->Buffer(), pBackend->Size());
+	int nSkip;
+	eLikeUnicode nDetect = LikeUnicode(pBackend->Buffer(), pBackend->Size(), nSkip);
 	switch (nDetect) {
 	case UNI_LE:
 		pDecoder = new CUnicodeToOEMDecoder();
-		if (!pBackend->SetDecoder(pDecoder, 2)) return false;
+		if (!pBackend->SetDecoder(pDecoder, nSkip)) return false;
 		return pFrontend->Process(pBackend);
 	case UNI_BE:
 		pDecoder = new CReverseUnicodeToOEMDecoder();
-		if (!pBackend->SetDecoder(pDecoder, 2)) return false;
+		if (!pBackend->SetDecoder(pDecoder, nSkip)) return false;
 		return pFrontend->Process(pBackend);
 	case UNI_UTF8:
 		pDecoder = new CUTF8ToOEMDecoder();
-		if (!pBackend->SetDecoder(pDecoder, 3)) return false;
+		if (!pBackend->SetDecoder(pDecoder, nSkip)) return false;
 		return pFrontend->Process(pBackend);
 	}
 
@@ -80,19 +81,20 @@ bool RunSearchUnicode(CFileBackend *pBackend, IFrontend *pFrontend)
 {
 	shared_ptr<IDecoder> pDecoder;
 
-	eLikeUnicode nDetect = LikeUnicode(pBackend->Buffer(), pBackend->Size());
+	int nSkip;
+	eLikeUnicode nDetect = LikeUnicode(pBackend->Buffer(), pBackend->Size(), nSkip);
 	switch (nDetect) {
 	case UNI_LE:
 		pDecoder = new CPassthroughDecoder();
-		if (!pBackend->SetDecoder(pDecoder, 2)) return false;
+		if (!pBackend->SetDecoder(pDecoder, nSkip)) return false;
 		return pFrontend->Process(pBackend);
 	case UNI_BE:
 		pDecoder = new CReverseUnicodeToUnicodeDecoder();
-		if (!pBackend->SetDecoder(pDecoder, 2)) return false;
+		if (!pBackend->SetDecoder(pDecoder, nSkip)) return false;
 		return pFrontend->Process(pBackend);
 	case UNI_UTF8:
 		pDecoder = new CUTF8ToUnicodeDecoder();
-		if (!pBackend->SetDecoder(pDecoder, 3)) return false;
+		if (!pBackend->SetDecoder(pDecoder, nSkip)) return false;
 		return pFrontend->Process(pBackend);
 	}
 

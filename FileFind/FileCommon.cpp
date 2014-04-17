@@ -1195,12 +1195,84 @@ bool LocalFileTime(TCHAR cDrive)
 
 //////////////////////////////////////////////////////////////////////////
 
-eLikeUnicode LikeUnicode(const char *Buffer, int Size) {
+#ifndef UNICODE
+void XLatBuffer(BYTE *Buffer,int Length,int Table) {
+	for (register int I=0;I<Length;I++) Buffer[I]=XLatTables[Table].DecodeTable[Buffer[I]];
+}
+#endif
+
+bool IsTextUTF8(const char* Buffer,size_t Length)
+{
+	bool Ascii = true;
+	size_t Octets = 0;
+
+	for (size_t i = 0; i < Length; i++)
+	{
+		BYTE c=Buffer[i];
+
+		if (c & 0x80) Ascii=false;
+
+		if (Octets > 0)
+		{
+			if ((c & 0xC0) != 0x80) return false;
+			Octets--;
+		}
+		else
+		{
+			if (c&0x80)
+			{
+				while (c&0x80)
+				{
+					c<<=1;
+					Octets++;
+				}
+
+				Octets--;
+				if (Octets == 0) return false;
+			}
+		}
+	}
+
+	return (Octets == 0) && !Ascii;
+}
+
+eLikeUnicode LikeUnicode(const char *Buffer, int Size, int &nSkip)
+{
+	nSkip = 0;
 	if (Size < 2) return UNI_NONE;
 
-	if ((Buffer[0] == '\xFF') && (Buffer[1] == '\xFE')) return UNI_LE;
-	if ((Buffer[0] == '\xFE') && (Buffer[1] == '\xFF')) return UNI_BE;
-	if ((Size >= 3) && (Buffer[0] == '\xEF') && (Buffer[1] == '\xBB') && (Buffer[2] == '\xBF')) return UNI_UTF8;
+	if ((Buffer[0] == '\xFF') && (Buffer[1] == '\xFE')) { nSkip = 2; return UNI_LE; }
+	if ((Buffer[0] == '\xFE') && (Buffer[1] == '\xFF')) { nSkip = 2; return UNI_BE; }
+	if ((Size >= 3) && (Buffer[0] == '\xEF') && (Buffer[1] == '\xBB') && (Buffer[2] == '\xBF')) { nSkip = 3; return UNI_UTF8; }
+
+	int test =
+		IS_TEXT_UNICODE_STATISTICS|
+		IS_TEXT_UNICODE_REVERSE_STATISTICS|
+		IS_TEXT_UNICODE_CONTROLS|
+		IS_TEXT_UNICODE_REVERSE_CONTROLS|
+		IS_TEXT_UNICODE_ILLEGAL_CHARS|
+		IS_TEXT_UNICODE_ODD_LENGTH|
+		IS_TEXT_UNICODE_NULL_BYTES;
+
+	if (IsTextUnicode(Buffer, Size, &test) || true)
+	{
+		if (!(test&IS_TEXT_UNICODE_ODD_LENGTH) && !(test&IS_TEXT_UNICODE_ILLEGAL_CHARS))
+		{
+			if ((test&IS_TEXT_UNICODE_NULL_BYTES) || (test&IS_TEXT_UNICODE_CONTROLS) || (test & IS_TEXT_UNICODE_REVERSE_CONTROLS))
+			{
+				if ((test&IS_TEXT_UNICODE_CONTROLS) || (test&IS_TEXT_UNICODE_STATISTICS))
+				{
+					return UNI_LE;
+				}
+				else if ((test&IS_TEXT_UNICODE_REVERSE_CONTROLS) || (test&IS_TEXT_UNICODE_REVERSE_STATISTICS))
+				{
+					return UNI_BE;
+				}
+			}
+		}
+	}
+
+	if (IsTextUTF8(Buffer, Size)) return UNI_UTF8;
 
 	return UNI_NONE;
 }
