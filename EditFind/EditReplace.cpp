@@ -117,7 +117,7 @@ void DoEditReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, cons
 	if (bCachedReplace) {
 		if (!g_LineBuffer.empty()) {
 			strGetString.assign(&g_LineBuffer[0], &g_LineBuffer[0]+g_LineBuffer.size());
-			strGetString += g_DefEOL;
+			strGetString += g_LastEOL;
 		}
 	} else {
 		EditorGetString GetString = {ITEM_SS(EditorGetString) -1};
@@ -164,6 +164,7 @@ void DoEditReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, cons
 		LastLine--;
 	}
 	EctlForceSetPosition(&Position);
+	RefreshEditorInfo();
 
 	//	Setting actual text
 	for (size_t nLine = 0; nLine < arrLines.size(); nLine++)
@@ -171,10 +172,11 @@ void DoEditReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, cons
 		Position.CurLine = FirstLine + nLine;
 		EctlSetPosition(&Position);
 
-		if (bCachedReplace && (g_LineOffsets.size() == 1) && nLine == arrLines.size()-1)
+		if (bCachedReplace && (g_LineOffsets.size() == 1) && (nLine == arrLines.size()-1))
 		{
 			g_FirstLine = Position.CurLine;
 			ToArray(arrLines[nLine], g_LineBuffer);
+			g_LastEOL = arrLines[nLine].StringEOL;
 
 			//	Doing SetString() here to update view
 			if (!NoAsking) EctlSetString(&arrLines[nLine]);
@@ -528,7 +530,7 @@ bool ReplaceInTextByLine(int FirstLine, int StartPos, int LastLine, int EndPos, 
 				SetString.StringText   = &g_LineBuffer[0];
 				SetString.StringLength = g_LineBuffer.size();
 			}
-			SetString.StringEOL    = g_DefEOL.c_str();
+			SetString.StringEOL    = g_LastEOL.c_str();
 
 			EctlSetString(&SetString);
 		}
@@ -551,12 +553,21 @@ bool _EditorReplaceAgain()
 	return EditorReplaceAgain();
 }
 
+void FindDefaultEOL()
+{
+	EditorSetPosition FirstLine = {ITEM_SS(EditorSetPosition) 0, -1, -1, -1, -1, -1};
+	EctlForceSetPosition(&FirstLine);
+
+	EditorGetString String = {ITEM_SS(EditorGetString) -1};
+	SetDefEOL(EctlGetString(&String) ? String.StringEOL : _T("\r\n"));
+}
+
 bool EditorReplaceAgain()
 {
 	RefreshEditorInfo();
 	RefreshEditorColorInfo();
 	PatchEditorInfo(EdInfo);
-	EctlForceSetPosition(NULL);
+	FindDefaultEOL();
 	ClearLineBuffer();
 
 	EditorStartUndo();

@@ -75,6 +75,8 @@ EXTERN vector<TCHAR>	g_LineBuffer;
 EXTERN vector<int>		g_LineOffsets;
 EXTERN size_t			g_FirstLine;
 EXTERN tstring			g_DefEOL;
+EXTERN tstring			g_LastEOL;
+void SetDefEOL(LPCTSTR szEOL);
 void FillLineBuffer(size_t FirstLine, size_t LastLine);
 void ClearLineBuffer();
 
@@ -157,7 +159,7 @@ void ECleanup(bool PatternOnly);
 
 extern "C" const unsigned char *far_maketables(struct CharTableSet *pTable);
 
-void EctlGetString(EditorGetString *String);
+int  EctlGetString(EditorGetString *String);
 tstring EctlGetString(int nLine);
 tstring ToString   (const EditorGetString &String);
 tstring ToStringEOL(const EditorGetString &String);

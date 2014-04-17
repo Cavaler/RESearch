@@ -180,6 +180,7 @@ void ClearLineBuffer()
 
 void SetDefEOL(LPCTSTR szEOL)
 {
+	g_LastEOL = szEOL;
 	if (CSO::cstrlen(szEOL) > 0) {
 		g_DefEOL = szEOL;
 	} else if (g_DefEOL.empty()) {
@@ -200,7 +201,7 @@ void FillSingleLineBuffer(size_t FirstLine)
 		g_LineOffsets.resize(1);
 		g_LineOffsets[0] = 0;
 
-		g_DefEOL = String.StringEOL;
+		SetDefEOL(String.StringEOL);
 	} else if (g_LineOffsets.size() > 1) {
 		size_t nCut = g_LineOffsets[1];
 		g_LineBuffer.resize(nCut);
@@ -765,12 +766,12 @@ void OEMToEditor(string &String) {
 
 #endif
 
-void EctlGetString(EditorGetString *String)
+int EctlGetString(EditorGetString *String)
 {
 #ifdef FAR3
 	String->StructSize = sizeof(EditorGetString);
 #endif
-	StartupInfo.EditorControl(ECTL_GETSTRING, String);
+	return StartupInfo.EditorControl(ECTL_GETSTRING, String);
 }
 
 tstring EctlGetString(int nLine)
