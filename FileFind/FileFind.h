@@ -154,21 +154,10 @@ void FReadRegistry (CFarSettingsKey Key);
 void FWriteRegistry(CFarSettingsKey Key);
 void FCleanup(bool PatternOnly);
 
-#ifndef UNICODE
-void XLatBuffer(BYTE *Buffer,int Length,int Table);
-#endif
 enum eLikeUnicode {UNI_NONE, UNI_LE, UNI_BE, UNI_UTF8};
 eLikeUnicode LikeUnicode(const char *Buffer, int Size);
-bool FromUnicodeDetect(const char *Buffer, int Size, vector<TCHAR> &arrData, eLikeUnicode nDetect);
-bool FromUnicodeSkipDetect(const char *Buffer, int Size, vector<TCHAR> &arrData, eLikeUnicode nDetect);
-bool FromUnicodeLE(const char *Buffer, int Size, vector<TCHAR> &arrData);
-bool FromUnicodeBE(const char *Buffer, int Size, vector<TCHAR> &arrData);
-
-bool FromUTF8(const char *Buffer, int Size, vector<char> &arrData);
-bool FromUTF8(const char *Buffer, int Size, vector<wchar_t> &arrData);
 
 //	All sizes are in characters
-
 template<class CHAR> void SkipNoCRLF(const CHAR *&Buffer,int *Size);
 template<class CHAR> void SkipCRLF(const CHAR *&Buffer,int *Size);
 template<class CHAR> void SkipWholeLine(const CHAR *&Buffer,int *Size);

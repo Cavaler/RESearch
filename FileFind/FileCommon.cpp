@@ -1195,69 +1195,6 @@ bool LocalFileTime(TCHAR cDrive)
 
 //////////////////////////////////////////////////////////////////////////
 
-#ifndef UNICODE
-void XLatBuffer(BYTE *Buffer,int Length,int Table) {
-	for (register int I=0;I<Length;I++) Buffer[I]=XLatTables[Table].DecodeTable[Buffer[I]];
-}
-#endif
-
-bool FromUnicodeLE(const char *Buffer, int Size, vector<TCHAR> &arrData) {
-	arrData.resize(Size/2);
-	if (arrData.size() == 0) return true;
-
-#ifdef UNICODE
-	wmemmove(&arrData[0], (LPCWSTR)Buffer, Size/2);
-#else
-	int nResult = WideCharToMultiByte(CP_OEMCP, 0, (LPCWSTR)Buffer, Size/2, &arrData[0], arrData.size(), NULL, NULL);
-	if (nResult <= 0) return false;
-	arrData.resize(nResult);
-#endif
-
-	return true;
-}
-
-// Could be slow
-bool FromUnicodeBE(const char *Buffer, int Size, vector<TCHAR> &arrData) {
-	arrData.resize(Size/2);
-	if (arrData.size() == 0) return true;
-
-	for (int nChar = 0; nChar < Size/2; nChar++) {
-		wchar_t wcSingle = (Buffer[nChar*2]<<8) + Buffer[nChar*2+1];
-#ifdef UNICODE
-		arrData[nChar] = wcSingle;
-#else
-		WideCharToMultiByte(CP_OEMCP, 0, &wcSingle, 1, &arrData[nChar], 1, NULL, NULL);
-#endif
-	}
-	return true;
-}
-
-bool FromUTF8(const char *Buffer, int Size, vector<char> &arrData) {
-	if (Size == 0) {arrData.clear(); return true;}
-
-	vector<wchar_t> arrWData(Size);
-	int nResult = MultiByteToWideChar(CP_UTF8, 0, Buffer, Size, &arrWData[0], arrWData.size());
-	if (nResult <= 0) return false;
-
-	arrData.resize(nResult);
-	nResult = WideCharToMultiByte(CP_OEMCP, 0, &arrWData[0], nResult, &arrData[0], nResult, NULL, NULL);
-	if (nResult <= 0) return false;
-	arrData.resize(nResult);
-
-	return true;
-}
-
-bool FromUTF8(const char *Buffer, int Size, vector<wchar_t> &arrData) {
-	if (Size == 0) {arrData.clear(); return true;}
-
-	arrData.resize(Size);
-	int nResult = MultiByteToWideChar(CP_UTF8, 0, Buffer, Size, &arrData[0], arrData.size());
-	if (nResult <= 0) return false;
-	arrData.resize(nResult);
-
-	return true;
-}
-
 eLikeUnicode LikeUnicode(const char *Buffer, int Size) {
 	if (Size < 2) return UNI_NONE;
 
@@ -1266,28 +1203,4 @@ eLikeUnicode LikeUnicode(const char *Buffer, int Size) {
 	if ((Size >= 3) && (Buffer[0] == '\xEF') && (Buffer[1] == '\xBB') && (Buffer[2] == '\xBF')) return UNI_UTF8;
 
 	return UNI_NONE;
-}
-
-bool FromUnicodeDetect(const char *Buffer, int Size, vector<TCHAR> &arrData, eLikeUnicode nDetect) {
-	switch (nDetect) {
-	case UNI_LE:
-		return FromUnicodeLE(Buffer, Size, arrData);
-	case UNI_BE:
-		return FromUnicodeBE(Buffer, Size, arrData);
-	case UNI_UTF8:
-		return FromUTF8(Buffer, Size, arrData);
-	}
-	return false;
-}
-
-bool FromUnicodeSkipDetect(const char *Buffer, int Size, vector<TCHAR> &arrData, eLikeUnicode nDetect) {
-	switch (nDetect) {
-	case UNI_LE:
-		return FromUnicodeLE(Buffer+2, Size-2, arrData);
-	case UNI_BE:
-		return FromUnicodeBE(Buffer+2, Size-2, arrData);
-	case UNI_UTF8:
-		return FromUTF8(Buffer+3, Size-3, arrData);
-	}
-	return false;
 }
