@@ -117,8 +117,8 @@ void DoEditReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, cons
 	if (bCachedReplace) {
 		if (!g_LineBuffer.empty()) {
 			strGetString.assign(&g_LineBuffer[0], &g_LineBuffer[0]+g_LineBuffer.size());
-			strGetString += g_LastEOL;
 		}
+		strGetString += g_LastEOL;
 	} else {
 		EditorGetString GetString = {ITEM_SS(EditorGetString) -1};
 		EctlGetString(&GetString);
