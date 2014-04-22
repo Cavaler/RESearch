@@ -11,7 +11,7 @@ Numeric:
 
 String:
 
-	Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", "Search/Replace/Grep/etc")
+	Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", "<command>")
 
 	Commands available from panels:
 		Search, Replace, Grep, Select, Unselect, FlipSelection, Rename, RenameSelected,
@@ -23,11 +23,32 @@ String:
 	Commands available from viewer:
 		Search, SRAgain, ClearVariables
 
+Complete operations:
+	Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", "<command>", "<param1>", "<value1>"[, "param2", "value2"...])
+
+	This executes the same way as Preset with these parameters would have executed.
+	Semicolon in parameter list separates strings from integers/booleans
+
+	Commands and parameters available from panels:
+		Search			Mask, Text; MaskAsRegExp, CaseSensitive, SearchAs, IsInverse, AdvancedID
+		Replace			Mask, Text, Replace, Script; MaskAsRegExp, CaseSensitive, AllCharTables, SearchAs, AsScript, AdvancedID
+		Grep			Mask, Text; MaskAsRegExp, CaseSensitive, SearchAs, IsInverse, OutputNames, AddLineCount, AddMatchCound, OutputLines, AddLineNumbers, AddContext, ContextLines, MatchingLinePart
+		Rename			Mask, Text, Replace, Script; MaskAsRegExp, TextAsRegExp, CaseSensitive, Repeating, AdvancedID
+		RenameSelected	Text, Replace;TextAsRegExp, CaseSensitive, Repeating
+
+	Commands and parameters available from editor:
+		Search			Text; InSelection, IsRegExp, CaseSensitive, SeveralLine, Reverse, FromCurrent, ListAll, CountAll
+		Replace			Text, Replace, Script; InSelection, IsRegExp, CaseSensitive, SeveralLine, Reverse, FromCurrent, RemoveEmpty, RemoveNoMatch, AsScript
+		Filter			Text; LeaveFilter, IsRegExp, CaseSensitive, Reverse, FromCurrent
+		Transliterate	Text, Replace; 
+
+	Commands and parameters available from viewer:
+		Search			Text; IsRegExp, CaseSensitive, SeveralLine
+
 Menus:
 	Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", "Menu")		Shows RESearch menu
 	Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", "Batch")	Shows Batches  menu
 
 Batches and presets:
-
 	Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", "Batch", "<BatchName>")
 	Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", "Preset", "<PresetName>")
