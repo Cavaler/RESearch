@@ -654,15 +654,17 @@ bool ConfirmFile(int Title, const TCHAR *FileName)
 	Dialog.Add(new CFarButtonItem(0, 5, DIF_CENTERGROUP, false, MSkip));
 	Dialog.Add(new CFarButtonItem(0, 5, DIF_CENTERGROUP, false, MCancel));
 
-	switch (Dialog.Display(3, -3, -2, -1)) {
+	switch (Dialog.Display(3, -4, -3, -2)) {
 	case 1:
 		FRConfirmFileThisRun = false;
 	case 0:
 		FileConfirmed = true;
 		return true;
-	case 3:
+	case 2:
+		break;
 	case -1:
 		g_bInterrupted = true;
+		break;
 	}
 
 	return false;
@@ -695,14 +697,13 @@ bool ConfirmFileReadonly(const TCHAR *FileName)
 	Dialog.Add(new CFarButtonItem(0, 6, DIF_CENTERGROUP, false, MSkip));
 	Dialog.Add(new CFarButtonItem(0, 6, DIF_CENTERGROUP, false, MCancel));
 
-	switch (Dialog.Display(3, -3, -2, -1)) {
+	switch (Dialog.Display(3, -4, -3, -2)) {
 	case 1:
 		FRConfirmReadonlyThisRun = false;
 	case 0:
 		return true;
 	case 2:
 		break;
-	case 3:
 	case -1:
 		g_bInterrupted = true;
 		break;

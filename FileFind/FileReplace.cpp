@@ -94,7 +94,7 @@ bool ConfirmReplacement(const TCHAR *Found, const TCHAR *Replaced, const TCHAR *
 	Dialog.Add(new CFarButtonItem(0, 7 + nCount, DIF_CENTERGROUP|DIF_NOBRACKETS, false, MSkip));
 	Dialog.Add(new CFarButtonItem(0, 7 + nCount, DIF_CENTERGROUP|DIF_NOBRACKETS, false, MSkipFile));
 	Dialog.Add(new CFarButtonItem(0, 7 + nCount, DIF_CENTERGROUP|DIF_NOBRACKETS, false, MCancel));
-	int Result = Dialog.Display(6, -6, -5, -4, -3, -2, -1);
+	int Result = Dialog.Display(5, -6, -5, -4, -3, -2);
 
 	switch (Result) {
 	case 2:
@@ -107,7 +107,6 @@ bool ConfirmReplacement(const TCHAR *Found, const TCHAR *Replaced, const TCHAR *
 		break;
 	case 4:
 		FRSkipThisFile = true;
-	case 5:
 	case -1:
 		g_bInterrupted = true;
 		break;
