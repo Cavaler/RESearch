@@ -59,6 +59,7 @@ EXTERN bool EReverse VALUE(false);
 EXTERN bool EIncremental VALUE(false);
 EXTERN bool ESearchAgainCalled VALUE(false);
 EXTERN bool EInSelection;
+EXTERN int  EInSelectionPreset;
 EXTERN bool EFromCurrentPosition VALUE(false);
 
 EXTERN tstring ETextUpcase;
@@ -115,6 +116,7 @@ OperationResult EditorReplaceExecutor();
 OperationResult EditorFilterExecutor();
 OperationResult EditorTransliterateExecutor();
 void EditorSeekToBeginEnd();
+bool EditorUpdateSelectionPosition();
 void EditorUpdatePresetPosition();
 
 void PatchEditorInfo(EditorInfo &EdInfo);

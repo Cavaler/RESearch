@@ -778,6 +778,9 @@ bool EditorReplace()
 
 OperationResult EditorReplaceExecutor()
 {
+	if (!EditorUpdateSelectionPosition())
+		return OR_FAILED;
+
 	if (!EPreparePattern(SearchText)) return OR_FAILED;
 
 	EText = SearchText;
@@ -817,7 +820,7 @@ bool CERPresetCollection::EditPreset(CPreset *pPreset)
 	Dialog.Add(new CFarCheckBoxItem(35, 9, 0, MSeveralLine, &pPreset->m_mapInts["SeveralLine"]));
 	Dialog.Add(new CFarCheckBoxItem(5, 10, 0, MCaseSensitive, &pPreset->m_mapInts["CaseSensitive"]));
 	Dialog.Add(new CFarCheckBoxItem(5, 11, 0, MReverseSearch,&pPreset->m_mapInts["Reverse"]));
-	Dialog.Add(new CFarCheckBoxItem(35,11, 0, MInSelection, &pPreset->m_mapInts["InSelection"]));
+	Dialog.Add(new CFarCheckBox3Item(35,11, 0, MInSelection, &pPreset->m_mapInts["InSelection"]));
 
 	Dialog.Add(new CFarCheckBoxItem(5, 12, 0, MRemoveEmpty, &pPreset->m_mapInts["RemoveEmpty"]));
 	Dialog.Add(new CFarCheckBoxItem(5, 13, 0, MRemoveNoMatch, &pPreset->m_mapInts["RemoveNoMatch"]));

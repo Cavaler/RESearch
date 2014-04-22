@@ -2,16 +2,18 @@
 #include "..\RESearch.h"
 
 CParameterSet g_ESParamSet(EditorSearchExecutor,
-	"Text", &SearchText, "@Text", &EText, NULL, NULL,
+	"Text", &SearchText, "@Text", &EText, NULL,
+	"InSelection", &EInSelectionPreset, NULL,
 	"IsRegExp", &ERegExp, "CaseSensitive", &ECaseSensitive, "SeveralLine", &ESeveralLine,
-	"Reverse", &EReverse, "InSelection", &EInSelection,
+	"Reverse", &EReverse,
 	"ListAll", &EListAllFromPreset, "FromCurrent", &EFromCurrentPosition, "CountAll", &ECountAllFromPreset, NULL
 					 );
 CParameterSet g_ERParamSet(EditorReplaceExecutor,
 	"Text", &SearchText, "Replace", &ReplaceText, "Script", &EREvaluateScript, 
-	 "@Text", &EText,  "@Replace", &ERReplace, NULL, NULL,
+	"@Text", &EText,  "@Replace", &ERReplace, NULL,
+	"InSelection", &EInSelectionPreset, NULL,
 	"IsRegExp", &ERegExp, "CaseSensitive", &ECaseSensitive, "SeveralLine", &ESeveralLine,
-	"Reverse", &EReverse, "InSelection", &EInSelection,
+	"Reverse", &EReverse,
 	"RemoveEmpty", &ERRemoveEmpty, "RemoveNoMatch", &ERRemoveNoMatch,
 	"AsScript", &EREvaluate, "FromCurrent", &EFromCurrentPosition, NULL
 					 );
@@ -896,15 +898,33 @@ void EditorSeekToBeginEnd()
 	}
 }
 
+bool EditorUpdateSelectionPosition()
+{
+	RefreshEditorInfo();
+
+	switch (EInSelectionPreset)
+	{
+	case 0:
+		EInSelection = false;
+		return true;
+	case 1:
+		if (EdInfo.BlockType == BTYPE_NONE)
+			return false;
+		EInSelection = true;
+		return true;
+	case 2:
+		EInSelection = (EdInfo.BlockType != BTYPE_NONE);
+		return true;
+	}
+
+	return false;
+}
+
 void EditorUpdatePresetPosition()
 {
 	if (EFromCurrentPosition) {
 		EFromCurrentPosition = false;
-		RefreshEditorInfo();
-		if (EdInfo.BlockType == BTYPE_NONE)
-			EInSelection = false;
 	} else {
 		EditorSeekToBeginEnd();
-		EInSelection = false;
 	}
 }
