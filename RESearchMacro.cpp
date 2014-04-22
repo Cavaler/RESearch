@@ -36,9 +36,32 @@ bool GetIntValue(FarMacroValue &Value, int &nValue)
 	}
 }
 
-bool GetStringValue(FarMacroValue &Value, tstring &strValue)
+bool GetStringValue(FarMacroValue &Value, string &strValue)
 {
 	switch (Value.Type) {
+	case FMVT_INTEGER:
+		strValue = FormatStrA("%d", (int)Value.Integer);
+		return true;
+	case FMVT_DOUBLE:
+		strValue = FormatStrA("%f", (int)Value.Double);
+		return true;
+	case FMVT_STRING:
+		strValue = FormatStrA("%S", Value.String);
+		return true;
+	default:
+		return false;
+	}
+}
+
+bool GetStringValue(FarMacroValue &Value, wstring &strValue)
+{
+	switch (Value.Type) {
+	case FMVT_INTEGER:
+		strValue = FormatStrW(L"%d", (int)Value.Integer);
+		return true;
+	case FMVT_DOUBLE:
+		strValue = FormatStrW(L"%f", (int)Value.Double);
+		return true;
 	case FMVT_STRING:
 		strValue = Value.String;
 		return true;
@@ -188,21 +211,124 @@ int GetAreaType()
 	return -1;
 }
 
+bool ApplyMacroParameters(CParameterSet &Set, const OpenMacroInfo *MInfo)
+{
+	for (size_t nItem = 1; nItem < MInfo->Count-1; nItem += 2)
+	{
+		string strName;
+		if (!GetStringValue(MInfo->Values[nItem], strName))
+			return false;
+
+		map<string, tstring *>::iterator its = Set.m_mapStrings.find(strName);
+		if (its != Set.m_mapStrings.end())
+		{
+			wstring strValue;
+			if (!GetStringValue(MInfo->Values[nItem+1], strValue))
+				return false;
+			*its->second = strValue;
+			continue;
+		}
+
+		map<string, int *>::iterator iti = Set.m_mapInts.find(strName);
+		if (iti != Set.m_mapInts.end())
+		{
+			int nValue;
+			if (!GetIntValue(MInfo->Values[nItem+1], nValue))
+				return false;
+			*iti->second = nValue;
+			continue;
+		}
+
+		map<string, bool *>::iterator itb = Set.m_mapBools.find(strName);
+		if (itb != Set.m_mapBools.end())
+		{
+			int nValue;
+			if (!GetIntValue(MInfo->Values[nItem+1], nValue))
+				return false;
+			*itb->second = nValue != 0;
+			continue;
+		}
+
+		return false;
+	}
+
+	return true;
+}
+
 HANDLE OpenPluginFromFileParameters(const OpenMacroInfo *MInfo)
 {
-	return NO_PANEL_HANDLE;
+	if (MInfo->Values[0].Type != FMVT_STRING)
+		return NO_PANEL_HANDLE;
+
+	CParameterSet *pSet = NULL;
+	if (_wcsicmp(MInfo->Values[0].String, L"Search") == 0)
+		pSet = &g_FSParamSet;
+	else if (_wcsicmp(MInfo->Values[0].String, L"Replace") == 0)
+		pSet = &g_FRParamSet;
+	else if (_wcsicmp(MInfo->Values[0].String, L"Grep") == 0)
+		pSet = &g_FGParamSet;
+	else if (_wcsicmp(MInfo->Values[0].String, L"Rename") == 0)
+		pSet = &g_RnParamSet;
+	else if (_wcsicmp(MInfo->Values[0].String, L"RenameSelected") == 0)
+		pSet = &g_QRParamSet;
+
+	if (pSet == NULL)
+		return NO_PANEL_HANDLE;
+
+	CParameterBackup _Backup(*pSet);
+
+	if (!ApplyMacroParameters(*pSet, MInfo))
+		return NO_PANEL_HANDLE;
+
+	return HandleFromOpResult(pSet->m_Executor());
 }
 
 HANDLE OpenPluginFromEditorParameters(const OpenMacroInfo *MInfo)
 {
-	CPresetCollection *pCollection = NULL;
+	if (MInfo->Values[0].Type != FMVT_STRING)
+		return NO_PANEL_HANDLE;
 
-	return NO_PANEL_HANDLE;
+	CParameterSet *pSet = NULL;
+	if (_wcsicmp(MInfo->Values[0].String, L"Search") == 0)
+		pSet = &g_ESParamSet;
+	else if (_wcsicmp(MInfo->Values[0].String, L"Replace") == 0)
+		pSet = &g_ERParamSet;
+	else if (_wcsicmp(MInfo->Values[0].String, L"Filter") == 0)
+		pSet = &g_EFParamSet;
+	else if (_wcsicmp(MInfo->Values[0].String, L"Transliterate") == 0)
+		pSet = &g_ETParamSet;
+
+	if (pSet == NULL)
+		return NO_PANEL_HANDLE;
+
+	EFromCurrentPosition = true;
+
+	CParameterBackup _Backup(*pSet);
+
+	if (!ApplyMacroParameters(*pSet, MInfo))
+		return NO_PANEL_HANDLE;
+
+	return HandleFromOpResult(pSet->m_Executor());
 }
 
 HANDLE OpenPluginFromViewerParameters(const OpenMacroInfo *MInfo)
 {
-	return NO_PANEL_HANDLE;
+	if (MInfo->Values[0].Type != FMVT_STRING)
+		return NO_PANEL_HANDLE;
+
+	CParameterSet *pSet = NULL;
+	if (_wcsicmp(MInfo->Values[0].String, L"Search") == 0)
+		pSet = &g_VSParamSet;
+
+	if (pSet == NULL)
+		return NO_PANEL_HANDLE;
+
+	CParameterBackup _Backup(*pSet);
+
+	if (!ApplyMacroParameters(*pSet, MInfo))
+		return NO_PANEL_HANDLE;
+
+	return HandleFromOpResult(pSet->m_Executor());
 }
 
 HANDLE OpenFromMacro(const OpenMacroInfo *MInfo)
