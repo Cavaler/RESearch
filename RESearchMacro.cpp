@@ -301,7 +301,10 @@ HANDLE OpenPluginFromEditorParameters(const OpenMacroInfo *MInfo)
 	if (pSet == NULL)
 		return NO_PANEL_HANDLE;
 
+	//	Some sensible defaults
 	EFromCurrentPosition = true;
+	EListAllFromPreset   = false;
+	ECountAllFromPreset  = false;
 
 	CParameterBackup _Backup(*pSet);
 
