@@ -61,6 +61,16 @@ void SaveActiveScripts();
 
 bool ProcessCommandLine(const TCHAR *Line, bool *ShowDialog, INT_PTR *Item);
 
+bool FindRunPreset(CPresetCollection *pColl, int &nItem, int nBreakCode, OperationResult &Result);
+bool FindRunPreset(CPresetCollection *pColl, LPCTSTR szName, OperationResult &Result);
+HANDLE HandleFromOpResult(OperationResult Result);
+HANDLE OpenPluginFromFileMenu(int Item, bool ShowDialog = true);
+HANDLE OpenPluginFromEditorMenu(int Item);
+HANDLE OpenPluginFromViewerMenu(int Item);
+#ifdef FAR3
+HANDLE OpenFromMacro(const OpenMacroInfo *MInfo);
+#endif
+
 LPCTSTR ScriptEngine(bool bEnabled);
 int  EngineIndex(const tstring &strValue);
 void SetEngineIndex(int nIndex, tstring &strValue);

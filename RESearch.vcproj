@@ -1376,6 +1376,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\RESearchMacro.cpp"
+				>
+			</File>
+			<File
 				RelativePath="Scripting.cpp"
 				>
 			</File>
