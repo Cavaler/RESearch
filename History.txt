@@ -11,7 +11,11 @@ Planned:
 	? Extended batch properties, overriding preset properties (e.g. Search from beginning)
 	+ Command to "lock" read-only file before replacing
 
-Version 8.37 (22.04.2014)
+Version 8.39 (05.05.2014)
+	* Always restore selection after Editor Replace
+	- Workaround for adding EOL to line without EOL
+
+Version 8.38 (22.04.2014)
 	- File Replace confirmations fixed
 	* Three-state In Selection Only checkbox for Edit presets
 	+ Can execute complete operations from Lua, see PluginCall.txt for details
