@@ -172,7 +172,9 @@ void DoEditReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, cons
 		Position.CurLine = FirstLine + nLine;
 		EctlSetPosition(&Position);
 
-		if (bCachedReplace && (g_LineOffsets.size() == 1) && (nLine == arrLines.size()-1))
+		bool bLastLine = nLine == arrLines.size()-1;
+
+		if (bCachedReplace && (g_LineOffsets.size() == 1) && bLastLine)
 		{
 			g_FirstLine = Position.CurLine;
 			ToArray(arrLines[nLine], g_LineBuffer);
@@ -183,7 +185,10 @@ void DoEditReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, cons
 		}
 		else
 		{
-			EctlSetString(&arrLines[nLine]);
+			if (bLastLine)
+				EctlSetStringWithWorkarounds(&arrLines[nLine]);
+			else
+				EctlSetString(&arrLines[nLine]);
 		}
 	}
 
@@ -532,7 +537,7 @@ bool ReplaceInTextByLine(int FirstLine, int StartPos, int LastLine, int EndPos, 
 			}
 			SetString.StringEOL    = g_LastEOL.c_str();
 
-			EctlSetString(&SetString);
+			EctlSetStringWithWorkarounds(&SetString);
 		}
 
 		if (ERRemoveNoMatch && !Matched) {
@@ -559,6 +564,7 @@ void FindDefaultEOL()
 	EctlForceSetPosition(&FirstLine);
 
 	EditorGetString String = {ITEM_SS(EditorGetString) -1};
+	g_DefEOL.clear();
 	SetDefEOL(EctlGetString(&String) ? String.StringEOL : _T("\r\n"));
 
 	FirstLine.CurLine = EdInfo.CurLine;

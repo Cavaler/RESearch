@@ -168,6 +168,7 @@ tstring ToStringEOL(const EditorGetString &String);
 void ToArray   (const EditorGetString &String, vector<TCHAR> &arrBuffer);
 void ToArray   (const EditorSetString &String, vector<TCHAR> &arrBuffer);
 void EctlSetString(EditorSetString *String);
+void EctlSetStringWithWorkarounds(EditorSetString *String);
 void EctlSetPosition(EditorSetPosition *Position);
 void EctlForceSetPosition(EditorSetPosition *Position);
 

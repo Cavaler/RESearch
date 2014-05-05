@@ -823,6 +823,39 @@ void EctlSetString(EditorSetString *String)
 	StartupInfo.EditorControl(ECTL_SETSTRING, String);
 }
 
+void EctlSetStringWithWorkarounds(EditorSetString *String)
+{
+	EditorGetString GetString = {ITEM_SS(EditorGetString) String->StringNumber};
+	EctlGetString(&GetString);
+
+#ifdef FAR3
+	String->StructSize = sizeof(EditorSetString);
+#endif
+
+	if ((CSO::cstrlen(GetString.StringEOL) == 0) && (CSO::cstrlen(String->StringEOL) > 0))
+	{
+		int StringNumber = String->StringNumber;
+		if (StringNumber < 0) {
+			RefreshEditorInfo();
+			StringNumber = EdInfo.CurLine;
+		}
+
+		StartupInfo.EditorControl(ECTL_INSERTSTRING, String);
+		RefreshEditorInfo();
+		CEditorSetString EmptyString(-1, _T(""), _T(""), 0);
+		StartupInfo.EditorControl(ECTL_SETSTRING, &EmptyString);
+		RefreshEditorInfo();
+
+		EditorSetPosition Position = {ITEM_SS(EditorSetPosition) StringNumber, -1, -1, -1, -1, -1};
+		EctlForceSetPosition(&Position);
+		StartupInfo.EditorControl(ECTL_SETSTRING, String);
+	}
+	else
+	{
+		StartupInfo.EditorControl(ECTL_SETSTRING, String);
+	}
+}
+
 int _nOldLine = -2;
 
 void EctlSetPosition(EditorSetPosition *Position)
