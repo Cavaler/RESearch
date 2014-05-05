@@ -459,10 +459,12 @@ void GetHighlightPosition(EditorSetPosition &Position, int FirstLine,int StartPo
 
 void SaveSelection()
 {
-	int I;
-
 	RefreshEditorInfo();
-	if ((SelType=EdInfo.BlockType)!=BTYPE_NONE) {
+
+	if ((SelType=EdInfo.BlockType) != BTYPE_NONE)
+	{
+		int I;
+
 		for (I=SelStartLine=EdInfo.BlockStartLine;I<EdInfo.TotalLines;I++) {
 			EditorGetString String;
 			String.StringNumber=I;
@@ -477,12 +479,18 @@ void SaveSelection()
 
 void RestoreSelection()
 {
-	if (SelType != BTYPE_NONE) {
+	if (SelType != BTYPE_NONE)
+	{
 		int nStartPos = (SelType == BTYPE_COLUMN) ? RealToTab(SelStartPos) : SelStartPos;
 		int nEndPos   = (SelType == BTYPE_COLUMN) ? RealToTab(SelEndPos)   : SelEndPos;
 		EditorSelect Select={ITEM_SS(EditorSelect) SelType, SelStartLine, nStartPos, nEndPos-nStartPos, SelEndLine-SelStartLine+1};
-		StartupInfo.EditorControl(ECTL_SELECT,&Select);
+		StartupInfo.EditorControl(ECTL_SELECT, &Select);
 		SelType=BTYPE_NONE;
+	}
+	else
+	{
+		EditorSelect Select={ITEM_SS(EditorSelect) SelType};
+		StartupInfo.EditorControl(ECTL_SELECT, &Select);
 	}
 }
 

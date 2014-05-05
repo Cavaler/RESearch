@@ -560,6 +560,9 @@ void FindDefaultEOL()
 
 	EditorGetString String = {ITEM_SS(EditorGetString) -1};
 	SetDefEOL(EctlGetString(&String) ? String.StringEOL : _T("\r\n"));
+
+	FirstLine.CurLine = EdInfo.CurLine;
+	EctlForceSetPosition(&FirstLine);
 }
 
 bool EditorReplaceAgain()
@@ -587,15 +590,14 @@ bool EditorReplaceAgain()
 	LastReplacePos  = EdInfo.CurPos;
 	bCachedReplace  = false;
 
+	SaveSelection();
 	if (EInSelection) {		// ***************** REPLACE IN SELECTION
-		SaveSelection();
 		ReplaceStartLine = SelStartLine;
 		if (!ESeveralLine || ERRemoveEmpty || ERRemoveNoMatch) {
 			ReplaceInTextByLine(SelStartLine, SelStartPos, SelEndLine, SelEndPos, SelType == BTYPE_COLUMN);
 		} else {
 			ReplaceInText(SelStartLine, SelStartPos, SelEndLine, SelEndPos);
 		}
-		RestoreSelection();
 	} else {				// ***************** PLAIN REPLACE
 		int FirstLine, StartPos, LastLine, EndPos;
 		if (EReverse) {
@@ -617,6 +619,7 @@ bool EditorReplaceAgain()
 			ReplaceInText(FirstLine, StartPos, LastLine, EndPos);
 		}
 	}
+	RestoreSelection();
 
 	RefreshEditorInfo();
 	EditorSetPosition Position = {ITEM_SS(EditorSetPosition) LastReplaceLine, LastReplacePos, -1,
