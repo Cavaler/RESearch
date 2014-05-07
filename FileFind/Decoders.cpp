@@ -14,6 +14,7 @@ CDecoder::CDecoder()
 void CDecoder::Clear()
 {
 	m_nSize = 0;
+	AllocBuffer(0);
 }
 
 bool CDecoder::AllocBuffer(INT_PTR nSize)

@@ -39,6 +39,8 @@ bool CFileBackend::SetBlockSize(INT_PTR nBlockSize)
 {
 	if (nBlockSize == 0) {
 		m_bSlurpMode = true;
+		if (m_szBuffer) free(m_szBuffer);
+		m_szBuffer = (char *)malloc(0);
 		return true;
 	}
 
@@ -296,7 +298,7 @@ bool CFileBackend::WriteThru(const char *szBuffer, INT_PTR nLength, INT_PTR nSki
 
 	if ((m_pEncoder == NULL) && (m_pDecoder != NULL))
 		m_pEncoder = m_pDecoder->GetEncoder();
-
+ 
 	if (m_pEncoder != NULL) {
 		m_pEncoder->Decode(szBuffer, nLength);
 		szBuffer = m_pEncoder->Buffer();
