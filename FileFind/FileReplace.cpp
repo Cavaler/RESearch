@@ -293,7 +293,7 @@ void ReplaceSingleFile(const FIND_DATA *FindData, panelitem_vector &PanelItems)
 		}
 
 		if (bProcess) {
-			AddFile(FindData, PanelItems);
+			AddFile(FindData->GetFileName(), PanelItems);
 		} else {
 			if (FRSkipThisFile)
 				g_bInterrupted = false;
