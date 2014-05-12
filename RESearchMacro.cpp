@@ -341,7 +341,11 @@ HANDLE OpenFromMacro(const OpenMacroInfo *MInfo)
 	int nType = GetAreaType();
 
 	int nValue;
-	if (MInfo->Count == 1)
+	if (MInfo->Count == 0)
+	{
+		return OpenFromStringMacro(nType, L"Menu");
+	}
+	else if (MInfo->Count == 1)
 	{
 		if (nType < 0) return NO_PANEL_HANDLE;
 
