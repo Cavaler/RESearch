@@ -110,6 +110,8 @@ HANDLE RunBatch(CBatchActionCollection *pBatches, LPCWSTR szBatch)
 
 	if (pAction = pBatches->FindMenuAction(szBatch)) {
 		pAction->Execute();
+	} else {
+		ShowError(GetMsg(MBatchNotFound), szBatch);
 	}
 
 	return NO_PANEL_HANDLE;
@@ -211,13 +213,33 @@ int GetAreaType()
 	return -1;
 }
 
-bool ApplyMacroParameters(CParameterSet &Set, const OpenMacroInfo *MInfo)
+bool ApplyMacroParameters(CParameterSet &Set, CPresetCollection *pColl, const OpenMacroInfo *MInfo)
 {
 	for (size_t nItem = 1; nItem < MInfo->Count-1; nItem += 2)
 	{
 		string strName;
 		if (!GetStringValue(MInfo->Values[nItem], strName))
 			return false;
+
+		if (strName == "Preset")
+		{
+			if (pColl == NULL)
+				return false;
+
+			wstring strValue;
+			if (!GetStringValue(MInfo->Values[nItem+1], strValue))
+				return false;
+
+			CPreset *pPreset = pColl->FindMenuPreset(strValue.c_str());
+			if (pPreset == NULL) {
+				ShowError(GetMsg(MPresetNotFound), strValue.c_str());
+				return false;
+			}
+
+			pPreset->Apply();
+
+			continue;
+		}
 
 		map<string, tstring *>::iterator its = Set.m_mapStrings.find(strName);
 		if (its != Set.m_mapStrings.end())
@@ -261,23 +283,31 @@ HANDLE OpenPluginFromFileParameters(const OpenMacroInfo *MInfo)
 		return NO_PANEL_HANDLE;
 
 	CParameterSet *pSet = NULL;
-	if (_wcsicmp(MInfo->Values[0].String, L"Search") == 0)
-		pSet = &g_FSParamSet;
-	else if (_wcsicmp(MInfo->Values[0].String, L"Replace") == 0)
-		pSet = &g_FRParamSet;
-	else if (_wcsicmp(MInfo->Values[0].String, L"Grep") == 0)
-		pSet = &g_FGParamSet;
-	else if (_wcsicmp(MInfo->Values[0].String, L"Rename") == 0)
-		pSet = &g_RnParamSet;
-	else if (_wcsicmp(MInfo->Values[0].String, L"RenameSelected") == 0)
-		pSet = &g_QRParamSet;
+	CPresetCollection *pColl = NULL;
+
+	if (_wcsicmp(MInfo->Values[0].String, L"Search") == 0) {
+		pSet  = &g_FSParamSet;
+		pColl =    FSPresets;
+	} else if (_wcsicmp(MInfo->Values[0].String, L"Replace") == 0) {
+		pSet  = &g_FRParamSet;
+		pColl =    FRPresets;
+	} else if (_wcsicmp(MInfo->Values[0].String, L"Grep") == 0) {
+		pSet  = &g_FGParamSet;
+		pColl =    FGPresets;
+	} else if (_wcsicmp(MInfo->Values[0].String, L"Rename") == 0) {
+		pSet  = &g_RnParamSet;
+		pColl =    RnPresets;
+	} else if (_wcsicmp(MInfo->Values[0].String, L"RenameSelected") == 0) {
+		pSet  = &g_QRParamSet;
+		pColl =    QRPresets;
+	}
 
 	if (pSet == NULL)
 		return NO_PANEL_HANDLE;
 
 	CParameterBackup _Backup(*pSet);
 
-	if (!ApplyMacroParameters(*pSet, MInfo))
+	if (!ApplyMacroParameters(*pSet, pColl, MInfo))
 		return NO_PANEL_HANDLE;
 
 	return HandleFromOpResult(pSet->m_Executor());
@@ -289,14 +319,21 @@ HANDLE OpenPluginFromEditorParameters(const OpenMacroInfo *MInfo)
 		return NO_PANEL_HANDLE;
 
 	CParameterSet *pSet = NULL;
-	if (_wcsicmp(MInfo->Values[0].String, L"Search") == 0)
-		pSet = &g_ESParamSet;
-	else if (_wcsicmp(MInfo->Values[0].String, L"Replace") == 0)
-		pSet = &g_ERParamSet;
-	else if (_wcsicmp(MInfo->Values[0].String, L"Filter") == 0)
-		pSet = &g_EFParamSet;
-	else if (_wcsicmp(MInfo->Values[0].String, L"Transliterate") == 0)
-		pSet = &g_ETParamSet;
+	CPresetCollection *pColl = NULL;
+
+	if (_wcsicmp(MInfo->Values[0].String, L"Search") == 0) {
+		pSet  = &g_ESParamSet;
+		pColl =    ESPresets;
+	} else if (_wcsicmp(MInfo->Values[0].String, L"Replace") == 0) {
+		pSet  = &g_ERParamSet;
+		pColl =    ERPresets;
+	} else if (_wcsicmp(MInfo->Values[0].String, L"Filter") == 0) {
+		pSet  = &g_EFParamSet;
+		pColl =    EFPresets;
+	} else if (_wcsicmp(MInfo->Values[0].String, L"Transliterate") == 0) {
+		pSet  = &g_ETParamSet;
+		pColl =    ETPresets;
+	}
 
 	if (pSet == NULL)
 		return NO_PANEL_HANDLE;
@@ -308,7 +345,7 @@ HANDLE OpenPluginFromEditorParameters(const OpenMacroInfo *MInfo)
 
 	CParameterBackup _Backup(*pSet);
 
-	if (!ApplyMacroParameters(*pSet, MInfo))
+	if (!ApplyMacroParameters(*pSet, pColl, MInfo))
 		return NO_PANEL_HANDLE;
 
 	return HandleFromOpResult(pSet->m_Executor());
@@ -320,15 +357,19 @@ HANDLE OpenPluginFromViewerParameters(const OpenMacroInfo *MInfo)
 		return NO_PANEL_HANDLE;
 
 	CParameterSet *pSet = NULL;
-	if (_wcsicmp(MInfo->Values[0].String, L"Search") == 0)
-		pSet = &g_VSParamSet;
+	CPresetCollection *pColl = NULL;
+
+	if (_wcsicmp(MInfo->Values[0].String, L"Search") == 0) {
+		pSet  = &g_VSParamSet;
+		pColl =    VSPresets;
+	}
 
 	if (pSet == NULL)
 		return NO_PANEL_HANDLE;
 
 	CParameterBackup _Backup(*pSet);
 
-	if (!ApplyMacroParameters(*pSet, MInfo))
+	if (!ApplyMacroParameters(*pSet, pColl, MInfo))
 		return NO_PANEL_HANDLE;
 
 	return HandleFromOpResult(pSet->m_Executor());

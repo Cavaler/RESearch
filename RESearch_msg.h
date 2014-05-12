@@ -295,6 +295,7 @@ enum eStringTable {
 	MAddToMenu,
 	MDeletePresetQuery,
 	MCopyOf,
+	MPresetNotFound,
 
 	MPanelBatches,
 	MEditorBatches,
@@ -302,6 +303,7 @@ enum eStringTable {
 	MBatchName,
 	MBtnCommands,
 	MBatchCommands,
+	MBatchNotFound,
 
 	MDeleteBatchQuery,
 	MExecuteBatchQuery,

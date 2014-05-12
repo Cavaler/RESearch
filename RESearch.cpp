@@ -222,7 +222,10 @@ bool FindRunPreset(CPresetCollection *pColl, int &nItem, int nBreakCode, Operati
 bool FindRunPreset(CPresetCollection *pColl, LPCTSTR szName, OperationResult &Result)
 {
 	CPreset *pPreset = pColl->FindMenuPreset(szName);
-	if (pPreset == NULL) return false;
+	if (pPreset == NULL) {
+		ShowError(GetMsg(MPresetNotFound), szName);
+		return false;
+	}
 
 	Result = pPreset->ExecutePreset();
 	return true;
