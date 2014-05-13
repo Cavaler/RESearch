@@ -40,7 +40,8 @@ CParameterSet g_FAParamSet(NULL,
 	"FullFileNameMatch", &FAFullFileNameMatch, "CaseSensitive", &FACaseSensitive, "FullFileNameInverse", &FAFullFileNameInverse,
 	"DirectoryMatch", &FADirectoryMatch, "DirectoryCaseSensitive", &FADirectoryCaseSensitive, "DirectoryInverse", &FADirectoryInverse,
 	"DateAfter", &FADateAfter, "DateBefore", &FADateBefore, "ModificationDate", &FAModificationDate,
-	"SizeGreater", &FASizeGreater, "SizeLess", &FASizeLess, "SearchHead", &FASearchHead, NULL
+	"SizeGreater", &FASizeGreater, "SizeLess", &FASizeLess, "SearchHead", &FASearchHead,
+	"UseStreams", &FAUseStreams, NULL
 	);
 
 void FReadRegistry(CFarSettingsKey Key)
@@ -398,6 +399,41 @@ bool AdvancedApplies(FIND_DATA *FindData)
 	return true;
 }
 
+typedef HANDLE (WINAPI *FindFirstStreamWProc)(LPCWSTR lpFileName, STREAM_INFO_LEVELS InfoLevel, LPVOID lpFindStreamData, DWORD dwFlags);
+typedef BOOL (APIENTRY *FindNextStreamWProc)(HANDLE hFindStream, LPVOID lpFindStreamData);
+
+bool ScanFileStreams(const FIND_DATA &Found, vector<FIND_DATA> &arrFoundData)
+{
+	static FindFirstStreamWProc FFS = NULL;
+	static FindNextStreamWProc FNS = NULL;
+	if ((FFS == NULL) || (FNS == NULL))
+	{
+		HMODULE hKernel = LoadLibraryW(L"kernel32.dll");
+		FFS = (FindFirstStreamWProc)GetProcAddress(hKernel, "FindFirstStreamW");
+		FNS = (FindNextStreamWProc) GetProcAddress(hKernel, "FindNextStreamW" );
+		if ((FFS == NULL) || (FNS == NULL)) return false;
+	}
+
+	WIN32_FIND_STREAM_DATA StmData;
+	HANDLE hFind = FFS(Found.GetFileName(), FindStreamInfoStandard, &StmData, NULL);
+	if (hFind == INVALID_HANDLE_VALUE) return false;
+
+	while (FNS(hFind, &StmData))
+	{
+		FIND_DATA SFound = Found;
+		SFound.strFileName = Found.strFileName + StmData.cStreamName;
+		SFound.strAlternateFileName.clear();
+		SFound.nFileSize = StmData.StreamSize.QuadPart;
+		SFound.dwFileAttributes = GetFileAttributes(SFound.strFileName.c_str());
+
+		arrFoundData.push_back(SFound);
+	}
+
+	FindClose(hFind);
+
+	return true;
+}
+
 bool DoScanDirectory(tstring strDirectory, panelitem_vector &PanelItems, ProcessFileProc ProcessFile)
 {
 	if (FASkipSystemFolders && FASystemFoldersMask) {
@@ -436,6 +472,9 @@ bool DoScanDirectory(tstring strDirectory, panelitem_vector &PanelItems, Process
 		FIND_DATA Found = FindData;
 		Found.strFileName = strDirectory+Found.strFileName;
 		arrFoundData.push_back(Found);
+
+		if (FAdvanced && FAUseStreams)
+			ScanFileStreams(Found, arrFoundData);
 	} while (FindNextFile(HSearch,&FindData)&&!g_bInterrupted);
 	FindClose(HSearch);
 
@@ -951,7 +990,9 @@ void CFarDateTimeStorage::Put(const TCHAR *pszBuffer) {
 
 bool AdvancedSettings()
 {
-	CFarDialog Dialog(78,24,_T("AdvancedFileSearchDlg"));
+	CFarDialog Dialog(78,25,_T("AdvancedFileSearchDlg"));
+	Dialog.SetUseID(true);
+
 	Dialog.AddFrame(MAdvancedOptions);
 	Dialog.Add(new CFarCheckBoxItem(5,2,0,MFullFileNameMatch,&FAFullFileNameMatch));
 	Dialog.Add(new CFarEditItem(5,3,59,DIF_HISTORY,_T("FullPath"), FAFullFileName));
@@ -967,10 +1008,10 @@ bool AdvancedSettings()
 
 	Dialog.Add(new CFarCheckBoxItem(5,8,0,MDateAfter,&FADateAfter));
 	Dialog.Add(new CFarEditItem(30,8,50,0,NULL,new CFarDateTimeStorage(&FADateAfterThis)));
-	Dialog.Add(new CFarButtonItem(52,8,0,false,MCurrent));
+	Dialog.Add(new CFarButtonItem(52,8,0,false,MCurrentA));
 	Dialog.Add(new CFarCheckBoxItem(5,9,0,MDateBefore,&FADateBefore));
 	Dialog.Add(new CFarEditItem(30,9,50,0,NULL,new CFarDateTimeStorage(&FADateBeforeThis)));
-	Dialog.Add(new CFarButtonItem(52,9,0,false,MCurrent));
+	Dialog.Add(new CFarButtonItem(52,9,0,false,MCurrentB));
 	Dialog.Add(new CFarRadioButtonItem(5,10,0,MCreationDate,&FAModificationDate,false));
 	Dialog.Add(new CFarRadioButtonItem(30,10,0,MModificationDate,&FAModificationDate,true));
 
@@ -986,33 +1027,34 @@ bool AdvancedSettings()
 	Dialog.Add(new CFarEditItem(32,13,40,0,NULL,
 		CFarIntegerStorage(FASearchHeadLimit, &CFarSizeConverter::Instance),
 		new CFarIntegerRangeValidator(0,0x7FFFFFFF)));
+	Dialog.Add(new CFarCheckBoxItem(5,14,0,MSearchInStreams,&FAUseStreams));
 
-	Dialog.Add(new CFarTextItem(5,15,0,MAttributes));
-	Dialog.Add(new CFarCheckBox3Item(7,16,DIF_3STATE,MDirectory,&FAAttributesCleared,&FAAttributesSet,FILE_ATTRIBUTE_DIRECTORY));
-	Dialog.Add(new CFarCheckBox3Item(7,17,DIF_3STATE,MReadOnly,&FAAttributesCleared,&FAAttributesSet,FILE_ATTRIBUTE_READONLY));
-	Dialog.Add(new CFarCheckBox3Item(7,18,DIF_3STATE,MArchive,&FAAttributesCleared,&FAAttributesSet,FILE_ATTRIBUTE_ARCHIVE));
-	Dialog.Add(new CFarCheckBox3Item(27,16,DIF_3STATE,MHidden,&FAAttributesCleared,&FAAttributesSet,FILE_ATTRIBUTE_HIDDEN));
-	Dialog.Add(new CFarCheckBox3Item(27,17,DIF_3STATE,MSystem,&FAAttributesCleared,&FAAttributesSet,FILE_ATTRIBUTE_SYSTEM));
-	Dialog.Add(new CFarCheckBox3Item(47,16,DIF_3STATE,MCompressed,&FAAttributesCleared,&FAAttributesSet,FILE_ATTRIBUTE_COMPRESSED));
-	Dialog.Add(new CFarCheckBox3Item(47,17,DIF_3STATE,MEncrypted,&FAAttributesCleared,&FAAttributesSet,FILE_ATTRIBUTE_ENCRYPTED));
-	Dialog.AddButtons(MOk,MCancel);
-	Dialog.Add(new CFarButtonItem(62, 20, 0, false, MBtnPresets));
-	Dialog.SetFocus(2);
+	Dialog.Add(new CFarTextItem(5,16,0,MAttributes));
+	Dialog.Add(new CFarCheckBox3Item(7,17,DIF_3STATE,MDirectory,&FAAttributesCleared,&FAAttributesSet,FILE_ATTRIBUTE_DIRECTORY));
+	Dialog.Add(new CFarCheckBox3Item(7,18,DIF_3STATE,MReadOnly,&FAAttributesCleared,&FAAttributesSet,FILE_ATTRIBUTE_READONLY));
+	Dialog.Add(new CFarCheckBox3Item(7,19,DIF_3STATE,MArchive,&FAAttributesCleared,&FAAttributesSet,FILE_ATTRIBUTE_ARCHIVE));
+	Dialog.Add(new CFarCheckBox3Item(27,17,DIF_3STATE,MHidden,&FAAttributesCleared,&FAAttributesSet,FILE_ATTRIBUTE_HIDDEN));
+	Dialog.Add(new CFarCheckBox3Item(27,18,DIF_3STATE,MSystem,&FAAttributesCleared,&FAAttributesSet,FILE_ATTRIBUTE_SYSTEM));
+	Dialog.Add(new CFarCheckBox3Item(47,11,DIF_3STATE,MCompressed,&FAAttributesCleared,&FAAttributesSet,FILE_ATTRIBUTE_COMPRESSED));
+	Dialog.Add(new CFarCheckBox3Item(47,18,DIF_3STATE,MEncrypted,&FAAttributesCleared,&FAAttributesSet,FILE_ATTRIBUTE_ENCRYPTED));
+	Dialog.AddButtons(MOk, MCancel, MBtnClear);
+	Dialog.Add(new CFarButtonItem(62, 21, 0, false, MBtnPresets));
+	Dialog.SetFocus(MFullFileNameMatch, 1);
 
 	int Result;
 	do {
-		Result=Dialog.Display(4,-3,13,16,-1);
+		Result=Dialog.Display();
 		switch (Result) {
-		case 0:
+		case MOk:
 			break;
-		case 1:
-		case 2:{
+		case MCurrentA:
+		case MCurrentB:{
 			SYSTEMTIME CurTime;
 			GetSystemTime(&CurTime);
-			SystemTimeToFileTime(&CurTime,(Result==2) ? &FADateBeforeThis : &FADateAfterThis);
+			SystemTimeToFileTime(&CurTime,(Result == MCurrentB) ? &FADateBeforeThis : &FADateAfterThis);
 			continue;
 			  }
-		case 3:
+		case MBtnPresets:
 			g_dwDateAfterThis = (DWORD)FTtoTime_t(FADateAfterThis);
 			g_dwDateBeforeThis = (DWORD)FTtoTime_t(FADateBeforeThis);
 			if (FAPresets->ShowMenu(true) >= 0) {
@@ -1020,11 +1062,23 @@ bool AdvancedSettings()
 				Time_tToFT(g_dwDateBeforeThis, FADateBeforeThis);
 			}
 			continue;
+		case MBtnClear:
+			FAFullFileNameMatch	= false;
+			FADirectoryMatch	= false;
+			FADateAfter			= false;
+			FADateBefore		= false;
+			FASizeGreater		= false;
+			FASizeLess			= false;
+			FASearchHead		= false;
+			FAUseStreams		= false;
+			FAAttributesCleared = 0;
+			FAAttributesSet		= 0;
+			continue;
 		default:
 			return false;
 		}
 
-	} while (!CompileAdvancedSettings() || (Result != 0));
+	} while (!CompileAdvancedSettings() || (Result != MOk));
 
 	return true;
 }
@@ -1094,7 +1148,9 @@ void CFPreset::Apply()
 
 bool CFAPresetCollection::EditPreset(CPreset *pPreset)
 {
-	CFarDialog Dialog(78,26,_T("FAPresetDlg"));
+	CFarDialog Dialog(78,27,_T("FAPresetDlg"));
+	Dialog.SetUseID(true);
+
 	Dialog.AddFrame(MFAPreset);
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
 	Dialog.Add(new CFarEditItem(20,2,70,DIF_HISTORY,_T("RESearch.PresetName"), pPreset->Name()));
@@ -1113,10 +1169,10 @@ bool CFAPresetCollection::EditPreset(CPreset *pPreset)
 
 	Dialog.Add(new CFarCheckBoxItem(5,10,0,MDateAfter,&pPreset->m_mapInts["DateAfter"]));
 	Dialog.Add(new CFarEditItem(30,10,50,0,NULL,new CFarDateTimeStorage((time_t *)&pPreset->m_mapInts["DateAfterThis"])));
-	Dialog.Add(new CFarButtonItem(52,10,0,FALSE,MCurrent));
+	Dialog.Add(new CFarButtonItem(52,10,0,FALSE,MCurrentA));
 	Dialog.Add(new CFarCheckBoxItem(5,11,0,MDateBefore,&pPreset->m_mapInts["DateBefore"]));
 	Dialog.Add(new CFarEditItem(30,11,50,0,NULL,new CFarDateTimeStorage((time_t *)&pPreset->m_mapInts["DateBeforeThis"])));
-	Dialog.Add(new CFarButtonItem(52,11,0,FALSE,MCurrent));
+	Dialog.Add(new CFarButtonItem(52,11,0,FALSE,MCurrentB));
 	Dialog.Add(new CFarRadioButtonItem(5,12,0,MCreationDate,&pPreset->m_mapInts["ModificationDate"],false));
 	Dialog.Add(new CFarRadioButtonItem(30,12,0,MModificationDate,&pPreset->m_mapInts["ModificationDate"],true));
 
@@ -1132,33 +1188,46 @@ bool CFAPresetCollection::EditPreset(CPreset *pPreset)
 	Dialog.Add(new CFarEditItem(32,15,40,0,NULL,
 		CFarIntegerStorage(FASearchHeadLimit, &CFarSizeConverter::Instance),
 		new CFarIntegerRangeValidator(0,0x7FFFFFFF)));
+	Dialog.Add(new CFarCheckBoxItem(5,16,0,MSearchInStreams,&pPreset->m_mapInts["UseStreams"]));
 
-	Dialog.Add(new CFarTextItem(5,17,0,MAttributes));
-	Dialog.Add(new CFarCheckBox3Item(7,18,DIF_3STATE,MDirectory,	(DWORD *)&pPreset->m_mapInts["AttributesCleared"],(DWORD *)&pPreset->m_mapInts["AttributesSet"],FILE_ATTRIBUTE_DIRECTORY));
-	Dialog.Add(new CFarCheckBox3Item(7,19,DIF_3STATE,MReadOnly,		(DWORD *)&pPreset->m_mapInts["AttributesCleared"],(DWORD *)&pPreset->m_mapInts["AttributesSet"],FILE_ATTRIBUTE_READONLY));
-	Dialog.Add(new CFarCheckBox3Item(7,20,DIF_3STATE,MArchive,		(DWORD *)&pPreset->m_mapInts["AttributesCleared"],(DWORD *)&pPreset->m_mapInts["AttributesSet"],FILE_ATTRIBUTE_ARCHIVE));
-	Dialog.Add(new CFarCheckBox3Item(27,18,DIF_3STATE,MHidden,		(DWORD *)&pPreset->m_mapInts["AttributesCleared"],(DWORD *)&pPreset->m_mapInts["AttributesSet"],FILE_ATTRIBUTE_HIDDEN));
-	Dialog.Add(new CFarCheckBox3Item(27,19,DIF_3STATE,MSystem,		(DWORD *)&pPreset->m_mapInts["AttributesCleared"],(DWORD *)&pPreset->m_mapInts["AttributesSet"],FILE_ATTRIBUTE_SYSTEM));
-	Dialog.Add(new CFarCheckBox3Item(47,18,DIF_3STATE,MCompressed,	(DWORD *)&pPreset->m_mapInts["AttributesCleared"],(DWORD *)&pPreset->m_mapInts["AttributesSet"],FILE_ATTRIBUTE_COMPRESSED));
-	Dialog.Add(new CFarCheckBox3Item(47,19,DIF_3STATE,MEncrypted,	(DWORD *)&pPreset->m_mapInts["AttributesCleared"],(DWORD *)&pPreset->m_mapInts["AttributesSet"],FILE_ATTRIBUTE_ENCRYPTED));
-	Dialog.AddButtons(MOk,MCancel);
-	Dialog.SetFocus(2);
+	Dialog.Add(new CFarTextItem(5,18,0,MAttributes));
+	Dialog.Add(new CFarCheckBox3Item(7,19,DIF_3STATE,MDirectory,	(DWORD *)&pPreset->m_mapInts["AttributesCleared"],(DWORD *)&pPreset->m_mapInts["AttributesSet"],FILE_ATTRIBUTE_DIRECTORY));
+	Dialog.Add(new CFarCheckBox3Item(7,20,DIF_3STATE,MReadOnly,		(DWORD *)&pPreset->m_mapInts["AttributesCleared"],(DWORD *)&pPreset->m_mapInts["AttributesSet"],FILE_ATTRIBUTE_READONLY));
+	Dialog.Add(new CFarCheckBox3Item(7,21,DIF_3STATE,MArchive,		(DWORD *)&pPreset->m_mapInts["AttributesCleared"],(DWORD *)&pPreset->m_mapInts["AttributesSet"],FILE_ATTRIBUTE_ARCHIVE));
+	Dialog.Add(new CFarCheckBox3Item(27,19,DIF_3STATE,MHidden,		(DWORD *)&pPreset->m_mapInts["AttributesCleared"],(DWORD *)&pPreset->m_mapInts["AttributesSet"],FILE_ATTRIBUTE_HIDDEN));
+	Dialog.Add(new CFarCheckBox3Item(27,20,DIF_3STATE,MSystem,		(DWORD *)&pPreset->m_mapInts["AttributesCleared"],(DWORD *)&pPreset->m_mapInts["AttributesSet"],FILE_ATTRIBUTE_SYSTEM));
+	Dialog.Add(new CFarCheckBox3Item(47,19,DIF_3STATE,MCompressed,	(DWORD *)&pPreset->m_mapInts["AttributesCleared"],(DWORD *)&pPreset->m_mapInts["AttributesSet"],FILE_ATTRIBUTE_COMPRESSED));
+	Dialog.Add(new CFarCheckBox3Item(47,20,DIF_3STATE,MEncrypted,	(DWORD *)&pPreset->m_mapInts["AttributesCleared"],(DWORD *)&pPreset->m_mapInts["AttributesSet"],FILE_ATTRIBUTE_ENCRYPTED));
+	Dialog.AddButtons(MOk, MCancel, MBtnClear);
+	Dialog.SetFocus(MPresetName, 1);
 
 	do {
-		int Result=Dialog.Display(3,-2,15,18);
+		int Result=Dialog.Display();
 		switch (Result) {
-		case 0:
+		case MOk:
 			return true;
-		case 1:
-		case 2:{
+		case MCurrentA:
+		case MCurrentB:{
 			SYSTEMTIME stCurTime;
 			FILETIME ftCurTime;
 			GetLocalTime(&stCurTime);
 			SystemTimeToFileTime(&stCurTime,&ftCurTime);
-			if (Result==1) pPreset->m_mapInts["DateAfterThis"] = (int)FTtoTime_t(ftCurTime);
+			if (Result==MCurrentA) pPreset->m_mapInts["DateAfterThis"] = (int)FTtoTime_t(ftCurTime);
 					else pPreset->m_mapInts["DateBeforeThis"] = (int)FTtoTime_t(ftCurTime);
 			continue;
 			  }
+		case MBtnClear:
+			pPreset->m_mapInts["FullFileNameMatch"]	= 0;
+			pPreset->m_mapInts["DirectoryMatch"]	= 0;
+			pPreset->m_mapInts["DateAfter"]			= 0;
+			pPreset->m_mapInts["DateBefore"]		= 0;
+			pPreset->m_mapInts["SizeGreater"]		= 0;
+			pPreset->m_mapInts["SizeLess"]			= 0;
+			pPreset->m_mapInts["SearchHead"]		= 0;
+			pPreset->m_mapInts["UseStreams"]		= 0;
+			pPreset->m_mapInts["AttributesCleared"] = 0;
+			pPreset->m_mapInts["AttributesSet"]		= 0;
+			continue;
 		default:
 			return false;
 		}

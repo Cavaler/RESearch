@@ -79,4 +79,6 @@ PERSIST_TYPED_VARIABLE(int, TPPanelMode, 4, 0, 9)
 PERSIST_TYPED_VARIABLE(int, TPSortMode, SM_DEFAULT, 0, 20)
 PERSIST_TYPED_VARIABLE(int, TPSortOrder, 0, 0, 1)
 
+PERSIST_bool_VARIABLE(FAUseStreams, false)
+
 #include <PersistVariablesUndef.h>

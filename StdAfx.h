@@ -1,7 +1,8 @@
 #define WIN32_LEAN_AND_MEAN
 #define STRICT
 
-#define _WIN32_WINNT 0x0500
+#define _WIN32_WINNT 0x0501
+#define _USE_32BIT_TIME_T
 
 #include <atlbase.h>
 #include <atlcom.h>

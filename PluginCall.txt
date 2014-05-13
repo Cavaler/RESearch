@@ -45,7 +45,9 @@ Complete operations:
 	Commands and parameters available from viewer:
 		Search			Text; IsRegExp, CaseSensitive, SeveralLine
 
-	One can also reference presets by using Preset as parameter name and preset name as value.
+	One can also reference presets by using Preset as parameter name and preset name as value, for example:
+		Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", "Search", "Preset", "MyPreset1", "AsRegExp", 0)
+		This will run a preset, with [ ] As regular expression parameter overridden
 
 Menus:
 	Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", "Menu")		Shows RESearch menu
