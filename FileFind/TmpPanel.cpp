@@ -159,10 +159,8 @@ void CTemporaryPanel::UpdateList()
 			continue;
 		}
 
-		WIN32_FIND_DATA FindData;
-		HANDLE hFind = FindFirstFile(ExtendedFileName(FarPanelFileName(m_arrItems[nItem])).c_str(), &FindData);
-		FindClose(hFind);
-		if (hFind == INVALID_HANDLE_VALUE) {
+		if (GetFileAttributes(ExtendedFileName(FarPanelFileName(m_arrItems[nItem])).c_str()) == INVALID_FILE_ATTRIBUTES)
+		{
 			m_arrItems.erase(m_arrItems.begin()+nItem);
 		}
 	}
