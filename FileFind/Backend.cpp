@@ -77,9 +77,11 @@ void CFileBackend::Free()
 	m_nBlockSize = 0;
 }
 
-bool CFileBackend::OpenInputFile(LPCTSTR szFileName)
+bool CFileBackend::OpenInputFile(LPCTSTR szFileName, bool bShareWrite)
 {
-	m_hFile = CreateFile(ExtendedFileName(szFileName).c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, NULL, NULL);
+	DWORD dwShareMode = bShareWrite ? FILE_SHARE_READ|FILE_SHARE_WRITE : FILE_SHARE_READ;
+
+	m_hFile = CreateFile(ExtendedFileName(szFileName).c_str(), GENERIC_READ, dwShareMode, NULL, OPEN_EXISTING, NULL, NULL);
 	if (m_hFile == INVALID_HANDLE_VALUE) return false;
 
 	DWORD dwSizeHigh;
@@ -101,7 +103,7 @@ void CFileBackend::InitSlurpMode()
 
 bool CFileBackend::Open(LPCTSTR szFileName, INT_PTR nMaxSize)
 {
-	if (!OpenInputFile(szFileName)) return false;
+	if (!OpenInputFile(szFileName, true)) return false;
 	if ((nMaxSize > 0) && (nMaxSize < m_nSizeLimit)) m_nSizeLimit = nMaxSize;
 
 	InitSlurpMode();
@@ -115,7 +117,7 @@ bool CFileBackend::Open(LPCTSTR szFileName, INT_PTR nMaxSize)
 
 bool CFileBackend::Open(LPCTSTR szInFileName, LPCTSTR szOutFileName)
 {
-	if (!OpenInputFile(szInFileName)) return false;
+	if (!OpenInputFile(szInFileName, false)) return false;
 
 	InitSlurpMode();
 	m_nOriginalSizeLimit = m_nSizeLimit;
