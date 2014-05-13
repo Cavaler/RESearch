@@ -542,8 +542,16 @@ HANDLE WINAPI OpenW(const struct OpenInfo *Info)
 		}
 		break;
 						  }
-	case OPEN_FROMMACRO:
-		return OpenFromMacro((const OpenMacroInfo *)Info->Data);
+	case OPEN_FROMMACRO:{
+		HANDLE hPlugin = OpenFromMacro((const OpenMacroInfo *)Info->Data);
+		if (hPlugin != NO_PANEL_HANDLE)
+		{
+			ClosePanelInfo Info = { sizeof(ClosePanelInfo), hPlugin };
+			ClosePanelW(&Info);
+		}
+
+		return NO_PANEL_HANDLE;
+						}
 	}
 
 	return NO_PANEL_HANDLE;
