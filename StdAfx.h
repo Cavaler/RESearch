@@ -2,7 +2,9 @@
 #define STRICT
 
 #define _WIN32_WINNT 0x0501
+#ifndef _WIN64
 #define _USE_32BIT_TIME_T
+#endif
 
 #include <atlbase.h>
 #include <atlcom.h>

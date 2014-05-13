@@ -415,13 +415,21 @@ bool ScanFileStreams(const FIND_DATA &Found, vector<FIND_DATA> &arrFoundData)
 	}
 
 	WIN32_FIND_STREAM_DATA StmData;
+#ifdef UNICODE
 	HANDLE hFind = FFS(Found.GetFileName(), FindStreamInfoStandard, &StmData, NULL);
+#else
+	HANDLE hFind = FFS(OEMToUnicode(Found.GetFileName()).c_str(), FindStreamInfoStandard, &StmData, NULL);
+#endif
 	if (hFind == INVALID_HANDLE_VALUE) return false;
 
 	while (FNS(hFind, &StmData))
 	{
 		FIND_DATA SFound = Found;
+#ifdef UNICODE
 		SFound.strFileName = Found.strFileName + StmData.cStreamName;
+#else
+		SFound.strFileName = Found.strFileName + OEMFromUnicode(StmData.cStreamName);
+#endif
 		SFound.strAlternateFileName.clear();
 		SFound.nFileSize = StmData.StreamSize.QuadPart;
 		SFound.dwFileAttributes = GetFileAttributes(SFound.strFileName.c_str());
