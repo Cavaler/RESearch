@@ -1035,7 +1035,7 @@ bool AdvancedSettings()
 	Dialog.Add(new CFarCheckBox3Item(7,19,DIF_3STATE,MArchive,&FAAttributesCleared,&FAAttributesSet,FILE_ATTRIBUTE_ARCHIVE));
 	Dialog.Add(new CFarCheckBox3Item(27,17,DIF_3STATE,MHidden,&FAAttributesCleared,&FAAttributesSet,FILE_ATTRIBUTE_HIDDEN));
 	Dialog.Add(new CFarCheckBox3Item(27,18,DIF_3STATE,MSystem,&FAAttributesCleared,&FAAttributesSet,FILE_ATTRIBUTE_SYSTEM));
-	Dialog.Add(new CFarCheckBox3Item(47,11,DIF_3STATE,MCompressed,&FAAttributesCleared,&FAAttributesSet,FILE_ATTRIBUTE_COMPRESSED));
+	Dialog.Add(new CFarCheckBox3Item(47,17,DIF_3STATE,MCompressed,&FAAttributesCleared,&FAAttributesSet,FILE_ATTRIBUTE_COMPRESSED));
 	Dialog.Add(new CFarCheckBox3Item(47,18,DIF_3STATE,MEncrypted,&FAAttributesCleared,&FAAttributesSet,FILE_ATTRIBUTE_ENCRYPTED));
 	Dialog.AddButtons(MOk, MCancel, MBtnClear);
 	Dialog.Add(new CFarButtonItem(62, 21, 0, false, MBtnPresets));
