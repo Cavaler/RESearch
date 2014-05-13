@@ -52,11 +52,14 @@ void SearchFile(const FIND_DATA *FindData, panelitem_vector &PanelItems)
 	if ((IsFound) ? !FSInverse : FSInverse) AddFile(FindData, PanelItems, true);
 }
 
-bool PrepareFileSearchPattern() {
+bool PrepareFileSearchPattern()
+{
 	if (!FPreparePattern(true)) return false;
+
 	if (FAdvanced) {
 		if (!CompileAdvancedSettings()) return false;
 	}
+
 	return true;
 }
 

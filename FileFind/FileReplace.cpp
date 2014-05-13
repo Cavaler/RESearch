@@ -304,11 +304,15 @@ void ReplaceSingleFile(const FIND_DATA *FindData, panelitem_vector &PanelItems)
 	}
 }
 
-bool PrepareFileReplacePattern() {
+bool PrepareFileReplacePattern()
+{
 	if (!FPreparePattern(false)) return false;
+
 	if (FAdvanced) {
+		FAUseStreams = false;
 		if (!CompileAdvancedSettings()) return false;
 	}
+
 	return true;
 }
 
