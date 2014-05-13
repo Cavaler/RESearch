@@ -6,10 +6,15 @@ Regular Expression Search and Replace
  * Minor change
 
 Planned:
-	- Search in share-opened files
-	? Searching in streams
 	? Extended batch properties, overriding preset properties (e.g. Search from beginning)
 	+ Command to "lock" read-only file before replacing
+
+Version 8.40 (13.05.2014)
+	- Fixed handling of zero-length files in Panels
+	* Another way of calling presets from Lua
+	* Search and Grep work on files opened for writing
+	* Search and Grep can operate on file streams
+	- Can handle UNC paths longer than 260 symbols
 
 Version 8.39 (05.05.2014)
 	* Always restore selection after Editor Replace
