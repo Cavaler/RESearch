@@ -25,7 +25,7 @@ bool EditorCountAllAgain()
 		bool ZeroMatch = (MatchFirstLine == MatchLastLine) && (MatchStartPos == MatchEndPos);
 
 		nFoundMatches++;
-		if (!bNotBOL) nFoundLines++;
+		if (!LastFoundLine != MatchFirstLine) nFoundLines++;
 		if (nFirstLine < 0) nFirstLine = MatchFirstLine;
 		nLastLine = MatchFirstLine;
 
