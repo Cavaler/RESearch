@@ -700,7 +700,6 @@ bool EditorReplace()
 	CFarDialog Dialog(80, 18, _T("ReplaceDlg"));
 	Dialog.SetWindowProc(EditorReplaceDialogProc, 0);
 	Dialog.SetUseID(true);
-	Dialog.SetCancelID(MCancel);
 
 	Dialog.AddFrame(MREReplace);
 	Dialog.Add(new CFarTextItem(5, 2, 0, MSearchFor));

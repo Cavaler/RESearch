@@ -58,7 +58,6 @@ bool EditorFilter()
 	CFarDialog Dialog(78, 13, _T("FilterDlg"));
 	Dialog.SetWindowProc(EditorSearchDialogProc, 0);
 	Dialog.SetUseID(true);
-	Dialog.SetCancelID(MCancel);
 
 	Dialog.AddFrame(MFilterLines);
 	Dialog.Add(new CFarTextItem(5,2,0,MSearchFor));

@@ -304,7 +304,6 @@ bool GrepPrompt(bool bPlugin)
 	CFarDialog Dialog(77, 27, _T("FileGrepDlg"));
 	Dialog.SetWindowProc(FileGrepDialogProc, 0);
 	Dialog.SetUseID(true);
-	Dialog.SetCancelID(MCancel);
 
 	Dialog.AddFrame(MREGrep);
 
@@ -448,7 +447,6 @@ bool CFGPresetCollection::EditPreset(CPreset *pPreset)
 	CFarDialog Dialog(76,26,_T("FGPresetDlg"));
 	Dialog.SetWindowProc(FileGrepDialogProc, 0);
 	Dialog.SetUseID(true);
-	Dialog.SetCancelID(MCancel);
 
 	Dialog.AddFrame(MREGrep);
 

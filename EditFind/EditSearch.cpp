@@ -293,7 +293,6 @@ bool EditorSearch()
 	CFarDialog Dialog(80, 14, _T("SearchDlg"));
 	Dialog.SetWindowProc(EditorSearchDialogProc, 0);
 	Dialog.SetUseID(true);
-	Dialog.SetCancelID(MCancel);
 
 	Dialog.AddFrame(MRESearch);
 	Dialog.Add(new CFarTextItem(5,2,0,MSearchFor));
@@ -407,7 +406,6 @@ bool CESPresetCollection::EditPreset(CPreset *pPreset)
 	CFarDialog Dialog(80, 20, _T("ESPresetDlg"));
 	Dialog.SetWindowProc(EditorSearchPresetDialogProc, 0);
 	Dialog.SetUseID(true);
-	Dialog.SetCancelID(MCancel);
 
 	Dialog.AddFrame(MESPreset);
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));

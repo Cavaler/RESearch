@@ -353,7 +353,6 @@ bool ReplacePrompt(bool Plugin)
 	CFarDialog Dialog(76, 27, _T("FileReplaceDlg"));
 	Dialog.SetWindowProc(FileReplaceDialogProc, 0);
 	Dialog.SetUseID(true);
-	Dialog.SetCancelID(MCancel);
 
 	Dialog.AddFrame(MREReplace);
 

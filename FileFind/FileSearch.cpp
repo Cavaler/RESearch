@@ -107,7 +107,6 @@ bool SearchPrompt(bool Plugin)
 	CFarDialog Dialog(76,23,_T("FileSearchDlg"));
 	Dialog.SetWindowProc(FileSearchDialogProc, 0);
 	Dialog.SetUseID(true);
-	Dialog.SetCancelID(MCancel);
 
 	Dialog.AddFrame(MRESearch);
 
