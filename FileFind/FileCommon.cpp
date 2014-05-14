@@ -996,9 +996,52 @@ void CFarDateTimeStorage::Put(const TCHAR *pszBuffer) {
 	}
 }
 
+void UpdateFADialog(CFarDialog *pDlg)
+{
+	bool bFullFileNameMatch = pDlg->IsDlgItemChecked(MFullFileNameMatch);
+	pDlg->EnableDlgItem(MFullFileNameMatch, bFullFileNameMatch, 1);
+	pDlg->EnableDlgItem(MFullFileNameMatch, bFullFileNameMatch, 2);
+	pDlg->EnableDlgItem(MFullFileNameMatch, bFullFileNameMatch, 3);
+
+	bool bDirectoryMatch = pDlg->IsDlgItemChecked(MDirectoryMatch);
+	pDlg->EnableDlgItem(MDirectoryMatch, bDirectoryMatch, 1);
+	pDlg->EnableDlgItem(MDirectoryMatch, bDirectoryMatch, 2);
+	pDlg->EnableDlgItem(MDirectoryMatch, bDirectoryMatch, 3);
+
+	bool bDateAfter = pDlg->IsDlgItemChecked(MDateAfter);
+	pDlg->EnableDlgItem(MDateAfter, bDateAfter, 1);
+	pDlg->EnableDlgItem(MDateAfter, bDateAfter, 2);
+
+	bool bDateBefore = pDlg->IsDlgItemChecked(MDateBefore);
+	pDlg->EnableDlgItem(MDateBefore, bDateBefore, 1);
+	pDlg->EnableDlgItem(MDateBefore, bDateBefore, 2);
+
+	pDlg->EnableDlgItem(MCreationDate, bDateAfter || bDateBefore);
+	pDlg->EnableDlgItem(MModificationDate, bDateAfter || bDateBefore);
+
+	pDlg->EnableDlgItem(MSizeGreater, pDlg->IsDlgItemChecked(MSizeGreater), 1);
+	pDlg->EnableDlgItem(MSizeLess,    pDlg->IsDlgItemChecked(MSizeLess   ), 1);
+	pDlg->EnableDlgItem(MSearchHead,  pDlg->IsDlgItemChecked(MSearchHead ), 1);
+}
+
+LONG_PTR WINAPI FileAdvancedDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LONG_PTR lParam2)
+{
+	int nCtlID = pDlg->GetID(nParam1);
+
+	switch (nMsg) {
+	case DN_INITDIALOG:
+	case DN_BTNCLICK:
+		UpdateFADialog(pDlg);
+		break;
+	}
+
+	return pDlg->DefDlgProc(nMsg, nParam1, lParam2);
+}
+
 bool AdvancedSettings()
 {
 	CFarDialog Dialog(78,25,_T("AdvancedFileSearchDlg"));
+	Dialog.SetWindowProc(FileAdvancedDialogProc, 0);
 	Dialog.SetUseID(true);
 
 	Dialog.AddFrame(MAdvancedOptions);
@@ -1157,6 +1200,7 @@ void CFPreset::Apply()
 bool CFAPresetCollection::EditPreset(CPreset *pPreset)
 {
 	CFarDialog Dialog(78,27,_T("FAPresetDlg"));
+	Dialog.SetWindowProc(FileAdvancedDialogProc, 0);
 	Dialog.SetUseID(true);
 
 	Dialog.AddFrame(MFAPreset);
