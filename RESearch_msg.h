@@ -24,9 +24,6 @@ enum eStringTable {
 
 	MF7,
 
-	MTempUpdate,
-	MTempSendFiles,
-
 	MMenuHeader,
 	MMenuSearch,
 	MMenuReplace,

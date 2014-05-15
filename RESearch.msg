@@ -24,9 +24,6 @@ MSearchResults		"Search results"	"Результаты поиска"
 
 MF7					"Remove"			"Убрать"
 
-MTempUpdate			"Updating temporary panel contents"	"Обновление содержимого временной панели"
-MTempSendFiles		"Sending files to temporary panel"	"Передача файлов во временную панель"
-
 MMenuHeader			"RESearch"					"RESearch"
 MMenuSearch			"&Search"					"&Поиск"
 MMenuReplace		"&Replace"					"&Замена"
