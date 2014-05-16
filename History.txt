@@ -9,6 +9,12 @@ Planned:
 	? Extended batch properties, overriding preset properties (e.g. Search from beginning)
 	+ Command to "lock" read-only file before replacing
 
+Version 8.45 (16.05.2014)
+	+ Special script engine FarLUA allows using internal Far3 Lua engine
+	+ Added Spanish translation, thanks to Mauro72
+	+ LuaScript dll's bundled in Add-ins, for usage with Far 1.75/2.0
+	- Fixed line count in Editor | Count All
+
 Version 8.40 (13.05.2014)
 	- Fixed handling of zero-length files in Panels
 	* Another way of calling presets from Lua
