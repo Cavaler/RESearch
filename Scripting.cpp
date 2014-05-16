@@ -12,6 +12,21 @@ _COM_SMARTPTR_TYPEDEF(IActiveScriptParse, __uuidof(IActiveScriptParse));
 _COM_SMARTPTR_TYPEDEF(ICatInformation, __uuidof(ICatInformation));
 _COM_SMARTPTR_TYPEDEF(IEnumCLSID, __uuidof(IEnumCLSID));
 
+#ifdef FAR3
+LPOLESTR g_szFarLUA = L"{40308C27-BCE7-4244-B5FF-5DFB32F9E778}";
+#endif
+
+void AddCustomScriptEngines()
+{
+	sActiveScript Script;
+#ifdef FAR3
+	CLSIDFromString(g_szFarLUA, &Script.m_clsid);
+	Script.m_strName = L"FarLUA";
+	m_arrEngines.push_back(Script);
+	m_lstEngines.Append(Script.m_strName.c_str());
+#endif
+}
+
 void ReadActiveScripts()
 {
 	CFarSettingsKey hRoot = GetSettings();
@@ -35,6 +50,8 @@ void ReadActiveScripts()
 	if (m_arrEngines.size() == 0) {
 		EnumActiveScripts();
 		SaveActiveScripts();
+	} else {
+		AddCustomScriptEngines();
 	}
 }
 
@@ -79,6 +96,8 @@ void EnumActiveScripts()
 		m_arrEngines.push_back(Script);
 		m_lstEngines.Append(Script.m_strName.c_str());
 	} while (true);
+
+	AddCustomScriptEngines();
 }
 
 LPCTSTR ScriptEngine(bool bEnabled)
@@ -361,8 +380,8 @@ template<>
 basic_string<char> EvaluateReplaceString(CREParameters<char> &Param, const char *Replace, const char *EOL, LPCTSTR szEngine)
 {
 	CReplaceParametersT<char, CConverter> *pParams = new CComObject<CReplaceParametersT<char, CConverter> >();
+	g_spREParam = pParams;
 	pParams->Init(&Param, EOL);
-	pParams->AddRef();
 
 #ifdef UNICODE
 	EvaluateReplaceStringT<CConverter>(pParams, UTF8ToUnicode(Replace).c_str(), szEngine);
@@ -372,7 +391,7 @@ basic_string<char> EvaluateReplaceString(CREParameters<char> &Param, const char 
 
 	basic_string<char> strResult = pParams->Result();
 
-	pParams->Release();
+	g_spREParam = NULL;
 
 	return strResult;
 }
@@ -383,14 +402,19 @@ template<>
 basic_string<wchar_t> EvaluateReplaceString(CREParameters<wchar_t> &Param, const wchar_t *Replace, const wchar_t *EOL, LPCTSTR szEngine)
 {
 	CReplaceParametersT<wchar_t, CConverter> *pParams = new CComObject<CReplaceParametersT<wchar_t, CConverter> >();
+	g_spREParam = pParams;
 	pParams->Init(&Param, EOL);
-	pParams->AddRef();
+
+#ifdef FAR3
+	if (_wcsicmp(szEngine, g_szFarLUA) == 0)
+		return EvaluateLUAString(Param, Replace);
+#endif
 
 	EvaluateReplaceStringT<CConverter>(pParams, Replace, szEngine);
 
 	basic_string<wchar_t> strResult = pParams->Result();
 
-	pParams->Release();
+	g_spREParam = NULL;
 
 	return strResult;
 }

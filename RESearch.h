@@ -68,7 +68,7 @@ HANDLE OpenPluginFromFileMenu(int Item, bool ShowDialog = true);
 HANDLE OpenPluginFromEditorMenu(int Item);
 HANDLE OpenPluginFromViewerMenu(int Item);
 #ifdef FAR3
-HANDLE OpenFromMacro(const OpenMacroInfo *MInfo);
+HANDLE OpenFromMacro(const OpenMacroInfo *MInfo, bool &bRawReturn);
 #endif
 
 LPCTSTR ScriptEngine(bool bEnabled);
@@ -122,8 +122,12 @@ void HighlightREError(CFarDialog *pDlg);
 void FillDefaultNamedParameters(const TCHAR *szFileName);
 void ClearVariables();
 
+EXTERN IReplaceParametersPtr g_spREParam;
 template<class CHAR>
 basic_string<CHAR> EvaluateReplaceString(CREParameters<CHAR> &Param, const CHAR *Replace, const CHAR *EOL, LPCTSTR szEngine);
+#ifdef FAR3
+wstring EvaluateLUAString(CREParameters<wchar_t> &Param, const wchar_t *Replace);
+#endif
 
 #ifdef UNICODE
 bool PreparePattern(pcre **Pattern,pcre_extra **PatternExtra,const string &Text,int CaseSensitive,const unsigned char *pTables=NULL);

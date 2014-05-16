@@ -298,9 +298,21 @@ void CREParameters<CHAR>::AddRE(pcre *re)
 }
 
 template<class CHAR>
+int CREParameters<CHAR>::ParamCount()
+{
+	return Empty() ? 0 : Count()/3;
+}
+
+template<class CHAR>
+bool CREParameters<CHAR>::HasParam(int nNumber)
+{
+	return !Empty() && (nNumber >= 0) && (nNumber < Count()/3);
+}
+
+template<class CHAR>
 typename CREParameters<CHAR>::cstring CREParameters<CHAR>::GetParam(int nNumber)
 {
-	if ((nNumber < 0) || (nNumber >= Count()/3) || Empty()) return cstring();
+	if (!HasParam(nNumber)) return cstring();
 
 	return cstring(m_szString+m_arrMatch[nNumber*2], m_arrMatch[nNumber*2+1]-m_arrMatch[nNumber*2]);
 }

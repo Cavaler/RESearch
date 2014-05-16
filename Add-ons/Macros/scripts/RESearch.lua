@@ -4,12 +4,54 @@ end
 
 local function CallRS1(p)
   mmode(3,1)
-  Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", p)
+  return Plugin.SyncCall("F250C12A-78E2-4ABC-A784-3FDD3156E415", p)
 end
 
 local function CallRS2(p1, p2)
   mmode(3,1)
-  Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", p1, p2)
+  return Plugin.SyncCall("F250C12A-78E2-4ABC-A784-3FDD3156E415", p1, p2)
+end
+
+local function CallRS3(p1, p2, p3)
+  mmode(3,1)
+  return Plugin.SyncCall("F250C12A-78E2-4ABC-A784-3FDD3156E415", p1, p2, p3)
+end
+
+local function CallRS4(p1, p2, p3, p4)
+  mmode(3,1)
+  return Plugin.SyncCall("F250C12A-78E2-4ABC-A784-3FDD3156E415", p1, p2, p3, p4)
+end
+
+function _G.match(n)
+  return CallRS3("Script", "match", n)
+end
+
+function _G.named(n)
+  return CallRS3("Script", "named", n)
+end
+
+function _G.eol()
+  return CallRS3("Script", "eol")
+end
+
+function _G.l()
+  return CallRS3("Script", "l")
+end
+
+function _G.n()
+  return CallRS3("Script", "n")
+end
+
+function _G.r()
+  return CallRS3("Script", "r")
+end
+
+function _G.init(n, v)
+  return CallRS3("Script", "init", n, v)
+end
+
+function _G.store(n, v)
+  return CallRS3("Script", "store", n, v)
 end
 
 Macro {

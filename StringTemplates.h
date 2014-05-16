@@ -57,6 +57,8 @@ public:
 	int *Match() { return m_arrMatch.empty() ? NULL : &m_arrMatch[0]; }
 	int  Count() { return (int)m_arrMatch.size(); }
 
+	int		ParamCount();
+	bool	HasParam (int nNumber);
 	cstring GetParam (int nNumber);
 	cstring GetParam (const cstring &strName, bool bCheckNumber = false);
 	int     FindParam(const cstring &strName, bool bCheckNumber = false);

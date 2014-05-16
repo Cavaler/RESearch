@@ -20,7 +20,7 @@ static LPCWSTR g_szViewerCommands[] = {
 	L"Search", L"SRAgain", L"ClearVariables"
 };
 
-bool GetIntValue(FarMacroValue &Value, int &nValue)
+bool GetIntValue(const FarMacroValue &Value, int &nValue)
 {
 	switch (Value.Type) {
 	case FMVT_INTEGER:
@@ -36,14 +36,14 @@ bool GetIntValue(FarMacroValue &Value, int &nValue)
 	}
 }
 
-bool GetStringValue(FarMacroValue &Value, string &strValue)
+bool GetStringValue(const FarMacroValue &Value, string &strValue)
 {
 	switch (Value.Type) {
 	case FMVT_INTEGER:
 		strValue = FormatStrA("%d", (int)Value.Integer);
 		return true;
 	case FMVT_DOUBLE:
-		strValue = FormatStrA("%f", (int)Value.Double);
+		strValue = FormatStrA("%g", Value.Double);
 		return true;
 	case FMVT_STRING:
 		strValue = FormatStrA("%S", Value.String);
@@ -53,14 +53,14 @@ bool GetStringValue(FarMacroValue &Value, string &strValue)
 	}
 }
 
-bool GetStringValue(FarMacroValue &Value, wstring &strValue)
+bool GetStringValue(const FarMacroValue &Value, wstring &strValue)
 {
 	switch (Value.Type) {
 	case FMVT_INTEGER:
 		strValue = FormatStrW(L"%d", (int)Value.Integer);
 		return true;
 	case FMVT_DOUBLE:
-		strValue = FormatStrW(L"%f", (int)Value.Double);
+		strValue = FormatStrW(L"%g", Value.Double);
 		return true;
 	case FMVT_STRING:
 		strValue = Value.String;
@@ -68,6 +68,37 @@ bool GetStringValue(FarMacroValue &Value, wstring &strValue)
 	default:
 		return false;
 	}
+}
+
+wstring GetStringValue(const FarMacroValue &Value)
+{
+	wstring strValue;
+	GetStringValue(Value, strValue);
+	return strValue;
+}
+
+bool GetVariantValue(const FarMacroValue &Value, _variant_t &vtValue)
+{
+	switch (Value.Type) {
+	case FMVT_INTEGER:
+		vtValue = (int)Value.Integer;
+		return true;
+	case FMVT_DOUBLE:
+		vtValue = Value.Double;
+		return true;
+	case FMVT_STRING:
+		vtValue = Value.String;
+		return true;
+	default:
+		return false;
+	}
+}
+
+_variant_t GetVariantValue(const FarMacroValue &Value)
+{
+	_variant_t vtValue;
+	GetVariantValue(Value, vtValue);
+	return vtValue;
 }
 
 HANDLE RunFilePreset(LPCWSTR szPreset)
@@ -375,7 +406,9 @@ HANDLE OpenPluginFromViewerParameters(const OpenMacroInfo *MInfo)
 	return HandleFromOpResult(pSet->m_Executor());
 }
 
-HANDLE OpenFromMacro(const OpenMacroInfo *MInfo)
+HANDLE OpenFromScriptMacro(const OpenMacroInfo *MInfo);
+
+HANDLE OpenFromMacro(const OpenMacroInfo *MInfo, bool &bRawReturn)
 {
 	g_bFromCmdLine = true;
 
@@ -386,7 +419,14 @@ HANDLE OpenFromMacro(const OpenMacroInfo *MInfo)
 	{
 		return OpenFromStringMacro(nType, L"Menu");
 	}
-	else if (MInfo->Count == 1)
+
+	if ((MInfo->Values[0].Type == FMVT_STRING) && (_wcsicmp(MInfo->Values[0].String, L"Script") == 0))
+	{
+		bRawReturn = true;
+		return OpenFromScriptMacro(MInfo);
+	}
+
+	if (MInfo->Count == 1)
 	{
 		if (nType < 0) return NO_PANEL_HANDLE;
 
@@ -430,4 +470,75 @@ HANDLE OpenFromMacro(const OpenMacroInfo *MInfo)
 		return NO_PANEL_HANDLE;
 	}
 }
+
+void FillMacroValueStrings(const OpenMacroInfo *MInfo, vector<wstring> &arrStrings)
+{
+	if (MInfo->Count <= 1) return;
+	if (g_spREParam == NULL) return;
+
+	wstring strFunc = GetStringValue(MInfo->Values[1]);
+	LPOLESTR bstrName = (LPOLESTR)strFunc.c_str();
+	DISPID dispID;
+	if (g_spREParam->GetIDsOfNames(IID_NULL, &bstrName, 1, LOCALE_SYSTEM_DEFAULT, &dispID) != S_OK)
+		return;
+
+	vector<_variant_t> arrParams;
+	for (size_t nParam = 2; nParam < MInfo->Count; nParam++)
+	{
+		arrParams.push_back(GetVariantValue((MInfo->Values[nParam])));
+	}
+
+	DISPPARAMS dispParams = { !arrParams.empty() ? &arrParams[0] : NULL, NULL, arrParams.size(), 0 };
+	_variant_t vtResult;
+	if (g_spREParam->Invoke(dispID, IID_NULL, LOCALE_SYSTEM_DEFAULT, DISPATCH_METHOD, &dispParams, &vtResult, NULL, NULL) != S_OK)
+		return;
+
+	arrStrings.push_back((LPCWSTR)_bstr_t(vtResult));
+}
+
+HANDLE OpenFromScriptMacro(const OpenMacroInfo *MInfo)
+{
+	static FarMacroCall Call = { sizeof(FarMacroCall), 0, NULL, NULL, NULL };
+	static vector<FarMacroValue> arrValues;
+	static vector<wstring> arrStrings;
+
+	arrStrings.clear();
+	FillMacroValueStrings(MInfo, arrStrings);
+
+	arrValues.resize(arrStrings.size());
+	if (arrStrings.empty())
+		return NULL;
+
+	for (size_t nParam = 0; nParam < arrStrings.size(); nParam++)
+	{
+		arrValues[nParam].Type   = FMVT_STRING;
+		arrValues[nParam].String = arrStrings[nParam].c_str();
+	}
+
+	Call.Count  = arrValues.size();
+	Call.Values = &arrValues[0];
+
+	return &Call;
+}
+
+wstring EvaluateLUAString(CREParameters<wchar_t> &Param, const wchar_t *Replace)
+{
+	vector<FarMacroValue> arrValues (Param.ParamCount());
+	vector<wstring>       arrStrings(Param.ParamCount());
+	for (int nParam = 0; nParam < Param.ParamCount(); nParam++)
+	{
+		arrStrings[nParam] = Param.GetParam(nParam);
+		arrValues[nParam].Type   = FMVT_STRING;
+		arrValues[nParam].String = arrStrings[nParam].c_str();
+	}
+
+	MacroExecuteString Macro = {sizeof(MacroExecuteString), KMFLAGS_LUA, Replace, arrValues.size(), &arrValues[0], 0, NULL};
+	StartupInfo.MacroControl(MCTL_EXECSTRING, 0, &Macro);
+
+	if (Macro.OutCount == 0)
+		return L"";
+
+	return GetStringValue(Macro.OutValues[0]);
+}
+
 #endif
