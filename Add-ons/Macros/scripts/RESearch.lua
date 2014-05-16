@@ -31,27 +31,27 @@ function _G.named(n)
 end
 
 function _G.eol()
-  return CallRS3("Script", "eol")
+  return CallRS2("Script", "eol")
 end
 
 function _G.l()
-  return CallRS3("Script", "l")
+  return CallRS2("Script", "l")
 end
 
 function _G.n()
-  return CallRS3("Script", "n")
+  return CallRS2("Script", "n")
 end
 
 function _G.r()
-  return CallRS3("Script", "r")
+  return CallRS2("Script", "r")
 end
 
 function _G.init(n, v)
-  return CallRS3("Script", "init", n, v)
+  return CallRS4("Script", "init", n, v)
 end
 
 function _G.store(n, v)
-  return CallRS3("Script", "store", n, v)
+  return CallRS4("Script", "store", n, v)
 end
 
 Macro {
