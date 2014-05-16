@@ -14,6 +14,7 @@ _COM_SMARTPTR_TYPEDEF(IEnumCLSID, __uuidof(IEnumCLSID));
 
 #ifdef FAR3
 LPOLESTR g_szFarLUA = L"{40308C27-BCE7-4244-B5FF-5DFB32F9E778}";
+LPOLESTR g_szFarMS  = L"{1ED8D46A-36D9-4542-9160-C8A8535CB683}";
 #endif
 
 void AddCustomScriptEngines()
@@ -22,6 +23,11 @@ void AddCustomScriptEngines()
 #ifdef FAR3
 	CLSIDFromString(g_szFarLUA, &Script.m_clsid);
 	Script.m_strName = L"FarLUA";
+	m_arrEngines.push_back(Script);
+	m_lstEngines.Append(Script.m_strName.c_str());
+
+	CLSIDFromString(g_szFarMS, &Script.m_clsid);
+	Script.m_strName = L"FarMoonScript";
 	m_arrEngines.push_back(Script);
 	m_lstEngines.Append(Script.m_strName.c_str());
 #endif
@@ -407,7 +413,9 @@ basic_string<wchar_t> EvaluateReplaceString(CREParameters<wchar_t> &Param, const
 
 #ifdef FAR3
 	if (_wcsicmp(szEngine, g_szFarLUA) == 0)
-		return EvaluateLUAString(Param, Replace);
+		return EvaluateLUAString(Param, Replace, KMFLAGS_LUA);
+	if (_wcsicmp(szEngine, g_szFarMS ) == 0)
+		return EvaluateLUAString(Param, Replace, KMFLAGS_MOONSCRIPT);
 #endif
 
 	EvaluateReplaceStringT<CConverter>(pParams, Replace, szEngine);

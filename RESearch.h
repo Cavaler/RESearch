@@ -126,7 +126,7 @@ EXTERN IReplaceParametersPtr g_spREParam;
 template<class CHAR>
 basic_string<CHAR> EvaluateReplaceString(CREParameters<CHAR> &Param, const CHAR *Replace, const CHAR *EOL, LPCTSTR szEngine);
 #ifdef FAR3
-wstring EvaluateLUAString(CREParameters<wchar_t> &Param, const wchar_t *Replace);
+wstring EvaluateLUAString(CREParameters<wchar_t> &Param, const wchar_t *Replace, FARKEYMACROFLAGS Flags);
 #endif
 
 #ifdef UNICODE

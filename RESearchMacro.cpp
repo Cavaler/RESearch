@@ -521,7 +521,7 @@ HANDLE OpenFromScriptMacro(const OpenMacroInfo *MInfo)
 	return &Call;
 }
 
-wstring EvaluateLUAString(CREParameters<wchar_t> &Param, const wchar_t *Replace)
+wstring EvaluateLUAString(CREParameters<wchar_t> &Param, const wchar_t *Replace, FARKEYMACROFLAGS Flags)
 {
 	vector<FarMacroValue> arrValues (Param.ParamCount());
 	vector<wstring>       arrStrings(Param.ParamCount());
@@ -532,7 +532,7 @@ wstring EvaluateLUAString(CREParameters<wchar_t> &Param, const wchar_t *Replace)
 		arrValues[nParam].String = arrStrings[nParam].c_str();
 	}
 
-	MacroExecuteString Macro = {sizeof(MacroExecuteString), KMFLAGS_LUA, Replace, arrValues.size(), &arrValues[0], 0, NULL};
+	MacroExecuteString Macro = {sizeof(MacroExecuteString), Flags, Replace, arrValues.size(), &arrValues[0], 0, NULL};
 	StartupInfo.MacroControl(MCTL_EXECSTRING, 0, &Macro);
 
 	if (Macro.OutCount == 0)
