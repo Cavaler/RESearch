@@ -96,8 +96,9 @@ bool SearchIn(const TCHAR *Line,int Start,int Length,int *MatchStart,int *MatchL
 		int Position=(EReverse)?ReverseBMHSearch(Line+Start,Length,ETextUpcase.data(),ETextUpcase.length(),Table)
 									  :BMHSearch(Line+Start,Length,ETextUpcase.data(),ETextUpcase.length(),Table);
 		if (Position>=0) {
-			if (MatchStart) *MatchStart=Start+Position;
-			if (MatchLength) *MatchLength=EText.length();
+			REParam.AddPlainTextMatch(Start+Position, EText.length());
+			if (MatchStart) *MatchStart = Start+Position;
+			if (MatchLength) *MatchLength = EText.length();
 			return true;
 		}
 	}

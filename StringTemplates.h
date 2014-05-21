@@ -56,6 +56,7 @@ public:
 	vector<int> m_arrMatch;
 	int *Match() { return m_arrMatch.empty() ? NULL : &m_arrMatch[0]; }
 	int  Count() { return (int)m_arrMatch.size(); }
+	void AddPlainTextMatch(int nStart, int nLength);
 
 	int		ParamCount();
 	bool	HasParam (int nNumber);

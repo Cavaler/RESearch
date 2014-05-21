@@ -218,6 +218,7 @@ void CREParameters<CHAR>::Clear()
 	m_arrMatch.clear();
 	m_re = NULL;
 	m_szString = NULL;
+	m_nLength  = 0;
 }
 
 template<class CHAR>
@@ -298,15 +299,23 @@ void CREParameters<CHAR>::AddRE(pcre *re)
 }
 
 template<class CHAR>
+void CREParameters<CHAR>::AddPlainTextMatch(int nStart, int nLength)
+{
+	m_arrMatch.resize(3);
+	m_arrMatch[0] = nStart;
+	m_arrMatch[1] = nStart + nLength;
+}
+
+template<class CHAR>
 int CREParameters<CHAR>::ParamCount()
 {
-	return Empty() ? 0 : Count()/3;
+	return (m_szString == NULL) ? 0 : Count()/3;
 }
 
 template<class CHAR>
 bool CREParameters<CHAR>::HasParam(int nNumber)
 {
-	return !Empty() && (nNumber >= 0) && (nNumber < Count()/3);
+	return (nNumber >= 0) && (nNumber < ParamCount());
 }
 
 template<class CHAR>
