@@ -533,7 +533,11 @@ wstring EvaluateLUAString(CREParameters<wchar_t> &Param, const wchar_t *Replace,
 	}
 
 	MacroExecuteString Macro = {sizeof(MacroExecuteString), Flags, Replace, arrValues.size(), !arrValues.empty() ? &arrValues[0] : NULL, 0, NULL};
-	StartupInfo.MacroControl(MCTL_EXECSTRING, 0, &Macro);
+	if (!StartupInfo.MacroControl(MCTL_EXECSTRING, 0, &Macro))
+	{
+		g_bInterrupted = true;
+		return L"";
+	}
 
 	wstring strResult;
 
