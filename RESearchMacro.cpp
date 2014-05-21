@@ -535,10 +535,12 @@ wstring EvaluateLUAString(CREParameters<wchar_t> &Param, const wchar_t *Replace,
 	MacroExecuteString Macro = {sizeof(MacroExecuteString), Flags, Replace, arrValues.size(), !arrValues.empty() ? &arrValues[0] : NULL, 0, NULL};
 	StartupInfo.MacroControl(MCTL_EXECSTRING, 0, &Macro);
 
-	if (Macro.OutCount == 0)
-		return L"";
+	wstring strResult;
 
-	return GetStringValue(Macro.OutValues[0]);
+	for (size_t nItem = 0; nItem < Macro.OutCount; nItem++)
+		strResult += GetStringValue(Macro.OutValues[nItem]);
+
+	return strResult;
 }
 
 #endif
