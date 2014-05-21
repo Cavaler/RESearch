@@ -211,6 +211,11 @@ public:
 		return S_OK;
 	}
 
+	STDMETHOD(s)(long *pValue) {
+		*pValue = CSO::ctoi(m_pParam->GetParam(CSO::__T2("S", L"S")).c_str());
+		return S_OK;
+	}
+
 	STDMETHOD(r)(long *pValue) {
 		*pValue = CSO::ctoi(m_pParam->GetParam(CSO::__T2("R", L"R")).c_str());
 		return S_OK;

@@ -42,6 +42,10 @@ function _G.n()
   return CallRS2("Script", "n")
 end
 
+function _G.s()
+  return CallRS2("Script", "s")
+end
+
 function _G.r()
   return CallRS2("Script", "r")
 end
