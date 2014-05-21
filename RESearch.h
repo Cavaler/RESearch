@@ -56,9 +56,7 @@ CFarSettingsKey GetSettings();
 void ReadRegistry();
 void WriteRegistry();
 
-void ReadActiveScripts();
 void EnumActiveScripts();
-void SaveActiveScripts();
 
 bool ProcessCommandLine(const TCHAR *Line, bool *ShowDialog, INT_PTR *Item);
 

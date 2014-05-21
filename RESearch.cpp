@@ -78,7 +78,7 @@ void WINAPI FAR_EXPORT(SetStartupInfo)(const PluginStartupInfo *Info)
 	CFarDialog::SetDefaultCancelID(MCancel);
 
 	CoInitialize(NULL);
-	ReadActiveScripts();
+	EnumActiveScripts();
 }
 
 int ShowFileMenu(int &nBreakCode)
@@ -716,7 +716,7 @@ int ConfigureCP()
 void ConfigureCommon()
 {
 	CFarDialog Dialog(64, 21, _T("CommonConfig"));
-	Dialog.EnableAutoHotkeys(true);
+	Dialog.SetUseID(true);
 	Dialog.AddFrame(MCommonSettings);
 
 	Dialog.Add(new CFarTextItem(5,3,0,MSeveralLinesIs));
@@ -738,19 +738,13 @@ void ConfigureCommon()
 	Dialog.Add(new CFarCheckBoxItem(5,12,0,MUseEscapesInPlainText,&g_bEscapesInPlainText));
 	Dialog.Add(new CFarCheckBoxItem(5,13,0,MIgnoreIdentReplace,&g_bIgnoreIdentReplace));
 
-	Dialog.Add(new CFarButtonItem(5, 15, DIF_CENTERGROUP, false, MUpdateScriptEngines));
-
 	Dialog.AddButtons(MOk, MCancel);
 
 	do {
-		int nResult = Dialog.Display(2, -2, -3);
+		int nResult = Dialog.Display();
 
 		switch (nResult) {
-		case 1:
-			EnumActiveScripts();
-			SaveActiveScripts();
-			break;
-		default:
+		case 0:
 			return;
 		}
 	} while (true);

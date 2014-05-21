@@ -33,48 +33,6 @@ void AddCustomScriptEngines()
 #endif
 }
 
-void ReadActiveScripts()
-{
-	CFarSettingsKey hRoot = GetSettings();
-	CFarSettingsKey hKey = hRoot.Open(_T("ScriptEngines"));
-
-	hKey.StartEnumValues();
-	tstring strName;
-
-	while (hKey.GetNextEnum(strName)) {
-		sActiveScript Script;
-		if (FAILED(CLSIDFromString(_bstr_t(strName.c_str()), &Script.m_clsid))) continue;
-
-		hKey.QueryStringValue(strName.c_str(), Script.m_strName);
-
-		m_arrEngines.push_back(Script);
-		m_lstEngines.Append(Script.m_strName.c_str());
-	}
-
-	hKey.Close();
-
-	if (m_arrEngines.size() == 0) {
-		EnumActiveScripts();
-		SaveActiveScripts();
-	} else {
-		AddCustomScriptEngines();
-	}
-}
-
-void SaveActiveScripts()
-{
-	CFarSettingsKey hRoot = GetSettings();
-	CFarSettingsKey hKey = hRoot.Open(_T("ScriptEngines"));
-	hKey.DeleteAllValues();
-
-	for (size_t nKey = 0; nKey < m_arrEngines.size(); nKey++) {
-		OLECHAR szGuid[42];
-		if (FAILED(StringFromGUID2(m_arrEngines[nKey].m_clsid, szGuid, 42))) continue;
-
-		hKey.SetStringValue((LPCTSTR)_bstr_t(szGuid), m_arrEngines[nKey].m_strName);
-	}
-}
-
 void EnumActiveScripts()
 {
 	m_arrEngines.clear();

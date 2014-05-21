@@ -159,7 +159,6 @@ MThreadStackMB		"&Thread stack:"						"&Стек потока:"									"Pila de
 MShowUsageWarnings	"Show &warnings on common mistakes"		"&Предупреждения о неправильном использовании"	"Mostrar advertencias en errores comúnes"
 MUseEscapesInPlainText	"Use &escapes in plain-text replace"	"Использовать &эскейпы при plain text замене"	"Usar secuencia de &escapes al reempl.texto-plano"
 MIgnoreIdentReplace	"Ignore &identical replacements"		"Игнорировать &идентичную замену"				"Ignorar reemplazos &idénticos"
-MUpdateScriptEngines	"Update script engines list"			"Обновить список скриптовых языков"			"Actualizar motor de lista de script"
 
 MDefaultCP			"&Default codepage:"					"&Кодировка по умолчанию:"						"Pág.Có&digos por defecto:"
 MDefaultOEM			"&OEM"									"&OEM"											"&OEM"
