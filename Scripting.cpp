@@ -236,6 +236,11 @@ public:
 		return S_OK;
 	}
 
+	STDMETHOD(skip)() {
+		g_bSkipReplace = true;
+		return S_OK;
+	}
+
 private:
 	CREParameters<CHAR> *m_pParam;
 	const CHAR *m_szEOL;

@@ -184,6 +184,7 @@ and many others are also available)
     #result(str)#   Has to be called to return a resulting value back to RESearch
     #store(n, v)#   Store value 'v' in named parameter 'n'
     #init(n, v)#    Same as store(), except that it works only once after 'Replace' is invoked.
+    #skip()#        Forces RESearch to skip current replace
 
 @CommonConfig
 $ #Общие настройки#

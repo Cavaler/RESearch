@@ -258,10 +258,13 @@ LONG_PTR WINAPI ReplaceOKDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LON
 }
 
 #ifdef UNICODE
-eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &EndPos, const TCHAR *Original, const tstring &Replace) {
+eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &EndPos, const TCHAR *Original, const tstring &Replace)
 #else
-eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &EndPos, const TCHAR *Original, const tstring &Replace, const tstring &Replace_O2E) {
+eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &EndPos, const TCHAR *Original, const tstring &Replace, const tstring &Replace_O2E)
 #endif
+{
+	if (g_bSkipReplace) return RR_SKIP;
+
 	RefreshEditorInfo();
 
 	EditorSetPosition Position INIT_SS(EditorSetPosition);

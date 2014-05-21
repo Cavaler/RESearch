@@ -15,6 +15,8 @@ template<class CHAR>
 typename CStringOperations<CHAR>::cstring
 CStringOperations<CHAR>::CreateReplaceString(const CHAR *Replace, const CHAR *EOL, LPCTSTR szEngine, CREParameters<CHAR> &Param)
 {
+	g_bSkipReplace = false;
+
 	if (szEngine != NULL)
 		return EvaluateReplaceString(Param, Replace, EOL, szEngine);
 

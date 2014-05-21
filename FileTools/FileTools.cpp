@@ -392,7 +392,8 @@ void RenameFile(const FIND_DATA *FindData, panelitem_vector &PanelItems)
 
 	bool bOnlyGlobalConfirm = !FRConfirmLineThisFile;
 
-	while (FindRename(strCurrentName.c_str(), MatchStart, MatchLength)) {
+	while (FindRename(strCurrentName.c_str(), MatchStart, MatchLength))
+	{
 		REParam.AddFNumbers(FileNumber, FindNumber, ReplaceNumber);
 
 		tstring strNewSubName = CSO::CreateReplaceString(FRReplace.c_str(), _T(""), ScriptEngine(FREvaluate), REParam);
@@ -401,18 +402,22 @@ void RenameFile(const FIND_DATA *FindData, panelitem_vector &PanelItems)
 
 		MatchStart += (strNewSubName.empty()) ? 1 : strNewSubName.length();
 
-		bool bConfirm = true;
+		if (!g_bSkipReplace)
+		{
+			bool bConfirm = true;
 
-		if (!bOnlyGlobalConfirm) {
-			if (!ConfirmFile(MMenuRename,strOriginalName.c_str())) break;
+			if (!bOnlyGlobalConfirm) {
+				if (!ConfirmFile(MMenuRename,strOriginalName.c_str())) break;
 
-			bConfirm = ConfirmRename(strCurrentName.c_str(), strNewName.c_str());
+				bConfirm = ConfirmRename(strCurrentName.c_str(), strNewName.c_str());
+			}
+
+			if (bConfirm) {
+				strCurrentName = strNewName;
+				ReplaceNumber++;
+			}
 		}
 
-		if (bConfirm) {
-			strCurrentName = strNewName;
-			ReplaceNumber++;
-		}
 		FindNumber++;
 
 		if (!FRepeating) break;

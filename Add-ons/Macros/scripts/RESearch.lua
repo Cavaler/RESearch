@@ -51,11 +51,15 @@ function _G.r()
 end
 
 function _G.init(n, v)
-  return CallRS4("Script", "init", n, v)
+  CallRS4("Script", "init", n, v)
 end
 
 function _G.store(n, v)
-  return CallRS4("Script", "store", n, v)
+  CallRS4("Script", "store", n, v)
+end
+
+function _G.skip()
+  CallRS2("Script", "skip")
 end
 
 Macro {

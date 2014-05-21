@@ -44,13 +44,14 @@ LONG_PTR WINAPI ConfirmReplacementDialogProc(CFarDialog *pDlg, int nMsg, int nPa
 
 bool ConfirmReplacement()
 {
-	return !FRConfirmLineThisFile;
+	return !g_bSkipReplace && !FRConfirmLineThisFile;
 }
 
 bool ConfirmReplacement(const TCHAR *Found, const TCHAR *Replaced, const TCHAR *FileName)
 {
-	if (!FRConfirmLineThisFile) return true;
 	if (g_bInterrupted) return false;
+	if (g_bSkipReplace) return false;
+	if (!FRConfirmLineThisFile) return true;
 
 	if (g_bIgnoreIdentReplace) {
 		if (_tcscmp(Found, Replaced) == 0) return false;

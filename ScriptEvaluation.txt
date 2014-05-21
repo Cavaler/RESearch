@@ -8,6 +8,7 @@ Functions available in scripts:
 - named(n) returns named subpattern, like ${n}
 - eol() returns end-of-line sequence to be used
 - l(), n(), s() and r() - same as corresponding $L etc sequences
+- skip() forces RESearch to skip this replacement
 
 Scripts can create persistent named variables. Their values can be retrieved via named() and will persist between script calls
 - store(n, v) - set named variable n to value v.

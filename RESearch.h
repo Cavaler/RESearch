@@ -46,6 +46,7 @@ struct sActiveScript {
 };
 EXTERN vector<sActiveScript> m_arrEngines;
 EXTERN CFarListData m_lstEngines CONSTRUCT((NULL, 0));
+EXTERN bool g_bSkipReplace;
 
 bool SystemToLocalTime(FILETIME &ft);
 bool LocalToSystemTime(FILETIME &ft);
