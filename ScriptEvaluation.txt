@@ -1,0 +1,24 @@
+Notes on "Evaluate as script" functionality
+
+All registered ActiveScripting engines will be present in the list, both built-in in Windows
+(JScript and VBScript) and any 3rd party you could have installed, like PerlScript or bundled LuaScript
+
+Functions available in scripts:
+- match(n) returns n-th subpattern, like $n
+- named(n) returns named subpattern, like ${n}
+- eol() returns end-of-line sequence to be used
+- l(), n(), s() and r() - same as corresponding $L etc sequences
+
+Scripts can create persistent named variables. Their values can be retrieved via named() and will persist between script calls
+- store(n, v) - set named variable n to value v.
+- init(n, v)  - initialize named variable n with value v. If it already exists, nothing is done
+
+To return value from script, use function result()
+
+If the engine does not support importing function in to root namespace (e.g. LuaScript), you should prefix
+each function with object name "research", e.g research:result() in LuaScript.
+
+In Far3, there are additional engines called FarLUA and FarMoonScript, representing Far built-in script engines.
+their usage is similar except that you should use "return" instead of result() to return values. Multiple returned values are merged together.
+Functionality of FarLUA/FarMoonScript depends on proper RESearch.lua script file in %FARRPROFILE%\Macros\scripts
+
