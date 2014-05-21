@@ -41,6 +41,7 @@ bool CFileBackend::SetBlockSize(INT_PTR nBlockSize)
 		m_bSlurpMode = true;
 		if (m_szBuffer) free(m_szBuffer);
 		m_szBuffer = (char *)malloc(0);
+		m_nBlockSize = 0;
 		return true;
 	}
 
