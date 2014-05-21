@@ -177,9 +177,9 @@ allows evaluating a line of script code as replacement text, using any installed
 and many others are also available)
     The following functions are available for the script:
 
-    #match(n)#      Returns the same as $n in usual replace
+    #match(n)#      Returns the same as $n in ~usual replace~@RegularReplace@
     #named(nm)#     Returns named parameter 'nm'
-    #l/n/r()#       Returns the same as $L/$N/$R in usual replace
+    #l/n/s/r()#     Returns the same as $L/$N/$S/$R in usual replace
     #eol()#         Returns a suitable end-of-line sequence
     #result(str)#   Has to be called to return a resulting value back to RESearch
     #store(n, v)#   Store value 'v' in named parameter 'n'
