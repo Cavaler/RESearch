@@ -9,6 +9,17 @@ Planned:
 	? Extended batch properties, overriding preset properties (e.g. Search from beginning)
 	+ Command to "lock" read-only file before replacing
 
+Version 8.46 (21.05.2014)
+	- Memory corruption fixed
+	- Fixed crash using FarLUA with plain-text search
+	- Spanish .lng not forgotten
+	* Plain-text search yields proper $0
+	* Multiple return values from FarLUA merged together
+	* Added some documentation for Script evaluation
+	- LuaScript dlls now register themselves properly
+	* More parameters in File presets
+	* Can skip() from scripts
+
 Version 8.45 (16.05.2014)
 	+ Special script engine FarLUA allows using internal Far3 Lua engine
 	+ Added Spanish translation, thanks to Mauro72
