@@ -15,13 +15,14 @@ CParameterSet g_FRParamSet(FileReplaceExecutor,
 	"SearchAs", &FSearchAs, "AsScript", &FREvaluate, NULL
 	);
 CParameterSet g_FGParamSet(FileGrepExecutor,
-	"Mask", &MaskText, "Text", &SearchText, "@Mask", &FMask, "@Text", &FText, NULL,
+	"Mask", &MaskText, "Text", &SearchText, "@Mask", &FMask, "@Text", &FText, "OutputFile", &FGOutputFile, NULL,
 	"AdvancedID", &FAdvancedID, "ContextLines", &FGContextLines, NULL,
 	"MaskAsRegExp", &FMaskAsRegExp, "CaseSensitive", &FCaseSensitive,
 	"SearchAs", &FSearchAs, "IsInverse", &FSInverse,
 	"OutputNames", &FGOutputNames, "AddLineCount", &FGAddLineCount, "AddMatchCount", &FGAddMatchCount,
 	"OutputLines", &FGOutputLines, "AddLineNumbers", &FGAddLineNumbers,
-	"AddContext", &FGAddContext, "MatchingLinePart", &FGMatchingLinePart, NULL
+	"AddContext", &FGAddContext, "MatchingLinePart", &FGMatchingLinePart,
+	"OutputToFile", &FGOutputToFile, "OpenInEditor", &FGOpenInEditor, "OpenPanel", &FGOpenPanel, NULL
 	);
 
 DWORD g_dwDateAfterThis, g_dwDateBeforeThis;

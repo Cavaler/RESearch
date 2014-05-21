@@ -32,7 +32,7 @@ Complete operations:
 	Commands and parameters available from panels:
 		Search			Mask, Text; MaskAsRegExp, CaseSensitive, SearchAs, IsInverse, AdvancedID
 		Replace			Mask, Text, Replace, Script; MaskAsRegExp, CaseSensitive, AllCharTables, SearchAs, AsScript, AdvancedID
-		Grep			Mask, Text; MaskAsRegExp, CaseSensitive, SearchAs, IsInverse, OutputNames, AddLineCount, AddMatchCound, OutputLines, AddLineNumbers, AddContext, ContextLines, MatchingLinePart
+		Grep			Mask, Text, OutputFile; MaskAsRegExp, CaseSensitive, SearchAs, IsInverse, OutputNames, AddLineCount, AddMatchCound, OutputLines, AddLineNumbers, AddContext, ContextLines, MatchingLinePart, OutputToFile, OpenInEditor, OpenPanel
 		Rename			Mask, Text, Replace, Script; MaskAsRegExp, TextAsRegExp, CaseSensitive, Repeating, AdvancedID
 		RenameSelected	Text, Replace;TextAsRegExp, CaseSensitive, Repeating
 

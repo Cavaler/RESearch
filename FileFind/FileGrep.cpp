@@ -345,7 +345,7 @@ bool GrepPrompt(bool bPlugin)
 	Dialog.Add(new CFarComboBoxItem(15,22,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearch, false),(int *)&FSearchIn));
 
 	Dialog.AddButtons(MOk,MCancel,MBtnClose);
-	Dialog.Add(new CFarButtonItem(60,25,0,0,MBtnPresets));
+	Dialog.Add(new CFarButtonItem(60,24,0,0,MBtnPresets));
 	Dialog.SetFocus(MMask, 1);
 	FACaseSensitive = FADirectoryCaseSensitive = MaskCaseHere();
 
@@ -445,7 +445,7 @@ bool CFGPresetCollection::EditPreset(CPreset *pPreset)
 	SearchAs FSA = (SearchAs)pPreset->m_mapInts["SearchAs"];
 	bool AsRegExp = (FSA == SA_REGEXP) || (FSA == SA_SEVERALLINE) || (FSA == SA_MULTILINE) || (FSA == SA_MULTIREGEXP);
 
-	CFarDialog Dialog(76,26,_T("FGPresetDlg"));
+	CFarDialog Dialog(76,30,_T("FGPresetDlg"));
 	Dialog.SetWindowProc(FileGrepDialogProc, 0);
 	Dialog.SetUseID(true);
 
@@ -477,12 +477,17 @@ bool CFGPresetCollection::EditPreset(CPreset *pPreset)
 		Dialog.Add(new CFarTextItem(21,17,0,MGrepContextLines));
 		Dialog.Add(new CFarCheckBoxItem(7,18,0,MGrepMatchedLinePart, &pPreset->m_mapInts["MatchingLinePart"]));
 
+	Dialog.Add(new CFarCheckBoxItem(5,20,0,MGrepOutputTo,&pPreset->m_mapInts["OutputToFile"]));
+	Dialog.Add(new CFarEditItem(20,20,45,DIF_HISTORY,_T("RESearch.GrepOutput"), pPreset->m_mapStrings["OutputFile"]));
+	Dialog.Add(new CFarCheckBoxItem(5,21,0,MGrepEditor,&pPreset->m_mapInts["OpenInEditor"]));
+	Dialog.Add(new CFarCheckBoxItem(5,22,0,MGrepPanel,&pPreset->m_mapInts["OpenPanel"]));
+
 	int  nAdvancedID = pPreset->m_mapInts["AdvancedID"];
 	bool bFAdvanced = nAdvancedID > 0;
 
 	Dialog.Add(new CFarCheckBoxItem(56,12,0,MLeftBracket,&bFAdvanced));
 	Dialog.Add(new CFarButtonItem  (62,12,DIF_NOBRACKETS,0,MBtnAdvanced));
-	Dialog.Add(new CFarCheckBoxItem(5,20,0,MAddToMenu,&pPreset->m_bAddToMenu));
+	Dialog.Add(new CFarCheckBoxItem(5,24,0,MAddToMenu,&pPreset->m_bAddToMenu));
 	Dialog.AddButtons(MOk,MCancel);
 
 	do {
