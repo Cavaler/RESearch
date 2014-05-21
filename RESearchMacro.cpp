@@ -532,7 +532,7 @@ wstring EvaluateLUAString(CREParameters<wchar_t> &Param, const wchar_t *Replace,
 		arrValues[nParam].String = arrStrings[nParam].c_str();
 	}
 
-	MacroExecuteString Macro = {sizeof(MacroExecuteString), Flags, Replace, arrValues.size(), &arrValues[0], 0, NULL};
+	MacroExecuteString Macro = {sizeof(MacroExecuteString), Flags, Replace, arrValues.size(), !arrValues.empty() ? &arrValues[0] : NULL, 0, NULL};
 	StartupInfo.MacroControl(MCTL_EXECSTRING, 0, &Macro);
 
 	if (Macro.OutCount == 0)
