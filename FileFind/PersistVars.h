@@ -44,6 +44,7 @@ PERSIST_STRING_VARIABLE(FGFileNameAppend, _T(""))
 PERSIST_bool_VARIABLE(FGOutputToFile, false)
 PERSIST_STRING_VARIABLE(FGOutputFile, _T(""))
 PERSIST_bool_VARIABLE(FGOpenInEditor, true)
+PERSIST_bool_VARIABLE(FGOpenPanel, false)
 
 PERSIST_bool_VARIABLE(FACaseSensitive, false)
 PERSIST_bool_VARIABLE(FADirectoryCaseSensitive, false)

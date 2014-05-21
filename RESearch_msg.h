@@ -88,6 +88,7 @@ enum eStringTable {
 	MGrepMatchedLinePart,
 	MGrepOutputTo,
 	MGrepEditor,
+	MGrepPanel,
 
 	MAdvancedOptions,
 	MFullFileNameMatch,

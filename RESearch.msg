@@ -88,6 +88,7 @@ MGrepContextLines	"context lines around matches"			"окружающих стр�
 MGrepMatchedLinePart	"only matched line fragments"		"только совпавшие фрагменты строки"			"Sólo fragmentos de lÝneas coincidentes"
 MGrepOutputTo		"&Output to:"							"В&ыводить в:"								"&Salida a:"
 MGrepEditor			"O&pen output in editor"				"Открыть вывод в р&едакторе"				"Abrir salida en editor"
+MGrepPanel			"List found files in panel"				"Открыть панель с найденными файлами"
 
 MAdvancedOptions	"Advanced search options"				"Дополнительные параметры поиска"			"Opciones de búsqueda avanzada"
 MFullFileNameMatch	"Full &file name matches:"				"Полное имя файла совпадает с:"				"Coincidir nombre archivo completo:"

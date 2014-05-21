@@ -301,7 +301,7 @@ bool GrepPrompt(bool bPlugin)
 {
 	bool AsRegExp = (FSearchAs == SA_REGEXP) || (FSearchAs == SA_SEVERALLINE) || (FSearchAs == SA_MULTILINE) || (FSearchAs == SA_MULTIREGEXP);
 
-	CFarDialog Dialog(77, 27, _T("FileGrepDlg"));
+	CFarDialog Dialog(77, 28, _T("FileGrepDlg"));
 	Dialog.SetWindowProc(FileGrepDialogProc, 0);
 	Dialog.SetUseID(true);
 
@@ -335,16 +335,17 @@ bool GrepPrompt(bool bPlugin)
 	Dialog.Add(new CFarCheckBoxItem(5,18,0,MGrepOutputTo,&FGOutputToFile));
 	Dialog.Add(new CFarEditItem(20,18,45,DIF_HISTORY,_T("RESearch.GrepOutput"), FGOutputFile));
 	Dialog.Add(new CFarCheckBoxItem(5,19,0,MGrepEditor,&FGOpenInEditor));
+	Dialog.Add(new CFarCheckBoxItem(5,20,0,MGrepPanel,&FGOpenPanel));
 
 	Dialog.Add(new CFarCheckBoxItem(56,11,0,MLeftBracket,&FAdvanced));
 	Dialog.Add(new CFarButtonItem  (62,11,DIF_NOBRACKETS,0,MBtnAdvanced));
 	Dialog.Add(new CFarButtonItem(60,14,0,0,MBtnSettings));
 
-	Dialog.Add(new CFarTextItem(5,21,0,MSearchIn));
-	Dialog.Add(new CFarComboBoxItem(15,21,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearch, false),(int *)&FSearchIn));
+	Dialog.Add(new CFarTextItem(5,22,0,MSearchIn));
+	Dialog.Add(new CFarComboBoxItem(15,22,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearch, false),(int *)&FSearchIn));
 
 	Dialog.AddButtons(MOk,MCancel,MBtnClose);
-	Dialog.Add(new CFarButtonItem(60,24,0,0,MBtnPresets));
+	Dialog.Add(new CFarButtonItem(60,25,0,0,MBtnPresets));
 	Dialog.SetFocus(MMask, 1);
 	FACaseSensitive = FADirectoryCaseSensitive = MaskCaseHere();
 
@@ -428,7 +429,7 @@ OperationResult FileGrep(bool ShowDialog)
 #endif
 				);
 		}
-		return OR_OK;
+		return (FGOpenPanel && !g_PanelItems.empty()) ? OR_PANEL : OR_OK;
 	} else return OR_FAILED;
 }
 
