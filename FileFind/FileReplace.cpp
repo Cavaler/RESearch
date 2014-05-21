@@ -381,11 +381,6 @@ bool ReplacePrompt(bool Plugin)
 	Dialog.Add(new CFarComboBoxItem(30, 15, 55, 0, new CFarListData(m_lstEngines, false), new CFarEngineStorage(EREvaluateScript)));
 	Dialog.Add(new CFarButtonItem  (60, 15, 0, false, MRunEditor));
 
-	Dialog.Add(new CFarCheckBoxItem(56,10,0,MLeftBracket,&FAdvanced));
-	Dialog.Add(new CFarButtonItem  (62,10,DIF_NOBRACKETS,0,MBtnAdvanced));
-	Dialog.Add(new CFarButtonItem(_tcslen(GetMsg(MSeveralLineRegExp))+10,11,0,0,MEllipsis));
-	Dialog.Add(new CFarButtonItem(57, 12, 0, false, MBtnREBuilder));
-
 	Dialog.Add(new CFarTextItem(5,17,0,MSearchIn));
 	if (Plugin) {
 		if (FSearchIn<SI_FROMCURRENT) FSearchIn=SI_FROMCURRENT;
@@ -393,6 +388,11 @@ bool ReplacePrompt(bool Plugin)
 	} else {
 		Dialog.Add(new CFarComboBoxItem(15,17,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearch, false),(int *)&FSearchIn));
 	}
+
+	Dialog.Add(new CFarCheckBoxItem(56,10,0,MLeftBracket,&FAdvanced));
+	Dialog.Add(new CFarButtonItem  (62,10,DIF_NOBRACKETS,0,MBtnAdvanced));
+	Dialog.Add(new CFarButtonItem(_tcslen(GetMsg(MSeveralLineRegExp))+10,11,0,0,MEllipsis));
+	Dialog.Add(new CFarButtonItem(57, 12, 0, false, MBtnREBuilder));
 
 	Dialog.Add(new CFarCheckBoxItem(5,19,0,MViewModified,&FROpenModified));
 	Dialog.Add(new CFarCheckBoxItem(5,20,0,MConfirmFile,&FRConfirmFile));
@@ -493,7 +493,10 @@ OperationResult FileReplaceExecutor()
 
 bool CFRPresetCollection::EditPreset(CPreset *pPreset)
 {
-	CFarDialog Dialog(76, 25, _T("FRPresetDlg"));
+	CFarDialog Dialog(76, 27, _T("FRPresetDlg"));
+	Dialog.SetWindowProc(FileReplaceDialogProc, 0);
+	Dialog.SetUseID(true);
+
 	Dialog.AddFrame(MFRPreset);
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
 	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,_T("RESearch.PresetName"), pPreset->Name()));
@@ -526,20 +529,23 @@ bool CFRPresetCollection::EditPreset(CPreset *pPreset)
 	Dialog.Add(new CFarComboBoxItem(30, 17, 55, 0, new CFarListData(m_lstEngines, false), new CFarEngineStorage(pPreset->m_mapStrings["Script"])));
 	Dialog.Add(new CFarButtonItem(60, 17, 0, FALSE, MRunEditor));
 
+	Dialog.Add(new CFarTextItem(5,19,0,MSearchIn));
+	Dialog.Add(new CFarComboBoxItem(15,19,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearch, false),(int *)&FSearchIn));
+
 	Dialog.Add(new CFarCheckBoxItem(56,12,0,MLeftBracket,&bFAdvanced));
 	Dialog.Add(new CFarButtonItem  (62,12,DIF_NOBRACKETS,0,MBtnAdvanced));
-	Dialog.Add(new CFarCheckBoxItem(5,19,0,MAddToMenu,&pPreset->m_bAddToMenu));
+	Dialog.Add(new CFarCheckBoxItem(5,21,0,MAddToMenu,&pPreset->m_bAddToMenu));
 	Dialog.AddButtons(MOk,MCancel);
 
 	do {
-		switch (Dialog.Display(3, -2, -4, -6)) {
-		case 0:
+		switch (Dialog.Display()) {
+		case MOk:
 			pPreset->m_mapInts["AdvancedID"] = bFAdvanced ? nAdvancedID : 0;
 			return true;
-		case 1:
+		case MBtnAdvanced:
 			SelectAdvancedPreset(nAdvancedID, bFAdvanced);
 			break;
-		case 2:
+		case MRunEditor:
 			RunExternalEditor(pPreset->m_mapStrings["Replace"]);
 			break;
 		default:

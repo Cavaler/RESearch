@@ -4,7 +4,7 @@
 CParameterSet g_RnParamSet(RenameFilesExecutor,
 	"Mask", &MaskText, "Text", &SearchText, "Replace", &ReplaceText, "Script", &EREvaluateScript,
 	"@Mask", &FMask, "@Text", &FText, "@Replace", &FRReplace, NULL,
-	"AdvancedID", &FAdvancedID, NULL,
+	"SearchIn", &FSearchIn, "AdvancedID", &FAdvancedID, NULL,
 	"MaskAsRegExp", &FMaskAsRegExp, "TextAsRegExp", &FSearchAs, "CaseSensitive", &FCaseSensitive, "Repeating", &FRepeating,
 	"AsScript", &FREvaluate, NULL
 	);
@@ -984,7 +984,7 @@ OperationResult UndoRenameFiles()
 
 bool CRnPresetCollection::EditPreset(CPreset *pPreset)
 {
-	CFarDialog Dialog(76,19,_T("RPresetDlg"));
+	CFarDialog Dialog(76,20,_T("RPresetDlg"));
 	Dialog.AddFrame(MRnPreset);
 	Dialog.SetUseID(true);
 
@@ -1005,17 +1005,20 @@ bool CRnPresetCollection::EditPreset(CPreset *pPreset)
 	Dialog.Add(new CFarCheckBoxItem(52,6,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
 	Dialog.Add(new CFarCheckBoxItem(25,8,0,MRepeating,&pPreset->m_mapInts["Repeating"]));
 
-	Dialog.Add(new CFarCheckBoxItem(5, 11, 0, MEvaluateAsScript, &pPreset->m_mapInts["AsScript"]));
-	Dialog.Add(new CFarComboBoxItem(30, 11, 55, 0, new CFarListData(m_lstEngines, false), new CFarEngineStorage(pPreset->m_mapStrings["Script"])));
-	Dialog.Add(new CFarButtonItem(60, 11, 0, false, MRunEditor));
+	Dialog.Add(new CFarTextItem(5,11,0,MSearchIn));
+	Dialog.Add(new CFarComboBoxItem(11,18,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearch, false),&pPreset->m_mapInts["SearchIn"]));
+
+	Dialog.Add(new CFarCheckBoxItem(5, 12, 0, MEvaluateAsScript, &pPreset->m_mapInts["AsScript"]));
+	Dialog.Add(new CFarComboBoxItem(30, 12, 55, 0, new CFarListData(m_lstEngines, false), new CFarEngineStorage(pPreset->m_mapStrings["Script"])));
+	Dialog.Add(new CFarButtonItem(60, 12, 0, false, MRunEditor));
 
 	int  nAdvancedID = pPreset->m_mapInts["AdvancedID"];
 	bool bFAdvanced = nAdvancedID > 0;
 
-	Dialog.Add(new CFarCheckBoxItem(56,12,0,MLeftBracket,&bFAdvanced));
-	Dialog.Add(new CFarButtonItem  (62,12,DIF_NOBRACKETS,0,MBtnAdvanced));
+	Dialog.Add(new CFarCheckBoxItem(56,13,0,MLeftBracket,&bFAdvanced));
+	Dialog.Add(new CFarButtonItem  (62,13,DIF_NOBRACKETS,0,MBtnAdvanced));
 
-	Dialog.Add(new CFarCheckBoxItem(5,13,0,MAddToMenu,&pPreset->m_bAddToMenu));
+	Dialog.Add(new CFarCheckBoxItem(5,14,0,MAddToMenu,&pPreset->m_bAddToMenu));
 	Dialog.AddButtons(MOk, MCancel);
 	Dialog.SetFocus(MPresetName, 1);
 

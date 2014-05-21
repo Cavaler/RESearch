@@ -129,10 +129,6 @@ bool SearchPrompt(bool Plugin)
 	Dialog.Add(new CFarCheckBoxItem(5,14,0,MInverseSearch,&FSInverse));
 	Dialog.Add(new CFarCheckBoxItem(5,15,0,MAllCharTables,&FAllCharTables));
 
-	Dialog.Add(new CFarCheckBoxItem(56,8,0,MLeftBracket,&FAdvanced));
-	Dialog.Add(new CFarButtonItem  (62,8,DIF_NOBRACKETS,0,MBtnAdvanced));
-	Dialog.Add(new CFarButtonItem(_tcslen(GetMsg(MSeveralLineRegExp))+10,9,0,0,MEllipsis));
-
 	Dialog.Add(new CFarTextItem(5,17,0,MSearchIn));
 	if (Plugin) {
 		if (FSearchIn<SI_FROMCURRENT) FSearchIn=SI_FROMCURRENT;
@@ -140,6 +136,10 @@ bool SearchPrompt(bool Plugin)
 	} else {
 		Dialog.Add(new CFarComboBoxItem(15,17,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearch, false),(int *)&FSearchIn));
 	}
+
+	Dialog.Add(new CFarCheckBoxItem(56,8,0,MLeftBracket,&FAdvanced));
+	Dialog.Add(new CFarButtonItem  (62,8,DIF_NOBRACKETS,0,MBtnAdvanced));
+	Dialog.Add(new CFarButtonItem(_tcslen(GetMsg(MSeveralLineRegExp))+10,9,0,0,MEllipsis));
 
 	Dialog.AddButtons(MOk,MCancel,MBtnClose);
 	Dialog.Add(new CFarButtonItem(60,19,0,0,MBtnPresets));
@@ -182,8 +182,13 @@ OperationResult FileFind(panelitem_vector &PanelItems, bool ShowDialog, bool bSi
 {
 	CPanelInfo PInfo;
 	PInfo.GetInfo(false);
-	if (PInfo.PanelType!=PTYPE_FILEPANEL) return OR_FAILED;
-	if (PInfo.Plugin&&((PInfo.Flags&PFLAGS_REALNAMES)==0)) return OR_FAILED;
+	if (PInfo.PanelType != PTYPE_FILEPANEL) return OR_FAILED;
+
+	if (PInfo.Plugin)
+	{
+		if ((PInfo.Flags & PFLAGS_REALNAMES) == 0) return OR_FAILED;
+		if (FSearchIn < SI_FROMCURRENT) FSearchIn = SI_FROMCURRENT;
+	}
 
 	if (ShowDialog) {
 		if (!SearchPrompt(PInfo.Plugin)) return OR_CANCEL;
@@ -209,8 +214,12 @@ OperationResult FileSearchExecutor()
 
 bool CFSPresetCollection::EditPreset(CPreset *pPreset)
 {
-	CFarDialog Dialog(76,24,_T("FSPresetDlg"));
+	CFarDialog Dialog(76,26,_T("FSPresetDlg"));
+	Dialog.SetWindowProc(FileSearchDialogProc, 0);
+	Dialog.SetUseID(true);
+
 	Dialog.AddFrame(MFSPreset);
+
 	Dialog.Add(new CFarTextItem(5,2,0,MPresetName));
 	Dialog.Add(new CFarEditItem(5,3,70,DIF_HISTORY,_T("RESearch.PresetName"), pPreset->Name()));
 
@@ -235,18 +244,22 @@ bool CFSPresetCollection::EditPreset(CPreset *pPreset)
 
 	Dialog.Add(new CFarCheckBoxItem(5,15,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
 	Dialog.Add(new CFarCheckBoxItem(5,16,0,MInverseSearch,&pPreset->m_mapInts["Inverse"]));
+
+	Dialog.Add(new CFarTextItem(5,18,0,MSearchIn));
+	Dialog.Add(new CFarComboBoxItem(15,18,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearch, false),&pPreset->m_mapInts["SearchIn"]));
+
 	Dialog.Add(new CFarCheckBoxItem(56,9,0,MLeftBracket,&bFAdvanced));
 	Dialog.Add(new CFarButtonItem  (62,9,DIF_NOBRACKETS,0,MBtnAdvanced));
 
-	Dialog.Add(new CFarCheckBoxItem(5,18,0,MAddToMenu,&pPreset->m_bAddToMenu));
+	Dialog.Add(new CFarCheckBoxItem(5,20,0,MAddToMenu,&pPreset->m_bAddToMenu));
 	Dialog.AddButtons(MOk,MCancel);
 
 	do {
-		switch (Dialog.Display(2, -2, -4)) {
-		case 0:
+		switch (Dialog.Display()) {
+		case MOk:
 			pPreset->m_mapInts["AdvancedID"] = bFAdvanced ? nAdvancedID : 0;
 			return true;
-		case 1:
+		case MBtnAdvanced:
 			SelectAdvancedPreset(nAdvancedID, bFAdvanced);
 			break;
 		default:

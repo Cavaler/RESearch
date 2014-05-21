@@ -445,7 +445,7 @@ bool CFGPresetCollection::EditPreset(CPreset *pPreset)
 	SearchAs FSA = (SearchAs)pPreset->m_mapInts["SearchAs"];
 	bool AsRegExp = (FSA == SA_REGEXP) || (FSA == SA_SEVERALLINE) || (FSA == SA_MULTILINE) || (FSA == SA_MULTIREGEXP);
 
-	CFarDialog Dialog(76,30,_T("FGPresetDlg"));
+	CFarDialog Dialog(76,32,_T("FGPresetDlg"));
 	Dialog.SetWindowProc(FileGrepDialogProc, 0);
 	Dialog.SetUseID(true);
 
@@ -482,16 +482,19 @@ bool CFGPresetCollection::EditPreset(CPreset *pPreset)
 	Dialog.Add(new CFarCheckBoxItem(5,21,0,MGrepEditor,&pPreset->m_mapInts["OpenInEditor"]));
 	Dialog.Add(new CFarCheckBoxItem(5,22,0,MGrepPanel,&pPreset->m_mapInts["OpenPanel"]));
 
+	Dialog.Add(new CFarTextItem(5,24,0,MSearchIn));
+	Dialog.Add(new CFarComboBoxItem(15,24,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearch, false),(int *)&FSearchIn));
+
 	int  nAdvancedID = pPreset->m_mapInts["AdvancedID"];
 	bool bFAdvanced = nAdvancedID > 0;
 
 	Dialog.Add(new CFarCheckBoxItem(56,12,0,MLeftBracket,&bFAdvanced));
 	Dialog.Add(new CFarButtonItem  (62,12,DIF_NOBRACKETS,0,MBtnAdvanced));
-	Dialog.Add(new CFarCheckBoxItem(5,24,0,MAddToMenu,&pPreset->m_bAddToMenu));
+	Dialog.Add(new CFarCheckBoxItem(5,26,0,MAddToMenu,&pPreset->m_bAddToMenu));
 	Dialog.AddButtons(MOk,MCancel);
 
 	do {
-		switch (Dialog.Display(-1)) {
+		switch (Dialog.Display()) {
 		case MOk:
 			pPreset->m_mapInts["SearchAs"] = AsRegExp ? SA_REGEXP : SA_PLAINTEXT;
 			pPreset->m_mapInts["AdvancedID"] = bFAdvanced ? nAdvancedID : 0;
