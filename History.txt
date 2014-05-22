@@ -9,6 +9,8 @@ Planned:
 	? Extended batch properties, overriding preset properties (e.g. Search from beginning)
 	+ Command to "lock" read-only file before replacing
 
+	http://forum.farmanager.com/viewtopic.php?f=5&t=307&p=119073#p119070
+
 Version 8.46 (21.05.2014)
 	- Memory corruption fixed
 	- Fixed crash using FarLUA with plain-text search
@@ -19,6 +21,7 @@ Version 8.46 (21.05.2014)
 	- LuaScript dlls now register themselves properly
 	* More parameters in File presets
 	* Can skip() from scripts
+	* Can show panel with Grep results
 
 Version 8.45 (16.05.2014)
 	+ Special script engine FarLUA allows using internal Far3 Lua engine
