@@ -2,106 +2,92 @@ local function RESearchExists ()
   return Plugin.Exist("F250C12A-78E2-4ABC-A784-3FDD3156E415")
 end
 
-local function CallRS1(p)
-  mmode(3,1)
-  return Plugin.SyncCall("F250C12A-78E2-4ABC-A784-3FDD3156E415", p)
+local function CallRS(...)
+  return Plugin.SyncCall("F250C12A-78E2-4ABC-A784-3FDD3156E415", ...)
 end
 
-local function CallRS2(p1, p2)
-  mmode(3,1)
-  return Plugin.SyncCall("F250C12A-78E2-4ABC-A784-3FDD3156E415", p1, p2)
+_G.research = {}
+
+function research.match(n)
+  return CallRS("Script", "match", n)
 end
 
-local function CallRS3(p1, p2, p3)
-  mmode(3,1)
-  return Plugin.SyncCall("F250C12A-78E2-4ABC-A784-3FDD3156E415", p1, p2, p3)
+function research.named(n)
+  return CallRS("Script", "named", n)
 end
 
-local function CallRS4(p1, p2, p3, p4)
-  mmode(3,1)
-  return Plugin.SyncCall("F250C12A-78E2-4ABC-A784-3FDD3156E415", p1, p2, p3, p4)
+function research.eol()
+  return CallRS("Script", "eol")
 end
 
-function _G.match(n)
-  return CallRS3("Script", "match", n)
+function research.l()
+  return CallRS("Script", "l")
 end
 
-function _G.named(n)
-  return CallRS3("Script", "named", n)
+function research.n()
+  return CallRS("Script", "n")
 end
 
-function _G.eol()
-  return CallRS2("Script", "eol")
+function research.s()
+  return CallRS("Script", "s")
 end
 
-function _G.l()
-  return CallRS2("Script", "l")
+function research.r()
+  return CallRS("Script", "r")
 end
 
-function _G.n()
-  return CallRS2("Script", "n")
+function research.init(n, v)
+  CallRS("Script", "init", n, v)
 end
 
-function _G.s()
-  return CallRS2("Script", "s")
+function research.store(n, v)
+  CallRS("Script", "store", n, v)
 end
 
-function _G.r()
-  return CallRS2("Script", "r")
-end
-
-function _G.init(n, v)
-  CallRS4("Script", "init", n, v)
-end
-
-function _G.store(n, v)
-  CallRS4("Script", "store", n, v)
-end
-
-function _G.skip()
-  CallRS2("Script", "skip")
+function research.skip()
+  CallRS("Script", "skip")
 end
 
 Macro {
   description=""; area="Shell"; key="AltF7"; flags=""; condition=RESearchExists;
---  action=function() CallRS1("Search") end;
+--  action=function() CallRS("Search") end;
   action=function() Keys("F11 s s") end;
 }
 
 Macro {
   description=""; area="Shell"; key="ShiftF7"; flags=""; condition=RESearchExists;
---  action=function() CallRS1("Replace") end;
+--  action=function() CallRS("Replace") end;
   action=function() Keys("F11 s r") end;
 }
 
 Macro {
   description=""; area="Shell"; key="CtrlAltF7"; flags=""; condition=RESearchExists;
-  action=function() CallRS1("Grep") end;
+  action=function() CallRS("Grep") end;
 }
 
 Macro {
   description=""; area="Shell"; key="AltF6"; flags=""; condition=RESearchExists;
-  action=function() CallRS1("RenameSelected") end;
+  action=function() CallRS("RenameSelected") end;
 }
 
 Macro {
   description=""; area="Shell"; key="CtrlAltF6"; flags=""; condition=RESearchExists;
-  action=function() CallRS1("Rename") end;
+  action=function() CallRS("Rename") end;
 }
 
 Macro {
   description=""; area="Shell"; key="AltAdd"; flags=""; condition=RESearchExists;
-  action=function() CallRS1("Select") end;
+  action=function() CallRS("Select") end;
 }
 
 Macro {
   description=""; area="Shell"; key="AltSubtract"; flags=""; condition=RESearchExists;
-  action=function() CallRS1("Unselect") end;
+  action=function() CallRS("Unselect") end;
 }
 
 Macro {
   description=""; area="Shell"; key="AltMultiply"; flags=""; condition=RESearchExists;
-  action=function() CallRS1("FlipSelection") end;
+  action=function() CallRS("FlipSelection") end;
 }
 
 
@@ -109,32 +95,32 @@ Macro {
 
 Macro {
   description=""; area="Editor"; key="F7"; flags=""; condition=RESearchExists;
-  action=function() CallRS1("Search") end;
+  action=function() CallRS("Search") end;
 }
 
 Macro {
   description=""; area="Editor"; key="CtrlF7"; flags=""; condition=RESearchExists;
-  action=function() CallRS1("Replace") end;
+  action=function() CallRS("Replace") end;
 }
 
 Macro {
   description=""; area="Editor"; key="ShiftF7"; flags=""; condition=RESearchExists;
-  action=function() CallRS1("SRAgain") end;
+  action=function() CallRS("SRAgain") end;
 }
 
 Macro {
   description=""; area="Editor"; key="AltF7"; flags=""; condition=RESearchExists;
-  action=function() CallRS1("Filter") end;
+  action=function() CallRS("Filter") end;
 }
 
 
 
 Macro {
   description=""; area="Viewer"; key="F7"; flags=""; condition=RESearchExists;
-  action=function() CallRS1("Search") end;
+  action=function() CallRS("Search") end;
 }
 
 Macro {
   description=""; area="Viewer"; key="ShiftF7"; flags=""; condition=RESearchExists;
-  action=function() CallRS1("SRAgain") end;
+  action=function() CallRS("SRAgain") end;
 }
