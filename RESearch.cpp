@@ -549,8 +549,12 @@ HANDLE WINAPI OpenW(const struct OpenInfo *Info)
 
 		if (hPlugin != NO_PANEL_HANDLE)
 		{
-			ClosePanelInfo Info = { sizeof(ClosePanelInfo), hPlugin };
-			ClosePanelW(&Info);
+			static FarMacroValue Value;
+			Value.Type = FMVT_PANEL;
+			Value.Pointer = hPlugin;
+
+			static FarMacroCall Call = { sizeof(FarMacroCall), 1, &Value, NULL, NULL };
+			return &Call;
 		}
 
 		return NO_PANEL_HANDLE;

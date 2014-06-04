@@ -6,58 +6,60 @@ local function CallRS(...)
   return Plugin.SyncCall("F250C12A-78E2-4ABC-A784-3FDD3156E415", ...)
 end
 
+local function CallRSS(...)
+  return Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", ...)
+end
+
 _G.research = {}
 
 function research.match(n)
-  return CallRS("Script", "match", n)
+  return CallRSS("Script", "match", n)
 end
 
 function research.named(n)
-  return CallRS("Script", "named", n)
+  return CallRSS("Script", "named", n)
 end
 
 function research.eol()
-  return CallRS("Script", "eol")
+  return CallRSS("Script", "eol")
 end
 
 function research.l()
-  return CallRS("Script", "l")
+  return CallRSS("Script", "l")
 end
 
 function research.n()
-  return CallRS("Script", "n")
+  return CallRSS("Script", "n")
 end
 
 function research.s()
-  return CallRS("Script", "s")
+  return CallRSS("Script", "s")
 end
 
 function research.r()
-  return CallRS("Script", "r")
+  return CallRSS("Script", "r")
 end
 
 function research.init(n, v)
-  CallRS("Script", "init", n, v)
+  CallRSS("Script", "init", n, v)
 end
 
 function research.store(n, v)
-  CallRS("Script", "store", n, v)
+  CallRSS("Script", "store", n, v)
 end
 
 function research.skip()
-  CallRS("Script", "skip")
+  CallRSS("Script", "skip")
 end
 
 Macro {
   description=""; area="Shell"; key="AltF7"; flags=""; condition=RESearchExists;
---  action=function() CallRS("Search") end;
-  action=function() Keys("F11 s s") end;
+  action=function() CallRS("Search") end;
 }
 
 Macro {
   description=""; area="Shell"; key="ShiftF7"; flags=""; condition=RESearchExists;
---  action=function() CallRS("Replace") end;
-  action=function() Keys("F11 s r") end;
+  action=function() CallRS("Replace") end;
 }
 
 Macro {
@@ -89,7 +91,6 @@ Macro {
   description=""; area="Shell"; key="AltMultiply"; flags=""; condition=RESearchExists;
   action=function() CallRS("FlipSelection") end;
 }
-
 
 
 
