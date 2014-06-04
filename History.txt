@@ -11,6 +11,13 @@ Planned:
 
 	http://forum.farmanager.com/viewtopic.php?f=5&t=307&p=119073#p119070
 
+Version 8.47 (04.06.2014)
+	- Don't import own functions into global table in RESearch.lua
+	* Do not try to cache script engines list
+	- Properly cancel operation if FarLUA script fails
+	- LuaScript dlls registration updated again
+	* Installation instructions added
+
 Version 8.46 (21.05.2014)
 	- Memory corruption fixed
 	- Fixed crash using FarLUA with plain-text search

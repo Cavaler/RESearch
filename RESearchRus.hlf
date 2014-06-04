@@ -2,7 +2,7 @@
 .PluginContents=Поиск регулярных выражений
 
 @Contents
-$ #Поиск и замена с регулярными выражениями, версия 8.46#
+$ #Поиск и замена с регулярными выражениями, версия 8.47#
 
   #Внимание! Русский Хелп не обновлялся очень давно!#
 
@@ -157,7 +157,7 @@ $ #Текст замены#
 
 @PredefinedNamedParam
 $ #Predefined named parameters#
-    You can refefrence some predefined named parameters in ~editor replace~@ReplaceDlg@ or
+    You can reference some predefined named parameters in ~editor replace~@ReplaceDlg@ or
 ~file replace~@FileReplaceDlg@/~rename~@FileRenameDlg@.
 
     ${_fullname} - full name of current file

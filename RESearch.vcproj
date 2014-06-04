@@ -1496,18 +1496,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Hints.txt"
-				>
-			</File>
-			<File
-				RelativePath="History.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\PluginCall.txt"
-				>
-			</File>
-			<File
 				RelativePath="RESearch.def"
 				>
 				<FileConfiguration
@@ -2017,13 +2005,38 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ScriptEvaluation.txt"
-				>
-			</File>
-			<File
 				RelativePath=".\version.h"
 				>
 			</File>
+			<Filter
+				Name="Documents"
+				Filter="*.txt"
+				>
+				<File
+					RelativePath=".\Hints.rus.txt"
+					>
+				</File>
+				<File
+					RelativePath=".\Hints.txt"
+					>
+				</File>
+				<File
+					RelativePath="History.txt"
+					>
+				</File>
+				<File
+					RelativePath=".\Install.txt"
+					>
+				</File>
+				<File
+					RelativePath=".\PluginCall.txt"
+					>
+				</File>
+				<File
+					RelativePath=".\ScriptEvaluation.txt"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<File
 			RelativePath=".\RESearch.tlb"

@@ -2,7 +2,7 @@
 .PluginContents=Regular Expression Search
 
 @Contents
-$ #Regular Expression Search and Replace, version 8.46#
+$ #Regular Expression Search and Replace, version 8.47#
     This plugin allows you to:
 
     - Perform text search and replace in editor
@@ -161,7 +161,7 @@ up to the length of nnn (so you can do ${X+0000} if you need).
 
 @PredefinedNamedParam
 $ #Predefined named parameters#
-    You can refefrence some predefined named parameters in ~editor replace~@ReplaceDlg@ or
+    You can reference some predefined named parameters in ~editor replace~@ReplaceDlg@ or
 ~file replace~@FileReplaceDlg@/~rename~@FileRenameDlg@.
 
     ${_fullname} - full name of current file
