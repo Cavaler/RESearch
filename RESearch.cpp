@@ -744,24 +744,17 @@ void ConfigureCommon()
 
 	Dialog.AddButtons(MOk, MCancel);
 
-	do {
-		int nResult = Dialog.Display();
-
-		switch (nResult) {
-		case 0:
-			return;
-		}
-	} while (true);
+	Dialog.Display();
 }
 
 void ConfigureFile()
 {
 #ifdef UNICODE
-	CFarDialog Dialog(70, 24, _T("FileConfig"));
+	CFarDialog Dialog(70, 25, _T("FileConfig"));
 #else
 	CFarDialog Dialog(70, 21, _T("FileConfig"));
 #endif
-	Dialog.EnableAutoHotkeys(true);
+	Dialog.SetUseID(true);
 	Dialog.AddFrame(MFileSearchSettings);
 
 	Dialog.Add(new CFarBoxItem(false,5,3,33,7,DIF_LEFTTEXT,MDefaultMaskCase));
@@ -791,12 +784,12 @@ void ConfigureFile()
 	Dialog.Add(new CFarTextItem  (5,  19, 0, MAllCPInclude));
 	Dialog.Add(new CFarButtonItem(35, 19, 0, false, MAllCPSelect));
 
-	Dialog.AddButtons(MOk,MCancel);
+	Dialog.AddButtons(MOk, MCancel);
 	do {
-		int nResult = Dialog.Display(2, -2, -3);
+		int nResult = Dialog.Display();
 
 		switch (nResult) {
-		case 1:
+		case MAllCPSelect:
 			ConfigureCP();
 			break;
 		default:
@@ -805,8 +798,8 @@ void ConfigureFile()
 	} while (true);
 
 #else
-	Dialog.AddButtons(MOk,MCancel);
-	Dialog.Display(-1);
+	Dialog.AddButtons(MOk, MCancel);
+	Dialog.Display();
 #endif
 }
 
@@ -830,9 +823,9 @@ void ConfigureGrep()
 void ConfigureRenumbering(bool bRuntime)
 {
 	CFarDialog Dialog(70, bRuntime ? 18 : 16, _T("RenumberConfig"));
-	Dialog.EnableAutoHotkeys(true);
-
+	Dialog.SetUseID(true);
 	Dialog.AddFrame(MRenumberSettings);
+
 	Dialog.Add(new CFarCheckBoxItem(5,3,0,MStripFromBeginning, g_bStripRegExp));
 	Dialog.Add(new CFarEditItem(42,3,61,DIF_HISTORY,_T("RESearch.Strip"), g_strStrip));
 	Dialog.Add(new CFarCheckBoxItem(5,4,0,MStripCommonPart, g_bStripCommon));
@@ -849,15 +842,15 @@ void ConfigureRenumbering(bool bRuntime)
 		Dialog.Add(new CFarCheckBoxItem(5,12,0,MLeaveSelection,&FRLeaveSelection));
 	}
 
-	Dialog.AddButtons(MOk,MCancel);
+	Dialog.AddButtons(MOk, MCancel);
 
-	Dialog.Display(-1);
+	Dialog.Display();
 }
 
 void ConfigureEditor()
 {
 	CFarDialog Dialog(61, 31, _T("EditorConfig"));
-	Dialog.EnableAutoHotkeys(true);
+	Dialog.SetUseID(true);
 	Dialog.AddFrame(MEditorSearchSettings);
 
 	Dialog.Add(new CFarTextItem(5,3,0,MShowPositionOffset));
@@ -894,7 +887,8 @@ void ConfigureEditor()
 	Dialog.Add(new CFarEditItem(32,25,45,0,_T("RESearch.SubName"),EPositionSubName));
 
 	Dialog.AddButtons(MOk,MCancel);
-	Dialog.Display(-1);
+
+	Dialog.Display();
 }
 
 #ifdef FAR3
