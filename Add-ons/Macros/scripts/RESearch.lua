@@ -3,11 +3,11 @@ local function RESearchExists ()
 end
 
 local function CallRS(...)
-  return Plugin.SyncCall("F250C12A-78E2-4ABC-A784-3FDD3156E415", ...)
+  return Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", ...)
 end
 
 local function CallRSS(...)
-  return Plugin.Call("F250C12A-78E2-4ABC-A784-3FDD3156E415", ...)
+  return Plugin.SyncCall("F250C12A-78E2-4ABC-A784-3FDD3156E415", ...)
 end
 
 _G.research = {}
