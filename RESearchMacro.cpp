@@ -539,7 +539,7 @@ wstring LoadStartupScript()
 
 extern LPOLESTR g_szFarLUA;
 
-bool CompileLUAString(const wstring &strReplace, LPCWSTR szEngine)
+bool CompileLUAString(const tstring &strReplace, LPCTSTR szEngine)
 {
 	if ((szEngine == NULL) || (wcscmp(g_szFarLUA, szEngine) != 0))
 		return true;
@@ -616,6 +616,13 @@ bool EvaluateLUAStringCleanup()
 		return false;
 	}
 
+	return true;
+}
+
+#else
+
+bool CompileLUAString(const tstring &strReplace, LPCTSTR szEngine)
+{
 	return true;
 }
 

@@ -124,8 +124,8 @@ void ClearVariables();
 EXTERN IReplaceParametersPtr g_spREParam;
 template<class CHAR>
 basic_string<CHAR> EvaluateReplaceString(CREParameters<CHAR> &Param, const CHAR *Replace, const CHAR *EOL, LPCTSTR szEngine);
+bool CompileLUAString(const tstring &strReplace, LPCTSTR szEngine);
 #ifdef FAR3
-bool CompileLUAString(const wstring &strReplace, LPCWSTR szEngine);
 wstring EvaluateLUAString(CREParameters<wchar_t> &Param, LPCWSTR szReplace, FARKEYMACROFLAGS Flags);
 bool EvaluateLUAStringCleanup();
 #endif
