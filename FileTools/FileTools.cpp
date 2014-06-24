@@ -510,7 +510,7 @@ bool RenameFilesPrompt()
 		default:
 			return false;
 		}
-	} while (!IsOKClose(ExitCode) || !FPreparePattern(false));
+	} while (!IsOKClose(ExitCode) || !FPreparePattern(false) || !CompileLUAString(ReplaceText, ScriptEngine(FREvaluate)));
 
 	return (ExitCode == MOk);
 }
@@ -552,7 +552,10 @@ OperationResult RenameFilesExecutor()
 	FMask=MaskText;
 	FText=SearchText;
 	FRReplace=ReplaceText;
+	
 	if (!FPreparePattern(false)) return OR_FAILED;
+	if (!CompileLUAString(FRReplace, ScriptEngine(FREvaluate))) return OR_FAILED;
+
 	FTAskOverwrite = FTAskCreatePath = true;
 	FileNumber=-1;
 	g_bInterrupted=false;

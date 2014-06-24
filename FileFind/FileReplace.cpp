@@ -314,6 +314,8 @@ bool PrepareFileReplacePattern()
 		if (!CompileAdvancedSettings()) return false;
 	}
 
+	if (!CompileLUAString(FRReplace, ScriptEngine(FREvaluate))) return OR_FAILED;
+
 	return true;
 }
 

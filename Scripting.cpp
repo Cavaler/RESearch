@@ -25,11 +25,11 @@ void AddCustomScriptEngines()
 	Script.m_strName = L"FarLUA";
 	m_arrEngines.push_back(Script);
 	m_lstEngines.Append(Script.m_strName.c_str());
-
+/*
 	CLSIDFromString(g_szFarMS, &Script.m_clsid);
 	Script.m_strName = L"FarMoonScript";
 	m_arrEngines.push_back(Script);
-	m_lstEngines.Append(Script.m_strName.c_str());
+	m_lstEngines.Append(Script.m_strName.c_str());*/
 #endif
 }
 

@@ -423,9 +423,9 @@ bool ReplaceInText(int FirstLine, int StartPos, int LastLine, int EndPos)
 
 		REParam.AddENumbers(MatchFirstLine, MatchFirstLine-ReplaceStartLine, FindNumber, ReplaceNumber);
 #ifdef UNICODE
-		tstring Replace = CSO::CreateReplaceString(ERReplace.c_str(),_T("\n"), ScriptEngine(EREvaluate), REParam);
+		tstring Replace = CSO::CreateReplaceString(ERReplace.c_str(), _T("\n"), ScriptEngine(EREvaluate), REParam);
 #else
-		string Replace_O2E = CSO::CreateReplaceString(ERReplace_O2E.c_str(),"\n", ScriptEngine(EREvaluate), REParam);
+		string Replace_O2E = CSO::CreateReplaceString(ERReplace_O2E.c_str(), "\n", ScriptEngine(EREvaluate), REParam);
 #endif
 		if (g_bInterrupted) return false;	// Script failed
 
@@ -581,6 +581,8 @@ bool EditorReplaceAgain()
 	PatchEditorInfo(EdInfo);
 	FindDefaultEOL();
 	ClearLineBuffer();
+
+	if (!CompileLUAString(ReplaceText, ScriptEngine(EREvaluate))) return false;
 
 	EditorStartUndo();
 
@@ -767,7 +769,9 @@ bool EditorReplace()
 		case -1:
 			return false;
 		}
-	} while (((ExitCode != MReplace) && (ExitCode != MAll)&& (ExitCode != MBtnClose)) || !EPreparePattern(SearchText));
+	} while (((ExitCode != MReplace) && (ExitCode != MAll) && (ExitCode != MBtnClose))
+		|| !EPreparePattern(SearchText)
+		|| !CompileLUAString(ReplaceText, ScriptEngine(EREvaluate)));
 
 	EText = SearchText;
 #ifdef UNICODE
@@ -793,6 +797,7 @@ OperationResult EditorReplaceExecutor()
 		return OR_FAILED;
 
 	if (!EPreparePattern(SearchText)) return OR_FAILED;
+	if (!CompileLUAString(ReplaceText, ScriptEngine(EREvaluate))) return OR_FAILED;
 
 	EText = SearchText;
 #ifdef UNICODE

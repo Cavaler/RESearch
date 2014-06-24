@@ -1,5 +1,6 @@
 #include "StdAfx.h"
 #include "RESearch.h"
+#include "resource.h"
 
 #ifdef FAR3
 
@@ -521,7 +522,64 @@ HANDLE OpenFromScriptMacro(const OpenMacroInfo *MInfo)
 	return &Call;
 }
 
-wstring EvaluateLUAString(CREParameters<wchar_t> &Param, const wchar_t *Replace, FARKEYMACROFLAGS Flags)
+wstring LoadStartupScript()
+{
+	HRSRC hRsrc = FindResource(g_hInstance, MAKEINTRESOURCE(IDR_INIT_SCRIPT), L"SCRIPT");
+	if (hRsrc == NULL) return L"";
+
+	HGLOBAL hResource = LoadResource(g_hInstance, hRsrc);
+	if (hResource == NULL) return L"";
+
+	wstring strInitScript = wstring((LPCWSTR)LockResource(hResource), SizeofResource(g_hInstance, hRsrc)/2);
+
+	UnlockResource(hResource);
+
+	return strInitScript;
+}
+
+extern LPOLESTR g_szFarLUA;
+
+bool CompileLUAString(const wstring &strReplace, LPCWSTR szEngine)
+{
+	if ((szEngine == NULL) || (wcscmp(g_szFarLUA, szEngine) != 0))
+		return true;
+
+	MacroSendMacroText SendText;
+	SendText.StructSize = sizeof(MacroSendMacroText);
+	SendText.Flags = KMFLAGS_LUA;
+	SendText.SequenceText = strReplace.c_str();
+	if (!StartupInfo.MacroControl(MCTL_SENDSTRING, MSSC_CHECK, &SendText))
+	{
+		g_bInterrupted = true;
+		return false;
+	}
+
+	static wstring strInitScript = LoadStartupScript();
+	if (strInitScript.empty()) return false;
+
+	wstring strInitReplace = strInitScript + L" " + strReplace;
+	SendText.SequenceText = strInitReplace.c_str();
+	if (!StartupInfo.MacroControl(MCTL_SENDSTRING, MSSC_CHECK, &SendText))
+	{
+		g_bInterrupted = true;
+		return false;
+	}
+
+	wstring strStartup = L"_G.RESearch_f = setfenv(loadstring(...), setmetatable({}, { __index=_G }))";
+
+	FarMacroValue StartupParam(strInitReplace.c_str());
+
+	MacroExecuteString StartupMacro = {sizeof(MacroExecuteString), KMFLAGS_LUA, strStartup.c_str(), 1, &StartupParam, 0, NULL};
+	if (!StartupInfo.MacroControl(MCTL_EXECSTRING, 0, &StartupMacro))
+	{
+		g_bInterrupted = true;
+		return false;
+	}
+
+	return true;
+}
+
+wstring EvaluateLUAString(CREParameters<wchar_t> &Param, LPCWSTR szReplace, FARKEYMACROFLAGS Flags)
 {
 	vector<FarMacroValue> arrValues (Param.ParamCount());
 	vector<wstring>       arrStrings(Param.ParamCount());
@@ -532,7 +590,7 @@ wstring EvaluateLUAString(CREParameters<wchar_t> &Param, const wchar_t *Replace,
 		arrValues[nParam].String = arrStrings[nParam].c_str();
 	}
 
-	MacroExecuteString Macro = {sizeof(MacroExecuteString), Flags, Replace, arrValues.size(), !arrValues.empty() ? &arrValues[0] : NULL, 0, NULL};
+	MacroExecuteString Macro = {sizeof(MacroExecuteString), Flags, L"return RESearch_f(...)", arrValues.size(), !arrValues.empty() ? &arrValues[0] : NULL, 0, NULL};
 	if (!StartupInfo.MacroControl(MCTL_EXECSTRING, 0, &Macro))
 	{
 		g_bInterrupted = true;
@@ -545,6 +603,20 @@ wstring EvaluateLUAString(CREParameters<wchar_t> &Param, const wchar_t *Replace,
 		strResult += GetStringValue(Macro.OutValues[nItem]);
 
 	return strResult;
+}
+
+bool EvaluateLUAStringCleanup()
+{
+	wstring strCleanup = L"_G.RESearch_f = nil";
+
+	MacroExecuteString CleanupMacro = {sizeof(MacroExecuteString), KMFLAGS_LUA, strCleanup.c_str(), 0, NULL, 0, NULL};
+	if (!StartupInfo.MacroControl(MCTL_EXECSTRING, 0, &CleanupMacro))
+	{
+		g_bInterrupted = true;
+		return false;
+	}
+
+	return true;
 }
 
 #endif

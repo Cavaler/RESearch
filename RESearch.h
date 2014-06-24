@@ -31,7 +31,7 @@ enum   FindTextAtCursor {FT_NONE,FT_WORD,FT_ANY};
 #define DECLARE_PERSIST_VARS
 #include "PersistVars.h"
 
-EXTERN HANDLE g_hInstance;
+EXTERN HMODULE g_hInstance;
 
 #ifdef UNICODE
 typedef set<UINT> cp_set;
@@ -125,7 +125,9 @@ EXTERN IReplaceParametersPtr g_spREParam;
 template<class CHAR>
 basic_string<CHAR> EvaluateReplaceString(CREParameters<CHAR> &Param, const CHAR *Replace, const CHAR *EOL, LPCTSTR szEngine);
 #ifdef FAR3
-wstring EvaluateLUAString(CREParameters<wchar_t> &Param, const wchar_t *Replace, FARKEYMACROFLAGS Flags);
+bool CompileLUAString(const wstring &strReplace, LPCWSTR szEngine);
+wstring EvaluateLUAString(CREParameters<wchar_t> &Param, LPCWSTR szReplace, FARKEYMACROFLAGS Flags);
+bool EvaluateLUAStringCleanup();
 #endif
 
 #ifdef UNICODE
