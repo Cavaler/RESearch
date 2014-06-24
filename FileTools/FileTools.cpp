@@ -372,7 +372,8 @@ void RenamePreview(panelitem_vector &PanelItems)
 void RenameFile(const FIND_DATA *FindData, panelitem_vector &PanelItems)
 {
 	int MatchStart = 0, MatchLength;
-	int FindNumber = 0, ReplaceNumber = 0;
+	
+	FindNumber = ReplaceNumber = 0;
 
 	tstring strPath, strOriginalName, strCurrentName;
 
@@ -385,16 +386,14 @@ void RenameFile(const FIND_DATA *FindData, panelitem_vector &PanelItems)
 	}
 	strCurrentName = strOriginalName;
 
-	FRConfirmLineThisFile=FRConfirmLineThisRun;
-	FileConfirmed=!FRConfirmFileThisRun;
-
-	FileNumber++;
+	FRConfirmLineThisFile = FRConfirmLineThisRun;
+	FileConfirmed = !FRConfirmFileThisRun;
 
 	bool bOnlyGlobalConfirm = !FRConfirmLineThisFile;
 
 	while (FindRename(strCurrentName.c_str(), MatchStart, MatchLength))
 	{
-		REParam.AddFNumbers(FileNumber, FindNumber, ReplaceNumber);
+		REParam.AddFNumbers(FilesScanned, FileNumber, FindNumber, ReplaceNumber);
 
 		tstring strNewSubName = CSO::CreateReplaceString(FRReplace.c_str(), _T(""), ScriptEngine(FREvaluate), REParam);
 
@@ -527,20 +526,19 @@ OperationResult RenameFiles(panelitem_vector &PanelItems, bool ShowDialog)
 		if (!FPreparePattern(false)) return OR_CANCEL;
 	}
 
-	FRConfirmFileThisRun=FRConfirmFile;
-	FRConfirmLineThisRun=FRConfirmLine;
+	FRConfirmFileThisRun = FRConfirmFile;
+	FRConfirmLineThisRun = FRConfirmLine;
 	FTAskOverwrite = FTAskCreatePath = true;
-	FileNumber=-1;
-	g_bInterrupted=false;
+	g_bInterrupted = false;
 
 	m_arrPendingRename.clear();
 	m_arrLastRename.clear();
 
 	CDebugTimer tm(_T("FileRename() took %d ms"));
-	int nResult = ScanDirectories(PanelItems, RenameFile);
+	bool bResult = ScanDirectories(PanelItems, RenameFile);
 	tm.Stop();
 
-	if (nResult) {
+	if (bResult) {
 		if (FRPreviewRename) RenamePreview(PanelItems);
 		if (!FROpenModified) return OR_OK; else
 		return (PanelItems.empty()) ? NoFilesFound() : OR_PANEL;
@@ -557,8 +555,7 @@ OperationResult RenameFilesExecutor()
 	if (!CompileLUAString(FRReplace, ScriptEngine(FREvaluate))) return OR_FAILED;
 
 	FTAskOverwrite = FTAskCreatePath = true;
-	FileNumber=-1;
-	g_bInterrupted=false;
+	g_bInterrupted = false;
 
 	m_arrPendingRename.clear();
 	m_arrLastRename.clear();
@@ -568,17 +565,31 @@ OperationResult RenameFilesExecutor()
 	FRPreviewRename = false;
 	SanitateEngine();
 
-	if (ScanDirectories(g_PanelItems, RenameFile)) {
+	bool bResult = ScanDirectories(g_PanelItems, RenameFile);
+
+	if (bResult) {
 //		if (!FROpenModified) return OR_OK; else
 //			return (ItemsNumber == 0) ? OR_OK : OR_PANEL;
 		return OR_OK;
 	} else return OR_FAILED;
 }
 
+void CallRenameFile(const FIND_DATA &FindData, panelitem_vector &PanelItems)
+{
+	int PrevFindNumber = FindNumber;
+
+	RenameFile(&FindData, PanelItems);
+
+	FilesScanned++;
+	if (FindNumber > PrevFindNumber) FileNumber++;
+}
+
 bool PerformRenameSelectedFiles(CPanelInfo &PInfo, panelitem_vector &PanelItems)
 {
-	FileNumber=-1;
-	g_bInterrupted=false;
+	FilesScanned = FileNumber = 0;
+	FindNumber = ReplaceNumber = 0;
+
+	g_bInterrupted = false;
 
 	m_arrPendingRename.clear();
 	m_arrLastRename.clear();
@@ -599,7 +610,7 @@ bool PerformRenameSelectedFiles(CPanelInfo &PInfo, panelitem_vector &PanelItems)
 			FileFillNamedParameters(CatFile(PInfo.CurDir, szFileName).c_str());
 			arrOrigNames.push_back(szFileName);
 
-			RenameFile(&PanelToFD(PInfo.PanelItems[I]), PanelItems);
+			CallRenameFile(PanelToFD(PInfo.PanelItems[I]), PanelItems);
 		}
 	} else {
 		if ((PInfo.SelectedItemsNumber == 1) && ((PInfo.SelectedItems[0].Flags & PPIF_SELECTED) == 0))
@@ -611,7 +622,7 @@ bool PerformRenameSelectedFiles(CPanelInfo &PInfo, panelitem_vector &PanelItems)
 			FileFillNamedParameters(CatFile(PInfo.CurDir, szFileName).c_str());
 			arrOrigNames.push_back(szFileName);
 
-			RenameFile(&PanelToFD(PInfo.SelectedItems[I]), PanelItems);
+			CallRenameFile(PanelToFD(PInfo.SelectedItems[I]), PanelItems);
 		}
 	}
 

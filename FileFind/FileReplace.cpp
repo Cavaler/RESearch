@@ -272,8 +272,6 @@ void ReplaceSingleFile(const FIND_DATA *FindData, panelitem_vector &PanelItems)
 		if (FRReplaceReadonly == RR_NEVER) return;
 	}
 
-	FileNumber++;
-
 	g_strBackupFileName = (FROverwriteBackup)
 		? tstring(FindData->cFileName) + _T(".bak")
 		: GetUniqueFileName(FindData->cFileName, _T(".bak"));
@@ -326,8 +324,11 @@ void UpdateFRDialog(CFarDialog *pDlg)
 	bool bAsScript = pDlg->IsDlgItemChecked(MEvaluateAsScript);
 	pDlg->EnableDlgItem(MEvaluateAsScript, bAsScript, 1);
 
+	bool bReplaceToNew = pDlg->IsDlgItemChecked(MReplaceToNew);
+	pDlg->EnableCheckDlgItem(MSaveOriginal, !bReplaceToNew);
+
 	bool bSaveOriginal = pDlg->IsDlgItemChecked(MSaveOriginal);
-	pDlg->EnableDlgItem(MOverwriteBackup, bSaveOriginal);
+	pDlg->EnableCheckDlgItem(MOverwriteBackup, bSaveOriginal);
 }
 
 LONG_PTR WINAPI FileReplaceDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LONG_PTR lParam2)
@@ -336,15 +337,8 @@ LONG_PTR WINAPI FileReplaceDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, L
 
 	switch (nMsg) {
 	case DN_INITDIALOG:
-		UpdateFRDialog(pDlg);
-		break;
 	case DN_BTNCLICK:
-		switch (nCtlID) {
-		case MSaveOriginal:
-		case MEvaluateAsScript:
-			UpdateFRDialog(pDlg);
-			break;
-		}
+		UpdateFRDialog(pDlg);
 		break;
 	}
 
@@ -353,7 +347,7 @@ LONG_PTR WINAPI FileReplaceDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, L
 
 bool ReplacePrompt(bool Plugin)
 {
-	CFarDialog Dialog(76, 27, _T("FileReplaceDlg"));
+	CFarDialog Dialog(76, 28, _T("FileReplaceDlg"));
 	Dialog.SetWindowProc(FileReplaceDialogProc, 0);
 	Dialog.SetUseID(true);
 
@@ -397,12 +391,14 @@ bool ReplacePrompt(bool Plugin)
 	Dialog.Add(new CFarButtonItem(_tcslen(GetMsg(MSeveralLineRegExp))+10,11,0,0,MEllipsis));
 	Dialog.Add(new CFarButtonItem(57, 12, 0, false, MBtnREBuilder));
 
-	Dialog.Add(new CFarCheckBoxItem(5,19,0,MViewModified,&FROpenModified));
-	Dialog.Add(new CFarCheckBoxItem(5,20,0,MConfirmFile,&FRConfirmFile));
-	Dialog.Add(new CFarCheckBoxItem(5,21,0,MConfirmLine,&FRConfirmLine));
-	Dialog.Add(new CFarCheckBoxItem(40,19,0,MSaveOriginal,&FRSaveOriginal));
-	Dialog.Add(new CFarCheckBoxItem(40,20,0,MOverwriteBackup,&FROverwriteBackup));
-	Dialog.Add(new CFarCheckBoxItem(40,21,0,MReplaceToNew,&FRReplaceToNew));
+	Dialog.Add(new CFarCheckBoxItem(5,19,0,MConfirmFile,&FRConfirmFile));
+	Dialog.Add(new CFarCheckBoxItem(5,20,0,MConfirmLine,&FRConfirmLine));
+	Dialog.Add(new CFarCheckBoxItem(5,21,0,MViewModified,&FROpenModified));
+	Dialog.Add(new CFarCheckBoxItem(5,22,0,MShowStatistics,&FRShowStatistics));
+
+	Dialog.Add(new CFarCheckBoxItem(40,19,0,MReplaceToNew,&FRReplaceToNew));
+	Dialog.Add(new CFarCheckBoxItem(40,20,0,MSaveOriginal,&FRSaveOriginal));
+	Dialog.Add(new CFarCheckBoxItem(42,21,0,MOverwriteBackup,&FROverwriteBackup));
 
 	Dialog.AddButtons(MOk,MCancel,MBtnClose);
 	Dialog.Add(new CFarButtonItem(60,23,0,0,MBtnPresets));
@@ -468,19 +464,25 @@ OperationResult FileReplace(panelitem_vector &PanelItems, bool ShowDialog, bool 
 		if (!PrepareFileReplacePattern()) return OR_CANCEL;
 	}
 
-	FRConfirmFileThisRun=FRConfirmFile;
+	FRConfirmFileThisRun = FRConfirmFile;
 	FRConfirmReadonlyThisRun = (FRReplaceReadonly != RR_ALWAYS);
-	FRConfirmLineThisRun=FRConfirmLine;
-	FileNumber = -1;	// Easier to increment
+	FRConfirmLineThisRun = FRConfirmLine;
 
 	CDebugTimer tm(_T("FileReplace() took %d ms"));
-	int nResult = ScanDirectories(PanelItems, ReplaceSingleFile);
+	bool bResult = ScanDirectories(PanelItems, ReplaceSingleFile);
 	tm.Stop();
 
-	if (nResult) {
-		if (!FROpenModified) return OR_OK; else
-			return (PanelItems.empty()) ? (bSilent ? OR_OK : NoFilesFound()) : OR_PANEL;
-	} else return OR_FAILED;
+	if (!bResult) return OR_FAILED;
+
+	if (FRShowStatistics)
+		ShowStatistics(true, PanelItems);
+
+	if (!FROpenModified)
+		return OR_OK;
+	else
+		return !PanelItems.empty() ? OR_PANEL :
+			(bSilent || FRShowStatistics) ? OR_OK :
+			(FindNumber > 0) ? NoFilesModified() :  NoFilesFound();
 }
 
 OperationResult FileReplaceExecutor()

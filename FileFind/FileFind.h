@@ -86,7 +86,6 @@ EXTERN pcre_extra *FAFullFileNamePatternExtra VALUE(NULL);
 EXTERN pcre *FADirectoryPattern VALUE(NULL);
 EXTERN pcre_extra *FADirectoryPatternExtra VALUE(NULL);
 EXTERN DWORD CurrentRecursionLevel;
-EXTERN int  FilesScanned;
 EXTERN int  ScanProgressX;
 
 EXTERN CFarMaskSet *FASystemFoldersMask VALUE(NULL);
@@ -133,6 +132,8 @@ OperationResult FileReplaceExecutor();
 OperationResult FileGrepExecutor();
 
 OperationResult NoFilesFound();
+OperationResult NoFilesModified();
+void ShowStatistics(bool bReplace, panelitem_vector &PanelItems);
 void InitFoundPosition();
 
 bool MultipleMasksApply(const TCHAR *Filename);

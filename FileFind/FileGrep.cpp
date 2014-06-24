@@ -416,10 +416,10 @@ OperationResult FileGrep(bool ShowDialog)
 #endif
 
 	CDebugTimer tm(_T("FileGrep() took %d ms"));
-	int nResult = ScanDirectories(g_PanelItems, GrepFile);
+	bool bResult = ScanDirectories(g_PanelItems, GrepFile);
 	tm.Stop();
 
-	if (nResult) {
+	if (bResult) {
 		g_hOutput.Close();
 		if (FGOpenInEditor) {
 			StartupInfo.Editor(strFileName.c_str(), NULL, 0, 0, -1, -1,

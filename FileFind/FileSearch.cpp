@@ -197,10 +197,10 @@ OperationResult FileFind(panelitem_vector &PanelItems, bool ShowDialog, bool bSi
 	}
 
 	CDebugTimer tm(_T("FileFind() took %d ms"));
-	int nResult = ScanDirectories(PanelItems, SearchFile);
+	bool bResult = ScanDirectories(PanelItems, SearchFile);
 	tm.Stop();
 
-	if (nResult) {
+	if (bResult) {
 		return (PanelItems.empty()) ? (bSilent ? OR_OK : NoFilesFound()) : OR_PANEL;
 	} else return OR_FAILED;
 }

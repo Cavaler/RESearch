@@ -106,9 +106,12 @@ typedef CREParameters<TCHAR> TREParameters;
 EXTERN TREParameters REParam;
 void MatchDone();
 
-EXTERN int FileNumber;
-EXTERN int FindNumber;
-EXTERN int ReplaceNumber;
+EXTERN int FilesScanned;			//	Total matching given mask, attributes etc - filled in DoScanDirectory
+EXTERN int FileNumber;				//	Files with at least one entry
+EXTERN int FindNumber;				//	Find number in current file
+EXTERN int ReplaceNumber;			//	Replace number in current file
+EXTERN int TotalFindNumber;
+EXTERN int TotalReplaceNumber;
 EXTERN DWORD LastTickCount VALUE(0);
 
 EXTERN int REErrorField  VALUE(-1);

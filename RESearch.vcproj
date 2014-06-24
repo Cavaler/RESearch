@@ -2042,14 +2042,6 @@
 			RelativePath=".\RESearch.lua"
 			>
 		</File>
-		<File
-			RelativePath=".\RESearch.tlb"
-			>
-		</File>
-		<File
-			RelativePath=".\script1.bin"
-			>
-		</File>
 	</Files>
 	<Globals>
 	</Globals>

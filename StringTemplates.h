@@ -47,7 +47,7 @@ public:
 	bool Empty();
 
 	void AddENumbers(int nL, int nN, int nS, int nR);
-	void AddFNumbers(int nF, int nS, int nR);
+	void AddFNumbers(int nN, int nF, int nS, int nR);
 	void AddSource (const CHAR *szString, size_t nLength);
 	void CopySource(const CHAR *szString, size_t nLength);
 	void CopySource(const cstring &strString);

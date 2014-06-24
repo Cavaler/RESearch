@@ -73,7 +73,10 @@ enum eStringTable {
 	MAllCharTables,
 	MFilesScanned,
 	MFilesFound,
+	MEntriesFound,
+	MEntriesReplaced,
 	MNoFilesFound,
+	MNoFilesModified,
 	MFileConsoleTitle,
 	MEditConsoleTitle,
 
@@ -115,6 +118,7 @@ enum eStringTable {
 	MSearchInStreams,
 
 	MViewModified,
+	MShowStatistics,
 	MConfirmFile,
 	MConfirmLine,
 	MSaveOriginal,

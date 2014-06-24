@@ -346,6 +346,7 @@ void ShowProgress(const TCHAR *Directory, panelitem_vector &PanelItems)
 {
 	if (GetTickCount() < LastTickCount+250) return;
 	LastTickCount = GetTickCount();
+	Sleep(0);
 
 	tstring strScanned = FormatStr(GetMsg(MFilesScanned), FilesScanned);
 	tstring strFound   = FormatStr(GetMsg(MFilesFound), PanelItems.size());
@@ -443,6 +444,21 @@ bool ScanFileStreams(const FIND_DATA &Found, vector<FIND_DATA> &arrFoundData)
 	return true;
 }
 
+void CallProcessFile(const FIND_DATA &FindData, panelitem_vector &PanelItems, ProcessFileProc ProcessFile)
+{
+	int PrevFindNumber = FindNumber;
+	size_t PrevItemCount = PanelItems.size();
+
+	FileFillNamedParameters(FindData.cFileName);
+	ProcessFile(&FindData, PanelItems);
+
+	FilesScanned++;
+	if (FindNumber > PrevFindNumber) FileNumber++;
+	TotalFindNumber += FindNumber;
+	//	If file was ultimately skipped - don't increment
+	if (PanelItems.size() > PrevItemCount) TotalReplaceNumber += ReplaceNumber;
+}
+
 bool DoScanDirectory(tstring strDirectory, panelitem_vector &PanelItems, ProcessFileProc ProcessFile)
 {
 	if (FASkipSystemFolders && FASystemFoldersMask) {
@@ -503,10 +519,7 @@ bool DoScanDirectory(tstring strDirectory, panelitem_vector &PanelItems, Process
 				LPCTSTR szShortName = _tcsrchr(Found.cAlternateFileName, '\\');
 				MultipleMasksApply(szName ? szName+1 : Found.cFileName, szShortName ? szShortName+1 : Found.cAlternateFileName);
 			}
-			FileFillNamedParameters(Found.cFileName);
-			ProcessFile(&Found, PanelItems);
-			Sleep(0);
-			FilesScanned++;
+			CallProcessFile(Found, PanelItems, ProcessFile);
 		}
 		if ((nFound==0) || ((FText[0]==0) ? (FilesScanned%100 == 0) : (FilesScanned%25 == 0))) ShowProgress(strDirectory.c_str(), PanelItems);
 	}
@@ -518,7 +531,6 @@ bool DoScanDirectory(tstring strDirectory, panelitem_vector &PanelItems, Process
 	if ((HSearch=FindFirstFile(strDirAndMask.c_str(), &FindData))==INVALID_HANDLE_VALUE) return true;
 	CurrentRecursionLevel++;
 	do {
-//		Sleep(0);
 		if ((FindData.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY)==0) continue;
 		if (_tcscmp(FindData.cFileName, _T(".")) == 0) continue;
 		if (_tcscmp(FindData.cFileName, _T("..")) == 0) continue;
@@ -558,8 +570,7 @@ bool ScanPluginDirectories(CPanelInfo &Info,panelitem_vector &PanelItems,Process
 
 			FIND_DATA CurFindData = PanelToFD(Items[I]);
 			CurFindData.strFileName = GetFullFileName(CurFindData.cFileName);
-			ProcessFile(&CurFindData, PanelItems);
-			FilesScanned++;
+			CallProcessFile(CurFindData, PanelItems, ProcessFile);
 		}
 	}
 
@@ -573,8 +584,11 @@ bool ScanDirectories(panelitem_vector &PanelItems, ProcessFileProc ProcessFile)
 	tstring strCurDir = PInfo.CurDir;
 
 	PanelItems.clear();
-	g_bInterrupted=false;
-	FilesScanned=0;
+	g_bInterrupted = false;
+
+	FilesScanned = FileNumber = 0;
+	FindNumber = ReplaceNumber = 0;
+
 	ScanProgressX = 40;	// Minimal width
 	CurrentRecursionLevel=0;
 
@@ -629,17 +643,14 @@ bool ScanDirectories(panelitem_vector &PanelItems, ProcessFileProc ProcessFile)
 			if (CurFindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
 				// Test if directory itself applies
 				if (bMultipleMasksApply) {
-					ProcessFile(&CurFindData, PanelItems);
-					FilesScanned++;
+					CallProcessFile(CurFindData, PanelItems, ProcessFile);
 				}
 
 				// Scan subdirectory
 				if (!DoScanDirectory(CurFindData.strFileName, PanelItems, ProcessFile)) break;
 			} else {
 				if (!bMultipleMasksApply) continue;
-				FileFillNamedParameters(CurFindData.cFileName);
-				ProcessFile(&CurFindData, PanelItems);
-				FilesScanned++;
+				CallProcessFile(CurFindData, PanelItems, ProcessFile);
 			}
 		}
 		return true;
@@ -657,6 +668,37 @@ OperationResult NoFilesFound()
 	StartupInfo.Message(0, _T("NoFilesFound"), Lines, 4, 1);
 
 	return OR_OK;
+}
+
+OperationResult NoFilesModified()
+{
+	if (g_bInterrupted) return OR_OK;
+
+	tstring strScanned = FormatStr(GetMsg(MFilesScanned), FilesScanned);
+	const TCHAR *Lines[] = {GetMsg(MRESearch), strScanned.c_str(), GetMsg(MNoFilesModified), GetMsg(MOk)};
+	StartupInfo.Message(0, _T("NoFilesFound"), Lines, 4, 1);
+
+	return OR_OK;
+}
+
+void ShowStatistics(bool bReplace, panelitem_vector &PanelItems)
+{
+	if (g_bInterrupted) return;
+
+	tstring strScanned         = FormatStr(GetMsg(MFilesScanned),    FilesScanned);
+	tstring strEntriesFound    = FormatStr(GetMsg(MEntriesFound),    TotalFindNumber, FileNumber);
+
+	if (bReplace)
+	{
+		tstring strEntriesReplaced = FormatStr(GetMsg(MEntriesReplaced), TotalReplaceNumber, PanelItems.size());
+		const TCHAR *Lines[] = {GetMsg(MRESearch), strScanned.c_str(), strEntriesFound.c_str(), strEntriesReplaced.c_str(), GetMsg(MOk)};
+		StartupInfo.Message(0, _T("NoFilesFound"), Lines, 5, 1);
+	}
+	else
+	{
+		const TCHAR *Lines[] = {GetMsg(MRESearch), strScanned.c_str(), strEntriesFound.c_str(), GetMsg(MOk)};
+		StartupInfo.Message(0, _T("NoFilesFound"), Lines, 4, 1);
+	}
 }
 
 LONG_PTR WINAPI ConfirmFileDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LONG_PTR lParam2)

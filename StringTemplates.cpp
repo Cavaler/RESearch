@@ -241,7 +241,8 @@ void CREParameters<CHAR>::AddSingleCharParam(char C, const CHAR *sz)
 }
 
 template<class CHAR>
-void CREParameters<CHAR>::AddENumbers(int nL, int nN, int nS, int nR) {
+void CREParameters<CHAR>::AddENumbers(int nL, int nN, int nS, int nR)
+{
 	CHAR szNumber[16];
 	AddSingleCharParam('L', CSO::ctoa(nL, szNumber));
 	AddSingleCharParam('N', CSO::ctoa(nN, szNumber));
@@ -250,8 +251,10 @@ void CREParameters<CHAR>::AddENumbers(int nL, int nN, int nS, int nR) {
 }
 
 template<class CHAR>
-void CREParameters<CHAR>::AddFNumbers(int nF, int nS, int nR) {
+void CREParameters<CHAR>::AddFNumbers(int nN, int nF, int nS, int nR)
+{
 	CHAR szNumber[16];
+	AddSingleCharParam('N', CSO::ctoa(nN, szNumber));
 	AddSingleCharParam('F', CSO::ctoa(nF, szNumber));
 	AddSingleCharParam('S', CSO::ctoa(nS, szNumber));
 	AddSingleCharParam('R', CSO::ctoa(nR, szNumber));

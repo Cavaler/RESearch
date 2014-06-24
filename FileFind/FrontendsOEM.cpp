@@ -111,7 +111,7 @@ bool CReplacePlainTextFrontend::Process(IBackend *pBackend)
 			if (!pBackend->CheckWriteReady()) return false;
 
 			REParam.AddSource(szBuffer+nOffset, TextUpcase.size());
-			REParam.AddFNumbers(FileNumber, FindNumber, ReplaceNumber);
+			REParam.AddFNumbers(FilesScanned, FileNumber, FindNumber, ReplaceNumber);
 			string strReplace = CSO::CreateReplaceString(FRReplace.c_str(), "\n", ScriptEngine(FREvaluate), REParam);
 
 			FindNumber++;
@@ -158,7 +158,7 @@ bool ReplaceRegExpProcess(IBackend *pBackend, ISplitLineProcessor &Proc)
 			REParam.FillStartLength(&nOffset, &nLength);
 
 			REParam.AddSource(szBuffer, nOffset+nLength);
-			REParam.AddFNumbers(FileNumber, FindNumber, ReplaceNumber);
+			REParam.AddFNumbers(FilesScanned, FileNumber, FindNumber, ReplaceNumber);
 			string strReplace = CSO::CreateReplaceString(FRReplace.c_str(), "\n", ScriptEngine(FREvaluate), REParam);
 
 			FindNumber++;
