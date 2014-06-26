@@ -219,7 +219,7 @@ OperationResult FileSearchExecutor()
 
 bool CFSPresetCollection::EditPreset(CPreset *pPreset)
 {
-	CFarDialog Dialog(76,26,_T("FSPresetDlg"));
+	CFarDialog Dialog(76, 28, _T("FSPresetDlg"));
 	Dialog.SetWindowProc(FileSearchDialogProc, 0);
 	Dialog.SetUseID(true);
 
@@ -247,16 +247,18 @@ bool CFSPresetCollection::EditPreset(CPreset *pPreset)
 	Dialog.Add(new CFarRadioButtonItem(5,12,0,		MMultiLineRegExp,	pSearchAs,SA_MULTILINE));
 	Dialog.Add(new CFarRadioButtonItem(5,13,0,		MMultiPlainText,	pSearchAs,SA_MULTITEXT));
 
-	Dialog.Add(new CFarCheckBoxItem(5,15,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
-	Dialog.Add(new CFarCheckBoxItem(5,16,0,MInverseSearch,&pPreset->m_mapInts["Inverse"]));
+	Dialog.Add(new CFarCheckBoxItem(5,15,0,MCaseSensitive, &pPreset->m_mapInts["CaseSensitive"]));
+	Dialog.Add(new CFarCheckBoxItem(5,16,0,MInverseSearch, &pPreset->m_mapInts["Inverse"]));
+	Dialog.Add(new CFarCheckBoxItem(5,17,0,MAllCharTables, &pPreset->m_mapInts["AllCharTables"]));
+	Dialog.Add(new CFarCheckBoxItem(5,18,0,MShowStatistics,&pPreset->m_mapInts["ShowStatistics"]));
 
-	Dialog.Add(new CFarTextItem(5,18,0,MSearchIn));
-	Dialog.Add(new CFarComboBoxItem(15,18,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearch, false),&pPreset->m_mapInts["SearchIn"]));
+	Dialog.Add(new CFarTextItem(5,20,0,MSearchIn));
+	Dialog.Add(new CFarComboBoxItem(15,20,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearch, false),&pPreset->m_mapInts["SearchIn"]));
 
 	Dialog.Add(new CFarCheckBoxItem(56,9,0,MLeftBracket,&bFAdvanced));
 	Dialog.Add(new CFarButtonItem  (62,9,DIF_NOBRACKETS,0,MBtnAdvanced));
 
-	Dialog.Add(new CFarCheckBoxItem(5,20,0,MAddToMenu,&pPreset->m_bAddToMenu));
+	Dialog.Add(new CFarCheckBoxItem(5,22,0,MAddToMenu,&pPreset->m_bAddToMenu));
 	Dialog.AddButtons(MOk,MCancel);
 
 	do {

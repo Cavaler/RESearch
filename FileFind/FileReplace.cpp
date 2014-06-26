@@ -400,7 +400,7 @@ bool ReplacePrompt(bool Plugin)
 	Dialog.Add(new CFarCheckBoxItem(42,21,0,MOverwriteBackup,&FROverwriteBackup));
 
 	Dialog.AddButtons(MOk,MCancel,MBtnClose);
-	Dialog.Add(new CFarButtonItem(60,23,0,0,MBtnPresets));
+	Dialog.Add(new CFarButtonItem(60,24,0,0,MBtnPresets));
 
 	Dialog.SetFocus(MMask, 1);
 	if (FSearchAs>=SA_MULTITEXT) FSearchAs=SA_PLAINTEXT;
@@ -497,7 +497,7 @@ OperationResult FileReplaceExecutor()
 
 bool CFRPresetCollection::EditPreset(CPreset *pPreset)
 {
-	CFarDialog Dialog(76, 27, _T("FRPresetDlg"));
+	CFarDialog Dialog(76, 32, _T("FRPresetDlg"));
 	Dialog.SetWindowProc(FileReplaceDialogProc, 0);
 	Dialog.SetUseID(true);
 
@@ -538,7 +538,17 @@ bool CFRPresetCollection::EditPreset(CPreset *pPreset)
 
 	Dialog.Add(new CFarCheckBoxItem(56,12,0,MLeftBracket,&bFAdvanced));
 	Dialog.Add(new CFarButtonItem  (62,12,DIF_NOBRACKETS,0,MBtnAdvanced));
-	Dialog.Add(new CFarCheckBoxItem(5,21,0,MAddToMenu,&pPreset->m_bAddToMenu));
+
+	Dialog.Add(new CFarCheckBoxItem(5,21,0,MConfirmFile,&pPreset->m_mapInts["ConfirmFile"]));
+	Dialog.Add(new CFarCheckBoxItem(5,22,0,MConfirmLine,&pPreset->m_mapInts["ConfirmLine"]));
+	Dialog.Add(new CFarCheckBoxItem(5,23,0,MViewModified,&pPreset->m_mapInts["OpenModified"]));
+	Dialog.Add(new CFarCheckBoxItem(5,24,0,MShowStatistics,&pPreset->m_mapInts["ShowStatistics"]));
+
+	Dialog.Add(new CFarCheckBoxItem(40,21,0,MReplaceToNew,&pPreset->m_mapInts["ReplaceToNew"]));
+	Dialog.Add(new CFarCheckBoxItem(40,22,0,MSaveOriginal,&pPreset->m_mapInts["SaveOriginal"]));
+	Dialog.Add(new CFarCheckBoxItem(42,23,0,MOverwriteBackup,&pPreset->m_mapInts["OverwriteBackup"]));
+
+	Dialog.Add(new CFarCheckBoxItem(5,26,0,MAddToMenu,&pPreset->m_bAddToMenu));
 	Dialog.AddButtons(MOk,MCancel);
 
 	do {

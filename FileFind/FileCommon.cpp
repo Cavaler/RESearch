@@ -4,16 +4,20 @@
 CParameterSet g_FSParamSet(FileSearchExecutor,
 	"Mask", &MaskText, "Text", &SearchText, "@Mask", &FMask, "@Text", &FText, NULL,
 	"SearchIn", &FSearchIn, "AdvancedID", &FAdvancedID, NULL,
-	"MaskAsRegExp", &FMaskAsRegExp, "CaseSensitive", &FCaseSensitive,
-	"SearchAs", &FSearchAs, "IsInverse", &FSInverse, NULL
+	"MaskAsRegExp", &FMaskAsRegExp, "CaseSensitive", &FCaseSensitive, "AllCharTables", &FAllCharTables,
+	"SearchAs", &FSearchAs, "IsInverse", &FSInverse, "ShowStatistics", &FShowStatistics, NULL
 	);
+
 CParameterSet g_FRParamSet(FileReplaceExecutor,
 	"Mask", &MaskText, "Text", &SearchText, "Replace", &ReplaceText, "Script", &EREvaluateScript,
 	"@Mask", &FMask, "@Text", &FText, "@Replace", &FRReplace, NULL,
 	"SearchIn", &FSearchIn, "AdvancedID", &FAdvancedID, NULL,
 	"MaskAsRegExp", &FMaskAsRegExp, "CaseSensitive", &FCaseSensitive, "AllCharTables", &FAllCharTables,
-	"SearchAs", &FSearchAs, "AsScript", &FREvaluate, NULL
+	"SearchAs", &FSearchAs, "AsScript", &FREvaluate, "ShowStatistics", &FShowStatistics,
+	"ConfirmFile", &FRConfirmFile, "ConfirmLine", &FRConfirmLine, "OpenModified", &FROpenModified,
+	"ReplaceToNew", FRReplaceToNew, "SaveOriginal", &FRSaveOriginal, "OverwriteBackup", &FROverwriteBackup, NULL
 	);
+
 CParameterSet g_FGParamSet(FileGrepExecutor,
 	"Mask", &MaskText, "Text", &SearchText, "@Mask", &FMask, "@Text", &FText, "OutputFile", &FGOutputFile, NULL,
 	"SearchIn", &FSearchIn, "AdvancedID", &FAdvancedID, "ContextLines", &FGContextLines, NULL,
