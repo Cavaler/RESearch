@@ -15,7 +15,7 @@ CParameterSet g_FRParamSet(FileReplaceExecutor,
 	"MaskAsRegExp", &FMaskAsRegExp, "CaseSensitive", &FCaseSensitive, "AllCharTables", &FAllCharTables,
 	"SearchAs", &FSearchAs, "AsScript", &FREvaluate, "ShowStatistics", &FShowStatistics,
 	"ConfirmFile", &FRConfirmFile, "ConfirmLine", &FRConfirmLine, "OpenModified", &FROpenModified,
-	"ReplaceToNew", FRReplaceToNew, "SaveOriginal", &FRSaveOriginal, "OverwriteBackup", &FROverwriteBackup, NULL
+	"ReplaceToNew", &FRReplaceToNew, "SaveOriginal", &FRSaveOriginal, "OverwriteBackup", &FROverwriteBackup, NULL
 	);
 
 CParameterSet g_FGParamSet(FileGrepExecutor,
