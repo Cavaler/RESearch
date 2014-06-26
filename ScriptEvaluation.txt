@@ -20,6 +20,6 @@ If the engine does not support importing function in to root namespace (e.g. Lua
 each function with object name "research", e.g research:result() in LuaScript.
 
 In Far3, there are additional engines called FarLUA and FarMoonScript, representing Far built-in script engines.
-Their usage is similar except that you should use "research:" prefix and and use "return" instead of result() to return values.
+Their usage is similar except that you should use "return" instead of result() to return values.
 Multiple returned values are merged together.
-Functionality of FarLUA/FarMoonScript depends on proper RESearch.lua script file in %FARRPROFILE%\Macros\scripts
+
