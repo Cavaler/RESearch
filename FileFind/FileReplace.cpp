@@ -259,7 +259,6 @@ void ReplaceSingleFile(const FIND_DATA *FindData, panelitem_vector &PanelItems)
 	FRConfirmLineThisFile = FRConfirmLineThisRun;
 	FRSkipThisFile = false;
 	FileConfirmed = !FRConfirmFileThisRun;
-	FindNumber = ReplaceNumber = 0;
 #ifndef UNICODE
 	m_pReplaceTable = NULL;
 #endif
@@ -394,7 +393,7 @@ bool ReplacePrompt(bool Plugin)
 	Dialog.Add(new CFarCheckBoxItem(5,19,0,MConfirmFile,&FRConfirmFile));
 	Dialog.Add(new CFarCheckBoxItem(5,20,0,MConfirmLine,&FRConfirmLine));
 	Dialog.Add(new CFarCheckBoxItem(5,21,0,MViewModified,&FROpenModified));
-	Dialog.Add(new CFarCheckBoxItem(5,22,0,MShowStatistics,&FRShowStatistics));
+	Dialog.Add(new CFarCheckBoxItem(5,22,0,MShowStatistics,&FShowStatistics));
 
 	Dialog.Add(new CFarCheckBoxItem(40,19,0,MReplaceToNew,&FRReplaceToNew));
 	Dialog.Add(new CFarCheckBoxItem(40,20,0,MSaveOriginal,&FRSaveOriginal));
@@ -474,14 +473,14 @@ OperationResult FileReplace(panelitem_vector &PanelItems, bool ShowDialog, bool 
 
 	if (!bResult) return OR_FAILED;
 
-	if (FRShowStatistics)
+	if (FShowStatistics)
 		ShowStatistics(true, PanelItems);
 
 	if (!FROpenModified)
 		return OR_OK;
 	else
 		return !PanelItems.empty() ? OR_PANEL :
-			(bSilent || FRShowStatistics) ? OR_OK :
+			(bSilent || FShowStatistics) ? OR_OK :
 			(FindNumber > 0) ? NoFilesModified() :  NoFilesFound();
 }
 

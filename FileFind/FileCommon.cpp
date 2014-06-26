@@ -446,14 +446,14 @@ bool ScanFileStreams(const FIND_DATA &Found, vector<FIND_DATA> &arrFoundData)
 
 void CallProcessFile(const FIND_DATA &FindData, panelitem_vector &PanelItems, ProcessFileProc ProcessFile)
 {
-	int PrevFindNumber = FindNumber;
 	size_t PrevItemCount = PanelItems.size();
+	FindNumber = ReplaceNumber = 0;
 
 	FileFillNamedParameters(FindData.cFileName);
 	ProcessFile(&FindData, PanelItems);
 
 	FilesScanned++;
-	if (FindNumber > PrevFindNumber) FileNumber++;
+	if (FindNumber > 0) FileNumber++;
 	TotalFindNumber += FindNumber;
 	//	If file was ultimately skipped - don't increment
 	if (PanelItems.size() > PrevItemCount) TotalReplaceNumber += ReplaceNumber;
@@ -587,7 +587,7 @@ bool ScanDirectories(panelitem_vector &PanelItems, ProcessFileProc ProcessFile)
 	g_bInterrupted = false;
 
 	FilesScanned = FileNumber = 0;
-	FindNumber = ReplaceNumber = 0;
+	TotalFindNumber = TotalReplaceNumber = 0;
 
 	ScanProgressX = 40;	// Minimal width
 	CurrentRecursionLevel=0;

@@ -61,10 +61,12 @@ class ISplitLineProcessor : public IBufferSize
 public:
 	virtual bool		GetNextLine() = 0;
 	virtual INT_PTR		Start() = 0;
+	virtual INT_PTR		StartW() { return Start() / 2; }
 
 	virtual bool	WriteBack(INT_PTR nOffset) = 0;
 	virtual bool	WriteThru(const char *szBuffer, INT_PTR nLength, INT_PTR nSkipLength) = 0;
 	virtual void	SkipTo   (INT_PTR nOffset) = 0;
+	virtual void	SkipToW  (INT_PTR nOffset) { SkipTo(nOffset*2); }
 };
 
 class IFrontend : public IVirtual

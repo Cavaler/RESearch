@@ -16,14 +16,59 @@ bool CSearchPlainTextFrontend::Process(IBackend *pBackend)
 		const char *szBuffer = pBackend->Buffer();
 		INT_PTR nSize  = pBackend->Size();
 
-		if (BMHSearch(szBuffer, nSize, TextUpcase.data(), TextUpcase.size(), szTable) >= 0) return true;
+		while (nSize > 0)
+		{
+			int nOffset = BMHSearch(szBuffer, nSize, TextUpcase.data(), TextUpcase.size(), szTable);
+			if (nOffset >= 0)
+			{
+				FindNumber++;
+				if (!FShowStatistics) return true;
+
+				szBuffer += nOffset + TextUpcase.size();
+				nSize    -= nOffset + TextUpcase.size();
+			}
+			else
+				break;
+		}
 
 		if (pBackend->Last()) break;
 		if (!pBackend->Move(nSize-FText.size())) break;
 
 	} while (!Interrupted());
 
-	return false;
+	return FindNumber > 0;
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+bool SearchRegExpProcess(IBackend *pBackend, ISplitLineProcessor &Proc)
+{
+	do {
+		const char *szBuffer = Proc.Buffer();
+		INT_PTR nSize   = Proc.Size();
+		INT_PTR nOffset = Proc.Start();
+
+		while (nOffset < nSize)
+		{
+			int nResult = do_pcre_exec(FPattern, FPatternExtra, szBuffer, nSize, nOffset, 0, REParam.Match(), REParam.Count());
+			if (nResult >= 0)
+			{
+				if (FindNumber == 0) g_nFoundColumn = REParam.m_arrMatch[0]+1;
+				FindNumber++;
+				if (!FShowStatistics) return true;
+
+				nOffset = REParam.m_arrMatch[1];
+				Proc.SkipTo(nOffset);
+			}
+			else
+				break;
+		}
+
+		if (FindNumber == 0) g_nFoundLine++;
+
+	} while (!Interrupted() && Proc.GetNextLine());
+
+	return FindNumber > 0;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -32,13 +77,7 @@ bool CSearchRegExpFrontend::Process(IBackend *pBackend)
 {
 	CSingleByteSplitLineProcessor Proc(pBackend);
 
-	do {
-		int nResult = do_pcre_exec(FPattern, FPatternExtra, Proc.Buffer(), Proc.Size(), 0, 0, REParam.Match(), REParam.Count());
-		if (nResult >= 0) return true;
-		g_nFoundLine++;
-	} while (!Interrupted() && Proc.GetNextLine());
-
-	return false;
+	return SearchRegExpProcess(pBackend, Proc);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -47,32 +86,16 @@ bool CSearchSeveralLineRegExpFrontend::Process(IBackend *pBackend)
 {
 	CSingleByteSeveralLineProcessor Proc(pBackend, SeveralLines, SeveralLinesKB);
 
-	do {
-		int nResult = do_pcre_exec(FPattern, FPatternExtra, Proc.Buffer(), Proc.Size(), 0, 0, REParam.Match(), REParam.Count());
-		if (nResult >= 0) return true;
-		g_nFoundLine++;
-	} while (!Interrupted() && Proc.GetNextLine());
-
-	return false;
+	return SearchRegExpProcess(pBackend, Proc);
 }
 
 //////////////////////////////////////////////////////////////////////////
 
 bool CSearchMultiLineRegExpFrontend::Process(IBackend *pBackend)
 {
-	do {
-		const char *szBuffer = pBackend->Buffer();
-		INT_PTR nSize  = pBackend->Size();
+	CSingleBytePassThroughProcessor Proc(pBackend);
 
-		int nResult = do_pcre_exec(FPattern, FPatternExtra, szBuffer, nSize, 0, 0, REParam.Match(), REParam.Count());
-		if (nResult >= 0) return true;
-
-		if (pBackend->Last()) break;
-		if (!pBackend->Move(nSize > 1024 ? nSize - 1024 : nSize)) break;
-
-	} while (!Interrupted());
-
-	return false;
+	return SearchRegExpProcess(pBackend, Proc);
 }
 
 //////////////////////////////////////////////////////////////////////////

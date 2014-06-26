@@ -104,7 +104,7 @@ LONG_PTR WINAPI FileSearchDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LO
 
 bool SearchPrompt(bool Plugin)
 {
-	CFarDialog Dialog(76,23,_T("FileSearchDlg"));
+	CFarDialog Dialog(76, 24, _T("FileSearchDlg"));
 	Dialog.SetWindowProc(FileSearchDialogProc, 0);
 	Dialog.SetUseID(true);
 
@@ -128,13 +128,14 @@ bool SearchPrompt(bool Plugin)
 	Dialog.Add(new CFarCheckBoxItem(5,13,0,MCaseSensitive,&FCaseSensitive));
 	Dialog.Add(new CFarCheckBoxItem(5,14,0,MInverseSearch,&FSInverse));
 	Dialog.Add(new CFarCheckBoxItem(5,15,0,MAllCharTables,&FAllCharTables));
+	Dialog.Add(new CFarCheckBoxItem(5,16,0,MShowStatistics,&FShowStatistics));
 
-	Dialog.Add(new CFarTextItem(5,17,0,MSearchIn));
+	Dialog.Add(new CFarTextItem(5,18,0,MSearchIn));
 	if (Plugin) {
 		if (FSearchIn<SI_FROMCURRENT) FSearchIn=SI_FROMCURRENT;
-		Dialog.Add(new CFarComboBoxItem(15,17,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearchPlugin, false),(int *)&FSearchIn,NULL,3));
+		Dialog.Add(new CFarComboBoxItem(15,18,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearchPlugin, false),(int *)&FSearchIn,NULL,3));
 	} else {
-		Dialog.Add(new CFarComboBoxItem(15,17,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearch, false),(int *)&FSearchIn));
+		Dialog.Add(new CFarComboBoxItem(15,18,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearch, false),(int *)&FSearchIn));
 	}
 
 	Dialog.Add(new CFarCheckBoxItem(56,8,0,MLeftBracket,&FAdvanced));
@@ -142,7 +143,7 @@ bool SearchPrompt(bool Plugin)
 	Dialog.Add(new CFarButtonItem(_tcslen(GetMsg(MSeveralLineRegExp))+10,9,0,0,MEllipsis));
 
 	Dialog.AddButtons(MOk,MCancel,MBtnClose);
-	Dialog.Add(new CFarButtonItem(60,19,0,0,MBtnPresets));
+	Dialog.Add(new CFarButtonItem(60,20,0,0,MBtnPresets));
 
 	Dialog.SetFocus(MMask, 1);
 	FACaseSensitive=FADirectoryCaseSensitive=MaskCaseHere();
@@ -200,9 +201,13 @@ OperationResult FileFind(panelitem_vector &PanelItems, bool ShowDialog, bool bSi
 	bool bResult = ScanDirectories(PanelItems, SearchFile);
 	tm.Stop();
 
-	if (bResult) {
-		return (PanelItems.empty()) ? (bSilent ? OR_OK : NoFilesFound()) : OR_PANEL;
-	} else return OR_FAILED;
+	if (!bResult) return OR_FAILED;
+
+	if (FShowStatistics)
+		ShowStatistics(false, PanelItems);
+
+	return !PanelItems.empty() ? OR_PANEL :
+		(bSilent || FShowStatistics) ? OR_OK : NoFilesFound();
 }
 
 OperationResult FileSearchExecutor()
