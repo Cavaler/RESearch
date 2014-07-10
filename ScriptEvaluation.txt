@@ -23,3 +23,6 @@ In Far3, there are additional engines called FarLUA and FarMoonScript, represent
 Their usage is similar except that you should use "return" instead of result() to return values.
 Multiple returned values are merged together.
 
+Also, scripts can append additional information to the end of file after performing File / Editor Replace.
+In order to do that, script can check value of final() function and return data when final()) is true.
+If script didn't call final(), no data is appended.

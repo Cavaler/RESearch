@@ -187,6 +187,7 @@ and many others are also available)
     #store(n, v)#   Store value 'v' in named parameter 'n'
     #init(n, v)#    Same as store(), except that it works only once after 'Replace' is invoked.
     #skip()#        Forces RESearch to skip current replace
+    #final()#       Evaluates to true on final replace step
 
 @CommonConfig
 $ #Common settings#
