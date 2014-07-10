@@ -359,7 +359,7 @@ void CUTF8Traverse::SetString(const char *szBuffer, INT_PTR nLength)
 		int t = TestUTF8Byte(szBuffer[nByte]);
 		nByte += (t > 0) ? t : 1;
 
-		nChar++;
+		nChar += (t >= 4) ? 2 : 1;
 	}
 
 	utf2char[nByte] = nChar;
