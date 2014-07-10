@@ -125,6 +125,7 @@ template<class CHAR, class CONVERT>
 class CReplaceParametersT
 	: public CComObjectRootEx<CComSingleThreadModel>
 	, public IDispatchImpl<IReplaceParameters, &__uuidof(IReplaceParameters), &__uuidof(__RESearchLib), -1, -1>
+	, public IReplaceParametersInternal
 {
 public:
 	typedef CStringOperations<CHAR> CSO;
@@ -132,6 +133,7 @@ public:
 
 	BEGIN_COM_MAP(CReplaceParametersT)
 		COM_INTERFACE_ENTRY(IReplaceParameters)
+		COM_INTERFACE_ENTRY(IReplaceParametersInternal)
 		COM_INTERFACE_ENTRY(IDispatch)
 	END_COM_MAP()
 
@@ -139,9 +141,15 @@ public:
 	{
 		m_pParam = pParam;
 		m_szEOL  = szEOL;
+		m_bHasResult = false;
+		m_bFinal     = false;
+		m_bFinalChecked = false;
 	}
 
-	cstring Result() { return m_strResult; }
+	virtual cstring Result() { return m_strResult; }
+	virtual bool    HasResult() { return m_bHasResult; }
+	virtual void    SetFinal(bool bFinal) { m_bFinal = bFinal; }
+	virtual bool    FinalChecked() { return m_bFinalChecked; }
 
 	// IReplaceParameters methods
 	STDMETHOD(match)(long lPos, BSTR *pbstrMatch) {
@@ -181,6 +189,13 @@ public:
 
 	STDMETHOD(result)(BSTR bstrResult) {
 		m_strResult = CONVERT::FromBSTR<CHAR>(bstrResult);
+		m_bHasResult = true;
+		return S_OK;
+	}
+
+	STDMETHOD(final)(VARIANT_BOOL *pFinal) {
+		*pFinal = m_bFinal ? VARIANT_TRUE : VARIANT_FALSE;
+		m_bFinalChecked = true;
 		return S_OK;
 	}
 
@@ -204,6 +219,10 @@ private:
 	const CHAR *m_szEOL;
 
 	cstring m_strResult;
+	bool	m_bHasResult;
+
+	bool	m_bFinal;
+	bool	m_bFinalChecked;
 };
 
 // --------------------------------------------------
@@ -350,6 +369,8 @@ public:
 };
 #endif
 
+#ifndef UNICODE
+
 template<>
 basic_string<char> EvaluateReplaceString(CREParameters<char> &Param, const char *Replace, const char *EOL, LPCTSTR szEngine)
 {
@@ -364,13 +385,14 @@ basic_string<char> EvaluateReplaceString(CREParameters<char> &Param, const char 
 #endif
 
 	basic_string<char> strResult = pParams->Result();
+	if (!pParams->HasResult()) g_bSkipReplace = true;
 
 	g_spREParam = NULL;
 
 	return strResult;
 }
 
-#ifdef UNICODE
+#else
 
 template<>
 basic_string<wchar_t> EvaluateReplaceString(CREParameters<wchar_t> &Param, const wchar_t *Replace, const wchar_t *EOL, LPCTSTR szEngine)
@@ -389,6 +411,7 @@ basic_string<wchar_t> EvaluateReplaceString(CREParameters<wchar_t> &Param, const
 	EvaluateReplaceStringT<CConverter>(pParams, Replace, szEngine);
 
 	basic_string<wchar_t> strResult = pParams->Result();
+	if (!pParams->HasResult()) g_bSkipReplace = true;
 
 	g_spREParam = NULL;
 

@@ -198,9 +198,10 @@ void CStringOperations<CHAR>::QuoteAny(cstring &str, const CHAR *szList) {
 	}
 }
 
-template class CStringOperations<char>;
 #ifdef UNICODE
 template class CStringOperations<wchar_t>;
+#else
+template class CStringOperations<char>;
 #endif
 
 //////////////////////////////////////////////////////////////////////////

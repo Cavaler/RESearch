@@ -124,6 +124,15 @@ void HighlightREError(CFarDialog *pDlg);
 void FillDefaultNamedParameters(const TCHAR *szFileName);
 void ClearVariables();
 
+interface DECLSPEC_UUID("a74c4507-f8fc-4b09-8ebe-2801d86006e0") IReplaceParametersInternal : IUnknown
+{
+	virtual CStringOperations<TCHAR>::cstring Result() = 0;
+	virtual bool    HasResult() = 0;
+	virtual void    SetFinal(bool bFinal) = 0;
+	virtual bool    FinalChecked() = 0;
+};
+_COM_SMARTPTR_TYPEDEF(IReplaceParametersInternal, __uuidof(IReplaceParametersInternal));
+
 EXTERN IReplaceParametersPtr g_spREParam;
 template<class CHAR>
 basic_string<CHAR> EvaluateReplaceString(CREParameters<CHAR> &Param, const CHAR *Replace, const CHAR *EOL, LPCTSTR szEngine);

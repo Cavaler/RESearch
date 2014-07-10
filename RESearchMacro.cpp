@@ -599,8 +599,20 @@ wstring EvaluateLUAString(CREParameters<wchar_t> &Param, LPCWSTR szReplace, FARK
 
 	wstring strResult;
 
-	for (size_t nItem = 0; nItem < Macro.OutCount; nItem++)
-		strResult += GetStringValue(Macro.OutValues[nItem]);
+	IReplaceParametersInternalPtr spREInt = g_spREParam;
+
+	if (spREInt->HasResult())
+	{
+		strResult = spREInt->Result();
+	}
+	else
+	{
+		for (size_t nItem = 0; nItem < Macro.OutCount; nItem++)
+			strResult += GetStringValue(Macro.OutValues[nItem]);
+
+		if (Macro.OutCount == 0)
+			g_bSkipReplace = true;
+	}
 
 	return strResult;
 }

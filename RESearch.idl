@@ -26,6 +26,7 @@ interface IReplaceParameters : IDispatch
 	HRESULT match([in] long lPos, [out,retval] BSTR *pbstrMatch);
 	HRESULT named([in] BSTR strParam, [out,retval] BSTR *pbstrMatch);
 	HRESULT result([in] BSTR bstrResult);
+	HRESULT final([out,retval] VARIANT_BOOL *pFinal);
 
 	HRESULT eol([out,retval] BSTR *pbstrEOL);
 	HRESULT l([out,retval] long *pValue);
