@@ -136,20 +136,18 @@ $ #Replacement text#
     ${name} - captured named subpattern. See also: ~Predefined named parameters~@PredefinedNamedParam@
 
     When replacing in editor:
-    $L      - current line number (from 0)
-    $N      - current line number, counted from start of replacing (from 0)
-    $S      - current find number (from 0)
-    $R      - current replacement number (from 0)
+    $L      - current line number
+    $N      - current line number, counted from start of replacing
+    $S      - current find number
+    $R      - current replacement number
     
-    When replacing in files:
-    $F      - current file number (from 0)
-    $S      - current find number (from 0)
-    $R      - current replacement number (from 0)
-    
-    When renaming files:
-    $F      - current file number (from 0)
-    $S      - current find number (from 0)
-    $R      - current replacement number (from 0)
+    When replacing in or renaming files:
+	$N      - current matching file number
+    $F      - current file number with at least one match 
+    $S      - current find number in this file
+    $R      - current replacement number in this file
+
+	#NOTE#: All numbers are from 0. You can use form ${N+1} to count form 1.
 
     #NOTE#: Parameter references (subpatterns or special variables) can be extended by
 using the following forms:
@@ -183,7 +181,7 @@ and many others are also available)
 
     #match(n)#      Returns the same as $n in ~usual replace~@RegularReplace@
     #named(nm)#     Returns named parameter 'nm'
-    #l/n/s/r()#     Returns the same as $L/$N/$S/$R in usual replace
+    #get_l/n/s/f/r()#     Returns the same as $L/$N/$S/$F/$R in usual replace
     #eol()#         Returns a suitable end-of-line sequence
     #result(str)#   Has to be called to return a resulting value back to RESearch
     #store(n, v)#   Store value 'v' in named parameter 'n'

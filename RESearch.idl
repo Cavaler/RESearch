@@ -29,10 +29,11 @@ interface IReplaceParameters : IDispatch
 	HRESULT final([out,retval] VARIANT_BOOL *pFinal);
 
 	HRESULT eol([out,retval] BSTR *pbstrEOL);
-	HRESULT l([out,retval] long *pValue);
-	HRESULT n([out,retval] long *pValue);
-	HRESULT s([out,retval] long *pValue);
-	HRESULT r([out,retval] long *pValue);
+	HRESULT get_l([out,retval] long *pValue);
+	HRESULT get_n([out,retval] long *pValue);
+	HRESULT get_s([out,retval] long *pValue);
+	HRESULT get_f([out,retval] long *pValue);
+	HRESULT get_r([out,retval] long *pValue);
 
 	HRESULT init ([in] BSTR strParam, [in] BSTR strValue);
 	HRESULT store([in] BSTR strParam, [in] BSTR strValue);

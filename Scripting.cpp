@@ -167,22 +167,27 @@ public:
 		return S_OK;
 	}
 
-	STDMETHOD(l)(long *pValue) {
+	STDMETHOD(get_l)(long *pValue) {
 		*pValue = CSO::ctoi(m_pParam->GetParam(CSO::__T2("L", L"L")).c_str());
 		return S_OK;
 	}
 
-	STDMETHOD(n)(long *pValue) {
+	STDMETHOD(get_n)(long *pValue) {
 		*pValue = CSO::ctoi(m_pParam->GetParam(CSO::__T2("N", L"N")).c_str());
 		return S_OK;
 	}
 
-	STDMETHOD(s)(long *pValue) {
+	STDMETHOD(get_s)(long *pValue) {
 		*pValue = CSO::ctoi(m_pParam->GetParam(CSO::__T2("S", L"S")).c_str());
 		return S_OK;
 	}
 
-	STDMETHOD(r)(long *pValue) {
+	STDMETHOD(get_f)(long *pValue) {
+		*pValue = CSO::ctoi(m_pParam->GetParam(CSO::__T2("F", L"F")).c_str());
+		return S_OK;
+	}
+
+	STDMETHOD(get_r)(long *pValue) {
 		*pValue = CSO::ctoi(m_pParam->GetParam(CSO::__T2("R", L"R")).c_str());
 		return S_OK;
 	}
