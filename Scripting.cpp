@@ -377,6 +377,7 @@ basic_string<char> EvaluateReplaceString(CREParameters<char> &Param, const char 
 	CReplaceParametersT<char, CConverter> *pParams = new CComObject<CReplaceParametersT<char, CConverter> >();
 	g_spREParam = pParams;
 	pParams->Init(&Param, EOL);
+	pParams->SetFinal(g_bFinalReplace);
 
 #ifdef UNICODE
 	EvaluateReplaceStringT<CConverter>(pParams, UTF8ToUnicode(Replace).c_str(), szEngine);
@@ -386,8 +387,6 @@ basic_string<char> EvaluateReplaceString(CREParameters<char> &Param, const char 
 
 	basic_string<char> strResult = pParams->Result();
 	if (!pParams->HasResult()) g_bSkipReplace = true;
-
-	g_spREParam = NULL;
 
 	return strResult;
 }
@@ -400,6 +399,7 @@ basic_string<wchar_t> EvaluateReplaceString(CREParameters<wchar_t> &Param, const
 	CReplaceParametersT<wchar_t, CConverter> *pParams = new CComObject<CReplaceParametersT<wchar_t, CConverter> >();
 	g_spREParam = pParams;
 	pParams->Init(&Param, EOL);
+	pParams->SetFinal(g_bFinalReplace);
 
 #ifdef FAR3
 	if (_wcsicmp(szEngine, g_szFarLUA) == 0)
@@ -412,8 +412,6 @@ basic_string<wchar_t> EvaluateReplaceString(CREParameters<wchar_t> &Param, const
 
 	basic_string<wchar_t> strResult = pParams->Result();
 	if (!pParams->HasResult()) g_bSkipReplace = true;
-
-	g_spREParam = NULL;
 
 	return strResult;
 }

@@ -574,6 +574,30 @@ void FindDefaultEOL()
 	EctlForceSetPosition(&FirstLine);
 }
 
+void DoFinalReplace()
+{
+	IReplaceParametersInternalPtr spREInt = g_spREParam;
+	if (spREInt == NULL) return;
+
+	g_bFinalReplace = true;
+	REParam.Clear();
+	REParam.AddENumbers(0, 0, FindNumber, ReplaceNumber);
+	tstring Replace = CSO::CreateReplaceString(ERReplace.c_str(), _T("\n"), ScriptEngine(EREvaluate), REParam);
+	g_bFinalReplace = false;
+
+	if (spREInt->FinalChecked() && !g_bSkipReplace && ! g_bInterrupted)
+	{
+		RefreshEditorInfo();
+		LastReplaceLine = EdInfo.TotalLines;
+		LastReplacePos = EctlGetString(LastReplaceLine).length();
+
+		int FirstLine = LastReplaceLine;
+		int StartPos = LastReplacePos;
+		bCachedReplace = false;
+		DoEditReplace(FirstLine, StartPos, LastReplaceLine, LastReplacePos, Replace);
+	}
+}
+
 bool EditorReplaceAgain()
 {
 	RefreshEditorInfo();
@@ -581,6 +605,8 @@ bool EditorReplaceAgain()
 	PatchEditorInfo(EdInfo);
 	FindDefaultEOL();
 	ClearLineBuffer();
+
+	g_spREParam = NULL;
 
 	if (!CompileLUAString(ReplaceText, ScriptEngine(EREvaluate))) return false;
 
@@ -631,6 +657,8 @@ bool EditorReplaceAgain()
 		}
 	}
 	RestoreSelection();
+
+	DoFinalReplace();
 
 	RefreshEditorInfo();
 	EditorSetPosition Position = {ITEM_SS(EditorSetPosition) LastReplaceLine, LastReplacePos, -1,
