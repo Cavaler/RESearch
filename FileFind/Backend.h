@@ -16,6 +16,7 @@ public:
 	bool SetDecoder(IDecoder *pDecoder, INT_PTR nSkip = 0);
 	IDecoder *GetDecoder();
 	bool ResetDecoder(IDecoder *pDecoder);
+	void ClearDecoder();
 
 	void Close();
 	void Abort();

@@ -2,11 +2,21 @@
 #include "..\RESearch.h"
 #include "FileOperations.h"
 
+class CClearDecoder
+{
+public:
+	CClearDecoder(CFileBackend *pBackend) : m_pBackend(pBackend) {}
+	~CClearDecoder() { if (m_pBackend) m_pBackend->ClearDecoder(); }
+protected:
+	CFileBackend *m_pBackend;
+};
+
 #ifndef UNICODE
 
 bool RunSearchANSI(CFileBackend *pBackend, IFrontend *pFrontend)
 {
 	shared_ptr<IDecoder> pDecoder;
+	CClearDecoder _cd(pBackend);
 
 	int nSkip;
 	eLikeUnicode nDetect = LikeUnicode(pBackend->Buffer(), pBackend->Size(), nSkip);
@@ -80,6 +90,7 @@ bool RunReplace(LPCTSTR szInFileName, LPCTSTR szOutFileName, IFrontend *pFronten
 bool RunSearchUnicode(CFileBackend *pBackend, IFrontend *pFrontend)
 {
 	shared_ptr<IDecoder> pDecoder;
+	CClearDecoder _cd(pBackend);
 
 	int nSkip;
 	eLikeUnicode nDetect = LikeUnicode(pBackend->Buffer(), pBackend->Size(), nSkip);
@@ -177,7 +188,7 @@ bool RunReplace(LPCTSTR szInFileName, LPCTSTR szOutFileName, IFrontend *pFronten
 	bool bResult = RunSearchUnicode(pBackend, pFrontend);
 	if (g_bInterrupted) return false;
 
-	DoFinalReplace(pBackend);
+	bResult |= DoFinalReplace(pBackend);
 
 	return bResult;
 }

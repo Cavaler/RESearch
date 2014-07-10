@@ -154,6 +154,14 @@ bool CFileBackend::ResetDecoder(IDecoder *pDecoder)
 	return SetDecoder(pDecoder, m_nSkip);
 }
 
+void CFileBackend::ClearDecoder()
+{
+	if ((m_pEncoder == NULL) && (m_pDecoder != NULL))
+		m_pEncoder = m_pDecoder->GetEncoder();
+
+	m_pDecoder = NULL;
+}
+
 bool CFileBackend::ReadUp(INT_PTR nRest, INT_PTR nMax)
 {
 	DWORD dwToRead = m_nBlockSize-nRest;
@@ -311,8 +319,6 @@ bool CFileBackend::WriteThru(const char *szBuffer, INT_PTR nLength, INT_PTR nSki
 bool CFileBackend::AppendData(const char *szBuffer, INT_PTR nLength)
 {
 	if (!FlushOutputToEnd()) return false;
-	m_pDecoder = NULL;	//	Hack
-
 	return WriteThru(szBuffer, nLength, 0);
 }
 
