@@ -193,16 +193,9 @@ void CFileBackend::CloseInputFile()
 
 void CFileBackend::Close()
 {
-	if (m_hOutFile != INVALID_HANDLE_VALUE) {
-
-		LARGE_INTEGER liZero = {0, 0};
-		LARGE_INTEGER liCurrent;
-		SetFilePointerEx(m_hFile, liZero, &liCurrent, FILE_CURRENT);
-		m_nBlockOffset = liCurrent.QuadPart;
-
-		CatchUpOutput();
-		FlushBuffer();
-
+	if (m_hOutFile != INVALID_HANDLE_VALUE)
+	{
+		FlushOutputToEnd();
 		CloseHandle(m_hOutFile);
 		m_hOutFile = INVALID_HANDLE_VALUE;
 	}
@@ -315,6 +308,14 @@ bool CFileBackend::WriteThru(const char *szBuffer, INT_PTR nLength, INT_PTR nSki
 	return true;
 }
 
+bool CFileBackend::AppendData(const char *szBuffer, INT_PTR nLength)
+{
+	if (!FlushOutputToEnd()) return false;
+	m_pDecoder = NULL;	//	Hack
+
+	return WriteThru(szBuffer, nLength, 0);
+}
+
 bool CFileBackend::CatchUpOutput()
 {
 	if (m_nBackedUp >= m_nBlockOffset) return true;
@@ -344,6 +345,16 @@ bool CFileBackend::CatchUpOutput()
 	SetFilePointerEx(m_hFile, liCurrent, NULL, FILE_BEGIN);
 
 	return true;
+}
+
+bool CFileBackend::FlushOutputToEnd()
+{
+	LARGE_INTEGER liZero = {0, 0};
+	LARGE_INTEGER liCurrent;
+	SetFilePointerEx(m_hFile, liZero, &liCurrent, FILE_CURRENT);
+	m_nBlockOffset = liCurrent.QuadPart;
+
+	return CatchUpOutput() && FlushBuffer();
 }
 
 bool CFileBackend::OpenOutput()

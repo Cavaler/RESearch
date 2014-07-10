@@ -146,13 +146,40 @@ bool RunSearch(LPCTSTR szFileName, IFrontend *pFrontend)
 	return RunSearchUnicode(pBackend, pFrontend);
 }
 
+bool DoFinalReplace(IBackend *pBackend)
+{
+	IReplaceParametersInternalPtr spREInt = g_spREParam;
+	if (spREInt == NULL) return false;
+
+	g_bFinalReplace = true;
+	REParam.Clear();
+	REParam.AddFNumbers(FilesScanned, FileNumber, FindNumber, ReplaceNumber);
+	tstring strReplace = CSO::CreateReplaceString(FRReplace.c_str(), _T("\n"), ScriptEngine(FREvaluate), REParam);
+	g_bFinalReplace = false;
+
+	if (spREInt->FinalChecked() && !g_bSkipReplace && ! g_bInterrupted)
+	{
+		pBackend->AppendData((LPCSTR)strReplace.data(), strReplace.size()*sizeof(TCHAR));
+		return true;
+	}
+
+	return false;
+}
+
 bool RunReplace(LPCTSTR szInFileName, LPCTSTR szOutFileName, IFrontend *pFrontend)
 {
 	shared_ptr<CFileBackend> pBackend = new CFileBackend();
 	if (!pBackend->SetBlockSize(0)) return false;
 	if (!pBackend->Open(szInFileName, szOutFileName)) return false;
 
-	return RunSearchUnicode(pBackend, pFrontend);
+	g_spREParam = NULL;
+
+	bool bResult = RunSearchUnicode(pBackend, pFrontend);
+	if (g_bInterrupted) return false;
+
+	DoFinalReplace(pBackend);
+
+	return bResult;
 }
 
 #endif

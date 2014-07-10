@@ -30,6 +30,7 @@ public:
 	virtual bool	CheckWriteReady();
 	virtual bool	WriteBack(INT_PTR nOffset);
 	virtual bool	WriteThru(const char *szBuffer, INT_PTR nLength, INT_PTR nSkipLength);
+	virtual bool	AppendData(const char *szBuffer, INT_PTR nLength);
 	virtual LPCTSTR	FileName();
 
 	static void Free();
@@ -50,6 +51,7 @@ protected:
 
 	bool		OpenOutput();
 	bool		CatchUpOutput();
+	bool		FlushOutputToEnd();
 
 	static char	   *m_szBuffer;
 	static INT_PTR	m_nBlockSize;

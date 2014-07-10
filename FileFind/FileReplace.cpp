@@ -115,17 +115,6 @@ bool ConfirmReplacement(const TCHAR *Found, const TCHAR *Replaced, const TCHAR *
 	return false;
 }
 
-bool WriteBuffer(HANDLE hFile,const void *Buffer,DWORD BufLen,const TCHAR *FileName)
-{
-	DWORD WrittenBytes;
-	if (!WriteFile(hFile,Buffer,BufLen,&WrittenBytes,NULL)||
-		(WrittenBytes!=BufLen)) {
-		const TCHAR *Lines[]={GetMsg(MREReplace),GetMsg(MFileWriteError),FileName,GetMsg(MOk)};
-		StartupInfo.Message(FMSG_WARNING,_T("FRWriteError"),Lines,4,1);
-		return false;
-	} else return true;
-}
-
 bool RunReplace(LPCTSTR szFileName, __int64 dwFileSize)
 {
 	switch (FSearchAs) {
