@@ -472,7 +472,7 @@ HANDLE OpenFromMacro(const OpenMacroInfo *MInfo, bool &bRawReturn)
 	}
 }
 
-void FillMacroValueStrings(const OpenMacroInfo *MInfo, vector<wstring> &arrStrings)
+void FillMacroValueStrings(const OpenMacroInfo *MInfo, vector<_variant_t> &arrStrings)
 {
 	if (MInfo->Count <= 1) return;
 	if (g_spREParam == NULL) return;
@@ -494,26 +494,58 @@ void FillMacroValueStrings(const OpenMacroInfo *MInfo, vector<wstring> &arrStrin
 	if (g_spREParam->Invoke(dispID, IID_NULL, LOCALE_SYSTEM_DEFAULT, DISPATCH_METHOD, &dispParams, &vtResult, NULL, NULL) != S_OK)
 		return;
 
-	arrStrings.push_back((LPCWSTR)_bstr_t(vtResult));
+	arrStrings.push_back(vtResult);
 }
 
 HANDLE OpenFromScriptMacro(const OpenMacroInfo *MInfo)
 {
 	static FarMacroCall Call = { sizeof(FarMacroCall), 0, NULL, NULL, NULL };
 	static vector<FarMacroValue> arrValues;
+	static vector<_variant_t> arrVariants;
 	static vector<wstring> arrStrings;
 
-	arrStrings.clear();
-	FillMacroValueStrings(MInfo, arrStrings);
+	arrVariants.clear();
+	FillMacroValueStrings(MInfo, arrVariants);
 
-	arrValues.resize(arrStrings.size());
+	arrValues .resize(arrVariants.size());
+	arrStrings.resize(arrVariants.size());
 	if (arrStrings.empty())
 		return NULL;
 
-	for (size_t nParam = 0; nParam < arrStrings.size(); nParam++)
+	for (size_t nParam = 0; nParam < arrVariants.size(); nParam++)
 	{
-		arrValues[nParam].Type   = FMVT_STRING;
-		arrValues[nParam].String = arrStrings[nParam].c_str();
+		_variant_t &vt = arrVariants[nParam];
+
+		switch (vt.vt)
+		{
+		case VT_BSTR:
+			arrStrings[nParam] = vt.bstrVal;
+			arrValues[nParam].Type   = FMVT_STRING;
+			arrValues[nParam].String = arrStrings[nParam].c_str();
+			break;
+		case VT_BOOL:
+			arrValues[nParam].Type    = FMVT_BOOLEAN;
+			arrValues[nParam].Boolean = vt.boolVal ? 1 : 0;
+			break;
+		case VT_R4:
+		case VT_R8:
+			arrValues[nParam].Type    = FMVT_DOUBLE;
+			arrValues[nParam].Double  = (double)vt;
+			break;
+		case VT_I1:		case VT_I2:		case VT_I4:		case VT_I8:		case VT_INT:
+		case VT_UI1:	case VT_UI2:	case VT_UI4:	case VT_UI8:	case VT_UINT:
+			arrValues[nParam].Type    = FMVT_INTEGER;
+			arrValues[nParam].Integer = (__int64)vt;
+			break;
+		case VT_EMPTY:
+			arrValues[nParam].Type    = FMVT_NIL;
+			break;
+		default:
+			arrStrings[nParam] = (LPCWSTR)_bstr_t(vt);
+			arrValues[nParam].Type   = FMVT_STRING;
+			arrValues[nParam].String = arrStrings[nParam].c_str();
+			break;
+		}
 	}
 
 	Call.Count  = arrValues.size();
