@@ -39,6 +39,7 @@ interface IReplaceParameters : IDispatch
 	HRESULT store([in] BSTR strParam, [in] BSTR strValue);
 
 	HRESULT skip();
+	HRESULT msgbox([in] BSTR strText, [in, defaultvalue("")] BSTR strCaption);
 };
 
 }

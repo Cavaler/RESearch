@@ -219,6 +219,11 @@ public:
 		return S_OK;
 	}
 
+	STDMETHOD(msgbox)(BSTR strText, BSTR strCaption) {
+		ShowMessage(strCaption, strText);
+		return S_OK;
+	}
+
 private:
 	CREParameters<CHAR> *m_pParam;
 	const CHAR *m_szEOL;

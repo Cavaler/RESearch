@@ -183,6 +183,7 @@ and many others are also available)
     #init(n, v)#    Same as store(), except that it works only once after 'Replace' is invoked.
     #skip()#        Forces RESearch to skip current replace
     #final()#       Evaluates to true on final replace step
+    #msgbox(t, c)#  Show a message box with text and optional caption
 
 @CommonConfig
 $ #Общие настройки#
