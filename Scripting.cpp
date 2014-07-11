@@ -220,7 +220,7 @@ public:
 	}
 
 	STDMETHOD(msgbox)(BSTR strText, BSTR strCaption) {
-		ShowMessage(strCaption, strText);
+		ShowMessage(CONVERT::FromBSTR<CHAR>(strCaption).c_str(), CONVERT::FromBSTR<CHAR>(strText).c_str());
 		return S_OK;
 	}
 
