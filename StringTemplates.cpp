@@ -242,6 +242,15 @@ void CREParameters<CHAR>::AddSingleCharParam(char C, const CHAR *sz)
 }
 
 template<class CHAR>
+void CREParameters<CHAR>::RebuildSingleCharParam()
+{
+	for (char c = 'A'; c <= 'Z'; c++)
+	{
+		m_StrParamPtr[c - 'A'] = m_mapStrParam.find(cstring(1, c));
+	}
+}
+
+template<class CHAR>
 void CREParameters<CHAR>::AddENumbers(int nL, int nN, int nS, int nR)
 {
 	CHAR szNumber[16];

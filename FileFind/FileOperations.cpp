@@ -163,6 +163,7 @@ bool DoFinalReplace(IBackend *pBackend)
 	if (spREInt == NULL) return false;
 
 	g_bFinalReplace = true;
+	TREParameters REBackup = REParam;
 	REParam.Clear();
 	REParam.AddFNumbers(FilesScanned, FileNumber, FindNumber, ReplaceNumber);
 	tstring strReplace = CSO::CreateReplaceString(FRReplace.c_str(), _T("\n"), ScriptEngine(FREvaluate), REParam);
@@ -173,6 +174,9 @@ bool DoFinalReplace(IBackend *pBackend)
 		pBackend->AppendData((LPCSTR)strReplace.data(), strReplace.size()*sizeof(TCHAR));
 		return true;
 	}
+
+	REParam = REBackup;
+	REParam.RebuildSingleCharParam();
 
 	return false;
 }

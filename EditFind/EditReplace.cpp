@@ -580,6 +580,7 @@ void DoFinalReplace()
 	if (spREInt == NULL) return;
 
 	g_bFinalReplace = true;
+	TREParameters REBackup = REParam;
 	REParam.Clear();
 	REParam.AddENumbers(0, 0, FindNumber, ReplaceNumber);
 	tstring Replace = CSO::CreateReplaceString(ERReplace.c_str(), _T("\n"), ScriptEngine(EREvaluate), REParam);
@@ -595,6 +596,11 @@ void DoFinalReplace()
 		int StartPos = LastReplacePos;
 		bCachedReplace = false;
 		DoEditReplace(FirstLine, StartPos, LastReplaceLine, LastReplacePos, Replace);
+	}
+	else
+	{
+		REParam = REBackup;
+		REParam.RebuildSingleCharParam();
 	}
 }
 

@@ -75,6 +75,7 @@ public:
 	cstring FillNamedReferences(const cstring &strPattern, bool bQuote=true);
 
 	void AddSingleCharParam(char C, const CHAR *sz);
+	void RebuildSingleCharParam();
 
 public:
 	named_parameters m_mapStrParam;
