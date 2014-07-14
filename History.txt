@@ -9,6 +9,14 @@ Planned:
 	? Extended batch properties, overriding preset properties (e.g. Search from beginning)
 	+ Command to "lock" read-only file before replacing
 
+Version 8.51 (11.07.2014)
+	- Can probably work with UTF-8 files with symbols > 0xFFFF
+	* Can call result() from FarLUA, it will override return value
+	* Not calling result() (or not return from FarLUA) from scripts is equivalent to skip()
+	* Single-character scripting functions replaced with get_n() form
+	+ Scripts used in Replace can append additional info to the end of file, see ScriptEvaluation.txt for details
+	* msgbox() available in all scripting languages
+
 Version 8.50 (26.06.2014)
 	+ Internal function definitions removed from RESearch.lua
 	+ Compiling LUA script text only once
