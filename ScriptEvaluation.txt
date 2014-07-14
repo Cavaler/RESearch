@@ -7,7 +7,7 @@ Functions available in scripts:
 - match(n) returns n-th subpattern, like $n
 - named(n) returns named subpattern, like ${n}
 - eol() returns end-of-line sequence to be used
-- l(), n(), s() and r() - same as corresponding $L etc sequences
+- get_l(), get_n(), get_f(), get_s() and get_r() - same as corresponding $L etc sequences
 - skip() forces RESearch to skip this replacement
 - msgbox(title, [caption]) shows a message box
 

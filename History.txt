@@ -9,6 +9,9 @@ Planned:
 	? Extended batch properties, overriding preset properties (e.g. Search from beginning)
 	+ Command to "lock" read-only file before replacing
 
+Version 8.52 (14.07.2014)
+	- Named parameters saved during final() replace call
+
 Version 8.51 (11.07.2014)
 	- Can probably work with UTF-8 files with symbols > 0xFFFF
 	* Can call result() from FarLUA, it will override return value
@@ -97,7 +100,7 @@ Version 8.27 (19.02.2014)
 	- Fixed $ not matching before "\r\n"
 
 Version 8.26 (11.02.2014)
-	- Fixed incorrect pcre 8.34 integration, which led to freeze  wile compiling certain patterns
+	- Fixed incorrect pcre 8.34 integration, which led to freeze  while compiling certain patterns
 
 Version 8.25 (31.01.2014)
 	! Panel operations use pcre16 in Unicode versions, instead of UTF-8
@@ -387,7 +390,7 @@ Version 7.12 (04.05.2010)
 
 Version 7.11 (27.04.2010)
 	- Fixed crash with plain-text replace in editor
-	- TmpPanel reverted to old behaviour (everything worked in 2.0 well, and bug in 1.75 itself)
+	- TmpPanel reverted to old behavior (everything worked in 2.0 well, and bug in 1.75 itself)
 
 Version 7.10 (21.04.2010)
 	- FMENU_SHOWAMPERSAND for 'List all' in Editor
@@ -431,7 +434,7 @@ Version 7.01 (15.02.2010)
 Version 7.00 beta 4 (03.02.2010)
 	- Fixed finding nonexistent \n at the end of file in Editor
 	- More hotkeys fixed (HaRT, farman)
-	- Possible crash when tunring off [X] Mask as regexp
+	- Possible crash when turning off [X] Mask as regexp
 
 Version 7.00 beta 3 (25.01.2010)
 	- Processing of files with null symbols is now correct
@@ -476,7 +479,7 @@ Version 6.45 (07.09.2009)
 Version 6.44 (03.09.2009)
 	- Fixed compiling "Recurse if full directory matches" in Advanced settings
 	* Hotkey '.' for "Several lines  [...]" button
-	- Cannot start file search when regexp in Addanced settings did not compile
+	- Cannot start file search when regexp in Advanced settings did not compile
 
 Version 6.43 (18.08.2009)
 	- Files unmodified by File Replace operation retain old access times etc
@@ -510,7 +513,7 @@ Version 6.37 (03.12.2008)
 	- Only File Search/Replace/Grep affect subsequent Editor operations
 
 Version 6.36 (04.09.2008)
-	* Removed 512 symbols limit from 'Search for' and 'Replace with' fields everythere
+	* Removed 512 symbols limit from 'Search for' and 'Replace with' fields everywhere
 	* Search and Grep presets can be added to batches
 
 Version 6.35 (12.08.2008)
@@ -658,10 +661,10 @@ Version 5.36 (26.02.2006)
 	* A bit updated English help file
 
 Version 5.35 (17.02.2006)
-	- Correctly working 'Show all occurences" for non-OEM files
+	- Correctly working 'Show all occurrences" for non-OEM files
 	- Search/replace again do not bring up "Show all" sometimes
 	- Hotkeys fixed
-	- Replace in fiels fixed (no leftover backups etc)
+	- Replace in fields fixed (no leftover backups etc)
 	* Cancelling 'Show all' returns you to previous position
 	* Presets for 'Show all'
 
@@ -669,7 +672,7 @@ Version 5.30 (27.01.2006)
 	* Obsolete options removed
 	* "Overwrite previous version" when backing up is optional ('b' option in command line)
 	* Command-line options for 'Search In' (0..5)
-	+ Editor | Show all occurences
+	+ Editor | Show all occurrences
 	+ Editor | Search/Replace Again in another direction
 
 Version 5.20 (13.01.2006)
@@ -681,7 +684,7 @@ Version 5.20 (13.01.2006)
 
 Version 5.10 (13.07.2005)
 	* F8 in Renumber Files - strip common part
-	- Fixed character classes and case sensivity for RegExps in non-OEM character page
+	- Fixed character classes and case sensitivity for RegExps in non-OEM character page
 
 Version 5.00 (04.07.2005)
 	# WARNING! Far versions before 1.70 not supported, sorry
@@ -778,8 +781,8 @@ Version 3.90 (23.08.02)
 	* Dates in Advanced settings can be set to Current by button
 	+ Replace in readonly files supported
 	- Fixed errors with situations like '\L\U' in replace line
-	- Proper replace in edtor when line count changes
-	- $R and $N were mistankenly swapped in help
+	- Proper replace in editor when line count changes
+	- $R and $N were mistakenly swapped in help
 	- $N is no more equal to $L
 	* $L/$N/$R usage for file replace and renaming described in help
 
@@ -804,14 +807,14 @@ Version 3.75 (28.11.01)
 	* \c (\C) in replace - flip case
 
 Version 3.70 (20.11.01)
-	+ Default mask case sensivity can be configured and changed any time
+	+ Default mask case sensitivity can be configured and changed any time
 	* Finer displaying of long/multiline strings in replace prompts
 	+ Added presets to Rename Files and Rename Selected Files
 	- Added "Search in all local non-removable drives" option to Rename Files dialog
 
 Version 3.60 (25.10.01)
 	* Missing help topics added
-	* Replace All in editor is now interruptable
+	* Replace All in editor is now interruptible
 	- Deleting file from temporary panel (F7) works
 	- 'Several Lines' configuration moved to 'Common'
 	+ Advanced search options can test either creation or modification time
@@ -845,7 +848,7 @@ for plain text)
 	* BackSpace from Search Results panel now works as going to ".."
 
 Version 3.10 (17.06.2001)
-	+ Now "\n" in editor replace is handled cleanly, elimintaing need to
+	+ Now "\n" in editor replace is handled cleanly, eliminating need to
 reload editing file.
 	+ Fixed bug with loop when replacing text contains initial.
 	* Rename selected files processes all files if invoked from ".." entry with
@@ -869,7 +872,7 @@ Version 3.00 (29.01.2001)
 	! New command - "Rename selected files"
 	+ Now uses Boyere-Moore algorithm for plain text search, much faster
 	* Shortcuts from temporary panel are created correctly
-	- Fixed bug with case-insensivity not working in editor search with Cyrillic.
+	- Fixed bug with case-insensitivity not working in editor search with Cyrillic.
 	* (internal) Now uses class library for dialogs - bugs possible
 
 Version 2.80 (30.12.2000)
@@ -879,11 +882,11 @@ Version 2.80 (30.12.2000)
 Thanks to Roman Pekhov!
 	* File open/create error messages are now displayed
 	- Fixed problem with some help topics
-	* If search brought no results, essage is given instead of empty result panel
+	* If search brought no results, message is given instead of empty result panel
 	- Fixed bug with 'Del' in empty presets menu
 	* Timeslices are now released during lengthy operations
 	* Search progress is also updated every 100 files
-	* Search progess is shown upon search/replace in editor
+	* Search progress is shown upon search/replace in editor
 	+ Screen is not redrawn upon "Replace All" in editor
 	* Horizontal offset of found text from right screen side now can be specified
 	* Editor search/replace process can be interrupted by 'Esc'
