@@ -121,23 +121,27 @@ void CFarEngineStorage::Put(int nValue)
 
 // ---------------------------------------------------
 
-template<class CHAR, class CONVERT>
-class CReplaceParametersT
+#ifdef UNICODE
+BSTR ToBstr(LPCWSTR sz) { return SysAllocString(sz); }
+wstring FromBSTR(BSTR str) { return str; }
+#else
+BSTR ToBstr(LPCSTR sz)  { return SysAllocString(OEMToUnicode(sz).c_str()); }
+string FromBSTR(BSTR str) { return OEMFromUnicode(str); }
+#endif
+
+class CReplaceParameters
 	: public CComObjectRootEx<CComSingleThreadModel>
 	, public IDispatchImpl<IReplaceParameters, &__uuidof(IReplaceParameters), &__uuidof(__RESearchLib), -1, -1>
 	, public IReplaceParametersInternal
 {
 public:
-	typedef CStringOperations<CHAR> CSO;
-	typedef typename CSO::cstring cstring;
-
-	BEGIN_COM_MAP(CReplaceParametersT)
+	BEGIN_COM_MAP(CReplaceParameters)
 		COM_INTERFACE_ENTRY(IReplaceParameters)
 		COM_INTERFACE_ENTRY(IReplaceParametersInternal)
 		COM_INTERFACE_ENTRY(IDispatch)
 	END_COM_MAP()
 
-	void Init(CREParameters<CHAR> *pParam, const CHAR *szEOL)
+	void Init(CREParameters<TCHAR> *pParam, const TCHAR *szEOL)
 	{
 		m_pParam = pParam;
 		m_szEOL  = szEOL;
@@ -145,23 +149,23 @@ public:
 		m_bFinal     = false;
 	}
 
-	virtual cstring Result() { return m_strResult; }
+	virtual tstring Result() { return m_strResult; }
 	virtual bool    HasResult() { return m_bHasResult; }
 	virtual void    SetFinal(bool bFinal) { m_bFinal = bFinal; }
 
 	// IReplaceParameters methods
 	STDMETHOD(match)(long lPos, BSTR *pbstrMatch) {
-		*pbstrMatch = CONVERT::ToBstr(m_pParam->GetParam(lPos).c_str());
+		*pbstrMatch = ToBstr(m_pParam->GetParam(lPos).c_str());
 		return S_OK;
 	}
 
 	STDMETHOD(named)(BSTR strParam, BSTR *pbstrMatch) {
-		*pbstrMatch = CONVERT::ToBstr(m_pParam->GetParam(CONVERT::FromBSTR<CHAR>(strParam)).c_str());
+		*pbstrMatch = ToBstr(m_pParam->GetParam(FromBSTR(strParam)).c_str());
 		return S_OK;
 	}
 
 	STDMETHOD(eol)(BSTR *pbstrEOL) {
-		*pbstrEOL = CONVERT::ToBstr(m_szEOL);
+		*pbstrEOL = ToBstr(m_szEOL);
 		return S_OK;
 	}
 
@@ -191,7 +195,7 @@ public:
 	}
 
 	STDMETHOD(result)(BSTR bstrResult) {
-		m_strResult = CONVERT::FromBSTR<CHAR>(bstrResult);
+		m_strResult  = FromBSTR(bstrResult);
 		m_bHasResult = true;
 		return S_OK;
 	}
@@ -203,12 +207,12 @@ public:
 	}
 
 	STDMETHOD(init )(BSTR strParam, BSTR strValue) {
-		m_pParam->InitParam(CONVERT::FromBSTR<CHAR>(strParam), CONVERT::FromBSTR<CHAR>(strValue));
+		m_pParam->InitParam(FromBSTR(strParam), FromBSTR(strValue));
 		return S_OK;
 	}
 
 	STDMETHOD(store)(BSTR strParam, BSTR strValue) {
-		m_pParam->SetParam(CONVERT::FromBSTR<CHAR>(strParam), CONVERT::FromBSTR<CHAR>(strValue));
+		m_pParam->SetParam(FromBSTR(strParam), FromBSTR(strValue));
 		return S_OK;
 	}
 
@@ -218,15 +222,15 @@ public:
 	}
 
 	STDMETHOD(msgbox)(BSTR strText, BSTR strCaption) {
-		ShowMessage(CONVERT::FromBSTR<CHAR>(strCaption).c_str(), CONVERT::FromBSTR<CHAR>(strText).c_str());
+		ShowMessage(FromBSTR(strCaption).c_str(), FromBSTR(strText).c_str());
 		return S_OK;
 	}
 
 private:
-	CREParameters<CHAR> *m_pParam;
-	const CHAR *m_szEOL;
+	CREParameters<TCHAR> *m_pParam;
+	const TCHAR *m_szEOL;
 
-	cstring m_strResult;
+	tstring m_strResult;
 	bool	m_bHasResult;
 
 	bool	m_bFinal;
@@ -344,24 +348,6 @@ void EvaluateReplaceString(IReplaceParameters *pParams, LPCWSTR szReplace, LPCTS
 	pSite->Release();
 }
 
-
-#ifdef UNICODE
-class CBstrConverter {
-public:
-	static BSTR ToBstr(LPCWSTR sz) { return SysAllocString(sz); }
-	static BSTR ToBstr(LPCSTR  sz) { return SysAllocString(UTF8ToUnicode(sz).c_str()); }
-	template<class CHAR> static basic_string<CHAR> FromBSTR(BSTR str);
-};
-template<> static basic_string< char  > CBstrConverter::FromBSTR(BSTR str) { return UTF8FromUnicode(str); }
-template<> static basic_string<wchar_t> CBstrConverter::FromBSTR(BSTR str) { return str; }
-#else
-class CBstrConverter {
-public:
-	static BSTR ToBstr(LPCSTR  sz)   { return SysAllocString(OEMToUnicode(sz).c_str()); }
-	template<class CHAR> static string FromBSTR(BSTR str) { return OEMFromUnicode(str); }
-};
-#endif
-
 _bstr_t ExpandScriptText(LPCTSTR szReplace)
 {
 	_bstr_t bstrText;
@@ -376,7 +362,7 @@ _bstr_t ExpandScriptText(LPCTSTR szReplace)
 		}
 		bstrText = ANSIToUnicode(string(mapScript, mapScript.Size())).c_str();
 	} else {
-		bstrText.Attach(CBstrConverter::ToBstr(szReplace));
+		bstrText.Attach(ToBstr(szReplace));
 	}
 
 	return bstrText;
@@ -384,7 +370,7 @@ _bstr_t ExpandScriptText(LPCTSTR szReplace)
 
 tstring EvaluateReplaceString(CREParameters<TCHAR> &Param, LPCTSTR szReplace, LPCTSTR szEOL, LPCTSTR szEngine)
 {
-	CReplaceParametersT<TCHAR, CBstrConverter> *pParams = new CComObject<CReplaceParametersT<TCHAR, CBstrConverter> >();
+	CReplaceParameters *pParams = new CComObject<CReplaceParameters>();
 	g_spREParam = pParams;
 	pParams->Init(&Param, szEOL);
 	pParams->SetFinal(g_bFinalReplace);
