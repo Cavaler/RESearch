@@ -306,8 +306,7 @@ private:
 	IReplaceParameters *m_pParams;
 };
 
-template<class CONVERT>
-void EvaluateReplaceStringT(IReplaceParameters *pParams, LPCTSTR szReplace, LPCTSTR szEngine)
+void EvaluateReplaceString(IReplaceParameters *pParams, LPCWSTR szReplace, LPCTSTR szEngine)
 {
 	EXCEPINFO ExcepInfo;
 	HRESULT hResult;
@@ -331,23 +330,9 @@ void EvaluateReplaceStringT(IReplaceParameters *pParams, LPCTSTR szReplace, LPCT
 
 	spEngine->SetScriptSite(pSite);
 
-	_bstr_t bstrText;
-	if ((_tcslen(szReplace) > 3) && (szReplace[1] == ':') && (szReplace[2] == '\\')) {
-		CFileMapping mapScript;
-		if (!mapScript.Open(szReplace)) {
-			const TCHAR *Lines[]={GetMsg(MREReplace),GetMsg(MFileOpenError),szReplace,GetMsg(MOk)};
-			StartupInfo.Message(FMSG_WARNING,_T("FSOpenError"),Lines,4,1);
-			g_bInterrupted = true;
-			return;
-		}
-		bstrText = ANSIToUnicode(string(mapScript, mapScript.Size())).c_str();
-	} else {
-		bstrText.Attach(CONVERT::ToBstr(szReplace));
-	}
-
 	IActiveScriptParsePtr spParser = spEngine;
 	spParser->InitNew();
-	hResult = spParser->ParseScriptText(bstrText, NULL, NULL, NULL, 0, 0, 0, NULL, &ExcepInfo);
+	hResult = spParser->ParseScriptText(szReplace, NULL, NULL, NULL, 0, 0, 0, NULL, &ExcepInfo);
 	if (FAILED(hResult)) {
 		ShowHResultError(MErrorParsingText, hResult);
 		g_bInterrupted = true;
@@ -362,68 +347,63 @@ void EvaluateReplaceStringT(IReplaceParameters *pParams, LPCTSTR szReplace, LPCT
 	pSite->Release();
 }
 
+
 #ifdef UNICODE
-class CConverter {
+class CBstrConverter {
 public:
 	static BSTR ToBstr(LPCWSTR sz) { return SysAllocString(sz); }
 	static BSTR ToBstr(LPCSTR  sz) { return SysAllocString(UTF8ToUnicode(sz).c_str()); }
 	template<class CHAR> static basic_string<CHAR> FromBSTR(BSTR str);
 };
-template<> static basic_string< char  > CConverter::FromBSTR(BSTR str) { return UTF8FromUnicode(str); }
-template<> static basic_string<wchar_t> CConverter::FromBSTR(BSTR str) { return str; }
+template<> static basic_string< char  > CBstrConverter::FromBSTR(BSTR str) { return UTF8FromUnicode(str); }
+template<> static basic_string<wchar_t> CBstrConverter::FromBSTR(BSTR str) { return str; }
 #else
-class CConverter {
+class CBstrConverter {
 public:
 	static BSTR ToBstr(LPCSTR  sz)   { return SysAllocString(OEMToUnicode(sz).c_str()); }
 	template<class CHAR> static string FromBSTR(BSTR str) { return OEMFromUnicode(str); }
 };
 #endif
 
-#ifndef UNICODE
-
-template<>
-basic_string<char> EvaluateReplaceString(CREParameters<char> &Param, const char *Replace, const char *EOL, LPCTSTR szEngine)
+_bstr_t ExpandScriptText(LPCTSTR szReplace)
 {
-	CReplaceParametersT<char, CConverter> *pParams = new CComObject<CReplaceParametersT<char, CConverter> >();
-	g_spREParam = pParams;
-	pParams->Init(&Param, EOL);
-	pParams->SetFinal(g_bFinalReplace);
+	_bstr_t bstrText;
 
-#ifdef UNICODE
-	EvaluateReplaceStringT<CConverter>(pParams, UTF8ToUnicode(Replace).c_str(), szEngine);
-#else
-	EvaluateReplaceStringT<CConverter>(pParams, Replace, szEngine);
-#endif
+	if ((_tcslen(szReplace) > 3) && (szReplace[1] == ':') && (szReplace[2] == '\\')) {
+		CFileMapping mapScript;
+		if (!mapScript.Open(szReplace)) {
+			const TCHAR *Lines[]={GetMsg(MREReplace),GetMsg(MFileOpenError),szReplace,GetMsg(MOk)};
+			StartupInfo.Message(FMSG_WARNING,_T("FSOpenError"),Lines,4,1);
+			g_bInterrupted = true;
+			return bstrText;
+		}
+		bstrText = ANSIToUnicode(string(mapScript, mapScript.Size())).c_str();
+	} else {
+		bstrText.Attach(CBstrConverter::ToBstr(szReplace));
+	}
 
-	basic_string<char> strResult = pParams->Result();
-	if (!pParams->HasResult()) g_bSkipReplace = true;
-
-	return strResult;
+	return bstrText;
 }
 
-#else
-
-template<>
-basic_string<wchar_t> EvaluateReplaceString(CREParameters<wchar_t> &Param, const wchar_t *Replace, const wchar_t *EOL, LPCTSTR szEngine)
+tstring EvaluateReplaceString(CREParameters<TCHAR> &Param, LPCTSTR szReplace, LPCTSTR szEOL, LPCTSTR szEngine)
 {
-	CReplaceParametersT<wchar_t, CConverter> *pParams = new CComObject<CReplaceParametersT<wchar_t, CConverter> >();
+	CReplaceParametersT<TCHAR, CBstrConverter> *pParams = new CComObject<CReplaceParametersT<TCHAR, CBstrConverter> >();
 	g_spREParam = pParams;
-	pParams->Init(&Param, EOL);
+	pParams->Init(&Param, szEOL);
 	pParams->SetFinal(g_bFinalReplace);
+
+	_bstr_t bstrReplace = ExpandScriptText(szReplace);
 
 #ifdef FAR3
 	if (_wcsicmp(szEngine, g_szFarLUA) == 0)
-		return EvaluateLUAString(Param, Replace, KMFLAGS_LUA);
+		return EvaluateLUAString(Param, bstrReplace, KMFLAGS_LUA);
 	if (_wcsicmp(szEngine, g_szFarMS ) == 0)
-		return EvaluateLUAString(Param, Replace, KMFLAGS_MOONSCRIPT);
+		return EvaluateLUAString(Param, bstrReplace, KMFLAGS_MOONSCRIPT);
 #endif
+	EvaluateReplaceString(pParams, bstrReplace, szEngine);
 
-	EvaluateReplaceStringT<CConverter>(pParams, Replace, szEngine);
-
-	basic_string<wchar_t> strResult = pParams->Result();
+	tstring strResult = pParams->Result();
 	if (!pParams->HasResult()) g_bSkipReplace = true;
 
 	return strResult;
 }
-
-#endif

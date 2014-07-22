@@ -135,8 +135,8 @@ interface DECLSPEC_UUID("a74c4507-f8fc-4b09-8ebe-2801d86006e0") IReplaceParamete
 _COM_SMARTPTR_TYPEDEF(IReplaceParametersInternal, __uuidof(IReplaceParametersInternal));
 
 EXTERN IReplaceParametersPtr g_spREParam;
-template<class CHAR>
-basic_string<CHAR> EvaluateReplaceString(CREParameters<CHAR> &Param, const CHAR *Replace, const CHAR *EOL, LPCTSTR szEngine);
+tstring EvaluateReplaceString(CREParameters<TCHAR> &Param, LPCTSTR Replace, LPCTSTR EOL, LPCTSTR szEngine);
+_bstr_t ExpandScriptText(LPCTSTR szReplace);
 bool CompileLUAString(const tstring &strReplace, LPCTSTR szEngine);
 #ifdef FAR3
 wstring EvaluateLUAString(CREParameters<wchar_t> &Param, LPCWSTR szReplace, FARKEYMACROFLAGS Flags);

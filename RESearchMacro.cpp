@@ -576,10 +576,12 @@ bool CompileLUAString(const tstring &strReplace, LPCTSTR szEngine)
 	if ((szEngine == NULL) || (wcscmp(g_szFarLUA, szEngine) != 0))
 		return true;
 
+	_bstr_t bstrReplace = ExpandScriptText(strReplace.c_str());
+
 	MacroSendMacroText SendText;
 	SendText.StructSize = sizeof(MacroSendMacroText);
 	SendText.Flags = KMFLAGS_LUA;
-	SendText.SequenceText = strReplace.c_str();
+	SendText.SequenceText = bstrReplace;
 	if (!StartupInfo.MacroControl(MCTL_SENDSTRING, MSSC_CHECK, &SendText))
 	{
 		g_bInterrupted = true;
@@ -589,7 +591,7 @@ bool CompileLUAString(const tstring &strReplace, LPCTSTR szEngine)
 	static wstring strInitScript = LoadStartupScript();
 	if (strInitScript.empty()) return false;
 
-	wstring strInitReplace = strInitScript + L" " + strReplace;
+	wstring strInitReplace = strInitScript + L" " + (LPCWSTR)bstrReplace;
 	SendText.SequenceText = strInitReplace.c_str();
 	if (!StartupInfo.MacroControl(MCTL_SENDSTRING, MSSC_CHECK, &SendText))
 	{

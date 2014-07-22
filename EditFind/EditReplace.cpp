@@ -576,6 +576,8 @@ void FindDefaultEOL()
 
 void DoFinalReplace()
 {
+	if (g_bInterrupted) return;
+
 	IReplaceParametersInternalPtr spREInt = g_spREParam;
 	if (spREInt == NULL) return;
 
