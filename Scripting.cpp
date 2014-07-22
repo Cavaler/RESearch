@@ -143,13 +143,11 @@ public:
 		m_szEOL  = szEOL;
 		m_bHasResult = false;
 		m_bFinal     = false;
-		m_bFinalChecked = false;
 	}
 
 	virtual cstring Result() { return m_strResult; }
 	virtual bool    HasResult() { return m_bHasResult; }
 	virtual void    SetFinal(bool bFinal) { m_bFinal = bFinal; }
-	virtual bool    FinalChecked() { return m_bFinalChecked; }
 
 	// IReplaceParameters methods
 	STDMETHOD(match)(long lPos, BSTR *pbstrMatch) {
@@ -200,7 +198,7 @@ public:
 
 	STDMETHOD(final)(VARIANT_BOOL *pFinal) {
 		*pFinal = m_bFinal ? VARIANT_TRUE : VARIANT_FALSE;
-		m_bFinalChecked = true;
+		g_bFinalChecked = true;
 		return S_OK;
 	}
 
@@ -232,7 +230,6 @@ private:
 	bool	m_bHasResult;
 
 	bool	m_bFinal;
-	bool	m_bFinalChecked;
 };
 
 // --------------------------------------------------

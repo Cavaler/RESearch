@@ -48,6 +48,7 @@ EXTERN vector<sActiveScript> m_arrEngines;
 EXTERN CFarListData m_lstEngines CONSTRUCT((NULL, 0));
 EXTERN bool g_bSkipReplace  VALUE(false);
 EXTERN bool g_bFinalReplace VALUE(false);
+EXTERN bool g_bFinalChecked VALUE(false);
 
 bool SystemToLocalTime(FILETIME &ft);
 bool LocalToSystemTime(FILETIME &ft);
@@ -130,7 +131,6 @@ interface DECLSPEC_UUID("a74c4507-f8fc-4b09-8ebe-2801d86006e0") IReplaceParamete
 	virtual CStringOperations<TCHAR>::cstring Result() = 0;
 	virtual bool    HasResult() = 0;
 	virtual void    SetFinal(bool bFinal) = 0;
-	virtual bool    FinalChecked() = 0;
 };
 _COM_SMARTPTR_TYPEDEF(IReplaceParametersInternal, __uuidof(IReplaceParametersInternal));
 

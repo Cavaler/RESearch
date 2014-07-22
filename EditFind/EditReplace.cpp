@@ -576,7 +576,7 @@ void FindDefaultEOL()
 
 void DoFinalReplace()
 {
-	if (g_bInterrupted) return;
+	if (g_bInterrupted || !g_bFinalChecked) return;
 
 	IReplaceParametersInternalPtr spREInt = g_spREParam;
 	if (spREInt == NULL) return;
@@ -588,7 +588,7 @@ void DoFinalReplace()
 	tstring Replace = CSO::CreateReplaceString(ERReplace.c_str(), _T("\n"), ScriptEngine(EREvaluate), REParam);
 	g_bFinalReplace = false;
 
-	if (spREInt->FinalChecked() && !g_bSkipReplace && ! g_bInterrupted)
+	if (!g_bSkipReplace && ! g_bInterrupted)
 	{
 		RefreshEditorInfo();
 		LastReplaceLine = EdInfo.TotalLines;

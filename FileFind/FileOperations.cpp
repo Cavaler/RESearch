@@ -159,6 +159,8 @@ bool RunSearch(LPCTSTR szFileName, IFrontend *pFrontend)
 
 bool DoFinalReplace(IBackend *pBackend)
 {
+	if (g_bInterrupted || !g_bFinalChecked) return false;
+
 	IReplaceParametersInternalPtr spREInt = g_spREParam;
 	if (spREInt == NULL) return false;
 
@@ -169,7 +171,7 @@ bool DoFinalReplace(IBackend *pBackend)
 	tstring strReplace = CSO::CreateReplaceString(FRReplace.c_str(), _T("\n"), ScriptEngine(FREvaluate), REParam);
 	g_bFinalReplace = false;
 
-	if (spREInt->FinalChecked() && !g_bSkipReplace && ! g_bInterrupted)
+	if (!g_bSkipReplace && ! g_bInterrupted)
 	{
 		pBackend->AppendData((LPCSTR)strReplace.data(), strReplace.size()*sizeof(TCHAR));
 		return true;

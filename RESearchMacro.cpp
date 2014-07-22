@@ -573,6 +573,8 @@ extern LPOLESTR g_szFarLUA;
 
 bool CompileLUAString(const tstring &strReplace, LPCTSTR szEngine)
 {
+	g_bFinalChecked = false;
+
 	if ((szEngine == NULL) || (wcscmp(g_szFarLUA, szEngine) != 0))
 		return true;
 
@@ -669,6 +671,8 @@ bool EvaluateLUAStringCleanup()
 
 bool CompileLUAString(const tstring &strReplace, LPCTSTR szEngine)
 {
+	g_bFinalChecked = false;
+
 	return true;
 }
 
