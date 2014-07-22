@@ -3,6 +3,8 @@ Notes on "Evaluate as script" functionality
 All registered ActiveScripting engines will be present in the list, both built-in in Windows
 (JScript and VBScript) and any 3rd party you could have installed, like PerlScript or bundled LuaScript
 
+If a full file name is given as script, it will be read as ANSI script file
+
 Functions available in scripts:
 - match(n) returns n-th subpattern, like $n
 - named(n) returns named subpattern, like ${n}

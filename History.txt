@@ -9,6 +9,10 @@ Planned:
 	? Extended batch properties, overriding preset properties (e.g. Search from beginning)
 	+ Command to "lock" read-only file before replacing
 
+Version 8.53 (2.07.2014)
+	- Do not attempt finalization pass during Replace if final() wasn't called at least once during replace (also not called if there were no matches)
+	- FarLUA can load scripts from file, same as other engines could
+
 Version 8.52 (14.07.2014)
 	- Named parameters saved during final() replace call
 
