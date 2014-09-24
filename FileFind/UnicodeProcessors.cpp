@@ -107,6 +107,12 @@ CUnicodeSeveralLineProcessor::CUnicodeSeveralLineProcessor(IBackend *pBackend, i
 	m_bAtEnd = (nSize == 0) && m_pBackend->Last();
 }
 
+CUnicodeSeveralLineProcessor::~CUnicodeSeveralLineProcessor()
+{
+	CFileBackend *pFileBackend = dynamic_cast<CFileBackend *>(m_pBackend);
+	pFileBackend->ResetDecoder(NULL);
+}
+
 bool CUnicodeSeveralLineProcessor::Overflow()
 {
 	return Size() >= SeveralLinesKB*1024;

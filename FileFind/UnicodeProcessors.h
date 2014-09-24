@@ -27,6 +27,7 @@ class CUnicodeSeveralLineProcessor : public ISplitLineProcessor
 {
 public:
 	CUnicodeSeveralLineProcessor(IBackend *pBackend, int nLines, INT_PTR nMaxSize);
+	~CUnicodeSeveralLineProcessor();
 
 	virtual bool			GetNextLine();
 	virtual const char *	Buffer();

@@ -46,6 +46,7 @@ class CSingleByteSeveralLineProcessor : public ISplitLineProcessor
 {
 public:
 	CSingleByteSeveralLineProcessor(IBackend *pBackend, int nLines, INT_PTR nMaxSize);
+	~CSingleByteSeveralLineProcessor();
 
 	virtual bool			GetNextLine();
 	virtual const char *	Buffer();

@@ -153,6 +153,12 @@ CSingleByteSeveralLineProcessor::CSingleByteSeveralLineProcessor(IBackend *pBack
 	m_bAtEnd = (nSize == 0) && m_pBackend->Last();
 }
 
+CSingleByteSeveralLineProcessor::~CSingleByteSeveralLineProcessor()
+{
+	CFileBackend *pFileBackend = dynamic_cast<CFileBackend *>(m_pBackend);
+	pFileBackend->ResetDecoder(NULL);
+}
+
 bool CSingleByteSeveralLineProcessor::Overflow()
 {
 	return Size() >= SeveralLinesKB*1024;
