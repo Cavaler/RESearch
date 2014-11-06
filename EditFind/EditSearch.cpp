@@ -416,6 +416,8 @@ bool CESPresetCollection::EditPreset(CPreset *pPreset)
 
 	Dialog.Add(new CFarCheckBoxItem(5,7,0,MRegExp,&pPreset->m_mapInts["IsRegExp"]));
 	Dialog.Add(new CFarCheckBoxItem(35,7,0,MSeveralLine,&pPreset->m_mapInts["SeveralLine"]));
+	Dialog.Add(new CFarButtonItem(53,7,0,0,MEllipsis));
+
 	Dialog.Add(new CFarCheckBoxItem(5,8,0,MCaseSensitive,&pPreset->m_mapInts["CaseSensitive"]));
 	Dialog.Add(new CFarCheckBoxItem(5,9,0,MReverseSearch,&pPreset->m_mapInts["Reverse"]));
 	Dialog.Add(new CFarCheckBox3Item(35,9,0,MInSelection, &pPreset->m_mapInts["InSelection"]));
@@ -427,5 +429,16 @@ bool CESPresetCollection::EditPreset(CPreset *pPreset)
 
 	Dialog.AddButtons(MOk, MCancel);
 
-	return (Dialog.Display() == MOk);
+	do {
+		switch (Dialog.Display()) {
+		case MOk:
+			return true;
+		case MEllipsis:
+			ConfigureSeveralLines();
+			break;
+
+		default:
+			return false;
+		}
+	} while (true);
 }

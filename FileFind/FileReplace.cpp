@@ -527,6 +527,8 @@ bool CFRPresetCollection::EditPreset(CPreset *pPreset)
 
 	Dialog.Add(new CFarCheckBoxItem(56,12,0,MLeftBracket,&bFAdvanced));
 	Dialog.Add(new CFarButtonItem  (62,12,DIF_NOBRACKETS,0,MBtnAdvanced));
+	Dialog.Add(new CFarButtonItem(_tcslen(GetMsg(MSeveralLineRegExp))+10,13,0,0,MEllipsis));
+	Dialog.Add(new CFarButtonItem(57, 14, 0, false, MBtnREBuilder));
 
 	Dialog.Add(new CFarCheckBoxItem(5,21,0,MConfirmFile,&pPreset->m_mapInts["ConfirmFile"]));
 	Dialog.Add(new CFarCheckBoxItem(5,22,0,MConfirmLine,&pPreset->m_mapInts["ConfirmLine"]));
@@ -548,8 +550,16 @@ bool CFRPresetCollection::EditPreset(CPreset *pPreset)
 		case MBtnAdvanced:
 			SelectAdvancedPreset(nAdvancedID, bFAdvanced);
 			break;
+		case MBtnREBuilder:
+			if (RunREBuilder(pPreset->m_mapStrings["Text"], pPreset->m_mapStrings["Replace"])) {
+				if (*pSearchAs == SA_PLAINTEXT) *pSearchAs = SA_REGEXP;
+			}
+			break;
 		case MRunEditor:
 			RunExternalEditor(pPreset->m_mapStrings["Replace"]);
+			break;
+		case MEllipsis:
+			ConfigureSeveralLines();
 			break;
 		default:
 			return false;

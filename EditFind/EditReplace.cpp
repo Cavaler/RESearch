@@ -858,6 +858,8 @@ OperationResult EditorReplaceExecutor()
 bool CERPresetCollection::EditPreset(CPreset *pPreset)
 {
 	CFarDialog Dialog(80, 23, _T("ERPresetDlg"));
+	Dialog.SetUseID(true);
+
 	Dialog.AddFrame(MERPreset);
 	Dialog.Add(new CFarTextItem(5, 2, 0, MPresetName));
 	Dialog.Add(new CFarEditItem(5, 3, 74, DIF_HISTORY,_T("RESearch.PresetName"), pPreset->Name()));
@@ -870,9 +872,12 @@ bool CERPresetCollection::EditPreset(CPreset *pPreset)
 
 	Dialog.Add(new CFarCheckBoxItem(5,  9, 0, MRegExp, &pPreset->m_mapInts["IsRegExp"]));
 	Dialog.Add(new CFarCheckBoxItem(35, 9, 0, MSeveralLine, &pPreset->m_mapInts["SeveralLine"]));
+	Dialog.Add(new CFarButtonItem(55, 9, 0, 0, MEllipsis));
+
 	Dialog.Add(new CFarCheckBoxItem(5, 10, 0, MCaseSensitive, &pPreset->m_mapInts["CaseSensitive"]));
 	Dialog.Add(new CFarCheckBoxItem(5, 11, 0, MReverseSearch,&pPreset->m_mapInts["Reverse"]));
 	Dialog.Add(new CFarCheckBox3Item(35,11, 0, MInSelection, &pPreset->m_mapInts["InSelection"]));
+	Dialog.Add(new CFarButtonItem(62, 11, 0, FALSE, MBtnREBuilder));
 
 	Dialog.Add(new CFarCheckBoxItem(5, 12, 0, MRemoveEmpty, &pPreset->m_mapInts["RemoveEmpty"]));
 	Dialog.Add(new CFarCheckBoxItem(5, 13, 0, MRemoveNoMatch, &pPreset->m_mapInts["RemoveNoMatch"]));
@@ -885,13 +890,20 @@ bool CERPresetCollection::EditPreset(CPreset *pPreset)
 	Dialog.AddButtons(MOk, MCancel);
 
 	do {
-		switch (Dialog.Display(2, -2, -5)) {
-		case 0:
+		switch (Dialog.Display()) {
+		case MOk:
 			return true;
-		case 1:
+		case MRunEditor:
 			RunExternalEditor(pPreset->m_mapStrings["Replace"]);
 			break;
-
+		case MEllipsis:
+			ConfigureSeveralLines();
+			break;
+		case MBtnREBuilder:
+			if (RunREBuilder(pPreset->m_mapStrings["Text"], pPreset->m_mapStrings["Replace"])) {
+				pPreset->m_mapInts["IsRegExp"] = 1;
+			}
+			break;
 		default:
 			return false;
 		}

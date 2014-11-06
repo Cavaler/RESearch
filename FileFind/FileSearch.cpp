@@ -257,6 +257,7 @@ bool CFSPresetCollection::EditPreset(CPreset *pPreset)
 
 	Dialog.Add(new CFarCheckBoxItem(56,9,0,MLeftBracket,&bFAdvanced));
 	Dialog.Add(new CFarButtonItem  (62,9,DIF_NOBRACKETS,0,MBtnAdvanced));
+	Dialog.Add(new CFarButtonItem(_tcslen(GetMsg(MSeveralLineRegExp))+10,11,0,0,MEllipsis));
 
 	Dialog.Add(new CFarCheckBoxItem(5,22,0,MAddToMenu,&pPreset->m_bAddToMenu));
 	Dialog.AddButtons(MOk,MCancel);
@@ -268,6 +269,9 @@ bool CFSPresetCollection::EditPreset(CPreset *pPreset)
 			return true;
 		case MBtnAdvanced:
 			SelectAdvancedPreset(nAdvancedID, bFAdvanced);
+			break;
+		case MEllipsis:
+			ConfigureSeveralLines();
 			break;
 		default:
 			return false;
