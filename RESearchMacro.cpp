@@ -411,8 +411,6 @@ HANDLE OpenFromScriptMacro(const OpenMacroInfo *MInfo);
 
 HANDLE OpenFromMacro(const OpenMacroInfo *MInfo, bool &bRawReturn)
 {
-	g_bFromCmdLine = true;
-
 	int nType = GetAreaType();
 
 	int nValue;
@@ -486,7 +484,7 @@ void FillMacroValueStrings(const OpenMacroInfo *MInfo, vector<_variant_t> &arrSt
 	vector<_variant_t> arrParams;
 	for (size_t nParam = 2; nParam < MInfo->Count; nParam++)
 	{
-		arrParams.push_back(GetVariantValue((MInfo->Values[nParam])));
+		arrParams.insert(arrParams.begin(), GetVariantValue((MInfo->Values[nParam])));
 	}
 
 	DISPPARAMS dispParams = { !arrParams.empty() ? &arrParams[0] : NULL, NULL, arrParams.size(), 0 };

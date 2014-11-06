@@ -544,7 +544,12 @@ HANDLE WINAPI OpenW(const struct OpenInfo *Info)
 						  }
 	case OPEN_FROMMACRO:{
 		bool bRawReturn = false;
+
+		bool bFromCmdLine = g_bFromCmdLine;
+		g_bFromCmdLine = true;
 		HANDLE hPlugin = OpenFromMacro((const OpenMacroInfo *)Info->Data, bRawReturn);
+		g_bFromCmdLine = false;
+
 		if (bRawReturn) return hPlugin;
 
 		if (hPlugin != NO_PANEL_HANDLE)
