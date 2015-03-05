@@ -74,13 +74,14 @@ tstring GetNextLine(ViewerInfo &VInfo, char *szData, int nLength, int &nSkip)
 	}
 }
 
-void SetViewerSelection(__int64 nStart, int nLength, int nCharSize)
+void SetViewerSelection(__int64 nStart, int nLength)
 {
-	ViewerSelect VSelect = {ITEM_SS(ViewerSelect) nStart / nCharSize, nLength / nCharSize};
+	ViewerSetPosition VPos = {ITEM_SS(ViewerSetPosition) 0, (nStart > 512) ? nStart-512 : 0, 0};
+	StartupInfo.ViewerControl(VCTL_SETPOSITION, &VPos);
+
+	ViewerSelect VSelect = {ITEM_SS(ViewerSelect) nStart, nLength};
 	StartupInfo.ViewerControl(VCTL_SELECT, &VSelect);
 
-	ViewerSetPosition VPos = {ITEM_SS(ViewerSetPosition) /*VSP_NOREDRAW*/0, (nStart > 256) ? nStart-256 : 0, 0};
-	StartupInfo.ViewerControl(VCTL_SETPOSITION, &VPos);
 	g_bInterrupted = true;
 }
 
@@ -151,7 +152,7 @@ bool ViewerSearchAgain()
 
 			if (ERegExp) {
 				if (pcre_exec(EPattern, EPatternExtra, strLine.data(), strLine.length(), nLineOffset, 0, REParam.Match(), REParam.Count())>=0) {
-					SetViewerSelection(nOffset + REParam.m_arrMatch[0]*nCharSize, (REParam.m_arrMatch[1] - REParam.m_arrMatch[0])*nCharSize, nCharSize);
+					SetViewerSelection(nOffset + REParam.m_arrMatch[0]*nCharSize, (REParam.m_arrMatch[1] - REParam.m_arrMatch[0])*nCharSize);
 					Info.CurPos  = nOffset;
 					Info.LeftPos = REParam.m_arrMatch[1];
 					break;
@@ -159,7 +160,7 @@ bool ViewerSearchAgain()
 			} else {
 				int nPos = BMHSearch(strLine.data()+nLineOffset, strLine.length()-nLineOffset, ETextUpcase.data(), ETextUpcase.length(), NULL);
 				if (nPos >= 0) {
-					SetViewerSelection(nOffset + (nLineOffset + nPos)*nCharSize, EText.length()*nCharSize, nCharSize);
+					SetViewerSelection(nOffset + (nLineOffset + nPos)*nCharSize, EText.length()*nCharSize);
 					Info.CurPos  = nOffset;
 					Info.LeftPos = nLineOffset + nPos + EText.length();
 					break;
