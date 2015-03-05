@@ -9,6 +9,13 @@ Planned:
 	? Extended batch properties, overriding preset properties (e.g. Search from beginning)
 	+ Command to "lock" read-only file before replacing
 
+Version 8.55 (16.12.2014)
+	* x86 versions require only SSE, not SSE2. For those with 10-year-old processors.
+	* Added [...] to preset dialogs
+	* Dialog GUIDs now should be constant
+	- Fixed calling init()/store() from FarLUA
+	- Fixed rare infinite loop when selectively running batch commands containing LuaFAR from menu
+
 Version 8.54 (24.09.2014)
 	- Fixed crash after using Several-Line Search
 
