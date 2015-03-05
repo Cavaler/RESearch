@@ -292,7 +292,7 @@ HANDLE HandleFromOpResult(OperationResult Result)
 
 HANDLE OpenPluginFromFileMenu(int Item, bool ShowDialog)
 {
-	SetCurrentDirectory(CPanelInfo(false).CurDir);
+	CCurrentDirectoryBackup _cdb(CPanelInfo(false).CurDir);
 
 	OperationResult Result = OR_CANCEL;
 	int nBreakCode = -1;
