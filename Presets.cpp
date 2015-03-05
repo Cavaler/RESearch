@@ -692,7 +692,7 @@ void CBatchActionCollection::Save(CFarSettingsKey &hKey)
 
 void CBatchActionCollection::ShowMenu()
 {
-	int piBreakKeys[]={VK_INSERT, VK_ADD, VK_DELETE, VK_F4, VK_F6, VK_CTRL_UP, VK_CTRL_DOWN, 0};
+	int piBreakKeys[]={VK_INSERT, VK_ADD, VK_DELETE, VK_F4, VK_F5, VK_F6, VK_CTRL_UP, VK_CTRL_DOWN, 0};
 	vector<tstring> arrItems;
 
 	do {
@@ -748,6 +748,20 @@ void CBatchActionCollection::ShowMenu()
 			if (m_nCurrent < size()) {
 				at(m_nCurrent)->EditItems();
 				WriteRegistry();
+			}
+			break;
+		case VK_F5:
+			if (m_nCurrent < size())
+			{
+				CBatchAction *pBatch = new CBatchAction(*at(m_nCurrent));
+				pBatch->m_strName = GetMsg(MCopyOf) + pBatch->m_strName;
+				if (pBatch->EditProperties()) {
+					m_nCurrent = size();
+					insert(begin()+m_nCurrent, pBatch);
+					WriteRegistry();
+				} else {
+					delete pBatch;
+				}
 			}
 			break;
 		case VK_F6:
