@@ -120,6 +120,11 @@ bool ViewerSearchAgain()
 	}
 #endif
 
+	tstring _FText = FText;
+	bool _FCaseSensitive = FCaseSensitive;
+	bool _FShowStatistics = FShowStatistics;
+	SearchAs _FSearchAs = FSearchAs;
+ 
 	FText           = EText;
 	FCaseSensitive  = ECaseSensitive;
 	FShowStatistics = false;
@@ -142,6 +147,11 @@ bool ViewerSearchAgain()
 	}
 
 	bool bResult = pFrontend->Process(pBackend);
+
+	FText = _FText;
+	FCaseSensitive = _FCaseSensitive;
+	FShowStatistics = _FShowStatistics;
+	FSearchAs = _FSearchAs;
 
 	tm.Stop();
 
