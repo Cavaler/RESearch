@@ -384,7 +384,11 @@ bool CFileBackend::OpenOutput()
 		if (!ConfirmFile(MREReplace, m_strFileName.c_str())) return false;
 	}
 
-	m_hOutFile = CreateFile(ExtendedFileName(m_strOutFileName).c_str(), GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, NULL, NULL);
+	m_hOutFile = CreateFile(ExtendedFileName(m_strOutFileName).c_str(), GENERIC_WRITE, FILE_SHARE_READ, NULL, TRUNCATE_EXISTING, NULL, NULL);
+	if ((m_hOutFile == INVALID_HANDLE_VALUE) && (GetLastError() == ERROR_FILE_NOT_FOUND)) {
+		m_hOutFile = CreateFile(ExtendedFileName(m_strOutFileName).c_str(), GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, NULL, NULL);
+	}
+
 	if (m_hOutFile == INVALID_HANDLE_VALUE) {
 		ShowLastError(GetMsg(MFileCreateError), m_strOutFileName.c_str());
 		return false;
