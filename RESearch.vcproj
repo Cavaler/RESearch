@@ -684,7 +684,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)\$(ProjectName)U3 $(PlatformName).dll"
+				OutputFile="C:\Program Files\Far3\Plugins\_Debug\RESearch\$(ProjectName)U3 $(PlatformName).dll"
 				Version=""
 				ModuleDefinitionFile="RESearch3.def"
 				TargetMachine="17"

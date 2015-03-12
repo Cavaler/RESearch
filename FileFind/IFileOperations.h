@@ -24,6 +24,8 @@ class IBackend : public IBufferSize
 public:		//	Search functions
 	virtual bool	Last() = 0;
 	virtual bool	Move(INT_PTR nLength) = 0;
+	virtual INT_PTR	DecodedOffset(INT_PTR nOffset) = 0;
+	virtual INT_PTR	OriginalOffset(INT_PTR nOffset) = 0;
 
 public:		//	Replace functions
 
@@ -75,5 +77,13 @@ public:
 class IFrontend : public IVirtual
 {
 public:
+	IFrontend() : m_Offset(0), m_Length(0) {}
+
 	virtual bool	Process(IBackend *pBackend) = 0;
+
+	virtual __int64	GetOffset() const { return m_Offset; }
+	virtual __int64	GetLength() const { return m_Length; }
+protected:
+	__int64	m_Offset;
+	__int64	m_Length;
 };

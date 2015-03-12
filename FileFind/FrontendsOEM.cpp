@@ -22,6 +22,9 @@ bool CSearchPlainTextFrontend::Process(IBackend *pBackend)
 			if (nOffset >= 0)
 			{
 				FindNumber++;
+				m_Offset = pBackend->OriginalOffset(nOffset);
+				m_Length = pBackend->OriginalOffset(nOffset + TextUpcase.size()) - m_Offset;
+
 				if (!FShowStatistics) return true;
 
 				szBuffer += nOffset + TextUpcase.size();
@@ -41,8 +44,11 @@ bool CSearchPlainTextFrontend::Process(IBackend *pBackend)
 
 //////////////////////////////////////////////////////////////////////////
 
-bool SearchRegExpProcess(IBackend *pBackend, ISplitLineProcessor &Proc)
+bool SearchRegExpProcess(IBackend *pBackend, ISplitLineProcessor &Proc, __int64 &Offset, __int64 &Length)
 {
+	REParam.Clear();
+	REParam.AddRE(FPattern);
+
 	do {
 		const char *szBuffer = Proc.Buffer();
 		INT_PTR nSize   = Proc.Size();
@@ -55,6 +61,11 @@ bool SearchRegExpProcess(IBackend *pBackend, ISplitLineProcessor &Proc)
 			{
 				if (FindNumber == 0) g_nFoundColumn = REParam.m_arrMatch[0]+1;
 				FindNumber++;
+
+				__int64 Delta = Proc.Buffer() - pBackend->Buffer();
+				Offset = pBackend->OriginalOffset(Delta + REParam.m_arrMatch[0]);
+				Length = pBackend->OriginalOffset(Delta + REParam.m_arrMatch[1]) - Offset;
+
 				if (!FShowStatistics) return true;
 
 				nOffset = REParam.m_arrMatch[1];
@@ -77,7 +88,7 @@ bool CSearchRegExpFrontend::Process(IBackend *pBackend)
 {
 	CSingleByteSplitLineProcessor Proc(pBackend);
 
-	return SearchRegExpProcess(pBackend, Proc);
+	return SearchRegExpProcess(pBackend, Proc, m_Offset, m_Length);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -86,7 +97,7 @@ bool CSearchSeveralLineRegExpFrontend::Process(IBackend *pBackend)
 {
 	CSingleByteSeveralLineProcessor Proc(pBackend, SeveralLines, SeveralLinesKB);
 
-	return SearchRegExpProcess(pBackend, Proc);
+	return SearchRegExpProcess(pBackend, Proc, m_Offset, m_Length);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -95,7 +106,7 @@ bool CSearchMultiLineRegExpFrontend::Process(IBackend *pBackend)
 {
 	CSingleBytePassThroughProcessor Proc(pBackend);
 
-	return SearchRegExpProcess(pBackend, Proc);
+	return SearchRegExpProcess(pBackend, Proc, m_Offset, m_Length);
 }
 
 //////////////////////////////////////////////////////////////////////////

@@ -237,6 +237,16 @@ INT_PTR	CFileBackend::Size()
 	return m_pDecoder ? m_pDecoder->Size() : m_nSize;
 }
 
+INT_PTR	CFileBackend::DecodedOffset(INT_PTR nOffset)
+{
+	return m_pDecoder ? m_pDecoder->DecodedOffset(nOffset) : nOffset;
+}
+
+INT_PTR	CFileBackend::OriginalOffset(INT_PTR nOffset)
+{
+	return m_pDecoder ? m_pDecoder->OriginalOffset(nOffset) : nOffset;
+}
+
 bool CFileBackend::Last()
 {
 	return m_bEOF;

@@ -28,6 +28,8 @@ public:
 	virtual INT_PTR	Size();
 	virtual bool	Last();
 	virtual bool	Move(INT_PTR nLength);
+	virtual INT_PTR	DecodedOffset(INT_PTR nOffset);
+	virtual INT_PTR	OriginalOffset(INT_PTR nOffset);
 	virtual bool	CheckWriteReady();
 	virtual bool	WriteBack(INT_PTR nOffset);
 	virtual bool	WriteThru(const char *szBuffer, INT_PTR nLength, INT_PTR nSkipLength);

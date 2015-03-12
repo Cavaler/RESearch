@@ -8,88 +8,22 @@ struct ViewerSearchInfo {
 
 map<int, ViewerSearchInfo> g_ViewerInfo;
 
-bool IsUnicode(const ViewerMode &Mode) {
-#ifdef UNICODE
-	return (Mode.CodePage == 1200) || (Mode.CodePage == 1201);
-#else
-	return Mode.Unicode != 0;
-#endif
-}
-
-#ifndef UNICODE
-string ToOEM(ViewerInfo &VInfo, const char *szData, int nLength)
-{
-	if (nLength == 0) return "";
-
-	if (VInfo.CurMode.AnsiMode) {
-		vector<char> arrData(szData, szData+nLength);
-		CharToOemBuff(&arrData[0], &arrData[0], nLength);
-		return string(&arrData[0], arrData.size());
-	}
-	if (!VInfo.CurMode.UseDecodeTable || (VInfo.CurMode.TableNum >= (int)XLatTables.size())) return string(szData, nLength);
-
-	string strResult;
-	strResult.reserve(nLength);
-	while (nLength--) {
-		strResult += XLatTables[VInfo.CurMode.TableNum].DecodeTable[(BYTE)(*szData)];
-		szData++;
-	}
-	return strResult;
-}
-#endif
-
-tstring GetNextLine(ViewerInfo &VInfo, char *szData, int nLength, int &nSkip)
-{
-	if (IsUnicode(VInfo.CurMode)) {
-		const wchar_t *wszData = (const wchar_t *)szData;
-		const wchar_t *wszCur = wszData;
-		while (nLength && !wcschr(L"\r\n", *wszCur)) {wszCur++; nLength--;}
-
-		nSkip = (nLength == 0) ? 0 :
-			((nLength > 1) && (wszCur[0] == '\r') && (wszCur[1] == '\n')) ? 2 : 1;
-
-		nSkip = (nSkip + (wszCur - wszData)) * 2;
-		if (wszCur == wszData) return _T("");
-
-#ifdef UNICODE
-		return wstring(wszData, wszCur);
-#else
-		vector<char> arrData(wszCur - wszData);
-		WideCharToMultiByte(CP_OEMCP, 0, wszData, wszCur-wszData, &arrData[0], wszCur-wszData, " ", NULL);
-		return string(&arrData[0], arrData.size());
-#endif
-	} else {
-		const char *szCur = szData;
-		while (nLength && !strchr("\r\n", *szCur)) {szCur++; nLength--;}
-
-		nSkip = (nLength == 0) ? 0 :
-			((nLength > 1) && (szCur[0] == '\r') && (szCur[1] == '\n')) ? 2 : 1;
-
-		nSkip = nSkip + (szCur - szData);
-#ifdef UNICODE
-		return StrToUnicode(string(szData, szCur), VInfo.CurMode.CodePage);
-#else
-		return ToOEM(VInfo, szData, szCur-szData);
-#endif
-	}
-}
-
 void SetViewerSelection(__int64 nStart, int nLength)
 {
+	ViewerSelect VSelect = {ITEM_SS(ViewerSelect) nStart, nLength};
+	StartupInfo.ViewerControl(VCTL_SELECT, &VSelect);
+
+	//	After select since select changes position to that line on top
 	ViewerSetPosition VPos = {ITEM_SS(ViewerSetPosition) 0, (nStart > 512) ? nStart-512 : 0, 0};
 	StartupInfo.ViewerControl(VCTL_SETPOSITION, &VPos);
 
-	ViewerSelect VSelect = {ITEM_SS(ViewerSelect) nStart, nLength};
-	StartupInfo.ViewerControl(VCTL_SELECT, &VSelect);
+	StartupInfo.ViewerControl(VCTL_REDRAW, NULL);
 
 	g_bInterrupted = true;
 }
 
 bool ViewerSearchAgain()
 {
-	ViewerInfo VInfo;
-	VInfo.StructSize=sizeof(VInfo);
-	StartupInfo.ViewerControl(VCTL_GETINFO, &VInfo);
 	g_bInterrupted = false;
 
 	CDebugTimer tm(_T("ViewSearch() took %d ms"));
@@ -108,78 +42,116 @@ bool ViewerSearchAgain()
 	}
 	ViewerSearchInfo &Info = g_ViewerInfo[VInfo.ViewerID];
 
-	bool bUnicode  = IsUnicode(VInfo.CurMode);
-	int  nCharSize = bUnicode ? 2 : 1;
-
+	tstring strFileName;
 #ifdef FAR3
 	wchar_t szFileName[MAX_PATH];
 	StartupInfo.ViewerControl(VCTL_GETFILENAME, szFileName);
+	strFileName = szFileName;
 	CFileMapping mapInput(szFileName);
 #else
+	strFileName = VInfo.FileName;
 	CFileMapping mapInput(VInfo.FileName);
 #endif
 
-	if (!mapInput) return false;
-	char *szData = mapInput;
-	if (!szData) return false;
+	shared_ptr<CFileBackend> pBackend = new CFileBackend();
+	if (!pBackend->SetBlockSize(FBufferSize*1024*1024)) return false;
+	if (!pBackend->Open(strFileName.c_str(), -1)) return false;
 
-	long nOffset = (long)Info.CurPos;
-	if (bUnicode) {
-		if (nOffset == 0) {
-			if (mapInput.Size() >= 2) {
-				WORD wSig = *((WORD *)szData);
-				if ((wSig == 0xFEFF) || (wSig == 0xFFFE)) nOffset += 2;
-			}
+	int nSkip;
+	eLikeUnicode nDetect = LikeUnicode(pBackend->Buffer(), pBackend->Size(), nSkip);
+
+	shared_ptr<IDecoder> pDecoder;
+	CClearDecoder _cd(pBackend);
+
+	int nSizeDivisor = 1;
+#ifdef UNICODE
+	switch (VInfo.CurMode.CodePage)
+	{
+	case 1200:
+		pDecoder = new CPassthroughDecoder();
+		if (!pBackend->SetDecoder(pDecoder, nSkip)) return false;
+		break;
+	case 1201:
+		pDecoder = new CReverseUnicodeToUnicodeDecoder();
+		if (!pBackend->SetDecoder(pDecoder, nSkip)) return false;
+		break;
+	case 65001:
+		pDecoder = new CUTF8ToUnicodeDecoder();
+		if (!pBackend->SetDecoder(pDecoder, nSkip)) return false;
+		break;
+	default:
+		pDecoder = new CSingleByteToUnicodeDecoder(VInfo.CurMode.CodePage);
+		if (!pBackend->SetDecoder(pDecoder, 0)) return false;
+		break;
+	}
+#else
+	if (VInfo.CurMode.Unicode)
+	{
+		nSizeDivisor = 2;
+		if (nDetect == UNI_BE)
+			pDecoder = new CReverseUnicodeToOEMDecoder();
+		else
+			pDecoder = new CUnicodeToOEMDecoder();
+		if (!pBackend->SetDecoder(pDecoder, nSkip)) return false;
+	}
+	else
+	{
+		if (VInfo.CurMode.UseDecodeTable && (VInfo.CurMode.TableNum >= 0) && (VInfo.CurMode.TableNum < (int)XLatTables.size()))
+		{
+			const char *szDecodeTable = (const char *)XLatTables[VInfo.CurMode.TableNum].DecodeTable;
+			const char *szEncodeTable = (const char *)XLatTables[VInfo.CurMode.TableNum].EncodeTable;
+
+			pDecoder = new CTableToOEMDecoder(szDecodeTable, szEncodeTable);
+			if (!pBackend->SetDecoder(pDecoder, 0)) return false;
+		}
+		else if (VInfo.CurMode.AnsiMode)
+		{
+			pDecoder = new CSingleByteToOEMDecoder(CP_ACP);
+			if (!pBackend->SetDecoder(pDecoder, 0)) return false;
+		}
+		else
+		{
+			pDecoder = new CPassthroughDecoder();
+			if (!pBackend->SetDecoder(pDecoder, 0)) return false;
 		}
 	}
-	szData += nOffset;
+#endif
 
-	REParam.Clear();
-	if (ERegExp) REParam.AddRE(EPattern);
+	FText           = EText;
+	FCaseSensitive  = ECaseSensitive;
+	FShowStatistics = false;
 
-	if (ESeveralLine) {
-	} else {
-		tstring strLine;
-		int nCurrentLine = 0;
-		int nSkip;
+	FSearchAs = ERegExp ? (ESeveralLine ? SA_SEVERALLINE : SA_REGEXP) : SA_PLAINTEXT;
+	if (!FPreparePattern(false)) return false;
 
-		int nLineOffset = Info.LeftPos;
-		do {
-			if (Interrupted()) break;
-			strLine = GetNextLine(VInfo, szData, mapInput.Size()-nOffset, nSkip);
-			if (strLine.empty() && (nSkip == 0)) break;
-			if (!ECaseSensitive) strLine = UpCaseString(strLine);
+	shared_ptr<IFrontend> pFrontend = NULL;
 
-			if (ERegExp) {
-				if (pcre_exec(EPattern, EPatternExtra, strLine.data(), strLine.length(), nLineOffset, 0, REParam.Match(), REParam.Count())>=0) {
-					SetViewerSelection(nOffset + REParam.m_arrMatch[0]*nCharSize, (REParam.m_arrMatch[1] - REParam.m_arrMatch[0])*nCharSize);
-					Info.CurPos  = nOffset;
-					Info.LeftPos = REParam.m_arrMatch[1];
-					break;
-				}
-			} else {
-				int nPos = BMHSearch(strLine.data()+nLineOffset, strLine.length()-nLineOffset, ETextUpcase.data(), ETextUpcase.length(), NULL);
-				if (nPos >= 0) {
-					SetViewerSelection(nOffset + (nLineOffset + nPos)*nCharSize, EText.length()*nCharSize);
-					Info.CurPos  = nOffset;
-					Info.LeftPos = nLineOffset + nPos + EText.length();
-					break;
-				}
-			}
-
-			szData += nSkip;
-			nOffset += nSkip;
-			nLineOffset = 0;
-			nCurrentLine++;
-		} while (nOffset < (long)mapInput.Size());
+	if (ERegExp)
+	{
+		if (ESeveralLine)
+			pFrontend = new CSearchSeveralLineRegExpFrontend();
+		else
+			pFrontend = new CSearchRegExpFrontend();
 	}
+	else
+	{
+		pFrontend = new CSearchPlainTextFrontend();
+	}
+
+	bool bResult = pFrontend->Process(pBackend);
 
 	tm.Stop();
 
-	if (!g_bInterrupted) {
-		const TCHAR *Lines[]={GetMsg(MRESearch),GetMsg(MCannotFind),EText.c_str(),GetMsg(MOk)};
+	if (bResult)
+	{
+		SetViewerSelection((nSkip + pFrontend->GetOffset())/nSizeDivisor, (int)pFrontend->GetLength()/nSizeDivisor);
+	}
+	else if (!g_bInterrupted)
+	{
+		const TCHAR *Lines[] = {GetMsg(MRESearch), GetMsg(MCannotFind), EText.c_str(), GetMsg(MOk)};
 		StartupInfo.Message(FMSG_WARNING,_T("VCannotFind"),Lines,4,1);
 	}
+
 	return true;
 }
 
@@ -195,6 +167,9 @@ bool ViewerSearch()
 {
 	RefreshViewerInfo();
 	g_ViewerInfo.erase(VInfo.ViewerID);
+#ifndef UNICODE
+	EdInfo.FileName = VInfo.FileName;		//	For FillDefaultNamedParameters
+#endif
 
 	CFarDialog Dialog(76,13,_T("SearchDlg"));
 	Dialog.SetWindowProc(EditorSearchDialogProc, 0);
@@ -207,8 +182,8 @@ bool ViewerSearch()
 
 	Dialog.Add(new CFarTextItem(5,4,DIF_BOXCOLOR|DIF_SEPARATOR,_T("")));
 	Dialog.Add(new CFarCheckBoxItem(5,5,0,MRegExp,&ERegExp));
-	Dialog.Add(new CFarCheckBoxItem(30,5,DIF_DISABLE,MSeveralLine,&ESeveralLine));
-	Dialog.Add(new CFarButtonItem  (53,5,DIF_DISABLE,0,MEllipsis));
+	Dialog.Add(new CFarCheckBoxItem(30,5,0,MSeveralLine,&ESeveralLine));
+	Dialog.Add(new CFarButtonItem  (53,5,0,0,MEllipsis));
 	Dialog.Add(new CFarCheckBoxItem(5,6,0,MCaseSensitive,&ECaseSensitive));
 	Dialog.Add(new CFarCheckBoxItem(5,7,DIF_DISABLE,MReverseSearch,&EReverse));
 	Dialog.AddButtons(MOk,MCancel,MBtnClose);
@@ -272,5 +247,14 @@ bool CVSPresetCollection::EditPreset(CPreset *pPreset)
 
 OperationResult ViewSearchExecutor()
 {
-	return OR_CANCEL;
+	RefreshViewerInfo();
+	g_ViewerInfo.erase(VInfo.ViewerID);
+#ifndef UNICODE
+	EdInfo.FileName = VInfo.FileName;		//	For FillDefaultNamedParameters
+#endif
+
+	if (!EPreparePattern(SearchText)) return OR_FAILED;
+	EText = SearchText;
+
+	return ViewerSearchAgain() ? OR_OK : OR_CANCEL;
 }
