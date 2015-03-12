@@ -78,6 +78,8 @@ void UpdateFSDialog(CFarDialog *pDlg) {
 
 LONG_PTR WINAPI FileSearchDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LONG_PTR lParam2)
 {
+	ReplaceEOLDialogProc(nMsg, lParam2);
+
 	int nCtlID = pDlg->GetID(nParam1);
 
 	switch (nMsg) {

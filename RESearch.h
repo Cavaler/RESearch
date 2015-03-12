@@ -189,6 +189,11 @@ const unsigned char *DefCharTables();
 bool    CanUseCP(UINT nCP, const wstring &strUnicode);
 #endif
 
+tstring GetTextFromClipboard();
+bool CopyToClipboard(const tstring &strText);
+void ReplaceEOLInClipboard();
+bool ReplaceEOLDialogProc(int nMsg, LONG_PTR lParam2);
+
 void PrepareBMHSearch(const TCHAR *String,int StringLength,size_t nPattern = 0);
 int BMHSearch(const TCHAR *Buffer,int BufferLength,const TCHAR *String,int StringLength,TCHAR *XLatTable,int nPattern = 0);
 int ReverseBMHSearch(const TCHAR *Buffer,int BufferLength,const TCHAR *String,int StringLength,TCHAR *XLatTable,int nPattern = 0);

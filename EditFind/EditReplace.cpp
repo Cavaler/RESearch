@@ -705,6 +705,8 @@ void UpdateERDialog(CFarDialog *pDlg, bool bCheckSel = true)
 
 LONG_PTR WINAPI EditorReplaceDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LONG_PTR lParam2)
 {
+	ReplaceEOLDialogProc(nMsg, lParam2);
+
 	int nCtlID = pDlg->GetID(nParam1);
 
 	switch (nMsg) {
@@ -728,7 +730,6 @@ LONG_PTR WINAPI EditorReplaceDialogProc(CFarDialog *pDlg, int nMsg, int nParam1,
 
 	return pDlg->DefDlgProc(nMsg, nParam1, lParam2);
 }
-
 
 bool EditorReplace()
 {

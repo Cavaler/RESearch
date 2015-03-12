@@ -953,3 +953,108 @@ UINT IsDefCP(UINT nCP) {
 }
 
 #endif
+
+tstring GetTextFromClipboard()
+{
+	if (!OpenClipboard(NULL)) return _T("");
+
+	tstring strResult;
+#ifdef UNICODE
+	if (!IsClipboardFormatAvailable(CF_UNICODETEXT)) 
+		return L"";
+
+	HGLOBAL hData = GetClipboardData(CF_UNICODETEXT);
+	if (hData)
+	{
+		LPCWSTR szText = (LPCWSTR)GlobalLock(hData);
+		if (szText)
+		{
+			strResult = szText;
+			GlobalUnlock(hData);
+		}
+	}
+#else
+	if (!IsClipboardFormatAvailable(CF_OEMTEXT)) 
+		return "";
+
+	HGLOBAL hData = GetClipboardData(CF_OEMTEXT);
+	if (hData)
+	{
+		LPCSTR szText = (LPCSTR)GlobalLock(hData);
+		if (szText)
+		{
+			strResult = szText;
+			GlobalUnlock(hData);
+		}
+	}
+#endif
+
+	CloseClipboard();
+	return strResult;
+}
+
+bool CopyToClipboard(const tstring &strText)
+{
+	if (!OpenClipboard(NULL)) return false;
+	EmptyClipboard();
+
+#ifdef UNICODE
+	HGLOBAL hData = GlobalAlloc(GHND, strText.length()*2+2);
+	wcscpy((wchar_t *)GlobalLock(hData), strText.c_str());
+	GlobalUnlock(hData);
+	SetClipboardData(CF_UNICODETEXT, hData);
+#else
+	HGLOBAL hData = GlobalAlloc(GHND, strText.length()+1);
+	strcpy((char *)GlobalLock(hData), strText.c_str());
+	GlobalUnlock(hData);
+	SetClipboardData(CF_TEXT, hData);
+#endif
+
+	CloseClipboard();
+	return true;
+}
+
+void ReplaceEOLInClipboard()
+{
+	tstring strText = GetTextFromClipboard();
+	
+	if (g_bUseRealEOL)
+	{
+		CRegExp::Replace(strText, _T("\r"), _T("\\\\r"), true, 0, 0);
+		CRegExp::Replace(strText, _T("\n"), _T("\\\\n"), true, 0, 0);
+	}
+	else
+	{
+		CRegExp::Replace(strText, _T("\r?\n"), _T("\\\\n"), true, 0, 0);
+	}
+
+	CopyToClipboard(strText);
+}
+
+bool ReplaceEOLDialogProc(int nMsg, LONG_PTR lParam2)
+{
+#ifdef FAR3
+	if (nMsg == DN_CONTROLINPUT)
+	{
+		INPUT_RECORD *record = (INPUT_RECORD *)lParam2;
+		if ((record->EventType == KEY_EVENT) &&
+			(record->Event.KeyEvent.bKeyDown) &&
+			(record->Event.KeyEvent.wVirtualKeyCode == VK_INSERT) &&
+			(GetAsyncKeyState(VK_SHIFT) & 0x8000))
+		{
+			ReplaceEOLInClipboard();
+			return true;
+		}
+	}
+#else
+	if (nMsg == DN_KEY)
+	{
+		if (lParam2 == KEY_SHIFTINS)
+		{
+			ReplaceEOLInClipboard();
+			return true;
+		}
+	}
+#endif
+	return false;
+}
