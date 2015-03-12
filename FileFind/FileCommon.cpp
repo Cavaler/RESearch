@@ -1106,10 +1106,10 @@ bool AdvancedSettings()
 
 	Dialog.Add(new CFarCheckBoxItem(5,8,0,MDateAfter,&FADateAfter));
 	Dialog.Add(new CFarEditItem(30,8,50,0,NULL,new CFarDateTimeStorage(&FADateAfterThis)));
-	Dialog.Add(new CFarButtonItem(52,8,0,false,MCurrentA));
+	Dialog.Add(new CFarButtonItem(52,8,DIF_NOBRACKETS,false,MCurrentA));
 	Dialog.Add(new CFarCheckBoxItem(5,9,0,MDateBefore,&FADateBefore));
 	Dialog.Add(new CFarEditItem(30,9,50,0,NULL,new CFarDateTimeStorage(&FADateBeforeThis)));
-	Dialog.Add(new CFarButtonItem(52,9,0,false,MCurrentB));
+	Dialog.Add(new CFarButtonItem(52,9,DIF_NOBRACKETS,false,MCurrentB));
 	Dialog.Add(new CFarRadioButtonItem(5,10,0,MCreationDate,&FAModificationDate,false));
 	Dialog.Add(new CFarRadioButtonItem(30,10,0,MModificationDate,&FAModificationDate,true));
 
@@ -1268,10 +1268,10 @@ bool CFAPresetCollection::EditPreset(CPreset *pPreset)
 
 	Dialog.Add(new CFarCheckBoxItem(5,10,0,MDateAfter,&pPreset->m_mapInts["DateAfter"]));
 	Dialog.Add(new CFarEditItem(30,10,50,0,NULL,new CFarDateTimeStorage((time_t *)&pPreset->m_mapInts["DateAfterThis"])));
-	Dialog.Add(new CFarButtonItem(52,10,0,FALSE,MCurrentA));
+	Dialog.Add(new CFarButtonItem(52,10,DIF_NOBRACKETS,FALSE,MCurrentA));
 	Dialog.Add(new CFarCheckBoxItem(5,11,0,MDateBefore,&pPreset->m_mapInts["DateBefore"]));
 	Dialog.Add(new CFarEditItem(30,11,50,0,NULL,new CFarDateTimeStorage((time_t *)&pPreset->m_mapInts["DateBeforeThis"])));
-	Dialog.Add(new CFarButtonItem(52,11,0,FALSE,MCurrentB));
+	Dialog.Add(new CFarButtonItem(52,11,DIF_NOBRACKETS,FALSE,MCurrentB));
 	Dialog.Add(new CFarRadioButtonItem(5,12,0,MCreationDate,&pPreset->m_mapInts["ModificationDate"],false));
 	Dialog.Add(new CFarRadioButtonItem(30,12,0,MModificationDate,&pPreset->m_mapInts["ModificationDate"],true));
 
