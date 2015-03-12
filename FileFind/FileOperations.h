@@ -6,6 +6,15 @@
 #include "UnicodeProcessors.h"
 #include "Frontends.h"
 
+class CClearDecoder
+{
+public:
+	CClearDecoder(CFileBackend *pBackend) : m_pBackend(pBackend) {}
+	~CClearDecoder() { if (m_pBackend) m_pBackend->ClearDecoder(); }
+protected:
+	CFileBackend *m_pBackend;
+};
+
 bool RunSearch (LPCTSTR szFileName, IFrontend *pFrontend);
 bool RunReplace(LPCTSTR szInFileName, LPCTSTR szOutFileName, IFrontend *pFrontend);
 

@@ -2,15 +2,6 @@
 #include "..\RESearch.h"
 #include "FileOperations.h"
 
-class CClearDecoder
-{
-public:
-	CClearDecoder(CFileBackend *pBackend) : m_pBackend(pBackend) {}
-	~CClearDecoder() { if (m_pBackend) m_pBackend->ClearDecoder(); }
-protected:
-	CFileBackend *m_pBackend;
-};
-
 #ifndef UNICODE
 
 bool RunSearchANSI(CFileBackend *pBackend, IFrontend *pFrontend)
