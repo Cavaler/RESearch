@@ -1,9 +1,10 @@
 #include "StdAfx.h"
 #include "..\RESearch.h"
 
-struct ViewerSearchInfo {
+struct ViewerSearchInfo
+{
+	tstring m_strFileName;
 	__int64  CurPos;	// Line offset in BYTES from file start
-	int      LeftPos;	// Column in CHARS
 };
 
 map<int, ViewerSearchInfo> g_ViewerInfo;
@@ -24,23 +25,10 @@ void SetViewerSelection(__int64 nStart, int nLength)
 
 bool ViewerSearchAgain()
 {
+	RefreshViewerInfo();
 	g_bInterrupted = false;
 
 	CDebugTimer tm(_T("ViewSearch() took %d ms"));
-
-	map<int, ViewerSearchInfo>::iterator it = g_ViewerInfo.find(VInfo.ViewerID);
-	if (it == g_ViewerInfo.end()) {
-		ViewerSearchInfo Info;
-#ifdef UNICODE
-		Info.CurPos = VInfo.FilePos;
-		Info.LeftPos = (int)VInfo.LeftPos;
-#else
-		Info.CurPos = VInfo.FilePos.i64;
-		Info.LeftPos = VInfo.LeftPos;
-#endif
-		g_ViewerInfo[VInfo.ViewerID] = Info;
-	}
-	ViewerSearchInfo &Info = g_ViewerInfo[VInfo.ViewerID];
 
 	tstring strFileName;
 #ifdef FAR3
@@ -53,12 +41,27 @@ bool ViewerSearchAgain()
 	CFileMapping mapInput(VInfo.FileName);
 #endif
 
+	map<int, ViewerSearchInfo>::iterator it = g_ViewerInfo.find(VInfo.ViewerID);
+	if ((it == g_ViewerInfo.end()) || (it->second.m_strFileName != strFileName))
+	{
+		ViewerSearchInfo Info;
+		Info.m_strFileName = strFileName;
+#ifdef UNICODE
+		Info.CurPos = VInfo.FilePos + VInfo.LeftPos;
+#else
+		Info.CurPos = VInfo.FilePos.i64 + VInfo.LeftPos;
+#endif
+		g_ViewerInfo[VInfo.ViewerID] = Info;
+	}
+	ViewerSearchInfo &Info = g_ViewerInfo[VInfo.ViewerID];
+
 	shared_ptr<CFileBackend> pBackend = new CFileBackend();
 	if (!pBackend->SetBlockSize(FBufferSize*1024*1024)) return false;
 	if (!pBackend->Open(strFileName.c_str(), -1)) return false;
 
 	int nSkip;
 	eLikeUnicode nDetect = LikeUnicode(pBackend->Buffer(), pBackend->Size(), nSkip);
+	if (Info.CurPos > 0) nSkip = (int)Info.CurPos;
 
 	shared_ptr<IDecoder> pDecoder;
 	CClearDecoder _cd(pBackend);
@@ -81,7 +84,7 @@ bool ViewerSearchAgain()
 		break;
 	default:
 		pDecoder = new CSingleByteToUnicodeDecoder(VInfo.CurMode.CodePage);
-		if (!pBackend->SetDecoder(pDecoder, 0)) return false;
+		if (!pBackend->SetDecoder(pDecoder, nSkip)) return false;
 		break;
 	}
 #else
@@ -102,12 +105,12 @@ bool ViewerSearchAgain()
 			const char *szEncodeTable = (const char *)XLatTables[VInfo.CurMode.TableNum].EncodeTable;
 
 			pDecoder = new CTableToOEMDecoder(szDecodeTable, szEncodeTable);
-			if (!pBackend->SetDecoder(pDecoder, 0)) return false;
+			if (!pBackend->SetDecoder(pDecoder, nSkip)) return false;
 		}
 		else if (VInfo.CurMode.AnsiMode)
 		{
 			pDecoder = new CSingleByteToOEMDecoder(CP_ACP);
-			if (!pBackend->SetDecoder(pDecoder, 0)) return false;
+			if (!pBackend->SetDecoder(pDecoder, nSkip)) return false;
 		}
 		else
 		{
@@ -145,6 +148,7 @@ bool ViewerSearchAgain()
 	if (bResult)
 	{
 		SetViewerSelection((nSkip + pFrontend->GetOffset())/nSizeDivisor, (int)pFrontend->GetLength()/nSizeDivisor);
+		Info.CurPos  = nSkip + pFrontend->GetOffset() + pFrontend->GetLength();
 	}
 	else if (!g_bInterrupted)
 	{
