@@ -457,7 +457,7 @@ bool CFGPresetCollection::EditPreset(CPreset *pPreset)
 	Dialog.Add(new CFarTextItem(5,4,0,MMask));
 	Dialog.Add(new CFarEditItem(5,5,70,DIF_HISTORY,_T("Masks"), pPreset->m_mapStrings["Mask"]));
 
-	Dialog.Add(new CFarTextItem(5,6,0,MSearchFor));
+	Dialog.Add(new CFarTextItem(5,6,0,MText));
 	Dialog.Add(new CFarEditItem(5,7,70,DIF_HISTORY|DIF_VAREDIT,_T("SearchText"), pPreset->m_mapStrings["Text"]));
 
 	Dialog.Add(new CFarTextItem(5,8,DIF_BOXCOLOR|DIF_SEPARATOR,_T("")));

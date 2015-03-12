@@ -1025,7 +1025,7 @@ bool CRnPresetCollection::EditPreset(CPreset *pPreset)
 	Dialog.Add(new CFarCheckBoxItem(25,8,0,MRepeating,&pPreset->m_mapInts["Repeating"]));
 
 	Dialog.Add(new CFarTextItem(5,11,0,MSearchIn));
-	Dialog.Add(new CFarComboBoxItem(11,18,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearch, false),&pPreset->m_mapInts["SearchIn"]));
+	Dialog.Add(new CFarComboBoxItem(11,11,60,DIF_LISTAUTOHIGHLIGHT | DIF_LISTNOAMPERSAND,new CFarListData(g_WhereToSearch, false),&pPreset->m_mapInts["SearchIn"]));
 
 	Dialog.Add(new CFarCheckBoxItem(5, 12, 0, MEvaluateAsScript, &pPreset->m_mapInts["AsScript"]));
 	Dialog.Add(new CFarComboBoxItem(30, 12, 55, 0, new CFarListData(m_lstEngines, false), new CFarEngineStorage(pPreset->m_mapStrings["Script"])));
