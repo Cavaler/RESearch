@@ -144,6 +144,10 @@ bool EPreparePattern(tstring &SearchText);
 
 void FindIfClockPresent();
 void ShowCurrentLine(int CurLine,int TotalLines,int TotalColumns);
+
+tstring PickupSelection();
+tstring PickupMultilineSelection();
+tstring PickupWord();
 tstring PickupText();
 
 #ifndef UNICODE
@@ -165,6 +169,7 @@ int  EctlGetString(EditorGetString *String);
 tstring EctlGetString(int nLine);
 tstring ToString   (const EditorGetString &String);
 tstring ToStringEOL(const EditorGetString &String);
+tstring GetEOL     (const EditorGetString &String);
 void ToArray   (const EditorGetString &String, vector<TCHAR> &arrBuffer);
 void ToArray   (const EditorSetString &String, vector<TCHAR> &arrBuffer);
 void EctlSetString(EditorSetString *String);

@@ -686,6 +686,38 @@ tstring PickupSelection()
 #endif
 }
 
+tstring PickupMultilineSelection()
+{
+	EditorGetString String;
+	tstring strSelection;
+
+	RefreshEditorInfo();
+	if (EdInfo.BlockType == BTYPE_NONE) return _T("");
+
+	for (String.StringNumber = EdInfo.BlockStartLine; String.StringNumber < EdInfo.TotalLines; String.StringNumber++)
+	{
+		EctlGetString(&String);
+		if ((String.SelStart < 0) || (String.SelStart == String.SelEnd)) break;
+
+		if (String.SelEnd < 0)
+		{
+			strSelection = strSelection + ToStringEOL(String).substr(String.SelStart);
+		}
+		else
+		{
+			strSelection = strSelection + ToString(String).substr(String.SelStart, String.SelEnd - String.SelStart);
+			if (EdInfo.BlockType == BTYPE_COLUMN)
+			{
+				strSelection += GetEOL(String);
+			}
+			else
+				break;
+		}
+	}
+
+	return strSelection;
+}
+
 #ifdef UNICODE
 bool IsWordChar(TCHAR C) {
 	return iswalnum(C)||(C=='_');
@@ -698,7 +730,8 @@ bool IsWordChar(char C) {
 }
 #endif
 
-tstring PickupWord() {
+tstring PickupWord()
+{
 	if (EFindTextAtCursor==FT_NONE) return _T("");
 	RefreshEditorInfo();
 
@@ -803,7 +836,12 @@ tstring ToString(const EditorGetString &String)
 
 tstring ToStringEOL(const EditorGetString &String)
 {
-	return CSO::MakeString(String.StringText, String.StringLength) + ((String.StringEOL != NULL) ? String.StringEOL : _T(""));
+	return CSO::MakeString(String.StringText, String.StringLength) + GetEOL(String);
+}
+
+tstring GetEOL(const EditorGetString &String)
+{
+	return (String.StringEOL != NULL) ? String.StringEOL : _T("");
 }
 
 void ToArray(const EditorGetString &String, vector<TCHAR> &arrBuffer)
