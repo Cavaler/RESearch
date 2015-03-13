@@ -220,6 +220,19 @@ bool ReplaceSingleFile_Normal(const FIND_DATA &FindData)
 	return bProcess;
 }
 
+bool CopyFileBack(LPCTSTR szFrom, LPCTSTR szTo)
+{
+	CFileMapping mapFrom;
+	if (!mapFrom.Open(szFrom)) return false;
+
+	CFileMapping mapTo;
+	if (!mapTo.Open(szTo, true, mapFrom.Size())) return false;
+
+	CopyMemory(mapTo, mapFrom, mapFrom.Size());
+
+	return true;
+}
+
 //	Using slow but reliable mechanism for files with hardlinks
 bool ReplaceSingleFile_CopyFirst(const FIND_DATA &FindData)
 {
@@ -237,7 +250,8 @@ bool ReplaceSingleFile_CopyFirst(const FIND_DATA &FindData)
 			DeleteFile(g_strBackupFileName.c_str());
 		}
 	} else {
-		MoveFileEx(ExtendedFileName(g_strBackupFileName).c_str(), ExtendedFileName(FindData.strFileName).c_str(), MOVEFILE_REPLACE_EXISTING|MOVEFILE_COPY_ALLOWED);
+		CopyFileBack(ExtendedFileName(g_strBackupFileName).c_str(), ExtendedFileName(FindData.strFileName).c_str());
+		DeleteFile(ExtendedFileName(g_strBackupFileName).c_str());
 	}
 
 	return bProcess;
