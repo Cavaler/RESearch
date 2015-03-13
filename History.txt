@@ -9,6 +9,10 @@ Planned:
 	? Extended batch properties, overriding preset properties (e.g. Search from beginning)
 	+ Command to "lock" read-only file before replacing
 
+Version 8.61 (13.03.2015)
+	- Preserving hardlinks (again)
+	* Various cosmetic issues
+
 Version 8.60 (13.03.2015)
 	! Rewritten Viewer Search from scratch
 	! New feature: Repeat text in Editor
