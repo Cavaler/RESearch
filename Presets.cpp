@@ -702,7 +702,7 @@ void CBatchActionCollection::ShowMenu()
 		arrItems.push_back(tstring());
 
 		int nBreakKey;
-		int nResult = ChooseMenu(arrItems, GetMsg(m_Type.m_nTitle), _T("Ins,Del,F4,F6,Ctrl-\x18\x19"), _T("Batches"), m_nCurrent,
+		int nResult = ChooseMenu(arrItems, GetMsg(m_Type.m_nTitle), _T("Ins,Del,F4,F5,F6,Ctrl-\x18\x19"), _T("Batches"), m_nCurrent,
 			FMENU_WRAPMODE|FMENU_AUTOHIGHLIGHT|FMENU_RETURNCODE, piBreakKeys, &nBreakKey);
 		if (nResult >= 0) m_nCurrent = nResult;
 
