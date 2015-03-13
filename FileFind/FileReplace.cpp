@@ -78,15 +78,15 @@ bool ConfirmReplacement(const TCHAR *Found, const TCHAR *Replaced, const TCHAR *
 	Dialog.SetWindowProc(ConfirmReplacementDialogProc, (arrFound.size() << 16) + arrReplaced.size());
 	Dialog.AddFrame(MREReplace);
 
-	Dialog.Add(new CFarTextItem(-1, 2, 0, MAskReplace));
+	Dialog.Add(new CFarTextItem(-1, 2, DIF_NOAUTOHOTKEY, MAskReplace));
 	for (size_t I = 0; I<arrFound.size(); I++)
 		Dialog.Add(new CFarTextItem(-1, 3 + I, DIF_SHOWAMPERSAND|DLG_SETCOLOR(0xA0), arrFound[I]));
 
-	Dialog.Add(new CFarTextItem(-1, 3 + arrFound.size(), 0, MAskWith));
+	Dialog.Add(new CFarTextItem(-1, 3 + arrFound.size(), DIF_NOAUTOHOTKEY, MAskWith));
 	for (size_t I = 0; I<arrReplaced.size();I++)
 		Dialog.Add(new CFarTextItem(-1, 4 + arrFound.size() + I, DIF_SHOWAMPERSAND|DLG_SETCOLOR(0xB0), arrReplaced[I]));
 
-	Dialog.Add(new CFarTextItem(-1, 4 + nCount, 0, MInFile));
+	Dialog.Add(new CFarTextItem(-1, 4 + nCount, DIF_NOAUTOHOTKEY, MInFile));
 	Dialog.Add(new CFarTextItem(-1, 5 + nCount,  DIF_SHOWAMPERSAND|DLG_SETCOLOR(0x20), strFileName.c_str()));
 
 	Dialog.Add(new CFarButtonItem(0, 7 + nCount, DIF_CENTERGROUP|DIF_NOBRACKETS, true,  MReplace));

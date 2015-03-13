@@ -366,10 +366,10 @@ eReplaceResult EditorReplaceOK(int FirstLine, int StartPos, int &LastLine, int &
 		CFarDialog Dialog(-1, nDlgY + 1, nLen + 8, nDlgY + 8 + nTotalCount, _T("ERAskReplace"));
 		Dialog.SetWindowProc(ReplaceOKDialogProc, (arrFound.size() << 16) + arrReplaced.size());
 		Dialog.AddFrame(MREReplace);
-		Dialog.Add(new CFarTextItem(-1, 2, 0, MAskReplace));
+		Dialog.Add(new CFarTextItem(-1, 2, DIF_NOAUTOHOTKEY, MAskReplace));
 		for (size_t I = 0; I<arrFound.size();I++)
 			Dialog.Add(new CFarTextItem(-1, 3 + I, DIF_SHOWAMPERSAND|DLG_SETCOLOR(0xA0), arrFound[I]));
-		Dialog.Add(new CFarTextItem(-1, 3 + arrFound.size(), 0, MAskWith));
+		Dialog.Add(new CFarTextItem(-1, 3 + arrFound.size(), DIF_NOAUTOHOTKEY, MAskWith));
 		for (size_t I = 0; I<arrReplaced.size();I++)
 			Dialog.Add(new CFarTextItem(-1, 4 + arrFound.size() + I, DIF_SHOWAMPERSAND|DLG_SETCOLOR(0xB0), arrReplaced[I]));
 		Dialog.Add(new CFarButtonItem(0, 5 + nTotalCount, DIF_CENTERGROUP|DIF_NOBRACKETS, TRUE, MReplace));
