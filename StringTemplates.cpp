@@ -242,6 +242,13 @@ void CREParameters<CHAR>::AddSingleCharParam(char C, const CHAR *sz)
 }
 
 template<class CHAR>
+void CREParameters<CHAR>::AddSingleCharParam(char C, int n)
+{
+	CHAR szNumber[32];
+	AddSingleCharParam(C, CSO::ctoa(n, szNumber));
+}
+
+template<class CHAR>
 void CREParameters<CHAR>::RebuildSingleCharParam()
 {
 	for (char c = 'A'; c <= 'Z'; c++)
@@ -253,21 +260,19 @@ void CREParameters<CHAR>::RebuildSingleCharParam()
 template<class CHAR>
 void CREParameters<CHAR>::AddENumbers(int nL, int nN, int nS, int nR)
 {
-	CHAR szNumber[16];
-	AddSingleCharParam('L', CSO::ctoa(nL, szNumber));
-	AddSingleCharParam('N', CSO::ctoa(nN, szNumber));
-	AddSingleCharParam('S', CSO::ctoa(nS, szNumber));
-	AddSingleCharParam('R', CSO::ctoa(nR, szNumber));
+	AddSingleCharParam('L', nL);
+	AddSingleCharParam('N', nN);
+	AddSingleCharParam('S', nS);
+	AddSingleCharParam('R', nR);
 }
 
 template<class CHAR>
 void CREParameters<CHAR>::AddFNumbers(int nN, int nF, int nS, int nR)
 {
-	CHAR szNumber[16];
-	AddSingleCharParam('N', CSO::ctoa(nN, szNumber));
-	AddSingleCharParam('F', CSO::ctoa(nF, szNumber));
-	AddSingleCharParam('S', CSO::ctoa(nS, szNumber));
-	AddSingleCharParam('R', CSO::ctoa(nR, szNumber));
+	AddSingleCharParam('N', nN);
+	AddSingleCharParam('F', nF);
+	AddSingleCharParam('S', nS);
+	AddSingleCharParam('R', nR);
 }
 
 template<class CHAR>

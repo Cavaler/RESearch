@@ -17,6 +17,7 @@ PERSIST_STRING_VARIABLE(EPositionSubName, _T("pos"))
 PERSIST_STRING_VARIABLE(EREvaluateScript, _T(""))
 
 PERSIST_bool_VARIABLE(EFLeaveFilter, true)
+PERSIST_TYPED_VARIABLE(size_t, ERRepeatCount, 2, 1, 16384)
 
 PERSIST_STRING_VARIABLE(ETSource, _T(""))
 PERSIST_STRING_VARIABLE(ETTarget, _T(""))

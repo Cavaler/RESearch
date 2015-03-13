@@ -40,6 +40,7 @@ MMenuSearchAgainRev	"Search a&gain in other direction"				"Искать еще �
 MMenuSearchReplaceAgain	"Search/replace &again"	"&Искать/заменить еще раз"				"Buscar/reemplazar nuev&amente"
 MMenuSearchReplaceAgainRev	"Search/replace a&gain in other direction"	"Искать/заменить еще раз в &другом направлении"		"Buscar/reemplazar nuevamen&te en otra dirección"
 MMenuFilterText		"&Filter text"				"&Фильтрация текста"					"Texto a &filtrar"
+MMenuRepeatText		"Re&peat text"				"По&вторение текста"
 MMenuTransliterate	"&Transliterate"			"&Транслитерация"						"&Transliterar"
 MMenuShowLastResults	"Show last r&esults"	"Показать последние &результаты"		"Mostrar últimos r&esultados"
 MMenuBatches		"Batches..."				"Пакеты..."								"Proceso por lotes..."
@@ -132,6 +133,11 @@ MModifyReadonlyRequest	"is read-only. Should it be modified anyway?"	"помеч
 MFilterLines		"Filter text"				"Фильтрация текста"						"Filtrar texto"
 MLeaveMatching		"&Leave matching lines"		"&Оставить совпадающие строки"			"Mantener &líneas coincidentes"
 MRemoveMatching		"R&emove matching lines"	"&Убрать совпадающие строки"			"R&emover líneas coincidentes"
+
+MRepeatText			"Repeat text"				"Повторение текста"
+MTextToRepeat		"&Text to repeat:"			"Повторяемый текст:"
+MRepeatTimes		"&Repeat:"					"Повторить:"
+MTimes				"times"						"раз"
 
 MListAllLines		"List all lines"				"Вывести все строки"				"Listar todas las líneas"
 MTotalLines			"Total %d lines"				"Всего %d строк"					"Total %d líneas"

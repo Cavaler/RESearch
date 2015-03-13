@@ -884,6 +884,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\EditFind\EditRepeat.cpp"
+				>
+			</File>
+			<File
 				RelativePath="EditFind\EditReplace.cpp"
 				>
 			</File>

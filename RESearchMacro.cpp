@@ -12,7 +12,7 @@ static LPCWSTR g_szPanelCommands[] = {
 };
 
 static LPCWSTR g_szEditorCommands[] = {
-	L"Search", L"Replace", L"Filter", L"Transliterate", NULL,
+	L"Search", L"Replace", L"Filter", L"Repeat", L"Transliterate", NULL,
 	L"SRAgain", L"SRAgainRev", NULL,
 	L"ShowLastResults", L"ClearVariables"
 };

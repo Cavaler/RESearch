@@ -98,6 +98,8 @@ bool EditorReplaceAgain();
 bool _EditorReplaceAgain();
 bool EditorFilter();
 bool EditorFilterAgain();
+bool EditorRepeatText();
+bool EditorRepeatAgain();
 bool EditorTransliterate();
 bool EditorTransliterateAgain();
 bool EditorListAllAgain();
@@ -130,6 +132,7 @@ void AdjustPosition(TCHAR *Lines, intptr_t &FirstLine, intptr_t &StartPos);
 void Relative2Absolute(int Line,TCHAR *Lines,int MatchStart,int MatchLength,int &FirstLine,int &StartPos,int &LastLine,int &EndPos);
 
 void EditorSearchOK(int FirstLine,int StartPos,int LastLine,int EndPos);
+void DoEditReplace(int FirstLine, int StartPos, int &LastLine, int &EndPos, const tstring &Replace);
 
 int  TopLine(int NeededLine);
 int  TopLine(int FirstLine, int NeededLine, int LastLine);

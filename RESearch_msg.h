@@ -40,6 +40,7 @@ enum eStringTable {
 	MMenuSearchReplaceAgain,
 	MMenuSearchReplaceAgainRev,
 	MMenuFilterText,
+	MMenuRepeatText,
 	MMenuTransliterate,
 	MMenuShowLastResults,
 	MMenuBatches,
@@ -132,6 +133,11 @@ enum eStringTable {
 	MFilterLines,
 	MLeaveMatching,
 	MRemoveMatching,
+
+	MRepeatText,
+	MTextToRepeat,
+	MRepeatTimes,
+	MTimes,
 
 	MListAllLines,
 	MTotalLines,

@@ -138,6 +138,7 @@ int ShowEditorMenu(int &nBreakCode)
 	MenuItems.push_back(CFarMenuItemEx(MMenuSearch));
 	MenuItems.push_back(CFarMenuItemEx(MMenuReplace));
 	MenuItems.push_back(CFarMenuItemEx(MMenuFilterText));
+	MenuItems.push_back(CFarMenuItemEx(MMenuRepeatText));
 	MenuItems.push_back(CFarMenuItemEx(MMenuTransliterate));
 	MenuItems.push_back(CFarMenuItemEx(true));
 	MenuItems.push_back(CFarMenuItemEx(MMenuSearchReplaceAgain));
@@ -161,7 +162,7 @@ int ShowEditorMenu(int &nBreakCode)
 	if (nLastSelection >= (int)MenuItems.size()) nLastSelection = 0;
 	MenuItems[nLastSelection].Flags |= MIF_SELECTED;
 
-	if (!EditorListAllHasResults()) MenuItems[8].Flags |= MIF_DISABLE;
+	if (!EditorListAllHasResults()) MenuItems[9].Flags |= MIF_DISABLE;
 
 	int nBreakKeys[] = {VK_F4, 0};
 
@@ -398,7 +399,7 @@ HANDLE OpenPluginFromEditorMenu(int nItem)
 			do {
 				nItem = ShowEditorMenu(nBreakCode);
 				if (nItem == -1) return NO_PANEL_HANDLE;
-			} while ((nBreakCode >= 0) && (nItem < 10));
+			} while ((nBreakCode >= 0) && (nItem < 11));
 		}
 
 		switch (nItem) {
@@ -412,12 +413,15 @@ HANDLE OpenPluginFromEditorMenu(int nItem)
 			if (EditorFilter()) LastAction=2;
 			break;
 		case 3:
-			if (EditorTransliterate()) LastAction=3;
+			if (EditorRepeatText()) LastAction=3;
 			break;
-		case 6:
+		case 4:
+			if (EditorTransliterate()) LastAction=4;
+			break;
+		case 7:
 			EReverse = !EReverse;
 			//	fall-through
-		case 5:
+		case 6:
 			ESearchAgainCalled = true;
 			EPreparePattern(EText);		// In case codepage changed etc
 
@@ -436,24 +440,27 @@ HANDLE OpenPluginFromEditorMenu(int nItem)
 				EditorFilterAgain();
 				break;
 			case 3:
-				EditorTransliterateAgain();
+				EditorRepeatAgain();
 				break;
 			case 4:
+				EditorTransliterateAgain();
+				break;
+			case 5:
 				EditorListAllAgain();
 				break;
 			};
-			if (nItem == 6) EReverse = !EReverse;
-			break;
-		case 8:
-			EditorListAllShowResults(false);
+			if (nItem == 7) EReverse = !EReverse;
 			break;
 		case 9:
+			EditorListAllShowResults(false);
+			break;
+		case 10:
 			ClearVariables();
 			break;
 		}
 
-		if (nItem >= 11) {
-			nItem -= 11;
+		if (nItem >= 12) {
+			nItem -= 12;
 			OpenPluginFromEditorPreset(nItem, nBreakCode);
 		}
 	} while (nBreakCode >= 0);
