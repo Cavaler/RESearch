@@ -2,7 +2,7 @@
 .PluginContents=Regular Expression Search
 
 @Contents
-$ #Regular Expression Search and Replace, version 8.55#
+$ #Regular Expression Search and Replace, version 8.60#
     This plugin allows you to:
 
     - Perform text search and replace in editor
@@ -140,14 +140,17 @@ $ #Replacement text#
     $N      - current line number, counted from start of replacing
     $S      - current find number
     $R      - current replacement number
+
+    When repeating text in editor:
+    $N      - current item number
     
     When replacing in or renaming files:
-	$N      - current matching file number
+    $N      - current matching file number
     $F      - current file number with at least one match 
     $S      - current find number in this file
     $R      - current replacement number in this file
 
-	#NOTE#: All numbers are from 0. You can use form ${N+1} to count form 1.
+	#NOTE#: All numbers are from 0. You can use form ${N+1} to count from 1.
 
     #NOTE#: Parameter references (subpatterns or special variables) can be extended by
 using the following forms:
@@ -356,6 +359,7 @@ $ #RESearch menu in editor#
   ~#Replace#~@ReplaceDlg@              - Replace text or regular expression
   ~#Filter text#~@FilterDlg@          - Filter text by deleting (or leaving) lines
 matching a specified pattern.
+  ~#Repeat text#~@RepeatDlg@          - Repeat text several times
   ~#Transliterate#~@TransliterateDlg@        - Transliterate whole text in editor
 
   #Search/Replace again# - Repeat last search/replace operation
@@ -424,6 +428,19 @@ regard to symbol case. ANSI and OEM codepages are supported.
 
   #Leave matches lines#  This option makes the command to filter out unmatched lines
   #Remove matches lines# This option makes the command to filter only matching lines.
+
+@RepeatDlg
+$ #Repeat text#
+  This command allows you to repeat some text several times.
+You can use $N (and its derivatives) to count items.
+
+  #Repeat text#        Specifies ~text to repeat~@RegularReplace@.
+  #[ / ]#              This button will quote special symbols '\' and '$' in replace string.
+
+  #Evaluate as script# Forces evaluating of a replace string as script in a specified language.
+For more information, see ~Replace Scripting~@RegularReplaceScripting@.
+
+  #Repeat NNN times#   Number of times to repeat.
 
 @TransliterateDlg
 $ #Transliterate#

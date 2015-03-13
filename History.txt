@@ -9,6 +9,14 @@ Planned:
 	? Extended batch properties, overriding preset properties (e.g. Search from beginning)
 	+ Command to "lock" read-only file before replacing
 
+Version 8.60 (13.03.2015)
+	! Rewritten Viewer Search from scratch
+	! New feature: Repeat text in Editor
+	* Inserting from clipboard in most dialogs will replace EOLs with literals '\n'
+	* Copying batches
+	- Always restore current folder
+	- Preserving hardlinks (again)
+
 Version 8.55 (16.12.2014)
 	* x86 versions require only SSE, not SSE2. For those with 10-year-old processors.
 	* Added [...] to preset dialogs
