@@ -931,7 +931,11 @@ bool RefreshEditorInfo()
 	size_t FileNameSize=StartupInfo.EditorControl(ECTL_GETFILENAME, NULL);
 	if (FileNameSize) {
 		vector<TCHAR> arrFileName(FileNameSize+1);
+#ifdef FAR3
 		((PluginStartupInfo &)StartupInfo).EditorControl(-1, ECTL_GETFILENAME, FileNameSize+1, &arrFileName[0]);
+#else
+		StartupInfo.EditorControl(ECTL_GETFILENAME, &arrFileName[0]);
+#endif
 		EditorFileName = &arrFileName[0];
 	} else {
 		EditorFileName = _T("");
