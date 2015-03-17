@@ -701,11 +701,11 @@ tstring PickupMultilineSelection()
 
 		if (String.SelEnd < 0)
 		{
-			strSelection = strSelection + ToStringEOL(String).substr(String.SelStart);
+			strSelection = strSelection + ToStringEOL(String, String.SelStart).substr(String.SelStart);
 		}
 		else
 		{
-			strSelection = strSelection + ToString(String).substr(String.SelStart, String.SelEnd - String.SelStart);
+			strSelection = strSelection + ToString(String, String.SelEnd).substr(String.SelStart, String.SelEnd - String.SelStart);
 			if (EdInfo.BlockType == BTYPE_COLUMN)
 			{
 				strSelection += GetEOL(String);
@@ -829,14 +829,14 @@ tstring EctlGetString(int nLine)
 	return ToString(String);
 }
 
-tstring ToString(const EditorGetString &String)
+tstring ToString(const EditorGetString &String, int nAssureLength)
 {
-	return CSO::MakeString(String.StringText, String.StringLength);
+	return CSO::AssureLength(CSO::MakeString(String.StringText, String.StringLength), nAssureLength);
 }
 
-tstring ToStringEOL(const EditorGetString &String)
+tstring ToStringEOL(const EditorGetString &String, int nAssureLength)
 {
-	return CSO::MakeString(String.StringText, String.StringLength) + GetEOL(String);
+	return ToString(String, nAssureLength) + GetEOL(String);
 }
 
 tstring GetEOL(const EditorGetString &String)
