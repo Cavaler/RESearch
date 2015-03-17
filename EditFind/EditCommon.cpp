@@ -930,8 +930,8 @@ bool RefreshEditorInfo()
 #ifdef UNICODE
 	size_t FileNameSize=StartupInfo.EditorControl(ECTL_GETFILENAME, NULL);
 	if (FileNameSize) {
-		vector<TCHAR> arrFileName(FileNameSize);
-		StartupInfo.EditorControl(ECTL_GETFILENAME, &arrFileName[0]);
+		vector<TCHAR> arrFileName(FileNameSize+1);
+		((PluginStartupInfo &)StartupInfo).EditorControl(-1, ECTL_GETFILENAME, FileNameSize+1, &arrFileName[0]);
 		EditorFileName = &arrFileName[0];
 	} else {
 		EditorFileName = _T("");
