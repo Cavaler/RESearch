@@ -56,6 +56,7 @@ LONG_PTR WINAPI EditorRepeatDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, 
 
 bool EditorRepeatText()
 {
+	REParam.Clear();
 	EditorFillNamedParameters();
 
 	CFarDialog Dialog(80, 13, _T("RepeatDlg"));
