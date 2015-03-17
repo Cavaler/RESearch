@@ -8,8 +8,14 @@ Regular Expression Search and Replace
 Planned:
 	? Extended batch properties, overriding preset properties (e.g. Search from beginning)
 	+ Command to "lock" read-only file before replacing
+	+ Search / Replace in dialogs
 
-Version 8.61 (13.03.2015)
+Version 8.62 (17.03.2015)
+	- Preserving hardlinks (again)
+	- Fixed crash when using repeat text past end of line
+	- Various cosmetic issues
+
+Version 8.61 (13.03.2015) Friday, 13th
 	- Preserving hardlinks (again)
 	* Various cosmetic issues
 
