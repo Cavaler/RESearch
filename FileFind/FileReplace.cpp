@@ -250,7 +250,7 @@ bool ReplaceSingleFile_CopyFirst(const FIND_DATA &FindData)
 			DeleteFile(g_strBackupFileName.c_str());
 		}
 	} else {
-		CopyFileBack(ExtendedFileName(g_strBackupFileName).c_str(), ExtendedFileName(FindData.strFileName).c_str());
+		CopyFileBack(g_strBackupFileName.c_str(), FindData.strFileName.c_str());
 		DeleteFile(ExtendedFileName(g_strBackupFileName).c_str());
 	}
 

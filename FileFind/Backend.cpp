@@ -215,12 +215,8 @@ void CFileBackend::Close()
 
 void CFileBackend::Abort()
 {
-	if (m_hOutFile != INVALID_HANDLE_VALUE) {
-		CloseHandle(m_hOutFile);
-		m_hOutFile = INVALID_HANDLE_VALUE;
-
-		DeleteFile(m_strOutFileName.c_str());
-	}
+	//	We don't know which of these files was really a copy
+	CloseHandle(m_hOutFile);
 
 	CloseInputFile();
 
