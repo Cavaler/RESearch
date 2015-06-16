@@ -93,8 +93,13 @@ bool EditorListAllHasResults() {
 	return !Info.arrLines.empty();
 }
 
-bool EditorListAllShowResults(bool bImmediate) {
+bool EditorListAllShowResults(bool bImmediate)
+{
 	if (!bImmediate) RefreshEditorInfo();
+
+	EditorSetPosition Position = {ITEM_SS(EditorSetPosition) EdInfo.CurLine, EdInfo.CurPos, EdInfo.CurTabPos, 
+		EdInfo.TopScreenLine, EdInfo.LeftPos, -1};
+	EctlForceSetPosition(&Position);
 
 #ifdef UNICODE
 	sFindAllInfo &Info = FindAllInfos[CanonicalLCName(EditorFileName.c_str())];
@@ -103,16 +108,21 @@ bool EditorListAllShowResults(bool bImmediate) {
 #endif
 	if (Info.arrLines.size() == 0) return true;
 
+	int nBreakKeys[] = {VK_CTRL_RETURN, 0};
+
 	tstring strTotal = FormatStr(GetMsg(MTotalLines), Info.arrLines.size());
-	int nResult = ChooseMenu(Info.arrString, GetMsg(MListAllLines), strTotal.c_str(), _T("ListAll"), 0, FMENU_WRAPMODE|FMENU_SHOWAMPERSAND);
-	if (nResult >= 0) {
+
+	int nBreakKey = 0, nResult = 0;
+	do {
+		nResult = ChooseMenu(Info.arrString, GetMsg(MListAllLines), strTotal.c_str(), _T("ListAll"), nResult, FMENU_WRAPMODE|FMENU_SHOWAMPERSAND|FMENU_RETURNCODE, nBreakKeys, &nBreakKey);
+		if (nResult < 0)
+			break;
+
 		sFindOneInfo &OneInfo = Info.arrLines[nResult];
 		EditorSearchOK(OneInfo.FirstLine, OneInfo.StartPos, OneInfo.LastLine, OneInfo.EndPos);
-	} else {
-		EditorSetPosition Position = {ITEM_SS(EditorSetPosition) EdInfo.CurLine, EdInfo.CurPos, EdInfo.CurTabPos, 
-			EdInfo.TopScreenLine, EdInfo.LeftPos, -1};
-		EctlForceSetPosition(&Position);
-	}
+		StartupInfo.EditorControl(ECTL_REDRAW, NULL);
+
+	} while (nBreakKey == VK_CTRL_RETURN);
 
 	return true;
 }

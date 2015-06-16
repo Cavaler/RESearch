@@ -1033,6 +1033,9 @@ void ReplaceEOLInClipboard()
 
 bool ReplaceEOLDialogProc(int nMsg, LONG_PTR lParam2)
 {
+	if (!g_bReplaceOnShiftIns)
+		return false;
+
 #ifdef FAR3
 	if (nMsg == DN_CONTROLINPUT)
 	{

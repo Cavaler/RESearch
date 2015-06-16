@@ -13,6 +13,7 @@ PERSIST_TYPED_VARIABLE_(int, g_nThreadStackMB, _T("ThreadStackMB"), 64, 0, MAXIN
 PERSIST_bool_VARIABLE_(g_bShowUsageWarnings, _T("ShowUsageWarnings"), true)
 PERSIST_bool_VARIABLE(g_bEscapesInPlainText, true)
 PERSIST_bool_VARIABLE(g_bIgnoreIdentReplace, false)
+PERSIST_bool_VARIABLE(g_bReplaceOnShiftIns, false)
 PERSIST_bool_VARIABLE(g_bDefaultOEM, true)
 
 PERSIST_TYPED_VARIABLE(ShowPosition, EShowPosition, SP_CENTER, SP_TOP, SP_BOTTOM)

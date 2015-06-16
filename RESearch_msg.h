@@ -169,6 +169,7 @@ enum eStringTable {
 	MShowUsageWarnings,
 	MUseEscapesInPlainText,
 	MIgnoreIdentReplace,
+	MReplaceOnShiftIns,
 
 	MDefaultCP,
 	MDefaultOEM,

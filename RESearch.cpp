@@ -32,7 +32,11 @@ void WINAPI FAR_EXPORT(GetPluginInfo)(PluginInfo *Info)
 	MenuStrings[0]   = GetMsg(MRESearch);
 
 	Info->StructSize=sizeof(PluginInfo);
+#ifdef DEBUG
+	Info->Flags=PF_EDITOR|PF_VIEWER|PF_DIALOG|PF_FULLCMDLINE;
+#else
 	Info->Flags=PF_EDITOR|PF_VIEWER|PF_FULLCMDLINE;
+#endif
 
 #ifdef FAR3
 	static const GUID   ConfigGuids[1] = { GUID_RESearchConfig };
@@ -522,6 +526,11 @@ HANDLE OpenPluginFromViewerMenu(int nItem)
 	return NO_PANEL_HANDLE;
 }
 
+HANDLE OpenPluginFromDialog(const OpenDlgPluginData &Data)
+{
+	return NO_PANEL_HANDLE;
+}
+
 #ifdef FAR3
 HANDLE WINAPI OpenW(const struct OpenInfo *Info)
 {
@@ -538,6 +547,9 @@ HANDLE WINAPI OpenW(const struct OpenInfo *Info)
 
 	case OPEN_VIEWER:
 		return OpenPluginFromViewerMenu(0);
+
+	case OPEN_DIALOG:
+		return OpenPluginFromDialog(*(const OpenDlgPluginData *)Info->Data);
 
 	case OPEN_COMMANDLINE:{
 		OpenCommandLineInfo *CmdInfo = (OpenCommandLineInfo *)Info->Data;
@@ -602,6 +614,9 @@ HANDLE WINAPI OpenPlugin(int OpenFrom, INT_PTR Item)
 
 	case OPEN_VIEWER:
 		return OpenPluginFromViewerMenu(Item);
+
+	case OPEN_DIALOG:
+		return OpenPluginFromDialog(*(const OpenDlgPluginData *)Item);
 
 	case OPEN_SHORTCUT:
 #ifdef UNICODE
@@ -731,7 +746,7 @@ int ConfigureCP()
 
 void ConfigureCommon()
 {
-	CFarDialog Dialog(64, 21, _T("CommonConfig"));
+	CFarDialog Dialog(64, 22, _T("CommonConfig"));
 	Dialog.SetUseID(true);
 	Dialog.AddFrame(MCommonSettings);
 
@@ -753,6 +768,7 @@ void ConfigureCommon()
 	Dialog.Add(new CFarCheckBoxItem(5,11,0,MShowUsageWarnings,&g_bShowUsageWarnings));
 	Dialog.Add(new CFarCheckBoxItem(5,12,0,MUseEscapesInPlainText,&g_bEscapesInPlainText));
 	Dialog.Add(new CFarCheckBoxItem(5,13,0,MIgnoreIdentReplace,&g_bIgnoreIdentReplace));
+	Dialog.Add(new CFarCheckBoxItem(5,13,0,MReplaceOnShiftIns,&g_bReplaceOnShiftIns));
 
 	Dialog.AddButtons(MOk, MCancel);
 
