@@ -13,6 +13,14 @@ bool EditorCountAllAgain()
 	int FirstLine = 0, StartPos = 0, LastLine = EdInfo.TotalLines-1, EndPos = -1;
 	int LastFoundLine = -1;
 
+	if (EInSelection) {
+		SaveSelection();
+		FirstLine = SelStartLine;
+		StartPos = SelStartPos;
+		LastLine = SelEndLine;
+		EndPos = SelEndPos;
+	}
+
 	int nFoundMatches = 0, nFoundLines = 0, nFirstLine = -1, nLastLine = -1;
 
 	do {
@@ -25,7 +33,7 @@ bool EditorCountAllAgain()
 		bool ZeroMatch = (MatchFirstLine == MatchLastLine) && (MatchStartPos == MatchEndPos);
 
 		nFoundMatches++;
-		if (!LastFoundLine != MatchFirstLine) nFoundLines++;
+		if (LastFoundLine != MatchFirstLine) nFoundLines++;
 		if (nFirstLine < 0) nFirstLine = MatchFirstLine;
 		nLastLine = MatchFirstLine;
 
@@ -52,4 +60,3 @@ bool EditorCountAllAgain()
 
 	return true;
 }
-
