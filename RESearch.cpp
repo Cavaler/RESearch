@@ -768,7 +768,7 @@ void ConfigureCommon()
 	Dialog.Add(new CFarCheckBoxItem(5,11,0,MShowUsageWarnings,&g_bShowUsageWarnings));
 	Dialog.Add(new CFarCheckBoxItem(5,12,0,MUseEscapesInPlainText,&g_bEscapesInPlainText));
 	Dialog.Add(new CFarCheckBoxItem(5,13,0,MIgnoreIdentReplace,&g_bIgnoreIdentReplace));
-	Dialog.Add(new CFarCheckBoxItem(5,13,0,MReplaceOnShiftIns,&g_bReplaceOnShiftIns));
+	Dialog.Add(new CFarCheckBoxItem(5,14,0,MReplaceOnShiftIns,&g_bReplaceOnShiftIns));
 
 	Dialog.AddButtons(MOk, MCancel);
 

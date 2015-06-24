@@ -10,6 +10,15 @@ Planned:
 	+ Command to "lock" read-only file before replacing
 	+ Search / Replace in dialogs
 
+Version 8.64 (24.06.2015)
+	- Fixed bugs with hardlinks and long paths
+	- Fixed settings dialog bug
+	
+Version 8.63 (23.06.2015)
+	* Replacing EOLs on Shift-Ins is now optional
+	* Ctrl-Enter in Editor Show All menu positions to found text, but doesn't close menu
+	- Fixed Count All in Selection
+
 Version 8.62 (17.03.2015)
 	- Preserving hardlinks (again)
 	- Fixed crash when using repeat text past end of line

@@ -2,7 +2,7 @@
 .PluginContents=Поиск регулярных выражений
 
 @Contents
-$ #Поиск и замена с регулярными выражениями, версия 8.62#
+$ #Поиск и замена с регулярными выражениями, версия 8.64#
 
   #Внимание! Русский Хелп не обновлялся очень давно!#
 
@@ -28,6 +28,7 @@ $ #Поиск и замена с регулярными выражениями, версия 8.62#
 
    ~Поиск файла по регулярному выражению~@FileSearchDlg@
    ~Замена в файле по регулярному выражению~@FileReplaceDlg@
+   ~Regular Expression Grep~@FileGrepDlg@
    ~Переименование файлов по регулярному выражению~@FileRenameDlg@
 
    ~Дополнительные параметры поиска~@AdvancedFileSearchDlg@
@@ -212,7 +213,13 @@ $ #Общие настройки#
   #Игнорировать идентичную замену#      Если опция включена, не будет предлагаться
                                       подтверждение замены какого-то текста на точно
                                       такой же.
-  #Обновить список скриптовых языков#   Перечитать список доступных в системе скриптовых языков.
+  #Обрабатывать текст из буфера обмена#
+                                      Если опция включена, то в тексте, вставляемом
+                                      из буфера в любой диалог RESearch, символы конца
+                                      строки будут заменены на '\n'.
+                                      ВНИМАНИЕ, эта опция ренально меняет содержимое
+                                      буфера обмена, и может конфликтовать с различными
+                                      "улучшателями"
 
   
 @FileConfig
@@ -241,6 +248,13 @@ $ #Поиск в файловой панели#
    Искать и спрашивать у пользователя подтверждение замены
     #Всегда#
    Заменять без запросов
+
+@GrepConfig
+$ #Grep settings#
+
+  #Prepend to file name:#         Text to add immediately before file name in output
+  #Append to file name:#          Text to add immediately after file name in output.
+Note that when it is non-empty, newline isn't added automatically.
 
 @RenumberConfig
 $ #Перенумерование файлов#
@@ -347,6 +361,8 @@ $ #Меню RESearch в редакторе#
  Замена теста или по регулярному выражению
   ~#Фильтрация текста#~@FilterDlg@
  Фильтрация текста путем удаления (или оставления) строк соответсвующих шаблону.
+  ~#Повторение текста#~@RepeatDlg@
+ Повторение текста несколько раз
   ~#Транслитерация#~@TransliterateDlg@
  Транслитерировать весь текст в редакторе по задаваемым правилам.
   #Искать еще раз#
@@ -422,11 +438,24 @@ $ #Фильтрация по регулярному выражению#
   #Обратный поиск#
  Если выбрано, то поиск текста производится ВВЕРХ от текущей позиции.
 
-  #Оставить совпавдающие строки #
+  #Оставить совпадающие строки#
  Эта опция отфильтровует несовпавшие строки.
 
-  #Убрать совпавдающие строки #
+  #Убрать совпадающие строки#
  Эта опция отфильтровует только совпавшие строки.
+@RepeatDlg
+$ #Repeat text#
+  This command allows you to repeat some text several times.
+You can use $N (and its derivatives) to count items.
+
+  #Repeat text#        Specifies ~text to repeat~@RegularReplace@.
+  #[ / ]#              This button will quote special symbols '\' and '$' in replace string.
+
+  #Evaluate as script# Forces evaluating of a replace string as script in a specified language.
+For more information, see ~Replace Scripting~@RegularReplaceScripting@.
+
+  #Repeat NNN times#   Number of times to repeat.
+
 @TransliterateDlg
 $ #Транслитерировать#
 
@@ -434,25 +463,11 @@ $ #Транслитерировать#
 в символ той же позиции из строки 'Результирующие символы'
 (или на последний, если эти строка слишком короткая).
 
-@ListAllDlg
-$ #Показать все вхождения#
-
-Показывает список всех строк текста, содержащих строку поиска, и позволяет быстро перейти сразу на нужную строку.
-
-  #Искать текст#
- Определяет текст или ~регулярное выражение~@RegularExpressions@ для поиска.
-  #[ \ ]#
- Эта кнопка закомментирует все спец-символы в строке поиска если выбрано регулярное выражение.
-
-  #Регулярное выражение#
- Если помечено, будет произведен поиск по ~Регулярному выражению~@RegularExpressions@.
-
-  #Учитывать регистр#
- Если сброшено, то регулярное выражение не проверяется на соответсвие регистра. Поддерживаются кодовые страницы ANSI и OEM.
 @ListAll
 $ #Все вхождения#
 
-Вы можете выбрать строку для быстрого перехода.
+Вы можете выбрать строку для быстрого перехода. #CtrlEnter# переходит к выбранной строке,
+но не закрывает меню.
 
 @ERAskReplace
 $ #Подтверждение замены#
@@ -481,6 +496,8 @@ $ #Меню RESearch в панелях#
  Поиск файла по тексту или регулярному выражению
   ~#Замена#~@FileReplaceDlg@
  Замена в файле по тексту или регулярному выражению
+  ~#Grep#~@FileGrepDlg@
+ Grep for text or regexp in files
 
   ~#Выделить файлы#~@FileSelectDlg@
  Выделить файлы используя маску или регулярное выражение
@@ -495,6 +512,14 @@ $ #Меню RESearch в панелях#
  Переименовать выделенные файлы
   ~#Перенумеровать файлы#~@Renumber@
  Перенумеровать выделенные файлы
+  #Undo last rename files#
+ Undo last rename/renumber
+
+  #Show last results#
+ Show results of last search/replace/etc
+  #Clean up named variables#
+
+  #Batches#
 @FileSearchDlg
 $ #Поиск файла по регулярному выражению#
  Используя эту команду вы можете производить поиск файлов содержащий заданный текст или регулярное выражение.
@@ -624,6 +649,40 @@ $ #Дополнительные параметры поиска#
     #Системный#              #[?]# Атрибуты не важны
     #Сжатый#
     #Зашифрованный#
+@FileGrepDlg
+$ #File Grep#
+ This command mostly imitates behavior of unix grep(2) command.
+
+  #File mask(s)#             Specifies what files are to be searched. File mask delimiter
+can be set in ~configuration dialog~@RECfg@.
+  #As regular expression# If this option is set, mask will be treated as regular expression,
+not as usual DOS mask.
+
+  #Containing text#          This text is searched for.
+  #[ \ ]#                    This button will quote all special symbols in search string,
+if regular expression search is selected.
+
+  #Regular expression#       Each single line of the input file is matched with given
+~regular expression~@RegularExpressions@.
+
+  #Case sensitive#           If unchecked, text or regular expression is matched without regard
+to symbol case. ANSI and OEM codepages are supported.
+
+  #Inverse search#           Only non-matching lines are written.
+
+  #Use all character tables#
+
+  #Output file names#
+    #and line count#                    Appended to file anme in form of ":1"
+    #and match count#                   Appended to file anme in form of ";1"
+  #Output matched lines#
+    #and line numbers#                  Prepended in form of "1:"
+    #and NNNNN context lines around matches#
+    #only matched line fragments#       When using regular expressions, each matching part of line is written.
+
+  #Output to:#                          Output to specified file. If unchecked, temporary file is created.
+  #Open output in editor#
+
 @SearchResults
 $ #Панель результатов поиска#
  Эта панель во многом схожа состандартной временной панелью, за исключением того, что она не разрешает ручного добавления файлов.
