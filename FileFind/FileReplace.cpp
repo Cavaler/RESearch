@@ -236,7 +236,7 @@ bool CopyFileBack(LPCTSTR szFrom, LPCTSTR szTo)
 //	Using slow but reliable mechanism for files with hardlinks
 bool ReplaceSingleFile_CopyFirst(const FIND_DATA &FindData)
 {
-	if (FRReplaceToNew || !CopyFile(FindData.cFileName, g_strBackupFileName.c_str(), false)) {
+	if (FRReplaceToNew || !CopyFile(ExtendedFileName(FindData.cFileName).c_str(), ExtendedFileName(g_strBackupFileName).c_str(), false)) {
 		return ReplaceSingleFile_Normal(FindData);
 	}
 
@@ -247,10 +247,10 @@ bool ReplaceSingleFile_CopyFirst(const FIND_DATA &FindData)
 	if (bProcess) {
 		if (!FRSaveOriginal) {
 			ROBackup _ro2(g_strBackupFileName.c_str());
-			DeleteFile(g_strBackupFileName.c_str());
+			DeleteFile(ExtendedFileName(g_strBackupFileName).c_str());
 		}
 	} else {
-		CopyFileBack(g_strBackupFileName.c_str(), FindData.strFileName.c_str());
+		CopyFileBack(g_strBackupFileName.c_str(), FindData.cFileName);
 		DeleteFile(ExtendedFileName(g_strBackupFileName).c_str());
 	}
 
