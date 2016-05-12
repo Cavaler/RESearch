@@ -150,12 +150,6 @@ bool RunReplace(LPCTSTR szFileName, __int64 dwFileSize)
 	return false;
 }
 
-char *AddExtension(char *FileName,char *Extension)
-{
-	char *New=(char *)malloc(strlen(FileName)+strlen(Extension)+1);
-	return strcat(strcpy(New,FileName),Extension);
-}
-
 tstring GetUniqueFileName(const TCHAR *szCurrent, const TCHAR *szExt)
 {
 	int nTry = 0;

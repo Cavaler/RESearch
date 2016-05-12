@@ -466,12 +466,14 @@ bool ReplaceInTextByLine(int FirstLine, int StartPos, int LastLine, int EndPos, 
 
 	do {
 		bool Matched = false;
+		bool Modified = false;
 		int MatchFirstLine = Line, MatchStartPos = (Line == FirstLine)||EachLineLimited?StartPos:0;
 		int MatchLastLine = Line, MatchEndPos = (Line == LastLine)||EachLineLimited?EndPos:-1;
 		int FoundStartPos = MatchStartPos, FoundEndPos = MatchEndPos;
 		bool bNotBOL = false;
 
-		while (SearchInText(MatchFirstLine, FoundStartPos, MatchLastLine, FoundEndPos, bCachedReplace, bNotBOL)) {
+		while (SearchInText(MatchFirstLine, FoundStartPos, MatchLastLine, FoundEndPos, bCachedReplace, bNotBOL))
+		{
 			Matched = true;
 			// Assuming that MatchedLine starts from the needed line
 			RefreshEditorInfo();
@@ -501,6 +503,7 @@ bool ReplaceInTextByLine(int FirstLine, int StartPos, int LastLine, int EndPos, 
 #endif
 
 			if (Result == RR_CANCEL) return true;
+			Modified |= (Result == RR_OK);
 			if (!EReverse) LastLine += MatchLastLine-FoundLastLine;
 
 			if (ERRemoveEmpty && (Result == RR_OK) && (MatchFirstLine == MatchLastLine)) {
@@ -529,7 +532,7 @@ bool ReplaceInTextByLine(int FirstLine, int StartPos, int LastLine, int EndPos, 
 			bNotBOL = true;
 		}
 
-		if (bCachedReplace && Matched && NoAsking) {
+		if (bCachedReplace && Modified && NoAsking) {
 			CEditorSetString SetString(-1);
 
 			if (g_LineBuffer.empty()) {

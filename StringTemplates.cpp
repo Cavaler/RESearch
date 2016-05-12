@@ -208,7 +208,7 @@ template class CStringOperations<char>;
 
 template<class CHAR>
 CREParameters<CHAR>::CREParameters()
-: m_re(NULL), m_szString(NULL)
+: m_re(NULL), m_szString(NULL), m_nLength(0)
 {
 	for (int n = 0; n < 25; n++)
 		m_StrParamPtr[n] = m_mapStrParam.end();

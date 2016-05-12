@@ -183,7 +183,7 @@ void ClearLineBuffer()
 
 void SetDefEOL(LPCTSTR szEOL)
 {
-	g_LastEOL = szEOL;
+	g_LastEOL = szEOL ? szEOL : _T("");
 	if (CSO::cstrlen(szEOL) > 0) {
 		g_DefEOL = szEOL;
 	} else if (g_DefEOL.empty()) {

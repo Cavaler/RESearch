@@ -461,7 +461,9 @@ BatchActionIndex CBatchType::SelectPreset() {
 //////////////////////////////////////////////////////////////////////////
 
 CBatchAction::CBatchAction(CBatchType &Type)
-: m_Type(Type), m_bAddToMenu(false)
+: m_Type(Type)
+, m_bAddToMenu(false)
+, m_nCurrent(0)
 {
 }
 
@@ -469,6 +471,7 @@ CBatchAction::CBatchAction(CBatchType &Type, tstring strName, CFarSettingsKey &h
 : m_Type(Type)
 , m_strName(strName)
 , m_bAddToMenu(false)
+, m_nCurrent(0)
 {
 	CFarSettingsKey hOwnKey = hKey.Open(strName.c_str(), false);
 	if (!hOwnKey.Valid()) return;
