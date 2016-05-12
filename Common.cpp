@@ -1062,3 +1062,17 @@ bool ReplaceEOLDialogProc(int nMsg, LONG_PTR lParam2)
 #endif
 	return false;
 }
+
+void QuoteRegExpString(CFarDialog *pDlg, int nID, int nOffset)
+{
+	tstring strText = pDlg->GetDlgItemText(pDlg->MakeID(nID, nOffset));
+	CSO::QuoteRegExpString(strText);
+	pDlg->SetDlgItemText(pDlg->MakeID(nID, nOffset), strText.c_str());
+}
+
+void QuoteReplaceString(CFarDialog *pDlg, int nID, int nOffset)
+{
+	tstring strText = pDlg->GetDlgItemText(pDlg->MakeID(nID, nOffset));
+	CSO::QuoteReplaceString(strText);
+	pDlg->SetDlgItemText(pDlg->MakeID(nID, nOffset), strText.c_str());
+}

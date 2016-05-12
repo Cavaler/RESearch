@@ -335,7 +335,20 @@ LONG_PTR WINAPI FileReplaceDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, L
 
 	switch (nMsg) {
 	case DN_INITDIALOG:
+		UpdateFRDialog(pDlg);
+		break;
+
 	case DN_BTNCLICK:
+		switch (nCtlID)
+		{
+		case MQuoteSearch:
+			QuoteRegExpString(pDlg, MSearchFor);
+			return TRUE;
+		case MQuoteReplace:
+			QuoteReplaceString(pDlg, MReplaceWith);
+			return TRUE;
+		}
+
 		UpdateFRDialog(pDlg);
 		break;
 	}
@@ -416,12 +429,6 @@ bool ReplacePrompt(bool Plugin)
 			FMask=MaskText;
 			FText=SearchText;
 			FRReplace=ReplaceText;
-			break;
-		case MQuoteSearch:
-			if ((FSearchAs!=SA_PLAINTEXT) && (FSearchAs!=SA_MULTITEXT)) CSO::QuoteRegExpString(SearchText);
-			break;
-		case MQuoteReplace:
-			CSO::QuoteReplaceString(ReplaceText);
 			break;
 		case MBtnPresets:
 			FRPresets->ShowMenu(true);

@@ -194,6 +194,9 @@ bool CopyToClipboard(const tstring &strText);
 void ReplaceEOLInClipboard();
 bool ReplaceEOLDialogProc(int nMsg, LONG_PTR lParam2);
 
+void QuoteRegExpString(CFarDialog *pDlg, int nID, int nOffset = 1);
+void QuoteReplaceString(CFarDialog *pDlg, int nID, int nOffset = 1);
+
 void PrepareBMHSearch(const TCHAR *String,int StringLength,size_t nPattern = 0);
 int BMHSearch(const TCHAR *Buffer,int BufferLength,const TCHAR *String,int StringLength,TCHAR *XLatTable,int nPattern = 0);
 int ReverseBMHSearch(const TCHAR *Buffer,int BufferLength,const TCHAR *String,int StringLength,TCHAR *XLatTable,int nPattern = 0);

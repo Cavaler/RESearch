@@ -97,6 +97,9 @@ LONG_PTR WINAPI FileSearchDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LO
 		case MMultiRegExp:
 			UpdateFSDialog(pDlg);
 			break;
+		case MQuoteSearch:
+			QuoteRegExpString(pDlg, MText);
+			return TRUE;
 		}
 		break;
 	}
@@ -159,9 +162,6 @@ bool SearchPrompt(bool Plugin)
 		case MBtnClose:
 			FMask=MaskText;
 			FText=SearchText;
-			break;
-		case MQuoteSearch:
-			CSO::QuoteRegExpString(SearchText);
 			break;
 		case MBtnPresets:
 			FSPresets->ShowMenu(true);

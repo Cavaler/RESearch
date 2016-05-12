@@ -290,6 +290,13 @@ LONG_PTR WINAPI FileGrepDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, LONG
 		HighlightREError(pDlg);
 		break;
 	case DN_BTNCLICK:
+		switch (nCtlID)
+		{
+		case MQuoteSearch:
+			QuoteRegExpString(pDlg, MText);
+			return TRUE;
+		}
+
 		UpdateFGDialog(pDlg);
 		break;
 	}
@@ -360,9 +367,6 @@ bool GrepPrompt(bool bPlugin)
 			FSearchAs = AsRegExp ? SA_REGEXP : SA_PLAINTEXT;
 			FMask=MaskText;
 			FText=SearchText;
-			break;
-		case MQuoteSearch:
-			if (AsRegExp) CSO::QuoteRegExpString(SearchText);
 			break;
 		case MBtnPresets:
 			FGPresets->ShowMenu(true);

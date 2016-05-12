@@ -728,6 +728,12 @@ LONG_PTR WINAPI EditorReplaceDialogProc(CFarDialog *pDlg, int nMsg, int nParam1,
 		case MEvaluateAsScript:
 			UpdateERDialog(pDlg, true);
 			break;
+		case MQuoteSearch:
+			QuoteRegExpString(pDlg, MSearchFor);
+			return TRUE;
+		case MQuoteReplace:
+			QuoteReplaceString(pDlg, MReplaceWith);
+			return TRUE;
 		}
 		break;
 	}
@@ -786,12 +792,6 @@ bool EditorReplace()
 		case MReplace:
 		case MAll:
 		case MBtnClose:
-			break;
-		case MQuoteSearch:
-			if (ERegExp) CSO::QuoteRegExpString(SearchText);
-			break;
-		case MQuoteReplace:
-			CSO::QuoteReplaceString(ReplaceText);
 			break;
 		case MEllipsis:
 			ConfigureSeveralLines();

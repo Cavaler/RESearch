@@ -250,6 +250,9 @@ LONG_PTR WINAPI EditorSearchDialogProc(CFarDialog *pDlg, int nMsg, int nParam1, 
 			UpdateESDialog(pDlg, true);
 			pDlg->SetFocus(MSearchFor, 1);
 			break;
+		case MQuoteSearch:
+			QuoteRegExpString(pDlg, MSearchFor);
+			return TRUE;
 		}
 		break;
 #ifdef FAR3
@@ -322,9 +325,6 @@ bool EditorSearch()
 		case MShowAll:
 		case MCountAll:
 		case MBtnClose:
-			break;
-		case MQuoteSearch:
-			if (ERegExp) CSO::QuoteRegExpString(SearchText);
 			break;
 		case MEllipsis:
 			ConfigureSeveralLines();

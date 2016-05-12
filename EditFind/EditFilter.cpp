@@ -81,9 +81,6 @@ bool EditorFilter()
 		case MOk:
 		case MBtnClose:
 			break;
-		case MQuoteSearch:
-			if (ERegExp) CSO::QuoteRegExpString(SearchText);
-			break;
 		case MBtnPresets:
 			EFPresets->ShowMenu(true);
 			break;
