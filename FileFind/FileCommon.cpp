@@ -248,9 +248,9 @@ void AddFile(const WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems, bool
 	Item.CustomColumnNumber = 0;
 
 	if (!FText.empty() && !FSInverse)
-		Item.UData() = (DWORD)new TempUserData(g_nFoundLine, g_nFoundColumn, bSearch);
+		Item.UData() = (DWORD_PTR)new TempUserData(g_nFoundLine, g_nFoundColumn, bSearch);
 	else
-		Item.UData() = (DWORD)new TempUserData(-1, -1, bSearch);
+		Item.UData() = (DWORD_PTR)new TempUserData(-1, -1, bSearch);
 
 	PanelItems.push_back(Item);
 }
@@ -268,9 +268,9 @@ void AddFile(const FIND_DATA *FindData, panelitem_vector &PanelItems, bool bSear
 	Item.CustomColumnNumber = 0;
 
 	if (!FText.empty() && !FSInverse)
-		Item.UData() = (DWORD)new TempUserData(g_nFoundLine, g_nFoundColumn, bSearch);
+		Item.UData() = (DWORD_PTR)new TempUserData(g_nFoundLine, g_nFoundColumn, bSearch);
 	else
-		Item.UData() = (DWORD)new TempUserData(-1, -1, bSearch);
+		Item.UData() = (DWORD_PTR)new TempUserData(-1, -1, bSearch);
 
 	PanelItems.push_back(Item);
 }

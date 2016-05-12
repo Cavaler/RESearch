@@ -86,7 +86,7 @@ CTemporaryPanel::CTemporaryPanel(panelitem_vector &PanelItems,TCHAR *CalledFolde
 {
 	for (size_t I=0; I<m_arrItems.size(); I++) {
 		if (m_arrItems[I].UData() == 0)
-			m_arrItems[I].UData() = (DWORD)new TempUserData();
+			m_arrItems[I].UData() = (DWORD_PTR)new TempUserData();
 	}
 
 	if (LastTempPanel && !LastTempPanel->m_bActive) delete LastTempPanel;
