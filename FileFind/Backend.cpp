@@ -39,9 +39,8 @@ bool CFileBackend::SetBlockSize(INT_PTR nBlockSize)
 {
 	if (nBlockSize == 0) {
 		m_bSlurpMode = true;
-		if (m_szBuffer) free(m_szBuffer);
-		m_szBuffer = (char *)malloc(0);
 		m_nBlockSize = 0;
+		m_szBuffer = safe_realloc(m_szBuffer, 0);
 		return true;
 	}
 
@@ -49,9 +48,9 @@ bool CFileBackend::SetBlockSize(INT_PTR nBlockSize)
 
 	if (m_nBlockSize != nBlockSize) {
 		m_nBlockSize = nBlockSize;
-		while ((m_szBuffer = (char *)realloc(m_szBuffer, m_nBlockSize*4)) == NULL)
+		while ((m_szBuffer = safe_realloc(m_szBuffer, m_nBlockSize*4)) == NULL)
 			m_nBlockSize /= 2;
-		m_szBuffer = (char *)realloc(m_szBuffer, m_nBlockSize);
+		m_szBuffer = safe_realloc(m_szBuffer, m_nBlockSize);
 	}
 
 	m_nSize = 0;
