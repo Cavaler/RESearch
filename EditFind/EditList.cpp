@@ -112,7 +112,13 @@ bool EditorListAllShowResults(bool bImmediate)
 
 	tstring strTotal = FormatStr(GetMsg(MTotalLines), Info.arrLines.size());
 
-	int nBreakKey = 0, nResult = 0;
+	int nBreakKey = 0, nResult;
+	for (nResult = 0; nResult < Info.arrLines.size(); nResult++)
+	{
+		if (Info.arrLines[nResult].FirstLine > EdInfo.CurLine)
+			break;
+	}
+
 	do {
 		nResult = ChooseMenu(Info.arrString, GetMsg(MListAllLines), strTotal.c_str(), _T("ListAll"), nResult, FMENU_WRAPMODE|FMENU_SHOWAMPERSAND|FMENU_RETURNCODE, nBreakKeys, &nBreakKey);
 		if (nResult < 0)
