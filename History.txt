@@ -10,6 +10,11 @@ Planned:
 	+ Command to "lock" read-only file before replacing
 	+ Search / Replace in dialogs
 
+Version 8.65 (23.11.2015)
+	- Fixed one-symbol case conversion (\u and \l)
+	- Fixed Incremental search
+	* Menu on "Show All" highlights current or next nearest line
+
 Version 8.64 (24.06.2015)
 	- Fixed bugs with hardlinks and long paths
 	- Fixed settings dialog bug
