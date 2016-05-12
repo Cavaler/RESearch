@@ -310,6 +310,7 @@ TCHAR ConvertCase(TCHAR C)
 		break;
 	}
 
+	OneCaseConvert=CaseConvert;
 	return C;
 }
 #endif
