@@ -154,6 +154,7 @@ int ShowEditorMenu(int &nBreakCode)
 	MenuItems.push_back(CFarMenuItemEx(true));
 	ESPresets->FillMenuItems(MenuItems);
 	ERPresets->FillMenuItems(MenuItems);
+	EPPresets->FillMenuItems(MenuItems);
 	EFPresets->FillMenuItems(MenuItems);
 	ETPresets->FillMenuItems(MenuItems);
 
@@ -366,6 +367,7 @@ OperationResult OpenPluginFromEditorPreset(int nItem, int nBreakCode)
 
 	if (FindRunPreset(ESPresets, nItem, nBreakCode, Result) ||
 		FindRunPreset(ERPresets, nItem, nBreakCode, Result) ||
+		FindRunPreset(EPPresets, nItem, nBreakCode, Result) ||
 		FindRunPreset(EFPresets, nItem, nBreakCode, Result) ||
 		FindRunPreset(ETPresets, nItem, nBreakCode, Result)
 		) return OR_OK;

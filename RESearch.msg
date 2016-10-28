@@ -135,7 +135,7 @@ MLeaveMatching		"&Leave matching lines"		"&Оставить совпадающи
 MRemoveMatching		"R&emove matching lines"	"&Убрать совпадающие строки"			"R&emover líneas coincidentes"
 
 MRepeatText			"Repeat text"				"Повторение текста"
-MTextToRepeat		"&Text to repeat:"			"Повторяемый текст:"
+MTextToRepeat		"Te&xt to repeat:"			"Повторяемый текст:"
 MRepeatTimes		"&Repeat:"					"Повторить:"
 MTimes				"times"						"раз"
 
@@ -293,6 +293,7 @@ MInvalidCmdLine		"Invalid command line"				"Неверная командная 
 
 MESPreset			"Editor search preset"				"Пресет поиска в редакторе"				"Preajuste de búsqueda en editor"
 MERPreset			"Editor replace preset"				"Пресет замены в редакторе"				"Preajuste de reemplazo en editor"
+MEPPreset			"Editor repeat preset"				"Пресет повтора в редакторе"
 MEFPreset			"Editor filter preset"				"Пресет фильтра в редакторе"			"Preajuste de filtro en editor"
 METPreset			"Editor transliterate preset"		"Пресет транслитерации в редакторе"		"Preajuste de transliteración de editor"
 MFSPreset			"File search preset"				"Пресет поиска в файлах"				"Preajuste de búsqueda de archivo"

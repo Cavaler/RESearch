@@ -121,6 +121,7 @@ HANDLE RunEditorPreset(LPCWSTR szPreset)
 
 	FindRunPreset(ESPresets, szPreset, Result) ||
 	FindRunPreset(ERPresets, szPreset, Result) ||
+	FindRunPreset(EPPresets, szPreset, Result) ||
 	FindRunPreset(EFPresets, szPreset, Result) ||
 	FindRunPreset(ETPresets, szPreset, Result);
 
@@ -359,6 +360,9 @@ HANDLE OpenPluginFromEditorParameters(const OpenMacroInfo *MInfo)
 	} else if (_wcsicmp(MInfo->Values[0].String, L"Replace") == 0) {
 		pSet  = &g_ERParamSet;
 		pColl =    ERPresets;
+	} else if (_wcsicmp(MInfo->Values[0].String, L"Repeat") == 0) {
+		pSet  = &g_EPParamSet;
+		pColl =    EPPresets;
 	} else if (_wcsicmp(MInfo->Values[0].String, L"Filter") == 0) {
 		pSet  = &g_EFParamSet;
 		pColl =    EFPresets;

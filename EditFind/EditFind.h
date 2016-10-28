@@ -19,6 +19,13 @@ public:
 	virtual int  ID() { return 0; }
 };
 
+class CEPPresetCollection:public CStdPresetCollection {
+public:
+	CEPPresetCollection(CParameterSet &ParamSet) : CStdPresetCollection(ParamSet, _T("EditRepeat"), MEPPreset) {}
+	virtual bool EditPreset(CPreset *pPreset);
+	virtual int  ID() { return 4; }
+};
+
 class CEFPresetCollection:public CStdPresetCollection {
 public:
 	CEFPresetCollection(CParameterSet &ParamSet) : CStdPresetCollection(ParamSet, _T("EditFilter"), MEFPreset) {}
@@ -40,10 +47,12 @@ enum EPositioning {EP_BEGIN, EP_DIR, EP_END};
 
 extern CParameterSet g_ESParamSet;
 extern CParameterSet g_ERParamSet;
+extern CParameterSet g_EPParamSet;
 extern CParameterSet g_EFParamSet;
 extern CParameterSet g_ETParamSet;
 EXTERN CESPresetCollection *ESPresets;
 EXTERN CERPresetCollection *ERPresets;
+EXTERN CEPPresetCollection *EPPresets;
 EXTERN CEFPresetCollection *EFPresets;
 EXTERN CETPresetCollection *ETPresets;
 
@@ -115,6 +124,7 @@ EXTERN bool EListAllFromPreset;
 EXTERN bool ECountAllFromPreset;
 OperationResult EditorSearchExecutor();
 OperationResult EditorReplaceExecutor();
+OperationResult EditorRepeatExecutor();
 OperationResult EditorFilterExecutor();
 OperationResult EditorTransliterateExecutor();
 void EditorSeekToBeginEnd();

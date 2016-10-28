@@ -17,6 +17,10 @@ CParameterSet g_ERParamSet(EditorReplaceExecutor,
 	"RemoveEmpty", &ERRemoveEmpty, "RemoveNoMatch", &ERRemoveNoMatch,
 	"AsScript", &EREvaluate, "FromCurrent", &EFromCurrentPosition, NULL
 					 );
+CParameterSet g_EPParamSet(EditorRepeatExecutor,
+	"Replace", &ReplaceText, "Script", &EREvaluateScript, NULL,
+	"RepeatCount", &ERRepeatCount, "AsScript", &EREvaluate, NULL
+					 );
 CParameterSet g_EFParamSet(EditorFilterExecutor,
 	"Text", &SearchText, "@Text", &EText, NULL, NULL,
 	"LeaveFilter", &EFLeaveFilter, "IsRegExp", &ERegExp, "CaseSensitive", &ECaseSensitive,
@@ -36,6 +40,7 @@ void EReadRegistry(CFarSettingsKey Key)
 
 	ESPresets = new CESPresetCollection(g_ESParamSet);
 	ERPresets = new CERPresetCollection(g_ERParamSet);
+	EPPresets = new CEPPresetCollection(g_EPParamSet);
 	EFPresets = new CEFPresetCollection(g_EFParamSet);
 	ETPresets = new CETPresetCollection(g_ETParamSet);
 }
@@ -572,6 +577,7 @@ void ECleanup(bool PatternOnly)
 	if (!PatternOnly) {
 		delete ESPresets;
 		delete ERPresets;
+		delete EPPresets;
 		delete EFPresets;
 		delete ETPresets;
 	}

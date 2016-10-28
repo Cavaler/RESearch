@@ -41,7 +41,7 @@ void ReadRegistry()
 	FReadRegistry(Settings);
 	FTReadRegistry(Settings);
 
-	g_pEditorBatchType = new CBatchType(MEditorBatches, ESPresets, ERPresets, EFPresets, ETPresets, NULL);
+	g_pEditorBatchType = new CBatchType(MEditorBatches, ESPresets, ERPresets, EPPresets, EFPresets, ETPresets, NULL);
 	g_pEditorBatches = new CBatchActionCollection(*g_pEditorBatchType, Settings.Open(_T("EditorBatches")));
 
 	g_pPanelBatchType = new CBatchType(MPanelBatches, FSPresets, FRPresets, RnPresets, QRPresets, FGPresets, NULL);
