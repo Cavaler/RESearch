@@ -1608,7 +1608,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Compiling language file $(InputPath)..."
-						CommandLine="$(COMSPEC) /c ..\MakeAndCopyLng.bat RESearch RESearch_msg.h RESearchSpa.lng&#x0D;&#x0A;"
+						CommandLine="$(COMSPEC) /c $(OWN_LIB_PATH)\FarLib\MakeAndCopyLng.bat RESearch RESearch_msg.h RESearchSpa.lng&#x0D;&#x0A;"
 						Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
 					/>
 				</FileConfiguration>
@@ -1619,7 +1619,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Compiling language file $(InputPath)..."
-						CommandLine="$(COMSPEC) /c ..\MakeAndCopyLng.bat RESearch RESearch_msg.h RESearchSpa.lng&#x0D;&#x0A;"
+						CommandLine="$(COMSPEC) /c $(OWN_LIB_PATH)\FarLib\MakeAndCopyLng.bat RESearch RESearch_msg.h RESearchSpa.lng&#x0D;&#x0A;"
 						Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
 					/>
 				</FileConfiguration>
@@ -1630,7 +1630,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Compiling language file $(InputPath)..."
-						CommandLine="$(COMSPEC) /c ..\MakeAndCopyLng.bat RESearch RESearch_msg.h RESearchSpa.lng&#x0D;&#x0A;"
+						CommandLine="$(COMSPEC) /c $(OWN_LIB_PATH)\FarLib\MakeAndCopyLng.bat RESearch RESearch_msg.h RESearchSpa.lng&#x0D;&#x0A;"
 						Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
 					/>
 				</FileConfiguration>
@@ -1641,7 +1641,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Compiling language file $(InputPath)..."
-						CommandLine="$(COMSPEC) /c ..\MakeAndCopyLng.bat RESearch RESearch_msg.h RESearchSpa.lng&#x0D;&#x0A;"
+						CommandLine="$(COMSPEC) /c $(OWN_LIB_PATH)\FarLib\MakeAndCopyLng.bat RESearch RESearch_msg.h RESearchSpa.lng&#x0D;&#x0A;"
 						Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
 					/>
 				</FileConfiguration>
@@ -1651,7 +1651,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Compiling language file $(InputPath)..."
-						CommandLine="$(COMSPEC) /c ..\MakeAndCopyLng.bat RESearch RESearch_msg.h RESearchSpa.lng&#x0D;&#x0A;"
+						CommandLine="$(COMSPEC) /c $(OWN_LIB_PATH)\FarLib\MakeAndCopyLng.bat RESearch RESearch_msg.h RESearchSpa.lng&#x0D;&#x0A;"
 						Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
 					/>
 				</FileConfiguration>
@@ -1662,7 +1662,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Compiling language file $(InputPath)..."
-						CommandLine="$(COMSPEC) /c ..\MakeAndCopyLng.bat RESearch RESearch_msg.h RESearchSpa.lng&#x0D;&#x0A;"
+						CommandLine="$(COMSPEC) /c $(OWN_LIB_PATH)\FarLib\MakeAndCopyLng.bat RESearch RESearch_msg.h RESearchSpa.lng&#x0D;&#x0A;"
 						Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
 					/>
 				</FileConfiguration>
@@ -1673,7 +1673,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Compiling language file $(InputPath)..."
-						CommandLine="$(COMSPEC) /c ..\MakeAndCopyLng.bat RESearch RESearch_msg.h RESearchSpa.lng&#x0D;&#x0A;"
+						CommandLine="$(COMSPEC) /c $(OWN_LIB_PATH)\FarLib\MakeAndCopyLng.bat RESearch RESearch_msg.h RESearchSpa.lng&#x0D;&#x0A;"
 						Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
 					/>
 				</FileConfiguration>
@@ -1684,7 +1684,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Compiling language file $(InputPath)..."
-						CommandLine="$(COMSPEC) /c ..\MakeAndCopyLng.bat RESearch RESearch_msg.h RESearchSpa.lng&#x0D;&#x0A;"
+						CommandLine="$(COMSPEC) /c $(OWN_LIB_PATH)\FarLib\MakeAndCopyLng.bat RESearch RESearch_msg.h RESearchSpa.lng&#x0D;&#x0A;"
 						Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
 					/>
 				</FileConfiguration>
@@ -1694,7 +1694,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Compiling language file $(InputPath)..."
-						CommandLine="$(COMSPEC) /c ..\MakeAndCopyLng.bat RESearch RESearch_msg.h RESearchSpa.lng&#x0D;&#x0A;"
+						CommandLine="$(COMSPEC) /c $(OWN_LIB_PATH)\FarLib\MakeAndCopyLng.bat RESearch RESearch_msg.h RESearchSpa.lng&#x0D;&#x0A;"
 						Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
 					/>
 				</FileConfiguration>
@@ -1705,7 +1705,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Compiling language file $(InputPath)..."
-						CommandLine="$(COMSPEC) /c ..\MakeAndCopyLng.bat RESearch RESearch_msg.h RESearchSpa.lng&#x0D;&#x0A;"
+						CommandLine="$(COMSPEC) /c $(OWN_LIB_PATH)\FarLib\MakeAndCopyLng.bat RESearch RESearch_msg.h RESearchSpa.lng&#x0D;&#x0A;"
 						Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
 					/>
 				</FileConfiguration>
@@ -1716,7 +1716,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Compiling language file $(InputPath)..."
-						CommandLine="$(COMSPEC) /c ..\MakeAndCopyLng.bat RESearch RESearch_msg.h RESearchSpa.lng&#x0D;&#x0A;"
+						CommandLine="$(COMSPEC) /c $(OWN_LIB_PATH)\FarLib\MakeAndCopyLng.bat RESearch RESearch_msg.h RESearchSpa.lng&#x0D;&#x0A;"
 						Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
 					/>
 				</FileConfiguration>
@@ -1727,7 +1727,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Compiling language file $(InputPath)..."
-						CommandLine="$(COMSPEC) /c ..\MakeAndCopyLng.bat RESearch RESearch_msg.h RESearchSpa.lng&#x0D;&#x0A;"
+						CommandLine="$(COMSPEC) /c $(OWN_LIB_PATH)\FarLib\MakeAndCopyLng.bat RESearch RESearch_msg.h RESearchSpa.lng&#x0D;&#x0A;"
 						Outputs="$(ProjectName)Eng.lng;$(ProjectName)Rus.lng"
 					/>
 				</FileConfiguration>

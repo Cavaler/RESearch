@@ -1,0 +1,3 @@
+[submodule "OwnLibrary"]
+	path = OwnLibrary
+	url = git@github.com:Cavaler/OwnLib.git
