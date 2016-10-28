@@ -10,6 +10,12 @@ Planned:
 	+ Command to "lock" read-only file before replacing
 	+ Search / Replace in dialogs
 
+Version 8.66 (28.10.2016)
+	- Fixed crash in TmpPanel in x64
+	- Quote buttons don't reopen dialog
+	- Restore console title
+	+ Editor Repeat Text operation supports presets/batches/macros
+
 Version 8.65 (23.11.2015)
 	- Fixed one-symbol case conversion (\u and \l)
 	- Fixed Incremental search

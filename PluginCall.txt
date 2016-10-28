@@ -18,7 +18,7 @@ String:
 		Renumber, UndoRename, ShowLastResults, ClearVariables
 
 	Commands available from editor:
-		Search, Replace, Filter, Transliterate, SRAgain, SRAgainRev, ShowLastResults, ClearVariables
+		Search, Replace, Repeat, Filter, Transliterate, SRAgain, SRAgainRev, ShowLastResults, ClearVariables
 
 	Commands available from viewer:
 		Search, SRAgain, ClearVariables
@@ -40,6 +40,7 @@ Complete operations:
 	Commands and parameters available from editor:
 		Search			Text; InSelection, IsRegExp, CaseSensitive, SeveralLine, Reverse, FromCurrent, ListAll, CountAll
 		Replace			Text, Replace, Script; InSelection, IsRegExp, CaseSensitive, SeveralLine, Reverse, FromCurrent, RemoveEmpty, RemoveNoMatch, AsScript
+		Repeat			Replace, Script; RepeatCount, AsScript
 		Filter			Text; LeaveFilter, IsRegExp, CaseSensitive, Reverse, FromCurrent
 		Transliterate	Text, Replace; 
 
