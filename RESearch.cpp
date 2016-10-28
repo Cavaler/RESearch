@@ -538,6 +538,8 @@ HANDLE WINAPI OpenW(const struct OpenInfo *Info)
 	g_bInterrupted = false;
 	ESearchAgainCalled = false;
 
+	CConsoleTitleSaver _saver;
+
 	switch (Info->OpenFrom) {
 	case OPEN_PLUGINSMENU:
 		return OpenPluginFromFileMenu(0);
@@ -599,6 +601,8 @@ HANDLE WINAPI OpenPlugin(int OpenFrom, INT_PTR Item)
 	g_bInterrupted = false;
 
 	ESearchAgainCalled = false;
+
+	CConsoleTitleSaver _saver;
 
 	switch (OpenFrom) {
 	case OPEN_COMMANDLINE:

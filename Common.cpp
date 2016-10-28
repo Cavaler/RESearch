@@ -1076,3 +1076,15 @@ void QuoteReplaceString(CFarDialog *pDlg, int nID, int nOffset)
 	CSO::QuoteReplaceString(strText);
 	pDlg->SetDlgItemText(pDlg->MakeID(nID, nOffset), strText.c_str());
 }
+
+CConsoleTitleSaver::CConsoleTitleSaver()
+{
+	TCHAR szTitle[1024];
+	GetConsoleTitle(szTitle, 1024);
+	m_strTitle = szTitle;
+}
+
+CConsoleTitleSaver::~CConsoleTitleSaver()
+{
+	SetConsoleTitle(m_strTitle.c_str());
+}

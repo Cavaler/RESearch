@@ -260,4 +260,13 @@ typedef hack_wstring hack_tstring;
 typedef hack_string hack_tstring;
 #endif
 
+class CConsoleTitleSaver
+{
+public:
+	CConsoleTitleSaver();
+	~CConsoleTitleSaver();
+protected:
+	tstring m_strTitle;
+};
+
 #endif
