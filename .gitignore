@@ -1,0 +1,16 @@
+Debug
+Release
+Debug *
+Release *
+Lib
+*.user
+*.ncb
+*.suo
+*.tlb
+*.dll
+*.exp
+*.lib
+*.pdb
+*.lng
+/RESearchIDL.h
+/uuids.c
