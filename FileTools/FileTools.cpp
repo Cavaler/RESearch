@@ -74,7 +74,7 @@ void ChangeSelection(int How) {
 		MaskText=FMask;
 		if (Dialog.Display(-1)==-1) return;
 		FMask=MaskText;
-	} while (!FPrepareMaskPattern());
+	} while (!FPrepareMaskPattern(FACaseSensitive));
 
 	CPanelInfo PInfo;
 	PInfo.GetInfo(false);

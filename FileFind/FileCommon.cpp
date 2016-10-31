@@ -133,7 +133,7 @@ void FCleanup(bool PatternOnly)
 	}
 }
 
-int FPrepareMaskPattern()
+int FPrepareMaskPattern(bool CaseSensitive)
 {
 	FCleanup(true);
 
@@ -141,7 +141,7 @@ int FPrepareMaskPattern()
 	if (FASkipSystemFolders) {
 		if (FASystemFoldersMask) delete FASystemFoldersMask;
 
-		FASystemFoldersMask = new CFarMaskSet(FASystemFolders.c_str(), MaskCaseHere());
+		FASystemFoldersMask = new CFarMaskSet(FASystemFolders.c_str(), CaseSensitive);
 		if (!FASystemFoldersMask->Valid()) {
 			delete FASystemFoldersMask;
 			FASystemFoldersMask = NULL;

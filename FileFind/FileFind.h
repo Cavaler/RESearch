@@ -143,7 +143,7 @@ void AddFile(const WIN32_FIND_DATA *FindData, panelitem_vector &PanelItems, bool
 void AddFile(const FIND_DATA *FindData, panelitem_vector &PanelItems, bool bSearch = false);
 void AddFile(const TCHAR *szFileName, panelitem_vector &PanelItems, bool bSearch = false);
 bool ScanDirectories(panelitem_vector &PanelItems,ProcessFileProc ProcessFile);
-int  FPrepareMaskPattern();
+int  FPrepareMaskPattern(bool CaseSensitive = MaskCaseHere());
 int  FPreparePattern(bool bAcceptEmpty);
 
 bool ConfirmFile(int Title,const TCHAR *FileName);
