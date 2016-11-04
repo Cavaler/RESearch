@@ -343,7 +343,7 @@ void RenamePreview(panelitem_vector &PanelItems)
 {
 	vector<tstring> arrItems;
 	int nBreakKey, nResult = 0;
-	int BreakKeys[] = {VK_INSERT, VK_DELETE, VK_F2, VK_F3, 0};
+	int BreakKeys[] = {VK_INSERT, VK_DELETE, VK_F2, VK_F3, VK_F10, 0};
 
 	if (m_arrPendingRename.empty()) return;
 
@@ -362,17 +362,20 @@ void RenamePreview(panelitem_vector &PanelItems)
 			arrItems.push_back(arrFrom[nItem] + _T(" => ") + arrTo[nItem]);
 		}
 
-		nResult = ChooseMenu(arrItems, GetMsg(MRenamePreview), _T("Ins, Del, F2, F3, Enter, Esc"), _T("RenamePreview"), nResult, FMENU_WRAPMODE,
+		nResult = ChooseMenu(arrItems, GetMsg(MRenamePreview), _T("Ins/Enter, Del, F2, F3, F10, Esc"), _T("RenamePreview"), nResult, FMENU_WRAPMODE,
 			BreakKeys, &nBreakKey);
 
 		switch (nBreakKey) {
 		case -1:
 			if (nResult >= 0) {
-				PerformFinalRename(PanelItems);
+				if (PerformSingleRename(m_arrPendingRename[nResult], PanelItems)) {
+					m_arrPendingRename.erase(m_arrPendingRename.begin() + nResult);
+				}
 			} else {
 				g_bInterrupted = true;
+				return;
 			}
-			return;
+			break;
 		case 0:
 			if (PerformSingleRename(m_arrPendingRename[nResult], PanelItems)) {
 				m_arrPendingRename.erase(m_arrPendingRename.begin() + nResult);
@@ -393,6 +396,9 @@ void RenamePreview(panelitem_vector &PanelItems)
 			RunExternalViewer(strContent);
 			break;
 			   }
+		case 4:
+			PerformFinalRename(PanelItems);
+			return;
 		}
 
 		if (m_arrPendingRename.empty()) {

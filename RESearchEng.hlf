@@ -2,7 +2,7 @@
 .PluginContents=Regular Expression Search
 
 @Contents
-$ #Regular Expression Search and Replace, version 8.66#
+$ #Regular Expression Search and Replace, version 8.67#
     This plugin allows you to:
 
     - Perform text search and replace in editor
@@ -746,13 +746,12 @@ attempt, but try to apply pattern to new name again.
 $ #Rename results preview#
 Here you can preview results of the rename operation.
 
-  #Enter#    Perform renaming.
+  #F10#      Perform renaming.
   #Esc#      Cancel renaming.
   #F2#       Switch name shortening in menu
   #F3#       Show all name pairs in separate Viewer
-  #Insert#   Immediately rename selected file pair.
+  #Insert# or #Enter#  Immediately rename selected file pair.
   #Delete#   Remove selected file pair from rename.
-
 @Renumber
 $ #Renumber files#
 Most useful for renaming audio tracks in their order. You can use it in two ways: either
