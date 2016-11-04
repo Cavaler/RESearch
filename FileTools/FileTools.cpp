@@ -815,20 +815,43 @@ void ProcessNames(vector<tstring> &arrFileNames, vector<tstring> &arrProcessedNa
 	}
 }
 
-void PerformRenumber(vector<tstring> &arrFileNames, vector<tstring> &arrProcessedNames, LPCTSTR szCurDir)
+bool PerformRenumberOnce(vector<tstring> &arrFileNames, vector<tstring> &arrProcessedNames, LPCTSTR szCurDir)
+{
+	bool any = false;
+
+	for (size_t nItem = 0; nItem < arrFileNames.size(); ) {
+		if (arrFileNames[nItem].empty() || (arrFileNames[nItem] == arrProcessedNames[nItem])) {
+			arrFileNames.erase(arrFileNames.begin() + nItem);
+			arrProcessedNames.erase(arrProcessedNames.begin() + nItem);
+			any = true;
+			continue;
+		}
+
+		tstring strSrc = szCurDir + arrFileNames[nItem];
+		tstring strTgt = szCurDir + arrProcessedNames[nItem];
+
+		if (MoveFile(ExtendedFileName(strSrc).c_str(), ExtendedFileName(strTgt).c_str())) {
+			m_arrLastRename.push_back(make_pair(strSrc, strTgt));
+			arrFileNames.erase(arrFileNames.begin() + nItem);
+			arrProcessedNames.erase(arrProcessedNames.begin() + nItem);
+			any = true;
+			continue;
+		}
+
+		nItem++;
+	}
+
+	return any;
+}
+
+void PerformRenumber(const vector<tstring> &arrFileNames, const vector<tstring> &arrProcessedNames, LPCTSTR szCurDir)
 {
 	m_arrLastRename.clear();
 
-	for (size_t nItem = 0; nItem < arrFileNames.size(); nItem++) {
-		if (!arrFileNames[nItem].empty() && (arrFileNames[nItem] != arrProcessedNames[nItem])) {
-			tstring strSrc = szCurDir + arrFileNames[nItem];
-			tstring strTgt = szCurDir + arrProcessedNames[nItem];
+	vector<tstring> arrFN = arrFileNames;
+	vector<tstring> arrPN = arrProcessedNames;
 
-			if (MoveFile(ExtendedFileName(strSrc).c_str(), ExtendedFileName(strTgt).c_str())) {
-				m_arrLastRename.push_back(make_pair(strSrc, strTgt));
-			}
-		}
-	}
+	while (PerformRenumberOnce(arrFN, arrPN, szCurDir)) {}
 
 #ifdef UNICODE
 	StartupInfo.Control(PANEL_ACTIVE, FCTL_UPDATEPANEL, 0, NULL);
