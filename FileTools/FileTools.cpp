@@ -907,6 +907,7 @@ OperationResult RenumberFiles()
 		case VK_F4:
 			ConfigureRenumbering(true);
 			WriteRegistry();
+			g_nStartWithNow = g_nStartWith;
 			break;
 		case VK_F7:{
 			nOK = 0;
