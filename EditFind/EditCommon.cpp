@@ -19,7 +19,8 @@ CParameterSet g_ERParamSet(EditorReplaceExecutor,
 					 );
 CParameterSet g_EPParamSet(EditorRepeatExecutor,
 	"Replace", &ReplaceText, "Script", &EREvaluateScript, NULL,
-	"RepeatCount", &ERRepeatCount, "AsScript", &EREvaluate, NULL
+	"RepeatCount", &ERRepeatCount, NULL,
+	"AsScript", &EREvaluate, NULL
 					 );
 CParameterSet g_EFParamSet(EditorFilterExecutor,
 	"Text", &SearchText, "@Text", &EText, NULL, NULL,
