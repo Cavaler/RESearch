@@ -19,7 +19,10 @@ LPCTSTR FindEOL(LPCTSTR szText, int nLength, int &nSize)
 	LPCTSTR LF = (LPCTSTR)_tmemchr(szText, '\n', nLength);
 
 	if ((CR != NULL) && ((CR < LF) || (LF == NULL))) {
-		nSize = (LF == CR + 1) ? 2 : 1;
+		LPCTSTR End = CR+1;
+		while ((End < szText + nLength) && (*End == '\r')) End++;
+		if ((End < szText + nLength) && (*End == '\n')) End++;
+		nSize = End - CR;
 		return CR;
 	}
 
@@ -38,7 +41,11 @@ int LengthNoEOL(const tstring &strText)
 
 	int nLength = strText.length();
 	if (strText[nLength-1] == '\n') {
-		if ((strText.length() > 1) && (strText[nLength-2] == '\r')) return nLength-2;
+		nLength--;
+		while ((nLength > 0) && (strText[nLength-1] == '\r')) nLength--;
+		return nLength;
+	}
+	if (strText[nLength-1] == '\r') {
 		return nLength-1;
 	}
 
