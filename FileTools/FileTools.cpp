@@ -171,6 +171,37 @@ bool FindRename(const TCHAR *FileName, int &MatchStart, int &MatchLength)
 	return false;
 }
 
+bool WaitingForRename(const tstring &name)
+{
+	for (size_t nItem = 0; nItem < m_arrPendingRename.size(); nItem++)
+		if (m_arrPendingRename[nItem].first == name)
+			return true;
+
+	return false;
+}
+
+void SortPendingRename()
+{
+	rename_vector PendingRename;
+
+	while (true) {
+		bool any = false;
+		for (size_t nItem = 0; nItem < m_arrPendingRename.size(); )
+		{
+			if (!WaitingForRename(m_arrPendingRename[nItem].second)) {
+				PendingRename.push_back(m_arrPendingRename[nItem]);
+				m_arrPendingRename.erase(m_arrPendingRename.begin() + nItem);
+				any = true;
+			}
+			else
+				nItem++;
+		}
+		if (!any) break;
+	}
+
+	m_arrPendingRename.insert(m_arrPendingRename.begin(), PendingRename.begin(), PendingRename.end());
+}
+
 void PostPerformRename(rename_pair &Item)
 {
 	for (size_t nItem = 0; nItem < m_arrPendingRename.size(); nItem++) {
@@ -196,7 +227,7 @@ bool PerformSingleRename(rename_pair &Item)
 	do {
 		DWORD dwFlags = MOVEFILE_COPY_ALLOWED;
 		if (bOverwrite) dwFlags |= MOVEFILE_REPLACE_EXISTING;
-		
+
 		if (MoveFileEx(FullExtendedFileName(Item.first).c_str(), FullExtendedFileName(Item.second).c_str(), dwFlags)) {
 			PostPerformRename(Item);
 			return true;
@@ -286,6 +317,8 @@ bool PerformSingleRename(rename_pair &Item, panelitem_vector &PanelItems)
 
 void PerformFinalRename(panelitem_vector &PanelItems)
 {
+	SortPendingRename();
+
 	for (size_t nItem = 0; nItem < m_arrPendingRename.size(); nItem++) {
 		PerformSingleRename(m_arrPendingRename[nItem], PanelItems);
 		if (Interrupted()) break;
@@ -428,11 +461,7 @@ void RenameFile(const FIND_DATA *FindData, panelitem_vector &PanelItems)
 	strCurrentName = strPath + strCurrentName;
 
 	rename_pair Item(FindData->cFileName, strCurrentName);
-	if (FRPreviewRename) {
-		m_arrPendingRename.push_back(Item);
-	} else {
-		PerformSingleRename(Item, PanelItems);
-	}
+	m_arrPendingRename.push_back(Item);
 }
 
 bool RenameFilesPrompt()
@@ -539,9 +568,15 @@ OperationResult RenameFiles(panelitem_vector &PanelItems, bool ShowDialog)
 	tm.Stop();
 
 	if (bResult) {
-		if (FRPreviewRename) RenamePreview(PanelItems);
-		if (!FROpenModified) return OR_OK; else
-		return (PanelItems.empty()) ? NoFilesFound() : OR_PANEL;
+		if (FRPreviewRename)
+			RenamePreview(PanelItems);
+		else
+			PerformFinalRename(PanelItems);
+
+		if (!FROpenModified)
+			return OR_OK;
+		else
+			return (PanelItems.empty()) ? NoFilesFound() : OR_PANEL;
 	} else return OR_FAILED;
 }
 
@@ -568,8 +603,7 @@ OperationResult RenameFilesExecutor()
 	bool bResult = ScanDirectories(g_PanelItems, RenameFile);
 
 	if (bResult) {
-//		if (!FROpenModified) return OR_OK; else
-//			return (ItemsNumber == 0) ? OR_OK : OR_PANEL;
+		PerformFinalRename(g_PanelItems);
 		return OR_OK;
 	} else return OR_FAILED;
 }
@@ -626,7 +660,10 @@ bool PerformRenameSelectedFiles(CPanelInfo &PInfo, panelitem_vector &PanelItems)
 		}
 	}
 
-	if (FRPreviewRename) RenamePreview(PanelItems);
+	if (FRPreviewRename)
+		RenamePreview(PanelItems);
+	else
+		PerformFinalRename(PanelItems);
 
 #ifdef UNICODE
 	StartupInfo.Control(PANEL_ACTIVE, FCTL_UPDATEPANEL, 0, NULL);
@@ -649,6 +686,7 @@ bool PerformRenameSelectedFiles(CPanelInfo &PInfo, panelitem_vector &PanelItems)
 		}
 		SetPanelSelection(PNewInfo, false, true);
 	}
+
 	return true;
 }
 
