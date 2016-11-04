@@ -208,7 +208,7 @@ bool ReplaceSingleFile_Normal(const FIND_DATA &FindData)
 			}
 		}
 	} else {
-		DeleteFile(g_strNewFileName.c_str());
+		DeleteFile(ExtendedFileName(g_strNewFileName).c_str());
 	}
 
 	return bProcess;
