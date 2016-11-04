@@ -56,7 +56,7 @@ bool SearchIn(const TCHAR *Line,int Start,int Length,int *MatchStart,int *MatchL
 	REParam.Clear();
 	REParam.AddSource(Line, Start+Length);
 
-	if (ERegExp && !EReverse) {
+	if (ERegExp && (!EReverse || Length == 0)) {
 		REParam.AddRE(EPattern);
 
 #ifdef UNICODE
@@ -329,7 +329,9 @@ bool SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,bool bS
 				}
 			}
 
-			int nExecOptions = bNotBOL ? PCRE_NOTBOL : 0;
+			if (bNotBOL && (StartPos <= 0)) continue;
+
+			int nExecOptions = bNotBOL ? PCRE_NOTEOL : 0;
 			if (SearchInLine(Lines, LinesLength, (Line==FirstLine) ? StartPos : 0, -1, &MatchStart, &MatchLength, nExecOptions)) {
 				Relative2Absolute(Line, Lines, MatchStart, MatchLength, FirstLine, StartPos, LastLine, EndPos);
 				return true;
@@ -354,6 +356,8 @@ bool SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,bool bS
 					if (g_LineOffsets.size() <= 1) FirstLineLength -= nLastLength-EndPos;
 				}
 			}
+
+			if (bNotBOL && (FirstLineLength == StartPos)) continue;
 
 			int nExecOptions = bNotBOL ? PCRE_NOTBOL : 0;
 			if (SearchInLine(Lines,LinesLength,(Line==FirstLine)?StartPos:0,-1,&MatchStart,&MatchLength,nExecOptions)) {
