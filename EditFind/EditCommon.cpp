@@ -175,8 +175,8 @@ void Relative2Absolute(int Line,TCHAR *Lines,int MatchStart,int MatchLength,int 
 	AdjustPosition(Lines, FirstLine, StartPos);
 
 	LastLine = FirstLine;
-	EndPos = StartPos+MatchLength;
-	AdjustPosition(Lines, LastLine, EndPos);
+	EndPos = StartPos + MatchLength;
+	AdjustPosition(Lines + MatchStart - StartPos, LastLine, EndPos);
 }
 
 void ClearLineBuffer()
@@ -361,10 +361,8 @@ bool SearchInText(int &FirstLine,int &StartPos,int &LastLine,int &EndPos,bool bS
 
 			int nExecOptions = bNotBOL ? PCRE_NOTBOL : 0;
 			if (SearchInLine(Lines,LinesLength,(Line==FirstLine)?StartPos:0,-1,&MatchStart,&MatchLength,nExecOptions)) {
-				if (MatchStart<=FirstLineLength) {
-					Relative2Absolute(Line,Lines,MatchStart,MatchLength,FirstLine,StartPos,LastLine,EndPos);
-					return true;
-				}
+				Relative2Absolute(Line,Lines,MatchStart,MatchLength,FirstLine,StartPos,LastLine,EndPos);
+				return true;
 			}
 			bNotBOL = false;
 		}
