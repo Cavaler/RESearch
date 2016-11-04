@@ -10,6 +10,14 @@ Planned:
 	+ Command to "lock" read-only file before replacing
 	+ Search / Replace in dialogs
 
+Version 8.67 (04.11.2016)
+	- Fixed case sensitivity of Select Files operation
+	- Fixed some mask handling errors
+	- Fixed various issues with replacing ".*"
+	- Fixed support for nonstandard newlines like \r\r\n
+	- Rename and Renumber operations now attempt to resolve internal file name conflicts
+	* NOTE: hotkeys in Rename Preview have changed!
+
 Version 8.66 (28.10.2016)
 	- Fixed crash in TmpPanel in x64
 	- Quote buttons don't reopen dialog

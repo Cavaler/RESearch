@@ -237,7 +237,7 @@ MSelect				"Select files"						"Выделить файлы"						"Archivos sele
 MUnselect			"Unselect files"					"Снять выделение"						"Archivos deseleccionados"
 MFlipSelection		"Flip selection"					"Обратить выделение"					"Invertir selección"
 MRepeating			"R&epeating replace"				"Многократная замена"					"R&epitiendo reemplazo"
-MLeaveSelection		"Preserve &selection"				"Сохранить в&ыделение"					"Preservar &selección"
+MLeaveSelection		"Preserve $selection"				"Сохранить в&ыделение"					"Preservar &selección"
 MPreviewRename		"Preview rename results"			"Пред&варительно показать результат"	"Pre&visualizar renombrado resultantes"
 MRenamePreview		"Rename results preview"			"Результаты переименования"				"Previsualizar resultados de renombrar"
 
