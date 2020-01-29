@@ -214,6 +214,20 @@ void FillDefaultNamedParameters(const TCHAR *szFileName)
 			REParam.SetParam(CSO::_T2("_sname"), strName);
 		}
 	}
+
+	WIN32_FILE_ATTRIBUTE_DATA Data;
+	if (GetFileAttributesEx(szFileName, GetFileExInfoStandard, &Data)) {
+		SYSTEMTIME stWrite;
+		FileTimeToSystemTime(&Data.ftLastWriteTime, &stWrite);
+
+		TCHAR szNumber[32];
+		REParam.SetParam(CSO::_T2("_wyear"),  CSO::ctoa(stWrite.wYear,   szNumber));
+		REParam.SetParam(CSO::_T2("_wmonth"), CSO::ctoa(stWrite.wMonth,  szNumber));
+		REParam.SetParam(CSO::_T2("_wday"),   CSO::ctoa(stWrite.wDay,    szNumber));
+		REParam.SetParam(CSO::_T2("_whour"),  CSO::ctoa(stWrite.wHour,   szNumber));
+		REParam.SetParam(CSO::_T2("_wmin"),   CSO::ctoa(stWrite.wMinute, szNumber));
+		REParam.SetParam(CSO::_T2("_wsec"),   CSO::ctoa(stWrite.wSecond, szNumber));
+	}
 }
 
 void ClearVariables()
