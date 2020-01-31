@@ -1,3 +1,4 @@
+#include <windows.h>
 #include <pcre\config.h>
 #include <pcre\pcre_internal.h>
 #include <Plugin.hpp>

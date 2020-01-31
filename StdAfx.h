@@ -36,13 +36,12 @@ public:
 #include <set>
 #include <deque>
 #include <algorithm>
+#include <memory>
 using namespace std;
 
 #include <Pavel.h>
 #include <CRegExp.h>
 #include <DebugTimer.h>
-
-#include <shared_ptr.h>
 
 #import "RESearch.tlb" raw_interfaces_only
 using namespace RESearchLib;

@@ -130,8 +130,8 @@ CSingleByteSeveralLineProcessor::CSingleByteSeveralLineProcessor(IBackend *pBack
 , m_nMaxSize(nMaxSize)
 {
 	CFileBackend *pFileBackend = dynamic_cast<CFileBackend *>(m_pBackend);
-	m_pOwnDecoder = new CSingleByteCRLFDecoder(pFileBackend->GetDecoder());
-	pFileBackend->ResetDecoder(m_pOwnDecoder);
+	m_pOwnDecoder.reset(new CSingleByteCRLFDecoder(pFileBackend->GetDecoder()));
+	pFileBackend->ResetDecoder(m_pOwnDecoder.get());
 
 	m_szBuffer = m_pBackend->Buffer();
 	m_szEOL    = m_szBuffer;

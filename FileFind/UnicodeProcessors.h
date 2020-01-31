@@ -1,6 +1,5 @@
 #pragma once
 #include "IFileOperations.h"
-#include "shared_ptr.h"
 
 class CUnicodeSplitLineProcessor : public ISplitLineProcessor
 {
@@ -46,7 +45,7 @@ protected:
 	size_t  m_nLines;
 	INT_PTR m_nMaxSize;
 
-	shared_ptr<IDecoder> m_pOwnDecoder;
+	unique_ptr<IDecoder> m_pOwnDecoder;
 
 	const wchar_t *m_szBuffer;
 	const wchar_t *m_szEOL;

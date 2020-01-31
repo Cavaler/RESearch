@@ -905,7 +905,7 @@ bool IsOKClose(int ExitCode)
 {
 	return (ExitCode == MOk) || (ExitCode == MBtnClose);
 }
-
+/*
 hack_string::hack_string(const char *szData, size_t nSize) {
 	_Bx._Ptr = (char *)szData;
 	_Myres = string::_BUF_SIZE*2;
@@ -927,7 +927,7 @@ hack_wstring::~hack_wstring() {
 	_Myres = wstring::_BUF_SIZE-1;
 	_Mysize = 0;
 }
-
+*/
 
 #ifdef UNICODE
 

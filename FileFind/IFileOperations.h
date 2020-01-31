@@ -1,5 +1,7 @@
 #pragma once
 
+#include <assert.h>
+
 #define assert_even(n) assert((n&1)==0);
 
 //	Everything operates on char * since even for Unicode mode we use UTF-8

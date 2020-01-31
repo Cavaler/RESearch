@@ -55,7 +55,7 @@ bool ViewerSearchAgain()
 	}
 	ViewerSearchInfo &Info = g_ViewerInfo[VInfo.ViewerID];
 
-	shared_ptr<CFileBackend> pBackend = new CFileBackend();
+	unique_ptr<CFileBackend> pBackend(new CFileBackend());
 	if (!pBackend->SetBlockSize(FBufferSize*1024*1024)) return false;
 	if (!pBackend->Open(strFileName.c_str(), -1)) return false;
 
@@ -63,27 +63,27 @@ bool ViewerSearchAgain()
 	eLikeUnicode nDetect = LikeUnicode(pBackend->Buffer(), pBackend->Size(), nSkip);
 	if (Info.CurPos > 0) nSkip = (int)Info.CurPos;
 
-	shared_ptr<IDecoder> pDecoder;
-	CClearDecoder _cd(pBackend);
+	unique_ptr<IDecoder> pDecoder;
+	CClearDecoder _cd(pBackend.get());
 
 	int nSizeDivisor = 1;
 #ifdef UNICODE
 	switch (VInfo.CurMode.CodePage)
 	{
 	case 1200:
-		pDecoder = new CPassthroughDecoder();
+		pDecoder.reset(new CPassthroughDecoder());
 		if (!pBackend->SetDecoder(pDecoder, nSkip)) return false;
 		break;
 	case 1201:
-		pDecoder = new CReverseUnicodeToUnicodeDecoder();
+		pDecoder.reset(new CReverseUnicodeToUnicodeDecoder());
 		if (!pBackend->SetDecoder(pDecoder, nSkip)) return false;
 		break;
 	case 65001:
-		pDecoder = new CUTF8ToUnicodeDecoder();
+		pDecoder.reset(new CUTF8ToUnicodeDecoder());
 		if (!pBackend->SetDecoder(pDecoder, nSkip)) return false;
 		break;
 	default:
-		pDecoder = new CSingleByteToUnicodeDecoder(VInfo.CurMode.CodePage);
+		pDecoder.reset(new CSingleByteToUnicodeDecoder(VInfo.CurMode.CodePage));
 		if (!pBackend->SetDecoder(pDecoder, nSkip)) return false;
 		break;
 	}
@@ -92,9 +92,9 @@ bool ViewerSearchAgain()
 	{
 		nSizeDivisor = 2;
 		if (nDetect == UNI_BE)
-			pDecoder = new CReverseUnicodeToOEMDecoder();
+			pDecoder.reset(new CReverseUnicodeToOEMDecoder());
 		else
-			pDecoder = new CUnicodeToOEMDecoder();
+			pDecoder.reset(new CUnicodeToOEMDecoder());
 		if (!pBackend->SetDecoder(pDecoder, nSkip)) return false;
 	}
 	else
@@ -104,17 +104,17 @@ bool ViewerSearchAgain()
 			const char *szDecodeTable = (const char *)XLatTables[VInfo.CurMode.TableNum].DecodeTable;
 			const char *szEncodeTable = (const char *)XLatTables[VInfo.CurMode.TableNum].EncodeTable;
 
-			pDecoder = new CTableToOEMDecoder(szDecodeTable, szEncodeTable);
+			pDecoder.reset(new CTableToOEMDecoder(szDecodeTable, szEncodeTable));
 			if (!pBackend->SetDecoder(pDecoder, nSkip)) return false;
 		}
 		else if (VInfo.CurMode.AnsiMode)
 		{
-			pDecoder = new CSingleByteToOEMDecoder(CP_ACP);
+			pDecoder.reset(new CSingleByteToOEMDecoder(CP_ACP));
 			if (!pBackend->SetDecoder(pDecoder, nSkip)) return false;
 		}
 		else
 		{
-			pDecoder = new CPassthroughDecoder();
+			pDecoder.reset(new CPassthroughDecoder());
 			if (!pBackend->SetDecoder(pDecoder, 0)) return false;
 		}
 	}
@@ -132,21 +132,21 @@ bool ViewerSearchAgain()
 	FSearchAs = ERegExp ? (ESeveralLine ? SA_SEVERALLINE : SA_REGEXP) : SA_PLAINTEXT;
 	if (!FPreparePattern(false)) return false;
 
-	shared_ptr<IFrontend> pFrontend = NULL;
+	unique_ptr<IFrontend> pFrontend = NULL;
 
 	if (ERegExp)
 	{
 		if (ESeveralLine)
-			pFrontend = new CSearchSeveralLineRegExpFrontend();
+			pFrontend.reset(new CSearchSeveralLineRegExpFrontend());
 		else
-			pFrontend = new CSearchRegExpFrontend();
+			pFrontend.reset(new CSearchRegExpFrontend());
 	}
 	else
 	{
-		pFrontend = new CSearchPlainTextFrontend();
+		pFrontend.reset(new CSearchPlainTextFrontend());
 	}
 
-	bool bResult = pFrontend->Process(pBackend);
+	bool bResult = pFrontend->Process(pBackend.get());
 
 	FText = _FText;
 	FCaseSensitive = _FCaseSensitive;

@@ -14,6 +14,7 @@ public:
 	bool Open(LPCTSTR szInFileName, LPCTSTR szOutFileName);
 
 	bool SetDecoder(IDecoder *pDecoder, INT_PTR nSkip = 0);
+	bool SetDecoder(unique_ptr<IDecoder> &pDecoder, INT_PTR nSkip = 0);
 	IDecoder *GetDecoder();
 	bool ResetDecoder(IDecoder *pDecoder);
 	void ClearDecoder();

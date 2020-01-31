@@ -84,8 +84,8 @@ CUnicodeSeveralLineProcessor::CUnicodeSeveralLineProcessor(IBackend *pBackend, i
 , m_nMaxSize(nMaxSize)
 {
 	CFileBackend *pFileBackend = dynamic_cast<CFileBackend *>(m_pBackend);
-	m_pOwnDecoder = new CUnicodeCRLFDecoder(pFileBackend->GetDecoder());
-	pFileBackend->ResetDecoder(m_pOwnDecoder);
+	m_pOwnDecoder.reset(new CUnicodeCRLFDecoder(pFileBackend->GetDecoder()));
+	pFileBackend->ResetDecoder(m_pOwnDecoder.get());
 
 	m_szBuffer = m_pBackend->BufferW();
 	m_szEOL    = m_szBuffer;

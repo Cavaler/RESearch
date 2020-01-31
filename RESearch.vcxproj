@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{075A24B6-6A7D-4292-B300-88E3946C877D}</ProjectGuid>
+    <RootNamespace>RESearch</RootNamespace>
+    <DisabledWarnings>4011</DisabledWarnings>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)OwnLibPath.props" />
+    <Import Project="$(OWN_LIB_PATH)\PropSheets\Base $(Configuration).props" />
+    <Import Project="$(OWN_LIB_PATH)\PropSheets\Base $(Platform).props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)OwnLibPath.props" />
+    <Import Project="$(OWN_LIB_PATH)\PropSheets\Base $(Configuration).props" />
+    <Import Project="$(OWN_LIB_PATH)\PropSheets\Base $(Platform).props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)OwnLibPath.props" />
+    <Import Project="$(OWN_LIB_PATH)\PropSheets\Base $(Configuration).props" />
+    <Import Project="$(OWN_LIB_PATH)\PropSheets\Base $(Platform).props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)OwnLibPath.props" />
+    <Import Project="$(OWN_LIB_PATH)\PropSheets\Base $(Configuration).props" />
+    <Import Project="$(OWN_LIB_PATH)\PropSheets\Base $(Platform).props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>16.0.29511.113</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <TargetName>$(ProjectName)U3</TargetName>
+    <OutDir>$(FAR3_DEBUG_DLLS)\$(ProjectName)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <TargetName>$(ProjectName)U3</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <TargetName>$(ProjectName)U3  x64</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <TargetName>$(ProjectName)U3 x64</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Midl>
+      <HeaderFileName />
+    </Midl>
+    <Link>
+      <Version />
+      <ModuleDefinitionFile>RESearch3.def</ModuleDefinitionFile>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Command />
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <HeaderFileName />
+    </Midl>
+    <Link>
+      <OutputFile>C:\Program Files\Far3\Plugins\_Debug\RESearch\$(ProjectName)U3 $(Platform).dll</OutputFile>
+      <Version />
+      <ModuleDefinitionFile>RESearch3.def</ModuleDefinitionFile>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Midl>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <StringPooling>true</StringPooling>
+    </ClCompile>
+    <Link>
+      <OutputFile>$(ProjectName)U3.dll</OutputFile>
+      <Version />
+      <ModuleDefinitionFile>RESearch3.def</ModuleDefinitionFile>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <StringPooling>true</StringPooling>
+    </ClCompile>
+    <Link>
+      <OutputFile>$(ProjectName)U3 $(Platform).dll</OutputFile>
+      <Version />
+      <ModuleDefinitionFile>RESearch3.def</ModuleDefinitionFile>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="CommandLine.cpp" />
+    <ClCompile Include="Common.cpp" />
+    <ClCompile Include="EditFind\EditCommon.cpp" />
+    <ClCompile Include="EditFind\EditCount.cpp" />
+    <ClCompile Include="EditFind\EditFilter.cpp" />
+    <ClCompile Include="EditFind\EditList.cpp" />
+    <ClCompile Include="EditFind\EditRepeat.cpp" />
+    <ClCompile Include="EditFind\EditReplace.cpp" />
+    <ClCompile Include="EditFind\EditSearch.cpp" />
+    <ClCompile Include="EditFind\EditTransliterate.cpp" />
+    <ClCompile Include="EditFind\maketables.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="FileFind\Backend.cpp" />
+    <ClCompile Include="FileFind\Decoders.cpp" />
+    <ClCompile Include="FileFind\FileCommon.cpp" />
+    <ClCompile Include="FileFind\FileGrep.cpp" />
+    <ClCompile Include="FileFind\FileOperations.cpp" />
+    <ClCompile Include="FileFind\FileReplace.cpp" />
+    <ClCompile Include="FileFind\FileSearch.cpp" />
+    <ClCompile Include="FileFind\Frontends.cpp" />
+    <ClCompile Include="FileFind\FrontendsOEM.cpp" />
+    <ClCompile Include="FileFind\FrontendsUnicode.cpp" />
+    <ClCompile Include="FileFind\OEMDecoders.cpp" />
+    <ClCompile Include="FileFind\SingleByteProcessors.cpp" />
+    <ClCompile Include="FileFind\TmpPanel.cpp" />
+    <ClCompile Include="FileFind\UnicodeDecoders.cpp" />
+    <ClCompile Include="FileFind\UnicodeProcessors.cpp" />
+    <ClCompile Include="FileFind\UTF8Decoders.cpp" />
+    <ClCompile Include="FileTools\FileTools.cpp" />
+    <ClCompile Include="Presets.cpp" />
+    <ClCompile Include="REBuilder.cpp" />
+    <ClCompile Include="RESearch.cpp" />
+    <ClCompile Include="RESearchMacro.cpp" />
+    <ClCompile Include="Scripting.cpp" />
+    <ClCompile Include="StdAfx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="StringTemplates.cpp" />
+    <ClCompile Include="ViewFind\ViewCommon.cpp" />
+    <ClCompile Include="ViewFind\ViewSearch.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="EditFind\EditFind.h" />
+    <ClInclude Include="EditFind\PersistVars.h" />
+    <ClInclude Include="FileFind\Backend.h" />
+    <ClInclude Include="FileFind\Decoders.h" />
+    <ClInclude Include="FileFind\FileFind.h" />
+    <ClInclude Include="FileFind\FileOperations.h" />
+    <ClInclude Include="FileFind\Frontends.h" />
+    <ClInclude Include="FileFind\IFileOperations.h" />
+    <ClInclude Include="FileFind\OEMDecoders.h" />
+    <ClInclude Include="FileFind\PersistVars.h" />
+    <ClInclude Include="FileFind\SingleByteProcessors.h" />
+    <ClInclude Include="FileFind\UnicodeDecoders.h" />
+    <ClInclude Include="FileFind\UnicodeProcessors.h" />
+    <ClInclude Include="FileFind\UTF8Decoders.h" />
+    <ClInclude Include="FileTools\FileTools.h" />
+    <ClInclude Include="FileTools\PersistVars.h" />
+    <ClInclude Include="PersistVars.h" />
+    <ClInclude Include="Presets.h" />
+    <ClInclude Include="RESearch.h" />
+    <ClInclude Include="RESearch_msg.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="StdAfx.h" />
+    <ClInclude Include="StringTemplates.h" />
+    <ClInclude Include="version.h" />
+    <ClInclude Include="ViewFind\ViewFind.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="RESearch.idl">
+      <MkTypLibCompatible Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</MkTypLibCompatible>
+      <TargetEnvironment Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Win32</TargetEnvironment>
+      <GenerateStublessProxies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenerateStublessProxies>
+      <TypeLibraryName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\RESearch.tlb</TypeLibraryName>
+      <HeaderFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\RESearchIDL.h</HeaderFileName>
+      <InterfaceIdentifierFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\uuids.c</InterfaceIdentifierFileName>
+      <MkTypLibCompatible Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MkTypLibCompatible>
+      <TargetEnvironment Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Win32</TargetEnvironment>
+      <GenerateStublessProxies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateStublessProxies>
+      <TypeLibraryName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\RESearch.tlb</TypeLibraryName>
+      <HeaderFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\RESearchIDL.h</HeaderFileName>
+      <InterfaceIdentifierFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\uuids.c</InterfaceIdentifierFileName>
+      <MkTypLibCompatible Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</MkTypLibCompatible>
+      <TargetEnvironment Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Win32</TargetEnvironment>
+      <GenerateStublessProxies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</GenerateStublessProxies>
+      <TypeLibraryName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\RESearch.tlb</TypeLibraryName>
+      <HeaderFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\RESearchIDL.h</HeaderFileName>
+      <InterfaceIdentifierFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\uuids.c</InterfaceIdentifierFileName>
+      <MkTypLibCompatible Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</MkTypLibCompatible>
+      <TargetEnvironment Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Win32</TargetEnvironment>
+      <GenerateStublessProxies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateStublessProxies>
+      <TypeLibraryName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\RESearch.tlb</TypeLibraryName>
+      <HeaderFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\RESearchIDL.h</HeaderFileName>
+      <InterfaceIdentifierFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\uuids.c</InterfaceIdentifierFileName>
+    </Midl>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="File_Id.Diz" />
+    <CustomBuild Include="RESearch.def">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </CustomBuild>
+    <None Include="RESearch.lua" />
+    <CustomBuild Include="RESearch.msg">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compiling language file %(FullPath)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(COMSPEC) /c $(OWN_LIB_PATH)\FarLib\MakeAndCopyLng.bat RESearch RESearch_msg.h RESearchSpa.lng
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)Eng.lng;$(ProjectName)Rus.lng;%(Outputs)</Outputs>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compiling language file %(FullPath)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(COMSPEC) /c $(OWN_LIB_PATH)\FarLib\MakeAndCopyLng.bat RESearch RESearch_msg.h RESearchSpa.lng
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectName)Eng.lng;$(ProjectName)Rus.lng;%(Outputs)</Outputs>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compiling language file %(FullPath)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(COMSPEC) /c $(OWN_LIB_PATH)\FarLib\MakeAndCopyLng.bat RESearch RESearch_msg.h RESearchSpa.lng
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectName)Eng.lng;$(ProjectName)Rus.lng;%(Outputs)</Outputs>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compiling language file %(FullPath)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(COMSPEC) /c $(OWN_LIB_PATH)\FarLib\MakeAndCopyLng.bat RESearch RESearch_msg.h RESearchSpa.lng
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectName)Eng.lng;$(ProjectName)Rus.lng;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="RESearch3.def">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </CustomBuild>
+    <CustomBuild Include="RESearchEng.hlf">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Copying %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">xcopy /r /y %(Filename)%(Extension) "$(TargetDir)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(TargetDir)\%(Filename)%(Extension);%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="RESearchRus.hlf">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Copying %(Filename)%(Extension)...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">xcopy /r /y %(Filename)%(Extension) "$(TargetDir)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(TargetDir)\%(Filename)%(Extension);%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="RESearchW.def">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="RESearch.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Hints.rus.txt" />
+    <Text Include="Hints.txt" />
+    <Text Include="History.txt" />
+    <Text Include="Install.txt" />
+    <Text Include="PluginCall.txt" />
+    <Text Include="ScriptEvaluation.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="OwnLibrary\FarLib\FarLib.vcxproj">
+      <Project>{74fa64c9-638f-4bce-ad72-60d660ce0c2a}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="OwnLibrary\LibSrc\Pavel.vcxproj">
+      <Project>{22a97e73-bca6-4f61-b5cd-0fb88e54711a}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="OwnLibrary\LibSrc\pcre\pcre.vcxproj">
+      <Project>{27a32067-1043-454e-9770-209b4c2e4a43}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

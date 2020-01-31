@@ -97,8 +97,9 @@ public:
 	INT_PTR	CharToByte(INT_PTR nOffset);
 
 protected:
-	std::vector<INT_PTR> utf2char;
-	std::vector<INT_PTR> char2utf;
+	typedef std::vector<INT_PTR> ptr_vector;
+	ptr_vector utf2char;
+	ptr_vector char2utf;
 
 	INT_PTR nByte;
 	INT_PTR nChar;

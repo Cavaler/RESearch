@@ -4,6 +4,7 @@ Debug *
 Release *
 Lib
 *.user
+*.filters
 *.ncb
 *.suo
 *.tlb
@@ -14,3 +15,5 @@ Lib
 *.lng
 /RESearchIDL.h
 /uuids.c
+.vs
+*.7z

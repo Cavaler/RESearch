@@ -1,6 +1,5 @@
 #pragma once
 #include "IFileOperations.h"
-#include "shared_ptr.h"
 
 class CSingleBytePassThroughProcessor : public ISplitLineProcessor
 {
@@ -62,7 +61,7 @@ protected:
 	size_t  m_nLines;
 	INT_PTR m_nMaxSize;
 
-	shared_ptr<IDecoder> m_pOwnDecoder;
+	unique_ptr<IDecoder> m_pOwnDecoder;
 
 	const char *m_szBuffer;
 	const char *m_szEOL;

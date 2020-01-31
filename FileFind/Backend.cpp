@@ -143,6 +143,10 @@ bool CFileBackend::SetDecoder(IDecoder *pDecoder, INT_PTR nSkip)
 	return ReadUp(0);
 }
 
+bool CFileBackend::SetDecoder(unique_ptr<IDecoder>& pDecoder, INT_PTR nSkip) {
+	return SetDecoder(pDecoder.get(), nSkip);
+}
+
 IDecoder *CFileBackend::GetDecoder()
 {
 	return m_pDecoder;
