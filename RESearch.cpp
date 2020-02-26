@@ -7,6 +7,7 @@ DEFINE_GUID(GUID_RESearchRun,		0x9340f8e5, 0xf4a1, 0x4be2, 0xa1, 0x46, 0x0a, 0x4
 #include "version.h"
 
 CComModule _Module;
+bool _CoInited = false;
 
 BOOL __stdcall DllMain(HINSTANCE hInst, ULONG reason, LPVOID)
 {
@@ -81,7 +82,8 @@ void WINAPI FAR_EXPORT(SetStartupInfo)(const PluginStartupInfo *Info)
 	CFarDialog::AutoHotkeys = true;
 	CFarDialog::SetDefaultCancelID(MCancel);
 
-	CoInitialize(NULL);
+	_CoInited = SUCCEEDED(CoInitialize(NULL));
+
 	EnumActiveScripts();
 }
 
@@ -972,5 +974,7 @@ void WINAPI FAR_EXPORT(ExitFAR)() {
 	FCleanup(false);
 	FTCleanup(false);
 	StopREThread();
-	CoUninitialize();
+
+	if (_CoInited)
+		CoUninitialize();
 }
