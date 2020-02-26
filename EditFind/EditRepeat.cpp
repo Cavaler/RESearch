@@ -6,8 +6,16 @@ extern bool bCachedReplace;
 
 bool EditorRepeatAgain()
 {
-	int FirstLine = EdInfo.CurLine;
-	int StartPos  = EdInfo.CurPos;
+	int FirstLine, StartPos;
+
+	SaveSelection();
+	if (SelType == BTYPE_STREAM) {
+		FirstLine = SelStartLine;
+		StartPos  = SelStartPos;
+	} else {
+		FirstLine = EdInfo.CurLine;
+		StartPos  = EdInfo.CurPos;
+	}
 
 	EInSelection   = false;
 	bCachedReplace = false;
@@ -25,14 +33,16 @@ bool EditorRepeatAgain()
 #endif
 		if (g_bInterrupted) return false;	// Script failed
 
-		int LastLine = FirstLine;
-		int EndPos   = StartPos;
+		int LastLine = (SelType == BTYPE_STREAM) ? SelEndLine : FirstLine;
+		int EndPos   = (SelType == BTYPE_STREAM) ? SelEndPos : StartPos;
 		DoEditReplace(FirstLine, StartPos, LastLine, EndPos, Replace);
 		FirstLine = LastLine;
 		StartPos  = EndPos;
+		SelType = BTYPE_NONE;
 	}
 
 	EditorEndUndo();
+	RestoreSelection();
 
 	EditorSetPosition Position = {ITEM_SS(EditorSetPosition) FirstLine, StartPos, -1, TopLine(FirstLine), LeftColumn(StartPos), -1};
 	EctlForceSetPosition(&Position);

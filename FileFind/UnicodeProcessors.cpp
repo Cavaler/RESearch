@@ -18,7 +18,7 @@ bool CUnicodeSplitLineProcessor::GetNextLine()
 	int nSize = m_pBackend->SizeW() - (m_szEOL - m_pBackend->BufferW());
 	if (nSize < 2) {
 		if (!m_pBackend->Last()) {
-			if (!m_pBackend->Move(m_szEOL - m_pBackend->BufferW())) return false;
+			if (!m_pBackend->Move((m_szEOL - m_pBackend->BufferW())*2)) return false;
 			m_szEOL = m_pBackend->BufferW();
 			nSize = m_pBackend->SizeW();
 		} else {
@@ -33,7 +33,7 @@ bool CUnicodeSplitLineProcessor::GetNextLine()
 	SkipNoCRLF(m_szEOL, &nSize);
 	if (nSize == 0) {
 		if (!m_pBackend->Last()) {
-			if (!m_pBackend->Move(m_szBuffer - m_pBackend->BufferW())) return false;
+			if (!m_pBackend->Move((m_szBuffer - m_pBackend->BufferW())*2)) return false;
 			m_szBuffer = m_pBackend->BufferW();
 			nSize = m_pBackend->SizeW();
 
