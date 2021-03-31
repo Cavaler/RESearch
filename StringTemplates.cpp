@@ -65,6 +65,7 @@ CStringOperations<CHAR>::CreateReplaceString(const CHAR *Replace, const CHAR *EO
 		case 'U':CaseConvert=OneCaseConvert=CCV_UPPER;break;
 		case 'C':CaseConvert=OneCaseConvert=CCV_FLIP;break;
 		case 'E':CaseConvert=OneCaseConvert=CCV_NONE;break;
+		case 's':case 'S':DetectCaseConvert(Replace, Param, *Replace == 'S');continue;
 
 		default:
 			AddChar(String, *Replace);
@@ -177,6 +178,39 @@ CStringOperations<CHAR>::ExpandParameter(const CHAR *&Replace, CREParameters<CHA
 
 	Replace++;
 	return cstring();
+}
+
+template<class CHAR>
+void CStringOperations<CHAR>::DetectCaseConvert(const CHAR*& Replace, CREParameters<CHAR> &Param, bool flip) {
+	cstring strParam = ExpandParameter(Replace, Param);
+	if (strParam.empty()) return;
+
+	cstring strUpper = strParam;
+	cstring strLower = strParam;
+	for (size_t i = 0; i < strParam.size(); i++) {
+		strUpper[i] = ConvertCase(strUpper[i], CCV_UPPER);
+		strLower[i] = ConvertCase(strLower[i], CCV_LOWER);
+	}
+
+	if (strParam.size() > 1) {
+		if (strParam.substr(1) == strUpper.substr(1) && strParam.substr(1) != strLower.substr(1))
+			CaseConvert = flip ? CCV_LOWER : CCV_UPPER;
+		else if (strParam.substr(1) == strLower.substr(1) && strParam.substr(1) != strUpper.substr(1))
+			CaseConvert = flip ? CCV_UPPER : CCV_LOWER;
+		else
+			CaseConvert = CCV_NONE;
+	} else
+		CaseConvert = CCV_NONE;
+
+	if (strParam[0] == strUpper[0] && strParam[0] != strLower[0])
+		OneCaseConvert = flip ? CCV_LOWER : CCV_UPPER;
+	else if (strParam[0] == strLower[0] && strParam[0] != strUpper[0])
+		OneCaseConvert = flip ? CCV_UPPER : CCV_LOWER;
+	else
+		OneCaseConvert = CaseConvert;
+
+	if (strParam.size() == 1)
+		CaseConvert = OneCaseConvert;
 }
 
 template<class CHAR>

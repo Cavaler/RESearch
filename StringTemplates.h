@@ -16,6 +16,7 @@ public:
 
 	static cstring ExpandParameter(const CHAR *&Replace, CREParameters<CHAR> &Param);
 	static CHAR    ExpandHexDigits(const CHAR *&Replace);
+	static void    DetectCaseConvert(const CHAR *&Replace, CREParameters<CHAR> &Param, bool flip);
 	static cstring CreateReplaceString(const CHAR *Replace, const CHAR *EOL, LPCTSTR szEngine, CREParameters<CHAR> &Param);
 
 	static void QuoteRegExpString (cstring &strText) {
@@ -25,7 +26,6 @@ public:
 	static void QuoteReplaceString(cstring &strText) {
 		QuoteAny(strText, _T2("\\$"));
 	}
-
 };
 
 typedef CStringOperations<TCHAR>    CSO;

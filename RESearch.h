@@ -98,9 +98,7 @@ int  ConfigureSeveralLines();
 
 EXTERN ECaseConvert CaseConvert;
 EXTERN ECaseConvert OneCaseConvert;
-#ifdef UNICODE
-TCHAR ConvertCase_OEM(TCHAR C);
-#endif
+TCHAR ConvertCase(TCHAR C, ECaseConvert Convert);
 TCHAR ConvertCase(TCHAR C);
 #include "StringTemplates.h"
 

@@ -2,7 +2,7 @@
 .PluginContents=Regular Expression Search
 
 @Contents
-$ #Regular Expression Search and Replace, version 8.70#
+$ #Regular Expression Search and Replace, version 8.75#
     This plugin allows you to:
 
     - Perform text search and replace in editor
@@ -124,6 +124,8 @@ $ #Replacement text#
     \u      - uppercase next character.
     \L      - lowercase all charachers until \E.
     \U      - uppercase all charachers until \E.
+    \snn    - convert case to same as captured subpattern number nn.
+    \Snn    - convert case to inverse of captured subpattern number nn.
     \E      - end case modification.
     \xnn    - symbol with hexadecimal code nn (can be 1 or 2 characters).
     \nnn    - symbol with octal code nnn (can be 1 to 3 characters).

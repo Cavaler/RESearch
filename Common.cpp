@@ -2,6 +2,8 @@
 #define DEFINE_VARS
 #include "RESearch.h"
 
+#include <locale.h>
+
 CFarSettingsKey GetSettings()
 {
 	if (Settings.Valid()) return Settings;
@@ -255,7 +257,7 @@ void HighlightREError(CFarDialog *pDlg)
 }
 
 #ifndef UNICODE
-TCHAR ConvertCase_OEM(TCHAR C)
+TCHAR ConvertCase_OEM(TCHAR C, ECaseConvert Convert)
 {
 	TCHAR Ansi,Oem;
 
@@ -263,7 +265,7 @@ TCHAR ConvertCase_OEM(TCHAR C)
 	CharToOemBuff(&Ansi,&Oem,1);
 	if (Oem!=C) return C;
 
-	switch (OneCaseConvert) {
+	switch (Convert) {
 	case CCV_UPPER:
 		Ansi=(TCHAR)CharUpper((TCHAR *)(UTCHAR)Ansi);break;
 	case CCV_LOWER:
@@ -279,55 +281,57 @@ TCHAR ConvertCase_OEM(TCHAR C)
 	return C;
 }
 
-TCHAR ConvertCase(TCHAR C)
+TCHAR ConvertCase(TCHAR C, ECaseConvert Convert)
 {
-	if (OneCaseConvert == CCV_NONE) return C;
+	if (Convert == CCV_NONE) return C;
 
 	if (m_pReplaceTable) {
 		char cUp = m_pReplaceTable->UpperTable[(UTCHAR)C];
 		char cDn = m_pReplaceTable->LowerTable[(UTCHAR)C];
-		switch (OneCaseConvert) {
+		switch (Convert) {
 		case CCV_UPPER:
-			C = cUp;
-			break;
+			return cUp;
 		case CCV_LOWER:
-			C = cDn;
-			break;
+			return cDn;
 		case CCV_FLIP:
-			C = (C == cUp) ? cDn : cUp;
-			break;
+			return (C == cUp) ? cDn : cUp;
+		default:
+			return C;
 		}
 	} else {
-		C = ConvertCase_OEM(C);
+		return ConvertCase_OEM(C, Convert);
 	}
-
-	OneCaseConvert=CaseConvert;
-	return C;
 }
+
 #else
-TCHAR ConvertCase(TCHAR C)
+
+TCHAR ConvertCase(TCHAR C, ECaseConvert Convert)
 {
-	if (OneCaseConvert == CCV_NONE) return C;
+	if (Convert == CCV_NONE) return C;
 
 	TCHAR cUp = (TCHAR)CharUpper((LPTSTR)C);
 	TCHAR cDn = (TCHAR)CharLower((LPTSTR)C);
 
-	switch (OneCaseConvert) {
+	switch (Convert) {
 	case CCV_UPPER:
-		C = cUp;
-		break;
+		return cUp;
 	case CCV_LOWER:
-		C = cDn;
+		return cDn;
 		break;
 	case CCV_FLIP:
-		C = (C == cUp) ? cDn : cUp;
-		break;
+		return (C == cUp) ? cDn : cUp;
+	default:
+		return C;
 	}
-
-	OneCaseConvert=CaseConvert;
-	return C;
 }
 #endif
+
+TCHAR ConvertCase(TCHAR C)
+{
+	C = ConvertCase(C, OneCaseConvert);
+	OneCaseConvert = CaseConvert;
+	return C;
+}
 
 //////////////////////////////////////////////////////////////////////////
 
